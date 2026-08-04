@@ -43,12 +43,27 @@ bench. From `frappe_docker/`:
 ./hcc.sh exec backend bench --site frontend console
 ```
 
-After any `--force-recreate` or image rebuild, restore the editable install:
+After any `--force-recreate` or image rebuild, restore the editable install and
+restart the Python services. The editable install works through a `.pth` file, which
+Python only reads at interpreter startup, so a running gunicorn will not see a
+freshly installed app until it restarts — the symptom is `ModuleNotFoundError` in
+the web workers while the same import succeeds from the CLI.
 
 ```bash
 ./hcc.sh exec backend \
   /home/frappe/frappe-bench/env/bin/pip install -e /home/frappe/frappe-bench/apps/iso_compliance
+./hcc.sh restart backend queue-short queue-long scheduler websocket
 ```
+
+Recreating the `backend` container also changes its IP, which the `frontend` nginx
+has already resolved. If the site starts returning 502, restart it:
+
+```bash
+./hcc.sh restart frontend
+```
+
+The site is served by host header, so reach it at `http://frontend:8080`
+(not `http://localhost:8080`, which resolves to a site that does not exist).
 
 ## Installation
 
