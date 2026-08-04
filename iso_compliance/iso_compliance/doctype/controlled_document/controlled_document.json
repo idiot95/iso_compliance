@@ -12,6 +12,7 @@
   "column_break_head",
   "workflow_state",
   "clause_reference",
+  "legacy_document_number",
   "control_block_section",
   "issue_number",
   "issue_date",
@@ -102,6 +103,13 @@
    "fieldtype": "Data",
    "label": "ISO Clause Reference",
    "description": "Clause of ISO 9001 this document addresses, e.g. 7.5.3."
+  },
+  {
+   "fieldname": "legacy_document_number",
+   "fieldtype": "Data",
+   "label": "Legacy Document Number",
+   "search_index": 1,
+   "description": "The number this document was previously issued under, e.g. HCCPL-SLS-001. Kept so that copies already in circulation remain traceable to the current document."
   },
   {
    "fieldname": "control_block_section",
@@ -392,7 +400,7 @@
    "write": 1
   }
  ],
- "search_fields": "title,document_type,revision_number",
+ "search_fields": "title,document_type,revision_number,legacy_document_number",
  "show_title_field_in_link": 1,
  "sort_field": "name",
  "sort_order": "ASC",
