@@ -22,7 +22,49 @@ DocType outside this app.
 
 ## Proposed — awaiting approval
 
-_(none yet)_
+Two registers in REG-001 have no data source in ERPNext because the fields they
+depend on do not exist. Neither proposal changes existing behaviour: both are
+additive Custom Fields shipped as fixtures, and removing them leaves ERPNext exactly
+as it is today.
+
+### 1. Asset — calibration control (REG-011, SOP-017, FRM-025, ISO 9001 clause 7.1.5)
+
+All 33 Assets on the site are in the `Measuring Instruments` category, but `Asset`
+carries **zero** custom fields and the table has no calibration column — only
+`next_depreciation_date` and `maintenance_required`. There is nowhere to record when
+an instrument was last calibrated or when it is next due, so calibration status
+cannot be reported, and clause 7.1.5 cannot be evidenced from the ERP at all.
+
+| Fieldname | Type | Label | Purpose |
+| --- | --- | --- | --- |
+| `custom_calibration_required` | Check | Calibration Required | Distinguishes instruments under calibration control from other assets |
+| `custom_calibration_frequency_months` | Int | Calibration Frequency (Months) | Drives the due-date calculation |
+| `custom_last_calibration_date` | Date | Last Calibration Date | Evidence of the last calibration performed |
+| `custom_next_calibration_date` | Date | Next Calibration Due | Stored rather than computed so it is filterable and reportable |
+| `custom_calibration_agency` | Link (Supplier) | Calibration Agency | External calibration provider, traceable to the supplier record |
+| `custom_calibration_certificate` | Attach | Calibration Certificate | The certificate itself, which is the auditable record |
+
+Note: 31 of the 33 Assets are in Draft and 2 are Cancelled — none are submitted. The
+instrument register is not live regardless of these fields, which is a process matter
+rather than a schema one.
+
+### 2. Supplier — approval status (REG-007, SOP-005, ISO 9001 clause 8.4)
+
+REG-007 is the Approved Suppliers Register, but there is currently no way to express
+approval: of 945 Suppliers, 943 have no supplier group, none are on hold, none are
+disabled, and only 3 have a scorecard. A register built on `Supplier` today would
+list all 945, which is not a controlled list of approved suppliers.
+
+Supplier Group was considered instead and rejected: it already carries a different
+meaning, and overloading it would make approval status invisible to anyone reading
+the group.
+
+| Fieldname | Type | Label | Purpose |
+| --- | --- | --- | --- |
+| `custom_approval_status` | Select | Approval Status | `Approved` / `Provisional` / `Not Approved` / `Suspended` |
+| `custom_approved_on` | Date | Approved On | When approval was granted |
+| `custom_approved_by` | Link (User) | Approved By | Who granted it |
+| `custom_reapproval_due` | Date | Re-approval Due | Drives periodic re-evaluation required by 8.4 |
 
 ## Approved and applied
 
