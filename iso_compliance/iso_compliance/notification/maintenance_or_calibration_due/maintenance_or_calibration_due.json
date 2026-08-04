@@ -1,0 +1,29 @@
+{
+ "channel": "Email",
+ "condition": "",
+ "creation": "2026-08-06 11:00:00.000000",
+ "date_changed": "next_due_date",
+ "days_in_advance": 14,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Asset Maintenance Task",
+ "enabled": 1,
+ "event": "Days Before",
+ "idx": 0,
+ "is_standard": 1,
+ "message": "<h3>Maintenance / calibration due</h3>\n<p><b>{{ doc.maintenance_task }}</b> on asset <b>{{ doc.parent }}</b> is due on <b>{{ frappe.utils.format_date(doc.next_due_date) }}</b>.</p>\n<p>Type: {{ doc.maintenance_type }} &middot; Periodicity: {{ doc.periodicity }}</p>\n<p>Record an Asset Maintenance Log against it once completed. An instrument past its calibration date cannot be used as evidence of conformity.</p>\n",
+ "message_type": "HTML",
+ "modified": "2026-08-06 11:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "ISO Compliance",
+ "name": "Maintenance or Calibration Due",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "receiver_by_document_field": "assign_to"
+  }
+ ],
+ "send_system_notification": 1,
+ "sender_email": null,
+ "subject": "Due in 14 days: {{ doc.maintenance_type }} on {{ doc.parent }}"
+}

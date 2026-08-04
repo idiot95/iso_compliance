@@ -1,5 +1,5 @@
 {
- "creation": "2026-08-05 00:00:00.000000",
+ "creation": "2026-08-05 20:00:00.000000",
  "docstatus": 0,
  "doctype": "Number Card",
  "filters_json": "[]",
@@ -8,7 +8,7 @@
  "is_standard": 1,
  "label": "Instruments Not In Service",
  "method": "iso_compliance.api.dashboard.instruments_not_in_service",
- "modified": "2026-08-05 00:00:00.000000",
+ "modified": "2026-08-05 20:00:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Instruments Not In Service",

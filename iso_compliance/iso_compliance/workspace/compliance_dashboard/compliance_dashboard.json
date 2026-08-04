@@ -1,0 +1,119 @@
+{
+ "app": "iso_compliance",
+ "charts": [
+  {
+   "chart_name": "Documents by Status",
+   "label": "Documents by Status"
+  },
+  {
+   "chart_name": "Documents by Type",
+   "label": "Documents by Type"
+  },
+  {
+   "chart_name": "Inspection Volume",
+   "label": "Inspection Volume"
+  },
+  {
+   "chart_name": "Inspection Results",
+   "label": "Inspection Results"
+  }
+ ],
+ "content": "[{\"id\": \"hd0017\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Red flags</b></span>\", \"col\": 12}}, {\"id\": \"pg0018\", \"type\": \"paragraph\", \"data\": {\"text\": \"Each number counts things somebody has to go and do. A card at zero is a closed gap, not a good score.\", \"col\": 12}}, {\"id\": \"nc0019\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"No Approval Evidence\", \"col\": 3}}, {\"id\": \"nc0020\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Documents Never Written\", \"col\": 3}}, {\"id\": \"nc0021\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Review Overdue\", \"col\": 3}}, {\"id\": \"nc0022\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Review Due in 90 Days\", \"col\": 3}}, {\"id\": \"nc0023\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Calibration Overdue\", \"col\": 3}}, {\"id\": \"nc0024\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Assets Without Maintenance Plan\", \"col\": 3}}, {\"id\": \"nc0025\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Instruments Not In Service\", \"col\": 3}}, {\"id\": \"nc0026\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Corrective Actions Missing\", \"col\": 3}}, {\"id\": \"nc0027\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Rejected Inspections Erased\", \"col\": 3}}, {\"id\": \"nc0028\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Suppliers Not Approved\", \"col\": 3}}, {\"id\": \"nc0029\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Training Not Evaluated\", \"col\": 3}}, {\"id\": \"nc0030\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Controlled Documents\", \"col\": 3}}, {\"id\": \"hd0031\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>The document set</b></span>\", \"col\": 12}}, {\"id\": \"ch0032\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Documents by Status\", \"col\": 6}}, {\"id\": \"ch0033\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Documents by Type\", \"col\": 6}}, {\"id\": \"hd0034\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Quality operations</b></span>\", \"col\": 12}}, {\"id\": \"pg0035\", \"type\": \"paragraph\", \"data\": {\"text\": \"Compliance data is operational data: inspection volume and results are the signal the rest of the system rides on.\", \"col\": 12}}, {\"id\": \"ch0036\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Inspection Volume\", \"col\": 6}}, {\"id\": \"ch0037\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Inspection Results\", \"col\": 6}}, {\"id\": \"hd0038\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Worklists</b></span>\", \"col\": 12}}, {\"id\": \"sc0039\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Compliance Gaps\", \"col\": 3}}, {\"id\": \"sc0040\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Maintenance and Calibration Due\", \"col\": 3}}, {\"id\": \"sc0041\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Master Document Register\", \"col\": 3}}]",
+ "creation": "2026-08-05 20:00:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "dashboard",
+ "idx": 0,
+ "indicator_color": "red",
+ "is_hidden": 0,
+ "label": "Compliance Dashboard",
+ "links": [],
+ "modified": "2026-08-05 20:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "ISO Compliance",
+ "name": "Compliance Dashboard",
+ "number_cards": [
+  {
+   "label": "No Approval Evidence",
+   "number_card_name": "No Approval Evidence"
+  },
+  {
+   "label": "Documents Never Written",
+   "number_card_name": "Documents Never Written"
+  },
+  {
+   "label": "Review Overdue",
+   "number_card_name": "Review Overdue"
+  },
+  {
+   "label": "Review Due in 90 Days",
+   "number_card_name": "Review Due in 90 Days"
+  },
+  {
+   "label": "Calibration Overdue",
+   "number_card_name": "Calibration Overdue"
+  },
+  {
+   "label": "Assets Without Maintenance Plan",
+   "number_card_name": "Assets Without Maintenance Plan"
+  },
+  {
+   "label": "Instruments Not In Service",
+   "number_card_name": "Instruments Not In Service"
+  },
+  {
+   "label": "Corrective Actions Missing",
+   "number_card_name": "Corrective Actions Missing"
+  },
+  {
+   "label": "Rejected Inspections Erased",
+   "number_card_name": "Rejected Inspections Erased"
+  },
+  {
+   "label": "Suppliers Not Approved",
+   "number_card_name": "Suppliers Not Approved"
+  },
+  {
+   "label": "Training Not Evaluated",
+   "number_card_name": "Training Not Evaluated"
+  },
+  {
+   "label": "Controlled Documents",
+   "number_card_name": "Controlled Documents"
+  }
+ ],
+ "owner": "Administrator",
+ "parent_page": "ISO Compliance",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 41.0,
+ "shortcuts": [
+  {
+   "color": "Red",
+   "doc_view": "",
+   "label": "Compliance Gaps",
+   "link_to": "Compliance Gaps",
+   "type": "Report"
+  },
+  {
+   "color": "Orange",
+   "doc_view": "",
+   "label": "Maintenance and Calibration Due",
+   "link_to": "Maintenance and Calibration Due",
+   "type": "Report"
+  },
+  {
+   "color": "Blue",
+   "doc_view": "",
+   "label": "Master Document Register",
+   "link_to": "Master Document Register",
+   "type": "Report"
+  }
+ ],
+ "title": "Compliance Dashboard",
+ "type": "Workspace"
+}

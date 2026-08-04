@@ -130,37 +130,50 @@ def instruments_not_in_service(filters=None):
 
 
 @frappe.whitelist()
-def instruments_without_calibration_due(filters=None):
-	"""Instruments with no next calibration date.
+def calibration_overdue(filters=None):
+	"""Maintenance or calibration tasks past their due date.
 
-	Until the calibration fields proposed in EXTERNAL_CHANGES.md are approved,
-	the field does not exist and every instrument counts, which is the honest
-	answer: calibration status cannot be evidenced from the ERP at all.
+	ERPNext already models this: an Asset Maintenance holds tasks with a type of
+	Preventive Maintenance or Calibration, a periodicity, and a next due date.
+	Nothing needed adding to Asset to make calibration reportable -- the schema
+	was there and unused.
 	"""
-	total = frappe.db.count("Asset", {"asset_category": INSTRUMENT_CATEGORY})
-	if not frappe.db.has_column("Asset", "custom_next_calibration_date"):
-		return _card(total)
 	return _card(
 		frappe.db.count(
-			"Asset",
-			{"asset_category": INSTRUMENT_CATEGORY, "custom_next_calibration_date": ("is", "not set")},
+			"Asset Maintenance Task",
+			{"next_due_date": ("<", nowdate()), "maintenance_status": ("!=", "Cancelled")},
 		)
 	)
 
 
 @frappe.whitelist()
-def instruments_calibration_overdue(filters=None):
-	if not frappe.db.has_column("Asset", "custom_next_calibration_date"):
-		return _card(0)
+def calibration_due_soon(filters=None, days: int = 30):
 	return _card(
 		frappe.db.count(
-			"Asset",
+			"Asset Maintenance Task",
 			{
-				"asset_category": INSTRUMENT_CATEGORY,
-				"custom_next_calibration_date": ("<", nowdate()),
+				"next_due_date": ("between", [nowdate(), add_days(nowdate(), days)]),
+				"maintenance_status": ("!=", "Cancelled"),
 			},
 		)
 	)
+
+
+@frappe.whitelist()
+def assets_without_maintenance_plan(filters=None):
+	"""Assets with no maintenance schedule at all.
+
+	Covers jigs, dies and measuring instruments alike: anything the business runs
+	on that needs periodic attention. An asset with no plan is one nobody will be
+	reminded about.
+	"""
+	total = frappe.db.count("Asset", {"docstatus": ("<", 2)})
+	planned = frappe.db.sql(
+		"""select count(distinct am.asset_name)
+		   from `tabAsset Maintenance` am
+		   where ifnull(am.asset_name, '') != ''"""
+	)[0][0]
+	return _card(max(total - (planned or 0), 0))
 
 
 # ---------------------------------------------------------------------------
@@ -247,10 +260,18 @@ def get_gap_rows() -> list[dict]:
 		{
 			"area": _("Calibration"),
 			"clause": "7.1.5",
-			"finding": _("Measuring instruments with no calibration due date recorded"),
-			"count": instruments_without_calibration_due()["value"],
-			"action": _("Approve the Asset calibration fields, then record last and next calibration."),
-			"doctype": "Asset",
+			"finding": _("Maintenance or calibration tasks past their due date"),
+			"count": calibration_overdue()["value"],
+			"action": _("Carry out the task and record an Asset Maintenance Log against it."),
+			"doctype": "Asset Maintenance Task",
+		},
+		{
+			"area": _("Calibration"),
+			"clause": "7.1.5",
+			"finding": _("Assets with no maintenance or calibration plan"),
+			"count": assets_without_maintenance_plan()["value"],
+			"action": _("Create an Asset Maintenance record with a yearly task for each jig, die and instrument."),
+			"doctype": "Asset Maintenance",
 		},
 		{
 			"area": _("Calibration"),

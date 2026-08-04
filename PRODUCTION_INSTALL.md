@@ -13,11 +13,12 @@ Installed by `bench install-app`, carried by `bench migrate` on every upgrade:
 | --- | --- |
 | DocTypes | 16, all in the `ISO Compliance` module |
 | Print Format | `Controlled Document`, one format serving every body type |
-| Workspace | `ISO Compliance`, appears in the left sidebar |
+| Workspaces | `ISO Compliance` (home) and `Compliance Dashboard` (child) |
 | Desk apps screen | entry with its own logo, routes to the dashboard |
-| Number Cards | 11 |
+| Number Cards | 14 |
 | Dashboard Charts | 5 |
-| Query Reports | Master Document Register, Compliance Gaps |
+| Query Reports | Master Document Register, Compliance Gaps, Maintenance and Calibration Due |
+| Notification | Maintenance or Calibration Due, 14 days ahead |
 | Workflow States | Draft, Under Review, Approved, Active, Superseded, Obsolete |
 
 The workflow states are the one piece of configuration that lives outside this
@@ -62,10 +63,10 @@ Nothing below needs replicating on production, because none of it was altered in
 a way the app depends on.
 
 - **No Custom Fields on any ERPNext DocType.** Verified directly: zero exist.
-  The two sets proposed in [EXTERNAL_CHANGES.md](EXTERNAL_CHANGES.md) (Asset
-  calibration, Supplier approval) are still proposals awaiting approval. Until
-  they are approved, the calibration cards report the honest answer rather than
-  a wrong one.
+  The Asset calibration proposal has been **withdrawn** as unnecessary --
+  ERPNext's own Asset Maintenance model already covers calibration and annual
+  maintenance, so nothing needs adding to Asset. Only the Supplier approval set
+  in [EXTERNAL_CHANGES.md](EXTERNAL_CHANGES.md) remains proposed and unbuilt.
 - **No Property Setters, Client Scripts or permission changes** on existing
   DocTypes.
 - **No change to core behaviour.** The app adds Link fields on *its own*
@@ -82,6 +83,12 @@ a way the app depends on.
 
 ## Things to know before you promote
 
+- **`sites/apps.txt` can lose entries when containers are recreated.** On the clone,
+  recreating the frontend container re-ran the configurator and rewrote apps.txt from
+  what that image could see, dropping `iso_compliance`, `crm` and
+  `email_delivery_service`. The symptom is `Module ISO Compliance not found` and
+  print formats silently failing to sync. This is a docker-compose artifact and does
+  not arise on Frappe Cloud, but it is worth recognising.
 - **The six print formats that hardcode a document number** (Sales Order
   Acknowledgement, Purchase Order, Material Request, Purchase Receipt, Quotation,
   Work Order) still carry the old `HCCPL-SLS-001` style numbers. They are not

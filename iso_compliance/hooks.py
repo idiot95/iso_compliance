@@ -14,7 +14,7 @@ app_license = "mit"
 add_to_apps_screen = [
 	{
 		"name": "iso_compliance",
-		"logo": "/assets/iso_compliance/images/iso-compliance-logo.svg",
+		"logo": "/assets/iso_compliance/images/hcc-mark.png",
 		"title": "ISO Compliance",
 		"route": "/app/iso-compliance",
 		"has_permission": "iso_compliance.api.permission.has_app_permission",

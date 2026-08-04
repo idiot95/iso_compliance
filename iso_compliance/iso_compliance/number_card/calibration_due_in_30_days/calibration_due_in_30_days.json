@@ -6,15 +6,15 @@
  "idx": 0,
  "is_public": 1,
  "is_standard": 1,
- "label": "Corrective Actions Missing",
- "method": "iso_compliance.api.dashboard.corrective_actions_missing",
+ "label": "Calibration Due in 30 Days",
+ "method": "iso_compliance.api.dashboard.calibration_due_soon",
  "modified": "2026-08-05 20:00:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
- "name": "Corrective Actions Missing",
+ "name": "Calibration Due in 30 Days",
  "owner": "Administrator",
  "show_percentage_stats": 0,
  "stats_time_interval": "Monthly",
  "type": "Custom",
- "color": "red"
+ "color": "yellow"
 }
