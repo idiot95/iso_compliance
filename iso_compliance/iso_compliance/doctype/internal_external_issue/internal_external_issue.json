@@ -1,0 +1,158 @@
+{
+ "actions": [],
+ "creation": "2026-08-05 06:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "issue_title",
+  "issue_context",
+  "cb_head",
+  "category",
+  "owner_user",
+  "sb_detail",
+  "description",
+  "effect_on_qms",
+  "sb_action",
+  "action_taken",
+  "cb_action",
+  "status",
+  "review_frequency_months",
+  "last_reviewed_on",
+  "next_review_date"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "HCCPL/QMS/ISS-.####",
+   "default": "HCCPL/QMS/ISS-.####",
+   "reqd": 1,
+   "hidden": 1
+  },
+  {
+   "fieldname": "issue_title",
+   "fieldtype": "Data",
+   "label": "Issue",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "issue_context",
+   "fieldtype": "Select",
+   "label": "Context",
+   "options": "Internal\nExternal",
+   "default": "Internal",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "cb_head",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "label": "Category",
+   "options": "Political\nEconomic\nSocial\nTechnological\nLegal\nEnvironmental\nOrganisational\nResource\nOther",
+   "default": "Organisational",
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "owner_user",
+   "fieldtype": "Link",
+   "label": "Owner",
+   "options": "User"
+  },
+  {
+   "fieldname": "sb_detail",
+   "fieldtype": "Section Break",
+   "label": "Detail"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description",
+   "reqd": 1
+  },
+  {
+   "fieldname": "effect_on_qms",
+   "fieldtype": "Small Text",
+   "label": "Effect on the QMS"
+  },
+  {
+   "fieldname": "sb_action",
+   "fieldtype": "Section Break",
+   "label": "Response"
+  },
+  {
+   "fieldname": "action_taken",
+   "fieldtype": "Text Editor",
+   "label": "Action Taken"
+  },
+  {
+   "fieldname": "cb_action",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Open\nMonitoring\nClosed",
+   "default": "Open",
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "review_frequency_months",
+   "fieldtype": "Int",
+   "label": "Review Frequency (Months)",
+   "default": 6
+  },
+  {
+   "fieldname": "last_reviewed_on",
+   "fieldtype": "Date",
+   "label": "Last Reviewed On"
+  },
+  {
+   "fieldname": "next_review_date",
+   "fieldtype": "Date",
+   "label": "Next Review Date"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-08-05 06:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "ISO Compliance",
+ "name": "Internal External Issue",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "autoname": "naming_series:",
+ "title_field": "issue_title",
+ "show_title_field_in_link": 1,
+ "search_fields": "issue_title,issue_context,status"
+}

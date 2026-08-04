@@ -10,16 +10,16 @@ app_license = "mit"
 
 # required_apps = []
 
-# Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "iso_compliance",
-# 		"logo": "/assets/iso_compliance/logo.png",
-# 		"title": "ISO Compliance",
-# 		"route": "/iso_compliance",
-# 		"has_permission": "iso_compliance.api.permission.has_app_permission"
-# 	}
-# ]
+# Shows ISO Compliance on the desk apps screen, opening straight onto the dashboard.
+add_to_apps_screen = [
+	{
+		"name": "iso_compliance",
+		"logo": "/assets/iso_compliance/images/iso-compliance-logo.svg",
+		"title": "ISO Compliance",
+		"route": "/app/iso-compliance",
+		"has_permission": "iso_compliance.api.permission.has_app_permission",
+	}
+]
 
 # Includes in <head>
 # ------------------

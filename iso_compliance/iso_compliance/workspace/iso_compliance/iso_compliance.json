@@ -17,8 +17,8 @@
    "label": "Inspection Results"
   }
  ],
- "content": "[{\"id\": \"hd_16801662\", \"type\": \"heading\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Where the management system is failing</b></span>\", \"col\": 12}}, {\"id\": \"pg_23030343\", \"type\": \"paragraph\", \"data\": {\"text\": \"Each number is a count of things somebody has to go and do. A card at zero is a closed gap, not a good score.\", \"col\": 12}}, {\"id\": \"nc_43299808\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"No Approval Evidence\", \"col\": 3}}, {\"id\": \"nc_96387775\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Documents Never Written\", \"col\": 3}}, {\"id\": \"nc_70074299\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Review Overdue\", \"col\": 3}}, {\"id\": \"nc_44560633\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Review Due in 90 Days\", \"col\": 3}}, {\"id\": \"nc_78827888\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Calibration Not Tracked\", \"col\": 3}}, {\"id\": \"nc_51084254\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Instruments Not In Service\", \"col\": 3}}, {\"id\": \"nc_73339067\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Corrective Actions Missing\", \"col\": 3}}, {\"id\": \"nc_74286197\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Rejected Inspections Erased\", \"col\": 3}}, {\"id\": \"nc_1966594\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Suppliers Not Approved\", \"col\": 3}}, {\"id\": \"nc_62426660\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Training Not Evaluated\", \"col\": 3}}, {\"id\": \"nc_70076163\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Controlled Documents\", \"col\": 3}}, {\"id\": \"sp_95608403\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"hd_84114960\", \"type\": \"heading\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>The document set</b></span>\", \"col\": 12}}, {\"id\": \"ch_82058907\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Documents by Status\", \"col\": 6}}, {\"id\": \"ch_31433811\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Documents by Type\", \"col\": 6}}, {\"id\": \"sp_64321666\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"hd_24757969\", \"type\": \"heading\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Quality operations</b></span>\", \"col\": 12}}, {\"id\": \"pg_46071298\", \"type\": \"paragraph\", \"data\": {\"text\": \"Compliance data is operational data. Inspection volume and results are the signal the rest of the system rides on.\", \"col\": 12}}, {\"id\": \"ch_89514516\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Inspection Volume\", \"col\": 6}}, {\"id\": \"ch_25066724\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Inspection Results\", \"col\": 6}}, {\"id\": \"sp_84483953\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"hd_85973989\", \"type\": \"heading\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Registers and worklists</b></span>\", \"col\": 12}}, {\"id\": \"sc_15334574\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Compliance Gaps\", \"col\": 3}}, {\"id\": \"sc_37251329\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Master Document Register\", \"col\": 3}}, {\"id\": \"sc_1499319\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Controlled Document\", \"col\": 3}}, {\"id\": \"sc_9722792\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Non Conformance\", \"col\": 3}}, {\"id\": \"sc_48256347\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Quality Inspection\", \"col\": 3}}, {\"id\": \"sc_7579161\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset\", \"col\": 3}}]",
- "creation": "2026-08-05 00:00:00.000000",
+ "content": "[{\"id\": \"hd_6192225\", \"type\": \"heading\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Where the management system is failing</b></span>\", \"col\": 12}}, {\"id\": \"pg_96975400\", \"type\": \"paragraph\", \"data\": {\"text\": \"Each number is a count of things somebody has to go and do. A card at zero is a closed gap, not a good score.\", \"col\": 12}}, {\"id\": \"nc_73491658\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"No Approval Evidence\", \"col\": 3}}, {\"id\": \"nc_56209273\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Documents Never Written\", \"col\": 3}}, {\"id\": \"nc_94288398\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Review Overdue\", \"col\": 3}}, {\"id\": \"nc_79508123\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Review Due in 90 Days\", \"col\": 3}}, {\"id\": \"nc_70866192\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Calibration Not Tracked\", \"col\": 3}}, {\"id\": \"nc_62713588\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Instruments Not In Service\", \"col\": 3}}, {\"id\": \"nc_8896848\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Corrective Actions Missing\", \"col\": 3}}, {\"id\": \"nc_62291121\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Rejected Inspections Erased\", \"col\": 3}}, {\"id\": \"nc_69533104\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Suppliers Not Approved\", \"col\": 3}}, {\"id\": \"nc_60933928\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Training Not Evaluated\", \"col\": 3}}, {\"id\": \"nc_95239075\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Controlled Documents\", \"col\": 3}}, {\"id\": \"sp_52346913\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"hd_32981494\", \"type\": \"heading\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>The document set</b></span>\", \"col\": 12}}, {\"id\": \"ch_56118844\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Documents by Status\", \"col\": 6}}, {\"id\": \"ch_90170892\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Documents by Type\", \"col\": 6}}, {\"id\": \"sp_52953332\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"hd_7179475\", \"type\": \"heading\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Quality operations</b></span>\", \"col\": 12}}, {\"id\": \"pg_78451102\", \"type\": \"paragraph\", \"data\": {\"text\": \"Compliance data is operational data. Inspection volume and results are the signal the rest of the system rides on.\", \"col\": 12}}, {\"id\": \"ch_86204581\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Inspection Volume\", \"col\": 6}}, {\"id\": \"ch_660302\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Inspection Results\", \"col\": 6}}, {\"id\": \"sp_9647056\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"hd_67367822\", \"type\": \"heading\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Registers and worklists</b></span>\", \"col\": 12}}, {\"id\": \"sc_53103917\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Compliance Gaps\", \"col\": 3}}, {\"id\": \"sc_60959440\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Master Document Register\", \"col\": 3}}, {\"id\": \"sc_47648894\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Controlled Document\", \"col\": 3}}, {\"id\": \"sc_22876310\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Document Change Request\", \"col\": 3}}, {\"id\": \"sc_89981152\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Internal Audit\", \"col\": 3}}, {\"id\": \"sc_73085718\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Non Conformance\", \"col\": 3}}, {\"id\": \"sc_9570590\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Quality Inspection\", \"col\": 3}}, {\"id\": \"sc_46992726\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset\", \"col\": 3}}]",
+ "creation": "2026-08-05 08:00:00.000000",
  "custom_blocks": [],
  "docstatus": 0,
  "doctype": "Workspace",
@@ -45,6 +45,17 @@
    "label": "Controlled Document",
    "link_count": 0,
    "link_to": "Controlled Document",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Document Change Request",
+   "link_count": 0,
+   "link_to": "Document Change Request",
    "link_type": "DocType",
    "onboard": 1,
    "type": "Link"
@@ -137,6 +148,77 @@
   {
    "hidden": 0,
    "is_query_report": 0,
+   "label": "Context and Risk",
+   "link_count": 0,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Risk and Opportunity",
+   "link_count": 0,
+   "link_to": "Risk and Opportunity",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Internal External Issue",
+   "link_count": 0,
+   "link_to": "Internal External Issue",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Interested Party",
+   "link_count": 0,
+   "link_to": "Interested Party",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Legal Requirement",
+   "link_count": 0,
+   "link_to": "Legal Requirement",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Audit",
+   "link_count": 0,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Internal Audit",
+   "link_count": 0,
+   "link_to": "Internal Audit",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
    "label": "Resources and Suppliers",
    "link_count": 0,
    "onboard": 0,
@@ -176,8 +258,9 @@
    "type": "Link"
   }
  ],
- "modified": "2026-08-05 00:00:00.000000",
+ "modified": "2026-08-05 08:00:00.000000",
  "modified_by": "Administrator",
+ "app": "iso_compliance",
  "module": "ISO Compliance",
  "name": "ISO Compliance",
  "number_cards": [],
@@ -207,6 +290,20 @@
    "doc_view": "List",
    "label": "Controlled Document",
    "link_to": "Controlled Document",
+   "type": "DocType"
+  },
+  {
+   "color": "Blue",
+   "doc_view": "List",
+   "label": "Document Change Request",
+   "link_to": "Document Change Request",
+   "type": "DocType"
+  },
+  {
+   "color": "Orange",
+   "doc_view": "List",
+   "label": "Internal Audit",
+   "link_to": "Internal Audit",
    "type": "DocType"
   },
   {

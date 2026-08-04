@@ -1,0 +1,131 @@
+{
+ "actions": [],
+ "creation": "2026-08-05 06:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "party_name",
+  "party_type",
+  "cb_head",
+  "influence",
+  "owner_user",
+  "sb_needs",
+  "needs_and_expectations",
+  "how_addressed",
+  "sb_review",
+  "monitoring_method",
+  "cb_review",
+  "last_reviewed_on",
+  "next_review_date"
+ ],
+ "fields": [
+  {
+   "fieldname": "party_name",
+   "fieldtype": "Data",
+   "label": "Interested Party",
+   "reqd": 1,
+   "unique": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "party_type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "Customer\nSupplier\nEmployee\nRegulator\nShareholder\nCommunity\nOther",
+   "default": "Customer",
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "cb_head",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "influence",
+   "fieldtype": "Select",
+   "label": "Influence",
+   "options": "Low\nMedium\nHigh",
+   "default": "Medium",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "owner_user",
+   "fieldtype": "Link",
+   "label": "Owner",
+   "options": "User"
+  },
+  {
+   "fieldname": "sb_needs",
+   "fieldtype": "Section Break",
+   "label": "Needs and Expectations"
+  },
+  {
+   "fieldname": "needs_and_expectations",
+   "fieldtype": "Small Text",
+   "label": "Needs and Expectations",
+   "reqd": 1
+  },
+  {
+   "fieldname": "how_addressed",
+   "fieldtype": "Small Text",
+   "label": "How These Are Addressed"
+  },
+  {
+   "fieldname": "sb_review",
+   "fieldtype": "Section Break",
+   "label": "Monitoring"
+  },
+  {
+   "fieldname": "monitoring_method",
+   "fieldtype": "Small Text",
+   "label": "Monitoring Method"
+  },
+  {
+   "fieldname": "cb_review",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "last_reviewed_on",
+   "fieldtype": "Date",
+   "label": "Last Reviewed On"
+  },
+  {
+   "fieldname": "next_review_date",
+   "fieldtype": "Date",
+   "label": "Next Review Date"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-08-05 06:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "ISO Compliance",
+ "name": "Interested Party",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "party_name",
+ "sort_order": "ASC",
+ "states": [],
+ "track_changes": 1,
+ "autoname": "field:party_name",
+ "title_field": "party_name",
+ "show_title_field_in_link": 1,
+ "search_fields": "party_name,party_type"
+}

@@ -1,0 +1,159 @@
+{
+ "actions": [],
+ "creation": "2026-08-05 06:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "audit_title",
+  "audit_type",
+  "cb_head",
+  "audit_date",
+  "lead_auditor",
+  "department",
+  "sb_scope",
+  "clauses_covered",
+  "audit_criteria",
+  "scope",
+  "sb_findings",
+  "findings",
+  "sb_conclusion",
+  "conclusion",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "HCCPL/QMS/IA-.YYYY.-.###",
+   "default": "HCCPL/QMS/IA-.YYYY.-.###",
+   "reqd": 1,
+   "hidden": 1
+  },
+  {
+   "fieldname": "audit_title",
+   "fieldtype": "Data",
+   "label": "Audit Title",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "audit_type",
+   "fieldtype": "Select",
+   "label": "Audit Type",
+   "options": "Internal\nSupplier\nExternal",
+   "default": "Internal",
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "cb_head",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "audit_date",
+   "fieldtype": "Date",
+   "label": "Audit Date",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "lead_auditor",
+   "fieldtype": "Link",
+   "label": "Lead Auditor",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department Audited",
+   "options": "Department",
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "sb_scope",
+   "fieldtype": "Section Break",
+   "label": "Scope"
+  },
+  {
+   "fieldname": "clauses_covered",
+   "fieldtype": "Small Text",
+   "label": "Clauses Covered"
+  },
+  {
+   "fieldname": "audit_criteria",
+   "fieldtype": "Small Text",
+   "label": "Audit Criteria"
+  },
+  {
+   "fieldname": "scope",
+   "fieldtype": "Text Editor",
+   "label": "Scope and Method"
+  },
+  {
+   "fieldname": "sb_findings",
+   "fieldtype": "Section Break",
+   "label": "Findings"
+  },
+  {
+   "fieldname": "findings",
+   "fieldtype": "Table",
+   "label": "Findings",
+   "options": "Audit Finding"
+  },
+  {
+   "fieldname": "sb_conclusion",
+   "fieldtype": "Section Break",
+   "label": "Conclusion"
+  },
+  {
+   "fieldname": "conclusion",
+   "fieldtype": "Text Editor",
+   "label": "Conclusion"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "options": "Internal Audit",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-08-05 06:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "ISO Compliance",
+ "name": "Internal Audit",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "is_submittable": 1,
+ "autoname": "naming_series:",
+ "title_field": "audit_title",
+ "show_title_field_in_link": 1,
+ "search_fields": "audit_title,department,audit_date"
+}

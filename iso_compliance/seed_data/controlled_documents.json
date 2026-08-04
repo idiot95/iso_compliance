@@ -4593,7 +4593,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": false,
-   "mapped_doctype": null,
+   "mapped_doctype": "Document Change Request",
    "mapped_filters": null
   },
   {
@@ -4657,7 +4657,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": false,
-   "mapped_doctype": null,
+   "mapped_doctype": "Supplier Scorecard",
    "mapped_filters": null
   },
   {
@@ -4705,7 +4705,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": false,
-   "mapped_doctype": null,
+   "mapped_doctype": "Stock Entry",
    "mapped_filters": null
   },
   {
@@ -4929,7 +4929,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": false,
-   "mapped_doctype": null,
+   "mapped_doctype": "Internal Audit",
    "mapped_filters": null
   },
   {
@@ -4945,7 +4945,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": false,
-   "mapped_doctype": null,
+   "mapped_doctype": "Internal Audit",
    "mapped_filters": null
   },
   {
@@ -4977,8 +4977,8 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": false,
-   "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_doctype": "Asset",
+   "mapped_filters": "{\"asset_category\": \"Measuring Instruments\"}"
   },
   {
    "name": "HCCPL/QMS/FRM-026",
@@ -5009,7 +5009,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": false,
-   "mapped_doctype": null,
+   "mapped_doctype": "Asset Maintenance Log",
    "mapped_filters": null
   },
   {
@@ -5025,7 +5025,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": false,
-   "mapped_doctype": null,
+   "mapped_doctype": "Issue",
    "mapped_filters": null
   },
   {
@@ -5041,8 +5041,8 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": false,
-   "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_doctype": "Delivery Note",
+   "mapped_filters": "{\"docstatus\": 1}"
   },
   {
    "name": "HCCPL/QMS/FRM-030",
@@ -5073,7 +5073,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": false,
-   "mapped_doctype": null,
+   "mapped_doctype": "Training Result",
    "mapped_filters": null
   },
   {
@@ -5105,7 +5105,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": true,
-   "mapped_doctype": null,
+   "mapped_doctype": "Internal External Issue",
    "mapped_filters": null
   },
   {
@@ -5121,7 +5121,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": true,
-   "mapped_doctype": null,
+   "mapped_doctype": "Interested Party",
    "mapped_filters": null
   },
   {
@@ -5137,7 +5137,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": true,
-   "mapped_doctype": null,
+   "mapped_doctype": "Risk and Opportunity",
    "mapped_filters": null
   },
   {
@@ -5153,7 +5153,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": true,
-   "mapped_doctype": null,
+   "mapped_doctype": "Legal Requirement",
    "mapped_filters": null
   },
   {
@@ -5201,7 +5201,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": true,
-   "mapped_doctype": null,
+   "mapped_doctype": "Issue",
    "mapped_filters": null
   },
   {
@@ -5233,7 +5233,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": true,
-   "mapped_doctype": null,
+   "mapped_doctype": "Internal Audit",
    "mapped_filters": null
   },
   {
@@ -5473,7 +5473,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": false,
-   "mapped_doctype": null,
+   "mapped_doctype": "Quality Feedback",
    "mapped_filters": null
   },
   {

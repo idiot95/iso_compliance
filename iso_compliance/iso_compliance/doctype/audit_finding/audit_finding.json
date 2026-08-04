@@ -1,0 +1,90 @@
+{
+ "actions": [],
+ "creation": "2026-08-05 06:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "clause",
+  "finding_type",
+  "finding",
+  "objective_evidence",
+  "responsibility",
+  "target_date",
+  "corrective_action",
+  "finding_status"
+ ],
+ "fields": [
+  {
+   "fieldname": "clause",
+   "fieldtype": "Data",
+   "label": "Clause",
+   "in_list_view": 1,
+   "columns": 1
+  },
+  {
+   "fieldname": "finding_type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "Observation\nMinor Nonconformity\nMajor Nonconformity\nOpportunity for Improvement",
+   "default": "Observation",
+   "in_list_view": 1,
+   "columns": 2,
+   "reqd": 1
+  },
+  {
+   "fieldname": "finding",
+   "fieldtype": "Small Text",
+   "label": "Finding",
+   "in_list_view": 1,
+   "columns": 4,
+   "reqd": 1
+  },
+  {
+   "fieldname": "objective_evidence",
+   "fieldtype": "Small Text",
+   "label": "Objective Evidence",
+   "in_list_view": 1,
+   "columns": 3
+  },
+  {
+   "fieldname": "responsibility",
+   "fieldtype": "Link",
+   "label": "Responsibility",
+   "options": "User"
+  },
+  {
+   "fieldname": "target_date",
+   "fieldtype": "Date",
+   "label": "Target Date"
+  },
+  {
+   "fieldname": "corrective_action",
+   "fieldtype": "Link",
+   "label": "Corrective Action",
+   "options": "Quality Action"
+  },
+  {
+   "fieldname": "finding_status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Open\nIn Progress\nClosed",
+   "default": "Open",
+   "in_list_view": 1,
+   "columns": 2
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-08-05 06:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "ISO Compliance",
+ "name": "Audit Finding",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "idx",
+ "sort_order": "ASC",
+ "states": [],
+ "track_changes": 1,
+ "istable": 1
+}
