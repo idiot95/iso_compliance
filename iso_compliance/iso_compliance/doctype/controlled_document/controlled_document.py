@@ -1,6 +1,8 @@
 # Copyright (c) 2026, Hatim Carbon Co. Pvt. Ltd. and contributors
 # For license information, please see license.txt
 
+import json
+
 import frappe
 from frappe import _
 from frappe.model.document import Document
@@ -161,6 +163,53 @@ class ControlledDocument(Document):
 					),
 					title=_("Immutable Revision History"),
 				)
+
+	# ------------------------------------------------------------------
+	# Live register content
+	# ------------------------------------------------------------------
+
+	def get_register_rows(self, limit: int = 200) -> dict:
+		"""Return the live ERPNext rows this document is a controlled cover for.
+
+		A Form or Register declares the DocType it is filled in through, so the
+		printed register is the current data rather than a transcription of it.
+		Ordering is explicit: v16 lists default to `creation`, which is not a
+		defensible order for an evidentiary record.
+		"""
+		if not self.mapped_doctype:
+			return {"columns": [], "rows": [], "total": 0}
+
+		if not frappe.db.exists("DocType", self.mapped_doctype):
+			return {"columns": [], "rows": [], "total": 0, "error": _("Mapped DocType no longer exists.")}
+
+		if not frappe.has_permission(self.mapped_doctype, "read"):
+			return {"columns": [], "rows": [], "total": 0, "error": _("Not permitted to read the mapped DocType.")}
+
+		meta = frappe.get_meta(self.mapped_doctype)
+		skip = {"Section Break", "Column Break", "Tab Break", "Table", "HTML", "Button", "Attach", "Text Editor"}
+		columns = [{"fieldname": "name", "label": _("ID")}]
+		for field in meta.fields:
+			if len(columns) >= 7:
+				break
+			if field.in_list_view and field.fieldtype not in skip:
+				columns.append({"fieldname": field.fieldname, "label": _(field.label or field.fieldname)})
+
+		filters = {}
+		if self.mapped_filters:
+			try:
+				filters = json.loads(self.mapped_filters)
+			except ValueError:
+				return {"columns": [], "rows": [], "total": 0, "error": _("Mapped Filters is not valid JSON.")}
+
+		total = frappe.db.count(self.mapped_doctype, filters)
+		rows = frappe.get_all(
+			self.mapped_doctype,
+			filters=filters,
+			fields=[c["fieldname"] for c in columns],
+			order_by="creation asc",
+			limit_page_length=limit,
+		)
+		return {"columns": columns, "rows": rows, "total": total, "shown": len(rows), "limit": limit}
 
 	def append_revision(self, description_of_change: str, clause_section_affected: str | None = None):
 		"""Freeze the current control block and authority stamps as a history row."""

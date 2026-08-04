@@ -242,15 +242,35 @@
 
 {%- macro mapped_body(doc) -%}
 <div class="cd-section">
-	<h2 class="cd-h2">Data Source</h2>
 	{%- if doc.mapped_doctype -%}
-	<p class="cd-rich">
-		This document is completed in ERPNext. Entries are recorded against
-		<strong>{{ doc.mapped_doctype }}</strong>{% if doc.mapped_filters %} filtered by <code>{{ doc.mapped_filters }}</code>{% endif %}.
-		The register content is the live data in that DocType; this sheet is the controlled cover for it.
-	</p>
+		{%- set data = doc.get_register_rows() -%}
+		<h2 class="cd-h2">Register Entries</h2>
+		<p class="cd-source">
+			Completed in ERPNext against <strong>{{ doc.mapped_doctype }}</strong>{% if doc.mapped_filters %},
+			filtered by <code>{{ doc.mapped_filters }}</code>{% endif %}.
+			{%- if data.total %} {{ data.total }} entr{{ "y" if data.total == 1 else "ies" }} at time of printing.
+			{%- if data.shown < data.total %} First {{ data.shown }} shown.{% endif %}{% endif %}
+		</p>
+
+		{%- if data.error -%}
+			<div class="cd-empty">{{ data.error }}</div>
+		{%- elif data.rows -%}
+		<table class="cd-table cd-register">
+			<thead>
+				<tr>{% for c in data.columns %}<th>{{ c.label }}</th>{% endfor %}</tr>
+			</thead>
+			<tbody>
+			{%- for row in data.rows -%}
+				<tr>{% for c in data.columns %}<td>{{ row.get(c.fieldname) if row.get(c.fieldname) is not none else "" }}</td>{% endfor %}</tr>
+			{%- endfor -%}
+			</tbody>
+		</table>
+		{%- else -%}
+			<div class="cd-empty">No entries recorded yet.</div>
+		{%- endif -%}
 	{%- else -%}
-	<div class="cd-empty">No ERPNext data source has been mapped to this document yet.</div>
+		<h2 class="cd-h2">Data Source</h2>
+		<div class="cd-empty">No ERPNext data source has been mapped to this document yet.</div>
 	{%- endif -%}
 </div>
 {%- endmacro -%}

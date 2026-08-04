@@ -65,12 +65,37 @@ function print_controlled_set(document_type, include_retired) {
 				frappe.msgprint(__("No controlled documents matched."));
 				return;
 			}
+			const count = r.message.count;
+			// Each document is rendered by its own headless Chrome, so a large set
+			// has to go to a worker rather than the web process.
+			const queue = count > 25;
 			frappe.confirm(
-				__("Compile {0} controlled documents into a single PDF?", [r.message.count]),
+				queue
+					? __(
+							"Compile {0} controlled documents in the background? A download link appears when it is ready.",
+							[count]
+					  )
+					: __("Compile {0} controlled documents into a single PDF?", [count]),
 				() => {
-					window.open(
-						`/api/method/iso_compliance.api.bulk_print.print_all?${params.toString()}`
-					);
+					if (!queue) {
+						window.open(
+							`/api/method/iso_compliance.api.bulk_print.print_all?${params.toString()}`
+						);
+						return;
+					}
+					frappe.call({
+						method: "iso_compliance.api.bulk_print.queue_print_all",
+						args: {
+							document_type: document_type || null,
+							include_retired: include_retired ? 1 : 0,
+						},
+						callback() {
+							frappe.show_alert({
+								message: __("Compiling {0} documents. The download will start when ready.", [count]),
+								indicator: "blue",
+							});
+						},
+					});
 				}
 			);
 		},

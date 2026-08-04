@@ -20,6 +20,14 @@ RETIRED_STATES = ("Superseded", "Obsolete")
 
 PRINT_FORMAT = "Controlled Document"
 
+#: Above this many documents the compile is enqueued instead of run in the web
+#: process. Each document is rendered by its own headless Chrome, and those browser
+#: trees accumulate for the life of the process: compiling the full 93-document set
+#: in one web request took the container from 130 MB to over 4 GB and did not finish.
+#: A worker doing the same job is recycled afterwards and cannot take the site down
+#: with it.
+ASYNC_THRESHOLD = 25
+
 
 def get_current_documents(
 	document_type: str | None = None,
@@ -68,6 +76,15 @@ def print_all(
 	if not names:
 		frappe.throw(_("No controlled documents matched."), title=_("Nothing to Print"))
 
+	if len(names) > ASYNC_THRESHOLD:
+		frappe.throw(
+			_(
+				"{0} documents is too many to compile in one request. Use "
+				"{1} to run it in the background, or compile one document type at a time."
+			).format(len(names), frappe.bold("Queue Controlled Set")),
+			title=_("Compile in the Background"),
+		)
+
 	from frappe.utils.print_format import _download_multi_pdf
 
 	return _download_multi_pdf(
@@ -76,6 +93,36 @@ def print_all(
 		format=PRINT_FORMAT,
 		letterhead=letterhead,
 	)
+
+
+@frappe.whitelist()
+def queue_print_all(
+	document_type: str | None = None,
+	include_retired: int | str = 0,
+	include_drafts: int | str = 1,
+	letterhead: str | None = None,
+):
+	"""Compile the set in a background worker and publish a download link when done."""
+	frappe.has_permission("Controlled Document", "print", throw=True)
+
+	names = get_current_documents(
+		document_type=document_type,
+		include_retired=bool(int(include_retired)),
+		include_drafts=bool(int(include_drafts)),
+	)
+	if not names:
+		frappe.throw(_("No controlled documents matched."), title=_("Nothing to Print"))
+
+	from frappe.utils.print_format import download_multi_pdf_async
+
+	result = download_multi_pdf_async(
+		doctype={"Controlled Document": names},
+		name=_filename(document_type),
+		format=PRINT_FORMAT,
+		letterhead=letterhead,
+	)
+	result["count"] = len(names)
+	return result
 
 
 def _filename(document_type: str | None) -> str:

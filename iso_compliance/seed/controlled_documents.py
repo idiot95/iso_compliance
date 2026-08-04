@@ -16,6 +16,7 @@ at risk.
 
 import json
 import os
+import re
 
 import frappe
 from frappe import _
@@ -88,6 +89,7 @@ def import_seed(batch: str = SEED_BATCH, commit: bool = True) -> dict:
 	# cites REG-001 and FRM-001, which are created later in the same run. Link fields
 	# are therefore filled once every record exists.
 	linked = _resolve_cross_references(documents, resolve)
+	advanced = _advance_naming_series(documents)
 
 	if commit:
 		frappe.db.commit()
@@ -97,8 +99,37 @@ def import_seed(batch: str = SEED_BATCH, commit: bool = True) -> dict:
 		"documents_created": len(created),
 		"documents_skipped": len(skipped),
 		"cross_references_linked": linked,
+		"series_advanced": advanced,
 		"batch": batch,
 	}
+
+
+def _advance_naming_series(documents: list[dict]) -> dict:
+	"""Move each type's counter past the highest number the import consumed.
+
+	Imported documents are named explicitly, which bypasses the counter entirely.
+	Left alone it stays at zero, and the first document anyone creates by hand
+	collides with SOP-001.
+	"""
+	from frappe.model.naming import NamingSeries
+
+	highest: dict[str, int] = {}
+	for entry in documents:
+		abbr = entry["document_type"]
+		match = re.search(r"(\d+)$", entry["name"])
+		if match:
+			highest[abbr] = max(highest.get(abbr, 0), int(match.group(1)))
+
+	advanced = {}
+	for abbr, top in sorted(highest.items()):
+		if not frappe.db.exists("Controlled Document Type", abbr):
+			continue
+		doc_type = frappe.get_cached_doc("Controlled Document Type", abbr)
+		series = NamingSeries(doc_type.get_naming_series())
+		if series.get_current_value() < top:
+			series.update_counter(top)
+			advanced[abbr] = top
+	return advanced
 
 
 def _resolve_cross_references(documents: list[dict], resolve: dict) -> int:
