@@ -1,0 +1,402 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-08-04 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "document_type",
+  "body_mode",
+  "column_break_head",
+  "workflow_state",
+  "clause_reference",
+  "control_block_section",
+  "issue_number",
+  "issue_date",
+  "column_break_control",
+  "revision_number",
+  "revision_date",
+  "authority_section",
+  "prepared_by",
+  "prepared_by_name",
+  "prepared_on",
+  "column_break_reviewed",
+  "reviewed_by",
+  "reviewed_by_name",
+  "reviewed_on",
+  "column_break_approved",
+  "approved_by",
+  "approved_by_name",
+  "approved_on",
+  "ownership_section",
+  "process_owner",
+  "column_break_ownership",
+  "department",
+  "review_section",
+  "review_frequency_months",
+  "column_break_review",
+  "next_review_date",
+  "data_source_section",
+  "mapped_doctype",
+  "mapped_filters",
+  "sop_body_section",
+  "purpose",
+  "scope",
+  "rich_body_section",
+  "body_content",
+  "attachment_section",
+  "attachment",
+  "change_history_section",
+  "revisions",
+  "supersession_section",
+  "supersedes",
+  "column_break_supersession",
+  "superseded_by"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_global_search": 1,
+   "in_list_view": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "fieldname": "document_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Document Type",
+   "options": "Controlled Document Type",
+   "reqd": 1,
+   "set_only_once": 1,
+   "description": "Determines the document number and which body sections apply."
+  },
+  {
+   "fetch_from": "document_type.body_mode",
+   "fieldname": "body_mode",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Body Mode",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_head",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "workflow_state",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Status",
+   "no_copy": 1,
+   "options": "Workflow State",
+   "read_only": 1
+  },
+  {
+   "fieldname": "clause_reference",
+   "fieldtype": "Data",
+   "label": "ISO Clause Reference",
+   "description": "Clause of ISO 9001 this document addresses, e.g. 7.5.3."
+  },
+  {
+   "fieldname": "control_block_section",
+   "fieldtype": "Section Break",
+   "label": "Control Block",
+   "description": "Printed in the controlled header of every page. Issue is the edition; Revision is an amendment within that edition."
+  },
+  {
+   "default": "01",
+   "fieldname": "issue_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Issue No.",
+   "reqd": 1
+  },
+  {
+   "fieldname": "issue_date",
+   "fieldtype": "Date",
+   "label": "Issue Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_control",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "00",
+   "fieldname": "revision_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Revision No.",
+   "reqd": 1
+  },
+  {
+   "fieldname": "revision_date",
+   "fieldtype": "Date",
+   "label": "Revision Date"
+  },
+  {
+   "fieldname": "authority_section",
+   "fieldtype": "Section Break",
+   "label": "Authority",
+   "description": "Stamped by workflow transitions. These fields are the evidence of review and approval and cannot be typed in."
+  },
+  {
+   "fieldname": "prepared_by",
+   "fieldtype": "Link",
+   "label": "Prepared By",
+   "no_copy": 1,
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "prepared_by.full_name",
+   "fieldname": "prepared_by_name",
+   "fieldtype": "Data",
+   "label": "Prepared By Name",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "prepared_on",
+   "fieldtype": "Datetime",
+   "label": "Prepared On",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_reviewed",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reviewed_by",
+   "fieldtype": "Link",
+   "label": "Reviewed By",
+   "no_copy": 1,
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "reviewed_by.full_name",
+   "fieldname": "reviewed_by_name",
+   "fieldtype": "Data",
+   "label": "Reviewed By Name",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "reviewed_on",
+   "fieldtype": "Datetime",
+   "label": "Reviewed On",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_approved",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approved_by",
+   "fieldtype": "Link",
+   "label": "Approved By",
+   "no_copy": 1,
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "approved_by.full_name",
+   "fieldname": "approved_by_name",
+   "fieldtype": "Data",
+   "label": "Approved By Name",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "approved_on",
+   "fieldtype": "Datetime",
+   "label": "Approved On",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "ownership_section",
+   "fieldtype": "Section Break",
+   "label": "Ownership"
+  },
+  {
+   "fieldname": "process_owner",
+   "fieldtype": "Link",
+   "label": "Process Owner",
+   "options": "User"
+  },
+  {
+   "fieldname": "column_break_ownership",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fieldname": "review_section",
+   "fieldtype": "Section Break",
+   "label": "Periodic Review"
+  },
+  {
+   "fetch_from": "document_type.review_frequency_months",
+   "fetch_if_empty": 1,
+   "fieldname": "review_frequency_months",
+   "fieldtype": "Int",
+   "label": "Review Frequency (Months)"
+  },
+  {
+   "fieldname": "column_break_review",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "next_review_date",
+   "fieldtype": "Date",
+   "label": "Next Review Date"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "data_source_section",
+   "fieldtype": "Section Break",
+   "label": "Data Source",
+   "description": "For documents whose live content is ERPNext data. A Form or Register declares the DocType it is filled in through."
+  },
+  {
+   "fieldname": "mapped_doctype",
+   "fieldtype": "Link",
+   "label": "Mapped DocType",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "mapped_filters",
+   "fieldtype": "JSON",
+   "label": "Mapped Filters",
+   "description": "Optional filters narrowing the mapped DocType, as JSON. Example: {\"status\": \"Rejected\"}"
+  },
+  {
+   "depends_on": "eval:doc.body_mode=='Structured SOP'",
+   "fieldname": "sop_body_section",
+   "fieldtype": "Section Break",
+   "label": "Procedure"
+  },
+  {
+   "depends_on": "eval:doc.body_mode=='Structured SOP'",
+   "fieldname": "purpose",
+   "fieldtype": "Text Editor",
+   "label": "Purpose"
+  },
+  {
+   "depends_on": "eval:doc.body_mode=='Structured SOP'",
+   "fieldname": "scope",
+   "fieldtype": "Text Editor",
+   "label": "Scope"
+  },
+  {
+   "depends_on": "eval:['Rich Text','Matrix'].includes(doc.body_mode)",
+   "fieldname": "rich_body_section",
+   "fieldtype": "Section Break",
+   "label": "Content"
+  },
+  {
+   "depends_on": "eval:['Rich Text','Matrix'].includes(doc.body_mode)",
+   "fieldname": "body_content",
+   "fieldtype": "Text Editor",
+   "label": "Body Content"
+  },
+  {
+   "depends_on": "eval:doc.body_mode=='Attachment'",
+   "fieldname": "attachment_section",
+   "fieldtype": "Section Break",
+   "label": "Attached Document"
+  },
+  {
+   "depends_on": "eval:doc.body_mode=='Attachment'",
+   "fieldname": "attachment",
+   "fieldtype": "Attach",
+   "label": "Attachment"
+  },
+  {
+   "fieldname": "change_history_section",
+   "fieldtype": "Section Break",
+   "label": "Change History"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "revisions",
+   "fieldtype": "Table",
+   "label": "Revisions",
+   "no_copy": 1,
+   "options": "Document Revision",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "supersession_section",
+   "fieldtype": "Section Break",
+   "label": "Supersession"
+  },
+  {
+   "fieldname": "supersedes",
+   "fieldtype": "Link",
+   "label": "Supersedes",
+   "options": "Controlled Document"
+  },
+  {
+   "fieldname": "column_break_supersession",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "superseded_by",
+   "fieldtype": "Link",
+   "label": "Superseded By",
+   "no_copy": 1,
+   "options": "Controlled Document",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-08-04 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "ISO Compliance",
+ "name": "Controlled Document",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "title,document_type,revision_number",
+ "show_title_field_in_link": 1,
+ "sort_field": "name",
+ "sort_order": "ASC",
+ "states": [],
+ "title_field": "title",
+ "track_changes": 1
+}

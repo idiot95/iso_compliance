@@ -1,0 +1,146 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:abbreviation",
+ "creation": "2026-08-04 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "abbreviation",
+  "type_name",
+  "enabled",
+  "column_break_head",
+  "body_mode",
+  "description",
+  "numbering_section",
+  "naming_series_prefix",
+  "column_break_numbering",
+  "number_padding",
+  "control_section",
+  "requires_acknowledgement",
+  "column_break_control",
+  "review_frequency_months"
+ ],
+ "fields": [
+  {
+   "fieldname": "abbreviation",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Abbreviation",
+   "reqd": 1,
+   "unique": 1,
+   "description": "Short code used inside the document number, e.g. SOP, FRM, REG."
+  },
+  {
+   "fieldname": "type_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Document Type Name",
+   "reqd": 1,
+   "description": "Full name, e.g. Standard Operating Procedure."
+  },
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "column_break_head",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Rich Text",
+   "fieldname": "body_mode",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Body Mode",
+   "options": "Structured SOP\nRich Text\nAttachment\nMapped Data\nMatrix",
+   "reqd": 1,
+   "description": "Decides which body sections appear on a Controlled Document of this type. Every mode prints through the same controlled header, footer and Change History sheet."
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "numbering_section",
+   "fieldtype": "Section Break",
+   "label": "Numbering"
+  },
+  {
+   "fieldname": "naming_series_prefix",
+   "fieldtype": "Data",
+   "label": "Document Number Prefix",
+   "description": "Everything before the running number, including the trailing separator. Example: HCCPL/QMS/SOP-"
+  },
+  {
+   "fieldname": "column_break_numbering",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "3",
+   "fieldname": "number_padding",
+   "fieldtype": "Int",
+   "label": "Number Padding",
+   "description": "Digits in the running number. 3 produces 001, 002, 003."
+  },
+  {
+   "fieldname": "control_section",
+   "fieldtype": "Section Break",
+   "label": "Control"
+  },
+  {
+   "default": "0",
+   "fieldname": "requires_acknowledgement",
+   "fieldtype": "Check",
+   "label": "Requires Acknowledgement",
+   "description": "Readers must acknowledge the current revision of documents of this type."
+  },
+  {
+   "fieldname": "column_break_control",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "review_frequency_months",
+   "fieldtype": "Int",
+   "label": "Review Frequency (Months)",
+   "description": "Default periodic review interval. Individual documents may override it."
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [
+  {
+   "group": "Documents",
+   "link_doctype": "Controlled Document",
+   "link_fieldname": "document_type"
+  }
+ ],
+ "modified": "2026-08-04 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "ISO Compliance",
+ "name": "Controlled Document Type",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "show_title_field_in_link": 1,
+ "sort_field": "abbreviation",
+ "sort_order": "ASC",
+ "states": [],
+ "title_field": "type_name",
+ "track_changes": 1
+}
