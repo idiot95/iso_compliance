@@ -9,6 +9,7 @@
   "party_type",
   "cb_head",
   "influence",
+  "responsible_function",
   "owner_user",
   "sb_needs",
   "needs_and_expectations",
@@ -17,7 +18,8 @@
   "monitoring_method",
   "cb_review",
   "last_reviewed_on",
-  "next_review_date"
+  "next_review_date",
+  "seed_batch"
  ],
  "fields": [
   {
@@ -48,6 +50,13 @@
    "options": "Low\nMedium\nHigh",
    "default": "Medium",
    "in_list_view": 1
+  },
+  {
+   "fieldname": "responsible_function",
+   "fieldtype": "Data",
+   "label": "Responsible Function",
+   "in_list_view": 1,
+   "description": "The role accountable, as recorded in REG-013. Kept separate from the user link because the registers name functions, not accounts."
   },
   {
    "fieldname": "owner_user",
@@ -94,11 +103,21 @@
    "fieldname": "next_review_date",
    "fieldtype": "Date",
    "label": "Next Review Date"
+  },
+  {
+   "fieldname": "seed_batch",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Seed Batch",
+   "no_copy": 1,
+   "read_only": 1,
+   "search_index": 1,
+   "description": "Set only on records created by a seed import. Hand-created records leave this empty and are never touched by a purge."
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-08-05 06:00:00.000000",
+ "modified": "2026-08-05 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Interested Party",

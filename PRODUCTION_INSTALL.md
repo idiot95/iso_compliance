@@ -1,0 +1,96 @@
+# Installing on the live site
+
+Short version: **there is nothing to recreate by hand.** No DocType outside this
+app was modified, no Custom Field was added to ERPNext, and no site setting needs
+changing. Installing the app and running one import command reproduces everything
+that exists on the clone.
+
+## What the app brings with it automatically
+
+Installed by `bench install-app`, carried by `bench migrate` on every upgrade:
+
+| | |
+| --- | --- |
+| DocTypes | 16, all in the `ISO Compliance` module |
+| Print Format | `Controlled Document`, one format serving every body type |
+| Workspace | `ISO Compliance`, appears in the left sidebar |
+| Desk apps screen | entry with its own logo, routes to the dashboard |
+| Number Cards | 11 |
+| Dashboard Charts | 5 |
+| Query Reports | Master Document Register, Compliance Gaps |
+| Workflow States | Draft, Under Review, Approved, Active, Superseded, Obsolete |
+
+The workflow states are the one piece of configuration that lives outside this
+app's own DocTypes. Frappe ships only Open, Rejected, Approved and Pending, and
+`Controlled Document.workflow_state` links to Workflow State, so the rest must
+exist. They are created by an `after_install` and `after_migrate` hook, are
+idempotent, and touch nothing that already exists.
+
+## Steps
+
+```bash
+# 1. Install the app (Frappe Cloud: add it to the bench from the git repo,
+#    then install it on the site).
+bench --site <site> install-app iso_compliance
+
+# 2. Load the document set: 93 controlled documents and 6 document types.
+bench --site <site> execute iso_compliance.seed.controlled_documents.import_seed
+
+# 3. Load the register content: REG-002, REG-003, REG-004, REG-005.
+bench --site <site> execute iso_compliance.seed.qms_registers.import_registers
+```
+
+Both imports are idempotent. Running them twice creates nothing the second time.
+
+Seed loading is deliberately **not** in a migrate hook. A routine upgrade must
+never write 93 controlled documents into production on its own.
+
+## Removing the imported data
+
+```bash
+bench --site <site> execute iso_compliance.seed.qms_registers.purge_registers
+bench --site <site> execute iso_compliance.seed.controlled_documents.purge_seed
+```
+
+Every imported record carries a batch token and the purge removes exactly those.
+Anything created by hand is untouched, and a document type still used by a
+hand-created document is kept.
+
+## What was NOT changed, and why that matters
+
+Nothing below needs replicating on production, because none of it was altered in
+a way the app depends on.
+
+- **No Custom Fields on any ERPNext DocType.** Verified directly: zero exist.
+  The two sets proposed in [EXTERNAL_CHANGES.md](EXTERNAL_CHANGES.md) (Asset
+  calibration, Supplier approval) are still proposals awaiting approval. Until
+  they are approved, the calibration cards report the honest answer rather than
+  a wrong one.
+- **No Property Setters, Client Scripts or permission changes** on existing
+  DocTypes.
+- **No change to core behaviour.** The app adds Link fields on *its own*
+  DocTypes pointing at `User`, `Department`, `DocType`, `Asset`, `Supplier` and
+  so on. That adds nothing to those DocTypes and needs no fixture.
+- **`Print Settings.pdf_generator` is untouched.** It was briefly set to `chrome`
+  on the clone during development and has been set back to `wkhtmltopdf`, the
+  value restored from production. The print format carries
+  `pdf_generator = chrome` on the Print Format record itself, which is what
+  actually governs rendering, so nothing site-wide is required and no existing
+  print format changes behaviour.
+- **`developer_mode` is enabled on the clone only.** It is required to export
+  DocTypes to files during development. Do not enable it on production.
+
+## Things to know before you promote
+
+- **The six print formats that hardcode a document number** (Sales Order
+  Acknowledgement, Purchase Order, Material Request, Purchase Receipt, Quotation,
+  Work Order) still carry the old `HCCPL-SLS-001` style numbers. They are not
+  touched by this app. If the numbering convention changes, those six need
+  editing, and `legacy_document_number` on each Controlled Document keeps the old
+  number searchable in the meantime.
+- **Compiling more than 25 documents into one PDF is queued**, not run in the web
+  process. Each document is rendered by its own headless Chrome and those
+  accumulate; the full 93-document set exhausted memory when run synchronously.
+- **Page numbers are absent from the printed footer.** Frappe 16.29 is missing
+  the script that stamps them (`update_page_no.js`), so the footer repeats the
+  document number, issue and revision instead. See EXTERNAL_CHANGES.md.

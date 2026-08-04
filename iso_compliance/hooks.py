@@ -86,7 +86,12 @@ add_to_apps_screen = [
 # ------------
 
 # before_install = "iso_compliance.install.before_install"
-# after_install = "iso_compliance.install.after_install"
+after_install = "iso_compliance.setup.install.after_install"
+
+# Idempotent and additive, so a routine upgrade brings the lifecycle states with
+# it. Seed data is deliberately not here: a migrate must never write 93
+# controlled documents into production by itself.
+after_migrate = "iso_compliance.setup.install.after_migrate"
 
 # Uninstallation
 # ------------
