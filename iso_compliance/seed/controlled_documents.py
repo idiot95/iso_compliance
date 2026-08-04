@@ -20,6 +20,7 @@ import re
 
 import frappe
 from frappe import _
+from frappe.utils import add_months, getdate
 
 SEED_BATCH = "zip-2026-08-04"
 
@@ -202,6 +203,14 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 		"seed_batch": batch,
 	}
 
+	# A review interval is only useful if it resolves to a date something can fall
+	# past. Derive it from the issue date so the review-due reporting is live from
+	# day one rather than after someone fills 93 dates in by hand.
+	months = _review_months(entry["document_type"])
+	if months and payload.get("issue_date"):
+		payload["review_frequency_months"] = months
+		payload["next_review_date"] = add_months(getdate(payload["issue_date"]), months)
+
 	sop = entry.get("sop")
 	if sop:
 		payload["purpose"] = sop.get("purpose")
@@ -239,6 +248,13 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 		doc.insert(ignore_permissions=True)
 	finally:
 		frappe.flags.in_import = False
+
+
+def _review_months(abbr: str) -> int | None:
+	for code, _label, _mode, months in TYPES:
+		if code == abbr:
+			return months
+	return None
 
 
 def _baseline_note(entry: dict) -> str:

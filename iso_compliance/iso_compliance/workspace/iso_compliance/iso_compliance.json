@@ -1,0 +1,236 @@
+{
+ "charts": [
+  {
+   "chart_name": "Documents by Status",
+   "label": "Documents by Status"
+  },
+  {
+   "chart_name": "Documents by Type",
+   "label": "Documents by Type"
+  },
+  {
+   "chart_name": "Inspection Volume",
+   "label": "Inspection Volume"
+  },
+  {
+   "chart_name": "Inspection Results",
+   "label": "Inspection Results"
+  }
+ ],
+ "content": "[{\"id\": \"hd_16801662\", \"type\": \"heading\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Where the management system is failing</b></span>\", \"col\": 12}}, {\"id\": \"pg_23030343\", \"type\": \"paragraph\", \"data\": {\"text\": \"Each number is a count of things somebody has to go and do. A card at zero is a closed gap, not a good score.\", \"col\": 12}}, {\"id\": \"nc_43299808\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"No Approval Evidence\", \"col\": 3}}, {\"id\": \"nc_96387775\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Documents Never Written\", \"col\": 3}}, {\"id\": \"nc_70074299\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Review Overdue\", \"col\": 3}}, {\"id\": \"nc_44560633\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Review Due in 90 Days\", \"col\": 3}}, {\"id\": \"nc_78827888\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Calibration Not Tracked\", \"col\": 3}}, {\"id\": \"nc_51084254\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Instruments Not In Service\", \"col\": 3}}, {\"id\": \"nc_73339067\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Corrective Actions Missing\", \"col\": 3}}, {\"id\": \"nc_74286197\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Rejected Inspections Erased\", \"col\": 3}}, {\"id\": \"nc_1966594\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Suppliers Not Approved\", \"col\": 3}}, {\"id\": \"nc_62426660\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Training Not Evaluated\", \"col\": 3}}, {\"id\": \"nc_70076163\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Controlled Documents\", \"col\": 3}}, {\"id\": \"sp_95608403\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"hd_84114960\", \"type\": \"heading\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>The document set</b></span>\", \"col\": 12}}, {\"id\": \"ch_82058907\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Documents by Status\", \"col\": 6}}, {\"id\": \"ch_31433811\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Documents by Type\", \"col\": 6}}, {\"id\": \"sp_64321666\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"hd_24757969\", \"type\": \"heading\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Quality operations</b></span>\", \"col\": 12}}, {\"id\": \"pg_46071298\", \"type\": \"paragraph\", \"data\": {\"text\": \"Compliance data is operational data. Inspection volume and results are the signal the rest of the system rides on.\", \"col\": 12}}, {\"id\": \"ch_89514516\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Inspection Volume\", \"col\": 6}}, {\"id\": \"ch_25066724\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Inspection Results\", \"col\": 6}}, {\"id\": \"sp_84483953\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"hd_85973989\", \"type\": \"heading\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Registers and worklists</b></span>\", \"col\": 12}}, {\"id\": \"sc_15334574\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Compliance Gaps\", \"col\": 3}}, {\"id\": \"sc_37251329\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Master Document Register\", \"col\": 3}}, {\"id\": \"sc_1499319\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Controlled Document\", \"col\": 3}}, {\"id\": \"sc_9722792\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Non Conformance\", \"col\": 3}}, {\"id\": \"sc_48256347\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Quality Inspection\", \"col\": 3}}, {\"id\": \"sc_7579161\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Asset\", \"col\": 3}}]",
+ "creation": "2026-08-05 00:00:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "check-circle",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "ISO Compliance",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Document Control",
+   "link_count": 0,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Controlled Document",
+   "link_count": 0,
+   "link_to": "Controlled Document",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Controlled Document Type",
+   "link_count": 0,
+   "link_to": "Controlled Document Type",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Master Document Register",
+   "link_count": 0,
+   "link_to": "Master Document Register",
+   "link_type": "Report",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Compliance Gaps",
+   "link_count": 0,
+   "link_to": "Compliance Gaps",
+   "link_type": "Report",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Quality Records",
+   "link_count": 0,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Non Conformance",
+   "link_count": 0,
+   "link_to": "Non Conformance",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Quality Action",
+   "link_count": 0,
+   "link_to": "Quality Action",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Quality Inspection",
+   "link_count": 0,
+   "link_to": "Quality Inspection",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Quality Meeting",
+   "link_count": 0,
+   "link_to": "Quality Meeting",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Resources and Suppliers",
+   "link_count": 0,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Asset",
+   "link_count": 0,
+   "link_to": "Asset",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Supplier",
+   "link_count": 0,
+   "link_to": "Supplier",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Training Event",
+   "link_count": 0,
+   "link_to": "Training Event",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-08-05 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "ISO Compliance",
+ "name": "ISO Compliance",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 40.0,
+ "shortcuts": [
+  {
+   "color": "Red",
+   "doc_view": "",
+   "label": "Compliance Gaps",
+   "link_to": "Compliance Gaps",
+   "type": "Report"
+  },
+  {
+   "color": "Blue",
+   "doc_view": "",
+   "label": "Master Document Register",
+   "link_to": "Master Document Register",
+   "type": "Report"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Controlled Document",
+   "link_to": "Controlled Document",
+   "type": "DocType"
+  },
+  {
+   "color": "Orange",
+   "doc_view": "List",
+   "label": "Non Conformance",
+   "link_to": "Non Conformance",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Quality Inspection",
+   "link_to": "Quality Inspection",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Asset",
+   "link_to": "Asset",
+   "type": "DocType"
+  }
+ ],
+ "title": "ISO Compliance",
+ "type": "Workspace"
+}
