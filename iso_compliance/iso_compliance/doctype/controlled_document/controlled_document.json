@@ -45,6 +45,18 @@
   "sop_body_section",
   "purpose",
   "scope",
+  "references_section",
+  "references",
+  "definitions_section",
+  "definitions",
+  "responsibilities_section",
+  "responsibilities",
+  "procedure_section",
+  "procedure_steps",
+  "records_generated_section",
+  "records_generated",
+  "related_documents_section",
+  "related_documents",
   "rich_body_section",
   "body_content",
   "attachment_section",
@@ -54,7 +66,8 @@
   "supersession_section",
   "supersedes",
   "column_break_supersession",
-  "superseded_by"
+  "superseded_by",
+  "seed_batch"
  ],
  "fields": [
   {
@@ -312,6 +325,79 @@
    "label": "Scope"
   },
   {
+   "depends_on": "eval:doc.body_mode=='Structured SOP'",
+   "fieldname": "references_section",
+   "fieldtype": "Section Break",
+   "label": "References"
+  },
+  {
+   "fieldname": "references",
+   "fieldtype": "Table",
+   "label": "References",
+   "options": "Document Reference"
+  },
+  {
+   "depends_on": "eval:doc.body_mode=='Structured SOP'",
+   "fieldname": "definitions_section",
+   "fieldtype": "Section Break",
+   "label": "Definitions"
+  },
+  {
+   "fieldname": "definitions",
+   "fieldtype": "Table",
+   "label": "Definitions",
+   "options": "Document Definition"
+  },
+  {
+   "depends_on": "eval:doc.body_mode=='Structured SOP'",
+   "fieldname": "responsibilities_section",
+   "fieldtype": "Section Break",
+   "label": "Responsibilities"
+  },
+  {
+   "fieldname": "responsibilities",
+   "fieldtype": "Table",
+   "label": "Responsibilities",
+   "options": "Document Responsibility"
+  },
+  {
+   "depends_on": "eval:doc.body_mode=='Structured SOP'",
+   "fieldname": "procedure_section",
+   "fieldtype": "Section Break",
+   "label": "Procedure"
+  },
+  {
+   "fieldname": "procedure_steps",
+   "fieldtype": "Table",
+   "label": "Procedure Steps",
+   "options": "Document Procedure Step"
+  },
+  {
+   "depends_on": "eval:doc.body_mode=='Structured SOP'",
+   "fieldname": "records_generated_section",
+   "fieldtype": "Section Break",
+   "label": "Records Generated"
+  },
+  {
+   "fieldname": "records_generated",
+   "fieldtype": "Table",
+   "label": "Records Generated",
+   "options": "Document Link Item",
+   "description": "Forms and Registers produced by this procedure. Keeps REG-001 self-maintaining and makes the SOP to data-entry mapping queryable."
+  },
+  {
+   "depends_on": "eval:doc.body_mode=='Structured SOP'",
+   "fieldname": "related_documents_section",
+   "fieldtype": "Section Break",
+   "label": "Related Documents"
+  },
+  {
+   "fieldname": "related_documents",
+   "fieldtype": "Table",
+   "label": "Related Documents",
+   "options": "Document Link Item"
+  },
+  {
    "depends_on": "eval:['Rich Text','Matrix'].includes(doc.body_mode)",
    "fieldname": "rich_body_section",
    "fieldtype": "Section Break",
@@ -373,6 +459,16 @@
    "no_copy": 1,
    "options": "Controlled Document",
    "read_only": 1
+  },
+  {
+   "fieldname": "seed_batch",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Seed Batch",
+   "no_copy": 1,
+   "read_only": 1,
+   "search_index": 1,
+   "description": "Set only on records created by a seed import. Records created by hand leave this empty and are never touched by a purge."
   }
  ],
  "index_web_pages_for_search": 1,

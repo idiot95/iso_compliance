@@ -20,7 +20,8 @@
   "control_section",
   "requires_acknowledgement",
   "column_break_control",
-  "review_frequency_months"
+  "review_frequency_months",
+  "seed_batch"
  ],
  "fields": [
   {
@@ -108,6 +109,16 @@
    "fieldtype": "Int",
    "label": "Review Frequency (Months)",
    "description": "Default periodic review interval. Individual documents may override it."
+  },
+  {
+   "fieldname": "seed_batch",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Seed Batch",
+   "no_copy": 1,
+   "read_only": 1,
+   "search_index": 1,
+   "description": "Set only on records created by a seed import. Hand-created records leave this empty and are never touched by a purge."
   }
  ],
  "index_web_pages_for_search": 1,

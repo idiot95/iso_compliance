@@ -66,6 +66,32 @@ the group.
 | `custom_approved_by` | Link (User) | Approved By | Who granted it |
 | `custom_reapproval_due` | Date | Re-approval Due | Drives periodic re-evaluation required by 8.4 |
 
+## Observations about the site (no change made)
+
+### Print Settings still selects wkhtmltopdf
+
+`Print Settings.pdf_generator` on the restored production data is `wkhtmltopdf`, not
+`chrome`. This app's print format sets `pdf_generator = "chrome"` on the Print Format
+record itself, which is what actually governs rendering, so nothing site-wide was
+changed and no existing print format was affected.
+
+It is worth knowing that every other print format on the site is still rendered by
+wkhtmltopdf, which does not support modern CSS. Switching the site default is a
+deliberate decision with blast radius across all existing formats, so it is recorded
+here rather than made.
+
+### Per-page numbering is unavailable on frappe 16.29
+
+The framework asks the footer page to run `clone_and_update(...)` to stamp per-page
+numbers, but the script that defines that function is not present in the installed
+frappe, so the call fails silently. A substitute was written and tested; it restored
+numbering but the framework still inserts a blank footer page in second position,
+which shifts every later page's number by one.
+
+A controlled document with wrong page numbers is worse than one with none, so the
+footer is static and instead repeats the document number, issue and revision on every
+page. Worth revisiting when frappe ships the missing asset.
+
 ## Approved and applied
 
 | Date | Target DocType | Field / Change | Type | Reason | Fixture |

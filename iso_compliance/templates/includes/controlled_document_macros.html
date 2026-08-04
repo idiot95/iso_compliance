@@ -1,0 +1,274 @@
+{#
+	Shared print macros for every Controlled Document.
+
+	One pipeline, many body sources. A Manual scan, a rich-text policy, a
+	structured SOP and a live ERPNext register all print through the same
+	controlled header, the same footer and the same Change History sheet, so
+	the control block is identical no matter where the body came from.
+#}
+
+{#
+	A single table row, deliberately.
+
+	The repeated header is rendered by Chrome as its own small PDF, and only its
+	first page is merged onto each body page. A header tall enough to paginate
+	therefore loses everything after the first page -- silently, which is the worst
+	possible failure for a control block. Labels sit above their values inside each
+	cell so all eight control fields fit one band that cannot split.
+#}
+{%- macro control_header(doc) -%}
+<table class="cd-header">
+	<tr>
+		<td class="cd-org">
+			<div class="cd-org-name">Hatim Carbon Co. Pvt. Ltd.</div>
+			<div class="cd-org-addr">17/11, Mall Road, Dumdum, Kolkata&nbsp;700080, India</div>
+		</td>
+		<td class="cd-c-num">
+			<div class="cd-lbl">Document Number</div>
+			<div class="cd-val cd-nowrap">{{ doc.name }}</div>
+		</td>
+		<td class="cd-c-title">
+			<div class="cd-lbl">Title</div>
+			<div class="cd-val">{{ doc.title }}</div>
+		</td>
+		<td class="cd-c-ctl">
+			<div class="cd-lbl">Issue No. / Date</div>
+			<div class="cd-val">{{ doc.issue_number or "&mdash;" }} / {{ doc.get_formatted("issue_date") or "&mdash;" }}</div>
+		</td>
+		<td class="cd-c-ctl">
+			<div class="cd-lbl">Rev. No. / Date</div>
+			<div class="cd-val">{{ doc.revision_number or "&mdash;" }} / {{ doc.get_formatted("revision_date") or "&mdash;" }}</div>
+		</td>
+		<td class="cd-c-st">
+			<div class="cd-lbl">Status</div>
+			<div class="cd-val">{{ doc.workflow_state or "&mdash;" }}</div>
+		</td>
+	</tr>
+</table>
+{%- endmacro -%}
+
+
+{%- macro watermark(doc) -%}
+	{%- set state = (doc.workflow_state or "") -%}
+	{%- if state in ("Draft", "Under Review") -%}
+		<div class="cd-watermark cd-watermark-draft">{{ state|upper }}</div>
+	{%- elif state in ("Superseded", "Obsolete") -%}
+		<div class="cd-watermark cd-watermark-obsolete">{{ state|upper }}</div>
+	{%- else -%}
+		<div class="cd-watermark cd-watermark-uncontrolled">Uncontrolled Copy If Printed</div>
+	{%- endif -%}
+{%- endmacro -%}
+
+
+{%- macro authority_block(doc) -%}
+<table class="cd-authority">
+	<tr>
+		<th>Prepared By</th>
+		<th>Reviewed By</th>
+		<th>Approved By</th>
+	</tr>
+	<tr>
+		<td>
+			<div class="cd-sig-name">{{ doc.prepared_by_name or doc.prepared_by or "&mdash;" }}</div>
+			<div class="cd-sig-date">{{ doc.get_formatted("prepared_on") or "" }}</div>
+		</td>
+		<td>
+			<div class="cd-sig-name">{{ doc.reviewed_by_name or doc.reviewed_by or "&mdash;" }}</div>
+			<div class="cd-sig-date">{{ doc.get_formatted("reviewed_on") or "" }}</div>
+		</td>
+		<td>
+			<div class="cd-sig-name">{{ doc.approved_by_name or doc.approved_by or "&mdash;" }}</div>
+			<div class="cd-sig-date">{{ doc.get_formatted("approved_on") or "" }}</div>
+		</td>
+	</tr>
+</table>
+<div class="cd-authority-note">
+	Prepared, reviewed and approved electronically in ERPNext. The stamps above are written by
+	workflow transitions and cannot be typed in.
+</div>
+{%- endmacro -%}
+
+
+{#
+	The Change History sheet, in the column order specified by the assessor:
+	Issue No. | Issue Date | Revision No. | Revision Date | Clause/Section Affected |
+	Description of Change | Prepared By | Reviewed By | Approved By
+#}
+{%- macro change_history(doc) -%}
+<div class="cd-section cd-page-break">
+	<h2 class="cd-h2">Change History</h2>
+	<table class="cd-table cd-history">
+		<thead>
+			<tr>
+				<th>Issue No.</th>
+				<th>Issue Date</th>
+				<th>Revision No.</th>
+				<th>Revision Date</th>
+				<th>Clause / Section Affected</th>
+				<th>Description of Change</th>
+				<th>Prepared By</th>
+				<th>Reviewed By</th>
+				<th>Approved By</th>
+			</tr>
+		</thead>
+		<tbody>
+		{%- if doc.revisions -%}
+			{%- for r in doc.revisions -%}
+			<tr>
+				<td>{{ r.issue_number or "" }}</td>
+				<td>{{ r.get_formatted("issue_date") or "" }}</td>
+				<td>{{ r.revision_number or "" }}</td>
+				<td>{{ r.get_formatted("revision_date") or "" }}</td>
+				<td>{{ r.clause_section_affected or "" }}</td>
+				<td class="cd-desc">{{ r.description_of_change or "" }}</td>
+				<td>{{ r.prepared_by_name or r.prepared_by or "" }}</td>
+				<td>{{ r.reviewed_by_name or r.reviewed_by or "" }}</td>
+				<td>{{ r.approved_by_name or r.approved_by or "" }}</td>
+			</tr>
+			{%- endfor -%}
+		{%- else -%}
+			<tr><td colspan="9" class="cd-empty">No revisions recorded.</td></tr>
+		{%- endif -%}
+		</tbody>
+	</table>
+</div>
+{%- endmacro -%}
+
+
+{%- macro sop_body(doc) -%}
+	{%- if doc.purpose -%}
+	<div class="cd-section"><h2 class="cd-h2">1. Purpose</h2><div class="cd-rich">{{ doc.purpose }}</div></div>
+	{%- endif -%}
+
+	{%- if doc.scope -%}
+	<div class="cd-section"><h2 class="cd-h2">2. Scope</h2><div class="cd-rich">{{ doc.scope }}</div></div>
+	{%- endif -%}
+
+	{%- if doc.references -%}
+	<div class="cd-section"><h2 class="cd-h2">3. References</h2>
+		<ul class="cd-list">
+		{%- for r in doc.references -%}
+			<li>{{ r.reference }}{% if r.clause %} &mdash; cl. {{ r.clause }}{% endif %}</li>
+		{%- endfor -%}
+		</ul>
+	</div>
+	{%- endif -%}
+
+	{%- if doc.definitions -%}
+	<div class="cd-section"><h2 class="cd-h2">4. Definitions</h2>
+		<table class="cd-table">
+			<thead><tr><th style="width:22%">Term</th><th>Definition</th></tr></thead>
+			<tbody>
+			{%- for d in doc.definitions -%}
+				<tr><td class="cd-strong">{{ d.term }}</td><td>{{ d.definition or "" }}</td></tr>
+			{%- endfor -%}
+			</tbody>
+		</table>
+	</div>
+	{%- endif -%}
+
+	{%- if doc.responsibilities -%}
+	<div class="cd-section"><h2 class="cd-h2">5. Responsibilities</h2>
+		<table class="cd-table">
+			<thead><tr><th style="width:28%">Role</th><th>Responsibility</th></tr></thead>
+			<tbody>
+			{%- for r in doc.responsibilities -%}
+				<tr><td class="cd-strong">{{ r.role }}</td><td>{{ r.responsibility or "" }}</td></tr>
+			{%- endfor -%}
+			</tbody>
+		</table>
+	</div>
+	{%- endif -%}
+
+	{%- if doc.procedure_steps -%}
+	<div class="cd-section"><h2 class="cd-h2">6. Procedure</h2>
+		{%- for s in doc.procedure_steps -%}
+		<div class="cd-step">
+			<h3 class="cd-h3">{{ s.step_no or loop.index }}. {{ s.step_title }}</h3>
+			<div class="cd-rich">{{ s.step_content or "" }}</div>
+		</div>
+		{%- endfor -%}
+	</div>
+	{%- endif -%}
+
+	{%- if doc.records_generated -%}
+	<div class="cd-section"><h2 class="cd-h2">7. Records Generated</h2>
+		<table class="cd-table">
+			<thead><tr><th style="width:24%">Document No.</th><th>Title</th></tr></thead>
+			<tbody>
+			{%- for r in doc.records_generated -%}
+				<tr><td class="cd-strong">{{ r.document_number or r.document or "" }}</td><td>{{ r.document_title or "" }}</td></tr>
+			{%- endfor -%}
+			</tbody>
+		</table>
+	</div>
+	{%- endif -%}
+
+	{%- if doc.related_documents -%}
+	<div class="cd-section"><h2 class="cd-h2">8. Related Documents</h2>
+		<table class="cd-table">
+			<thead><tr><th style="width:24%">Document No.</th><th>Title</th></tr></thead>
+			<tbody>
+			{%- for r in doc.related_documents -%}
+				<tr><td class="cd-strong">{{ r.document_number or r.document or "" }}</td><td>{{ r.document_title or "" }}</td></tr>
+			{%- endfor -%}
+			</tbody>
+		</table>
+	</div>
+	{%- endif -%}
+{%- endmacro -%}
+
+
+{%- macro rich_body(doc) -%}
+	{%- if doc.body_content -%}
+	<div class="cd-section"><div class="cd-rich">{{ doc.body_content }}</div></div>
+	{%- endif -%}
+{%- endmacro -%}
+
+
+{%- macro attachment_body(doc) -%}
+<div class="cd-section">
+	{%- if doc.attachment -%}
+	<div class="cd-attach">
+		<div class="cd-attach-label">Controlled content is held as an attachment to this record.</div>
+		<div class="cd-attach-file">{{ doc.attachment.split("/")|last }}</div>
+	</div>
+	{%- else -%}
+	<div class="cd-empty">No attachment has been uploaded for this document.</div>
+	{%- endif -%}
+</div>
+{%- endmacro -%}
+
+
+{%- macro mapped_body(doc) -%}
+<div class="cd-section">
+	<h2 class="cd-h2">Data Source</h2>
+	{%- if doc.mapped_doctype -%}
+	<p class="cd-rich">
+		This document is completed in ERPNext. Entries are recorded against
+		<strong>{{ doc.mapped_doctype }}</strong>{% if doc.mapped_filters %} filtered by <code>{{ doc.mapped_filters }}</code>{% endif %}.
+		The register content is the live data in that DocType; this sheet is the controlled cover for it.
+	</p>
+	{%- else -%}
+	<div class="cd-empty">No ERPNext data source has been mapped to this document yet.</div>
+	{%- endif -%}
+</div>
+{%- endmacro -%}
+
+
+{%- macro body(doc) -%}
+	{%- set mode = doc.body_mode or "Rich Text" -%}
+	{%- if mode == "Structured SOP" -%}
+		{{ sop_body(doc) }}
+	{%- elif mode == "Attachment" -%}
+		{{ attachment_body(doc) }}
+	{%- elif mode == "Mapped Data" -%}
+		{{ mapped_body(doc) }}
+	{%- else -%}
+		{{ rich_body(doc) }}
+	{%- endif -%}
+
+	{%- if mode != "Mapped Data" and doc.mapped_doctype -%}
+		{{ mapped_body(doc) }}
+	{%- endif -%}
+{%- endmacro -%}

@@ -1,0 +1,50 @@
+{
+ "actions": [],
+ "creation": "2026-08-04 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "reference",
+  "linked_document",
+  "clause"
+ ],
+ "fields": [
+  {
+   "fieldname": "reference",
+   "fieldtype": "Data",
+   "label": "Reference",
+   "in_list_view": 1,
+   "columns": 6,
+   "reqd": 1
+  },
+  {
+   "fieldname": "linked_document",
+   "fieldtype": "Link",
+   "label": "Controlled Document",
+   "options": "Controlled Document",
+   "in_list_view": 1,
+   "columns": 3
+  },
+  {
+   "fieldname": "clause",
+   "fieldtype": "Data",
+   "label": "Clause",
+   "in_list_view": 1,
+   "columns": 2
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-08-04 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "ISO Compliance",
+ "name": "Document Reference",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "idx",
+ "sort_order": "ASC",
+ "states": [],
+ "track_changes": 1
+}

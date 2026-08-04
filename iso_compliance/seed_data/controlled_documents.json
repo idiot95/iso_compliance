@@ -1,0 +1,5496 @@
+{
+ "documents": [
+  {
+   "name": "HCCPL/QMS/QM-001",
+   "legacy_document_number": "QM001",
+   "title": "Quality Manual",
+   "document_type": "QM",
+   "clause_reference": "All",
+   "department_label": "QA",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Rich Text",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/POL-001",
+   "legacy_document_number": "POL001",
+   "title": "Quality Policy",
+   "document_type": "POL",
+   "clause_reference": "5.2",
+   "department_label": "Mgmt.",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Rich Text",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/POL-002",
+   "legacy_document_number": "POL002",
+   "title": "Quality Objectives",
+   "document_type": "POL",
+   "clause_reference": "6.2",
+   "department_label": "Mgmt.",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Rich Text",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/SOP-001",
+   "legacy_document_number": "SOP001",
+   "title": "Control of Documented Information",
+   "document_type": "SOP",
+   "clause_reference": "7.5",
+   "department_label": "QA",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null,
+   "sop": {
+    "declared_number": "SOP001",
+    "declared_title": "Control of Documented Information",
+    "purpose": "<p>To establish a systematic process for the creation, review, approval, issue, revision, distribution, storage, retention, and disposal of documented information to ensure that only current and approved documents are available at the point of use.</p>",
+    "scope": "<p>This procedure applies to all documented information forming part of the Quality Management System of Hatim Carbon Co. Pvt. Ltd., including internal and external documents, maintained in electronic or hard copy format.</p>",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 7.5 – Documented Information"
+     },
+     {
+      "reference": "QM001 - Quality Manual"
+     },
+     {
+      "reference": "REG001 - Master Document Register"
+     }
+    ],
+    "definitions": [
+     {
+      "term": "Document",
+      "definition": "Information defining requirements, procedures, or specifications."
+     },
+     {
+      "term": "Record",
+      "definition": "Evidence that an activity has been performed."
+     },
+     {
+      "term": "Controlled Document",
+      "definition": "Approved document subject to revision control."
+     },
+     {
+      "term": "Obsolete Document",
+      "definition": "Superseded document retained only for reference."
+     },
+     {
+      "term": "ERPNext",
+      "definition": "Company's electronic document management system used for maintaining controlled documents and records."
+     }
+    ],
+    "responsibilities": [
+     {
+      "role": "Director",
+      "responsibility": "Approve the Quality Manual, Quality Policy, and major QMS documents. Ensure adequate resources for document control."
+     },
+     {
+      "role": "Quality Manager / Management Representative",
+      "responsibility": "Maintain document control. Issue revisions. Maintain the Master Document Register."
+     },
+     {
+      "role": "Department Heads",
+      "responsibility": "Review documents applicable to their department. Ensure only current documents are used. Identify the need for document revisions."
+     },
+     {
+      "role": "All Employees",
+      "responsibility": "Use only approved documents. Prevent unauthorized modification of documents. Report any outdated or incorrect documents to the Quality Department."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Preparation of Documents",
+      "step_content": "<p>Documents are prepared by authorized personnel using the approved format and unique document numbering system.</p>"
+     },
+     {
+      "step_no": "2",
+      "step_title": "Review and Approval",
+      "step_content": "<p>All QMS documents shall be reviewed and approved prior to issue by authorized personnel.</p>"
+     },
+     {
+      "step_no": "3",
+      "step_title": "Document Identification",
+      "step_content": ""
+     },
+     {
+      "step_no": "4",
+      "step_title": "Each document shall contain:",
+      "step_content": ""
+     },
+     {
+      "step_no": "5",
+      "step_title": "Document Number",
+      "step_content": ""
+     },
+     {
+      "step_no": "6",
+      "step_title": "Title",
+      "step_content": "<p>Revision No.</p>"
+     },
+     {
+      "step_no": "7",
+      "step_title": "Issue Date",
+      "step_content": ""
+     },
+     {
+      "step_no": "8",
+      "step_title": "Page Number",
+      "step_content": ""
+     },
+     {
+      "step_no": "9",
+      "step_title": "Distribution",
+      "step_content": "<p>Controlled documents shall be made available through the ERPNext document management system. Uncontrolled copies shall be identified accordingly.</p>"
+     },
+     {
+      "step_no": "10",
+      "step_title": "Revision",
+      "step_content": "<p>Changes shall be reviewed, approved, and recorded. Superseded versions shall be withdrawn from use.</p>"
+     },
+     {
+      "step_no": "11",
+      "step_title": "External Documents",
+      "step_content": "<p>Applicable standards, customer drawings, specifications, and supplier documents shall be identified and controlled.</p>"
+     },
+     {
+      "step_no": "12",
+      "step_title": "Record Retention",
+      "step_content": "<p>Documents and records shall be stored, protected, retained, and disposed of in accordance with the Record Retention Register.</p>"
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "REG001",
+      "title": "Master Document List"
+     },
+     {
+      "number": "FRM001",
+      "title": "Document Change Request"
+     }
+    ],
+    "related_documents": [
+     {
+      "number": "QM001",
+      "title": "Quality Manual"
+     },
+     {
+      "number": "REG001",
+      "title": "Master Document List"
+     },
+     {
+      "number": "FRM001",
+      "title": "Document Change Request"
+     }
+    ]
+   }
+  },
+  {
+   "name": "HCCPL/QMS/SOP-002",
+   "legacy_document_number": "SOP002",
+   "title": "Risk & Opportunity Management",
+   "document_type": "SOP",
+   "clause_reference": "6.1",
+   "department_label": "QA",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null,
+   "sop": {
+    "declared_number": "SOP002",
+    "declared_title": "Risk & Opportunity Management Procedure",
+    "purpose": "<p>To establish a systematic approach for identifying, evaluating, controlling, and monitoring risks and opportunities that may affect the Quality Management System (QMS), customer satisfaction, product quality, and business performance of Hatim Carbon Co. Pvt. Ltd.</p>",
+    "scope": "<p>This procedure applies to all business processes, including sales, design, procurement, production, inspection, dispatch, customer service, and support functions.</p>",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 6.1"
+     },
+     {
+      "reference": "QM001 - Quality Manual"
+     },
+     {
+      "reference": "REG004 - Risk & Opportunity Register"
+     }
+    ],
+    "definitions": [
+     {
+      "term": "Risk",
+      "definition": "Effect of uncertainty that may negatively impact objectives or processes."
+     },
+     {
+      "term": "Opportunity",
+      "definition": "Circumstances that may improve performance, efficiency, or customer satisfaction."
+     },
+     {
+      "term": "Risk Register",
+      "definition": "Document used to record identified risks, opportunities, actions, and status."
+     }
+    ],
+    "responsibilities": [
+     {
+      "role": "Top Management",
+      "responsibility": "Review significant business risks and approve mitigation plans."
+     },
+     {
+      "role": "Quality Manager / MR",
+      "responsibility": "Maintain the Risk & Opportunity Register. Monitor implementation of actions. Present risk status during Management Review Meetings."
+     },
+     {
+      "role": "Department Heads",
+      "responsibility": "Identify process-specific risks and opportunities. Implement and monitor agreed actions."
+     },
+     {
+      "role": "All Employees",
+      "responsibility": "Report potential risks or improvement opportunities to their department head."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Identification",
+      "step_content": ""
+     },
+     {
+      "step_no": "2",
+      "step_title": "Risks and opportunities shall be identified through:",
+      "step_content": ""
+     },
+     {
+      "step_no": "3",
+      "step_title": "Management Review Meetings",
+      "step_content": ""
+     },
+     {
+      "step_no": "4",
+      "step_title": "Customer feedback and complaints",
+      "step_content": ""
+     },
+     {
+      "step_no": "5",
+      "step_title": "Internal and external audits",
+      "step_content": "<p>Process performance monitoring.</p>"
+     },
+     {
+      "step_no": "6",
+      "step_title": "Supplier evaluations",
+      "step_content": ""
+     },
+     {
+      "step_no": "7",
+      "step_title": "Production and quality issues",
+      "step_content": ""
+     },
+     {
+      "step_no": "8",
+      "step_title": "Market and statutory changes",
+      "step_content": ""
+     },
+     {
+      "step_no": "9",
+      "step_title": "Evaluation",
+      "step_content": ""
+     },
+     {
+      "step_no": "10",
+      "step_title": "Each identified risk shall be evaluated based on:",
+      "step_content": ""
+     },
+     {
+      "step_no": "11",
+      "step_title": "Likelihood of occurrence",
+      "step_content": ""
+     },
+     {
+      "step_no": "12",
+      "step_title": "Potential impact",
+      "step_content": ""
+     },
+     {
+      "step_no": "13",
+      "step_title": "Existing controls(if any)",
+      "step_content": "<p>Risks shall be prioritized for appropriate action.</p>"
+     },
+     {
+      "step_no": "14",
+      "step_title": "Action Planning",
+      "step_content": ""
+     },
+     {
+      "step_no": "15",
+      "step_title": "Appropriate actions may include:",
+      "step_content": ""
+     },
+     {
+      "step_no": "16",
+      "step_title": "Eliminating the risk",
+      "step_content": ""
+     },
+     {
+      "step_no": "17",
+      "step_title": "Reducing the likelihood or impact",
+      "step_content": ""
+     },
+     {
+      "step_no": "18",
+      "step_title": "Establishing additional controls",
+      "step_content": ""
+     },
+     {
+      "step_no": "19",
+      "step_title": "Assigning responsibilities",
+      "step_content": ""
+     },
+     {
+      "step_no": "20",
+      "step_title": "Setting completion timelines",
+      "step_content": "<p>Opportunities for improvement shall also be documented and implemented where feasible.</p>"
+     },
+     {
+      "step_no": "21",
+      "step_title": "Monitoring",
+      "step_content": "<p>The Quality Manager shall periodically review the Risk & Opportunity Register to verify:</p>"
+     },
+     {
+      "step_no": "22",
+      "step_title": "Completion of planned actions",
+      "step_content": "<p>Effectiveness of implemented controls.</p><p>Need for additional actions.</p><p>The register shall be reviewed during Management Review Meetings or whenever significant changes to the organization, or its processes occur.</p>"
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "REG004",
+      "title": "Risk & Opportunity Register"
+     },
+     {
+      "number": "MRM001",
+      "title": "Management Review Minutes"
+     },
+     {
+      "number": "REG018",
+      "title": "Corrective Action Records (where applicable)"
+     }
+    ],
+    "related_documents": [
+     {
+      "number": "QM001",
+      "title": "Quality Manual"
+     },
+     {
+      "number": "REG001",
+      "title": "Master Document List"
+     },
+     {
+      "number": "REG004",
+      "title": "Risk & Opportunity Register"
+     },
+     {
+      "number": "MRM001",
+      "title": "Management Review Minutes"
+     }
+    ]
+   }
+  },
+  {
+   "name": "HCCPL/QMS/SOP-003",
+   "legacy_document_number": "SOP003",
+   "title": "Human Resource, Competency & Training",
+   "document_type": "SOP",
+   "clause_reference": "7.1–7.3",
+   "department_label": "HR",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null,
+   "sop": {
+    "declared_number": "SOP003",
+    "declared_title": "Human Resource, Competency & Training Procedure",
+    "purpose": "<p>To ensure that personnel performing work affecting product quality are competent based on appropriate education, training, skills, and experience, and are aware of the Quality Management System and their responsibilities.</p>",
+    "scope": "<p>This procedure applies to all permanent, contractual, trainee, apprentice, and temporary employees working at Hatim Carbon Co. Pvt. Ltd.</p>",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 7.1.2"
+     },
+     {
+      "reference": "ISO 9001:2015 Clause 7.2"
+     },
+     {
+      "reference": "ISO 9001:2015 Clause 7.3"
+     },
+     {
+      "reference": "Quality Manual (QM001)"
+     }
+    ],
+    "definitions": [
+     {
+      "term": "Competency",
+      "definition": "Ability to perform assigned duties based on education, training, skills, and experience."
+     },
+     {
+      "term": "Training",
+      "definition": "Planned activity to improve employee knowledge and skills."
+     },
+     {
+      "term": "Induction Training",
+      "definition": "Orientation provided to newly joined employees regarding company policies, safety, and the QMS."
+     }
+    ],
+    "responsibilities": [
+     {
+      "role": "Top Management",
+      "responsibility": "Provide adequate resources for recruitment and training. Review competency requirements."
+     },
+     {
+      "role": "HR Department",
+      "responsibility": "Maintain employee records. Coordinate induction and training programs. Maintain training records."
+     },
+     {
+      "role": "Department Heads",
+      "responsibility": "Identify competency requirements. Recommend training needs. Evaluate employee performance and effectiveness of training."
+     },
+     {
+      "role": "All Employees",
+      "responsibility": "Attend assigned training programs. Apply acquired knowledge in their work. Follow company procedures and work instructions."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Recruitment",
+      "step_content": "<p>Personnel shall be recruited based on the qualification, experience, and competency requirements of the respective position.</p>"
+     },
+     {
+      "step_no": "2",
+      "step_title": "Induction",
+      "step_content": ""
+     },
+     {
+      "step_no": "3",
+      "step_title": "All new employees shall undergo induction training covering:",
+      "step_content": ""
+     },
+     {
+      "step_no": "4",
+      "step_title": "Company profile",
+      "step_content": ""
+     },
+     {
+      "step_no": "5",
+      "step_title": "Quality Policy and Quality Objectives",
+      "step_content": ""
+     },
+     {
+      "step_no": "6",
+      "step_title": "QMS awareness",
+      "step_content": ""
+     },
+     {
+      "step_no": "7",
+      "step_title": "Safety requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "8",
+      "step_title": "Departmental responsibilities",
+      "step_content": ""
+     },
+     {
+      "step_no": "9",
+      "step_title": "Applicable procedures and work instructions",
+      "step_content": ""
+     },
+     {
+      "step_no": "10",
+      "step_title": "Competency Evaluation",
+      "step_content": "<p>Department Heads shall periodically assess employee competency based on:</p>"
+     },
+     {
+      "step_no": "11",
+      "step_title": "Education and qualifications",
+      "step_content": ""
+     },
+     {
+      "step_no": "12",
+      "step_title": "Experience",
+      "step_content": ""
+     },
+     {
+      "step_no": "13",
+      "step_title": "Job performance",
+      "step_content": ""
+     },
+     {
+      "step_no": "14",
+      "step_title": "Skill level",
+      "step_content": ""
+     },
+     {
+      "step_no": "15",
+      "step_title": "Training effectiveness",
+      "step_content": ""
+     },
+     {
+      "step_no": "16",
+      "step_title": "Training",
+      "step_content": ""
+     },
+     {
+      "step_no": "17",
+      "step_title": "Training may include:",
+      "step_content": ""
+     },
+     {
+      "step_no": "18",
+      "step_title": "Technical training",
+      "step_content": ""
+     },
+     {
+      "step_no": "19",
+      "step_title": "Quality awareness",
+      "step_content": "<p>Process-specific training.</p>"
+     },
+     {
+      "step_no": "20",
+      "step_title": "Safety training",
+      "step_content": ""
+     },
+     {
+      "step_no": "21",
+      "step_title": "Customer-specific requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "22",
+      "step_title": "Equipment or machine operation",
+      "step_content": "<p>Training may be conducted internally or externally.</p>"
+     },
+     {
+      "step_no": "23",
+      "step_title": "Effectiveness of Training",
+      "step_content": "<p>The effectiveness of training shall be evaluated through one or more of the following:</p>"
+     },
+     {
+      "step_no": "24",
+      "step_title": "Observation of job performance",
+      "step_content": ""
+     },
+     {
+      "step_no": "25",
+      "step_title": "Practical demonstration",
+      "step_content": ""
+     },
+     {
+      "step_no": "26",
+      "step_title": "Supervisor feedback",
+      "step_content": ""
+     },
+     {
+      "step_no": "27",
+      "step_title": "Skill assessment",
+      "step_content": ""
+     },
+     {
+      "step_no": "28",
+      "step_title": "Reduction in errors or nonconformities",
+      "step_content": "<p>Additional training shall be provided where necessary.</p>"
+     },
+     {
+      "step_no": "29",
+      "step_title": "Awareness",
+      "step_content": ""
+     },
+     {
+      "step_no": "30",
+      "step_title": "Employees shall be made aware of:",
+      "step_content": ""
+     },
+     {
+      "step_no": "31",
+      "step_title": "The Quality Policy",
+      "step_content": ""
+     },
+     {
+      "step_no": "32",
+      "step_title": "Quality Objectives",
+      "step_content": ""
+     },
+     {
+      "step_no": "33",
+      "step_title": "Their contribution to product quality",
+      "step_content": ""
+     },
+     {
+      "step_no": "34",
+      "step_title": "Customer requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "35",
+      "step_title": "Consequences of nonconforming work",
+      "step_content": ""
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "REG012",
+      "title": "Training Register"
+     },
+     {
+      "number": "REG006",
+      "title": "Employee Competency Matrix"
+     },
+     {
+      "number": "",
+      "title": "FRM0XX – Employee Competency Evaluation Record"
+     },
+     {
+      "number": "",
+      "title": "FRM0XX – Training Attendance Record"
+     },
+     {
+      "number": "",
+      "title": "FRM0XX – Induction Training Checklist"
+     },
+     {
+      "number": "REG023",
+      "title": "Annual Training Calendar"
+     }
+    ],
+    "related_documents": [
+     {
+      "number": "QM001",
+      "title": "Quality Manual"
+     },
+     {
+      "number": "POL001",
+      "title": "Quality Policy"
+     },
+     {
+      "number": "POL002",
+      "title": "Quality Objectives"
+     },
+     {
+      "number": "REG006",
+      "title": "Employee Competency Matrix"
+     },
+     {
+      "number": "REG012",
+      "title": "Training Register"
+     }
+    ]
+   }
+  },
+  {
+   "name": "HCCPL/QMS/SOP-004",
+   "legacy_document_number": "SOP004",
+   "title": "Customer Communication, Sales & Contract Review",
+   "document_type": "SOP",
+   "clause_reference": "8.2",
+   "department_label": "Sales",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null,
+   "sop": {
+    "declared_number": "SOP004",
+    "declared_title": "Customer Communication, Sales & Contract Review Procedure",
+    "purpose": "<p>To establish a systematic process for receiving customer enquiries, reviewing customer requirements, preparing quotations, accepting orders, and maintaining effective communication to ensure customer requirements are clearly understood and fulfilled.</p>",
+    "scope": "<p>This procedure applies to all enquiries, quotations, purchase orders, contracts, amendments, and customer communications related to products and services provided by Hatim Carbon Co. Pvt. Ltd.</p>",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 8.2"
+     },
+     {
+      "reference": "Customer Purchase Order"
+     },
+     {
+      "reference": "Technical Drawings & Specifications"
+     },
+     {
+      "reference": "QM001 – Quality Manual"
+     }
+    ],
+    "definitions": [
+     {
+      "term": "Customer Enquiry",
+      "definition": "A request for quotation, technical information, or product details received from a customer."
+     },
+     {
+      "term": "Contract Review",
+      "definition": "Verification of customer requirements before accepting an order."
+     },
+     {
+      "term": "Purchase Order (PO)",
+      "definition": "Official order issued by the customer for the supply of products or services."
+     },
+     {
+      "term": "Quotation",
+      "definition": "Commercial offer issued by the organization based on reviewed customer requirements."
+     }
+    ],
+    "responsibilities": [
+     {
+      "role": "Top Management",
+      "responsibility": "Approve special commercial or contractual conditions when required."
+     },
+     {
+      "role": "Sales & Marketing Department",
+      "responsibility": "Receive customer enquiries. Prepare quotations. Coordinate with customers. Obtain order confirmation."
+     },
+     {
+      "role": "Design / Engineering Department (where applicable)",
+      "responsibility": "Review drawings, samples, and technical specifications. Confirm technical feasibility."
+     },
+     {
+      "role": "Production Department",
+      "responsibility": "Confirm manufacturing capability and delivery schedule."
+     },
+     {
+      "role": "Quality Department",
+      "responsibility": "Review quality, inspection, testing, and statutory requirements where applicable."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Receipt of Enquiry",
+      "step_content": ""
+     },
+     {
+      "step_no": "2",
+      "step_title": "Customer enquiries may be received through:",
+      "step_content": ""
+     },
+     {
+      "step_no": "3",
+      "step_title": "Email",
+      "step_content": ""
+     },
+     {
+      "step_no": "4",
+      "step_title": "Telephone",
+      "step_content": ""
+     },
+     {
+      "step_no": "5",
+      "step_title": "Customer visit",
+      "step_content": ""
+     },
+     {
+      "step_no": "6",
+      "step_title": "Online portal",
+      "step_content": ""
+     },
+     {
+      "step_no": "7",
+      "step_title": "Tender documents",
+      "step_content": "<p>The Sales Department shall record the enquiry and collect all applicable technical and commercial requirements.</p>"
+     },
+     {
+      "step_no": "8",
+      "step_title": "Review of Requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "9",
+      "step_title": "Customer requirements shall be reviewed to confirm:",
+      "step_content": ""
+     },
+     {
+      "step_no": "10",
+      "step_title": "Product specifications",
+      "step_content": ""
+     },
+     {
+      "step_no": "11",
+      "step_title": "Drawings or samples",
+      "step_content": ""
+     },
+     {
+      "step_no": "12",
+      "step_title": "Material grade",
+      "step_content": ""
+     },
+     {
+      "step_no": "13",
+      "step_title": "Quantity",
+      "step_content": ""
+     },
+     {
+      "step_no": "14",
+      "step_title": "Delivery schedule",
+      "step_content": ""
+     },
+     {
+      "step_no": "15",
+      "step_title": "Inspection requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "16",
+      "step_title": "Testing requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "17",
+      "step_title": "Packaging requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "18",
+      "step_title": "Statutory or regulatory requirements (if applicable)",
+      "step_content": "<p>Any ambiguity shall be clarified with the customer before submission of the quotation.</p>"
+     },
+     {
+      "step_no": "19",
+      "step_title": "Quotation",
+      "step_content": "<p>The Sales Department shall prepare the quotation based on approved technical and commercial inputs.</p>"
+     },
+     {
+      "step_no": "20",
+      "step_title": "The quotation shall include, where applicable:",
+      "step_content": ""
+     },
+     {
+      "step_no": "21",
+      "step_title": "Product description",
+      "step_content": ""
+     },
+     {
+      "step_no": "22",
+      "step_title": "Quantity",
+      "step_content": ""
+     },
+     {
+      "step_no": "23",
+      "step_title": "Price",
+      "step_content": ""
+     },
+     {
+      "step_no": "24",
+      "step_title": "Delivery period",
+      "step_content": ""
+     },
+     {
+      "step_no": "25",
+      "step_title": "Payment terms",
+      "step_content": ""
+     },
+     {
+      "step_no": "26",
+      "step_title": "Validity",
+      "step_content": ""
+     },
+     {
+      "step_no": "27",
+      "step_title": "Applicable taxes",
+      "step_content": ""
+     },
+     {
+      "step_no": "28",
+      "step_title": "Special conditions",
+      "step_content": ""
+     },
+     {
+      "step_no": "29",
+      "step_title": "Order Acceptance",
+      "step_content": "<p>Upon receipt of the Purchase Order, the Sales Department shall verify that it matches the quoted technical and commercial requirements.</p><p>Any deviations shall be resolved with the customer before acceptance.</p><p>Order acknowledgement shall be issued where applicable.</p><p>Accepted orders shall be communicated to the concerned departments for planning and execution.</p>"
+     },
+     {
+      "step_no": "30",
+      "step_title": "Customer Communication",
+      "step_content": ""
+     },
+     {
+      "step_no": "31",
+      "step_title": "Customer communication shall be maintained regarding:",
+      "step_content": "<p>Order status.</p>"
+     },
+     {
+      "step_no": "32",
+      "step_title": "Delivery schedule",
+      "step_content": ""
+     },
+     {
+      "step_no": "33",
+      "step_title": "Technical clarifications",
+      "step_content": "<p>Design changes.</p>"
+     },
+     {
+      "step_no": "34",
+      "step_title": "Customer complaints",
+      "step_content": ""
+     },
+     {
+      "step_no": "35",
+      "step_title": "Product feedback",
+      "step_content": ""
+     },
+     {
+      "step_no": "36",
+      "step_title": "After-sales support",
+      "step_content": ""
+     },
+     {
+      "step_no": "37",
+      "step_title": "Changes to Orders",
+      "step_content": "<p>Any change requested by the customer after order acceptance shall be reviewed for its impact on quality, cost, delivery, and production.</p><p>Approved changes shall be documented and communicated to all affected departments before implementation to ensure relevant documented information is updated.</p>"
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "REG008",
+      "title": "Customer Complaint Register"
+     },
+     {
+      "number": "",
+      "title": "FRMXX – Quotations"
+     },
+     {
+      "number": "",
+      "title": "Purchase Orders(Customer Documents)"
+     },
+     {
+      "number": "",
+      "title": "Order Acknowledgements"
+     },
+     {
+      "number": "",
+      "title": "FRMXX – Contract Review Checklist"
+     }
+    ],
+    "related_documents": [
+     {
+      "number": "QM001",
+      "title": "Quality Manual"
+     },
+     {
+      "number": "SOP007",
+      "title": "Production Planning & Control Procedure"
+     },
+     {
+      "number": "SOP013",
+      "title": "Control of Nonconforming Outputs Procedure"
+     },
+     {
+      "number": "SOP014",
+      "title": "Corrective Action Procedure"
+     }
+    ]
+   }
+  },
+  {
+   "name": "HCCPL/QMS/SOP-005",
+   "legacy_document_number": "SOP005",
+   "title": "Purchase & Supplier Management",
+   "document_type": "SOP",
+   "clause_reference": "8.4",
+   "department_label": "Purchase",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null,
+   "sop": {
+    "declared_number": "SOP005",
+    "declared_title": "Purchase & Supplier Management Procedure",
+    "purpose": "<p>To ensure that all externally provided products, materials, and services conform to specified purchase requirements through systematic supplier selection, evaluation, purchasing, and performance monitoring.</p>",
+    "scope": "<p>This procedure applies to the procurement of raw materials, bought-out components, consumables, subcontracted processes, equipment, services, and other externally provided products required by Hatim Carbon Co. Pvt. Ltd.</p>",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 8.4"
+     },
+     {
+      "reference": "QM001 – Quality Manual"
+     },
+     {
+      "reference": "REG007 – Approved Suppliers Register"
+     },
+     {
+      "reference": "Purchase Orders"
+     }
+    ],
+    "definitions": [
+     {
+      "term": "Supplier",
+      "definition": "External provider of products or services."
+     },
+     {
+      "term": "Approved Supplier",
+      "definition": "Supplier evaluated and approved by Hatim Carbon."
+     },
+     {
+      "term": "Purchase Order (PO)",
+      "definition": "Official document issued to procure materials or services."
+     },
+     {
+      "term": "Outsourced Process",
+      "definition": "A process performed by an external provider under the control of Hatim Carbon."
+     }
+    ],
+    "responsibilities": [
+     {
+      "role": "Top Management",
+      "responsibility": "Approve critical suppliers when required."
+     },
+     {
+      "role": "Purchase Department",
+      "responsibility": "Identify and evaluate suppliers. Issue Purchase Orders. Monitor supplier performance."
+     },
+     {
+      "role": "Quality Department",
+      "responsibility": "Define quality requirements. Verify supplier quality documents. Review supplier performance."
+     },
+     {
+      "role": "Stores Department",
+      "responsibility": "Verify received quantity and documents. Coordinate incoming inspection."
+     },
+     {
+      "role": "Production Department",
+      "responsibility": "Provide technical specifications or material requirements where applicable."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Supplier Selection",
+      "step_content": ""
+     },
+     {
+      "step_no": "2",
+      "step_title": "Suppliers shall be selected based on:",
+      "step_content": ""
+     },
+     {
+      "step_no": "3",
+      "step_title": "Product quality",
+      "step_content": ""
+     },
+     {
+      "step_no": "4",
+      "step_title": "Technical capability",
+      "step_content": ""
+     },
+     {
+      "step_no": "5",
+      "step_title": "Delivery performance",
+      "step_content": ""
+     },
+     {
+      "step_no": "6",
+      "step_title": "Commercial terms",
+      "step_content": ""
+     },
+     {
+      "step_no": "7",
+      "step_title": "Previous performance",
+      "step_content": ""
+     },
+     {
+      "step_no": "8",
+      "step_title": "Certifications (where applicable)",
+      "step_content": ""
+     },
+     {
+      "step_no": "9",
+      "step_title": "Supplier Approval",
+      "step_content": "<p>New suppliers shall be evaluated before approval.</p>"
+     },
+     {
+      "step_no": "10",
+      "step_title": "Evaluation may consider:",
+      "step_content": ""
+     },
+     {
+      "step_no": "11",
+      "step_title": "Product samples",
+      "step_content": ""
+     },
+     {
+      "step_no": "12",
+      "step_title": "Manufacturing capability",
+      "step_content": ""
+     },
+     {
+      "step_no": "13",
+      "step_title": "Past performance",
+      "step_content": ""
+     },
+     {
+      "step_no": "14",
+      "step_title": "Customer references",
+      "step_content": ""
+     },
+     {
+      "step_no": "15",
+      "step_title": "Quality certifications",
+      "step_content": "<p>Approved suppliers shall be listed in the REG007 - Approved Supplier List.</p>"
+     },
+     {
+      "step_no": "16",
+      "step_title": "Purchase Order",
+      "step_content": ""
+     },
+     {
+      "step_no": "17",
+      "step_title": "Purchase Orders shall clearly specify:",
+      "step_content": ""
+     },
+     {
+      "step_no": "18",
+      "step_title": "Product description",
+      "step_content": ""
+     },
+     {
+      "step_no": "19",
+      "step_title": "Material grade",
+      "step_content": ""
+     },
+     {
+      "step_no": "20",
+      "step_title": "Quantity",
+      "step_content": ""
+     },
+     {
+      "step_no": "21",
+      "step_title": "Applicable drawings/specifications",
+      "step_content": ""
+     },
+     {
+      "step_no": "22",
+      "step_title": "Delivery schedule",
+      "step_content": ""
+     },
+     {
+      "step_no": "23",
+      "step_title": "Inspection requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "24",
+      "step_title": "Packaging requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "25",
+      "step_title": "Commercial terms",
+      "step_content": "<p>Only authorized personnel shall issue Purchase Orders.</p>"
+     },
+     {
+      "step_no": "26",
+      "step_title": "Monitoring Supplier Performance",
+      "step_content": ""
+     },
+     {
+      "step_no": "27",
+      "step_title": "Supplier performance shall be periodically reviewed based on:",
+      "step_content": ""
+     },
+     {
+      "step_no": "28",
+      "step_title": "Quality of supplied materials",
+      "step_content": ""
+     },
+     {
+      "step_no": "29",
+      "step_title": "On-time delivery",
+      "step_content": ""
+     },
+     {
+      "step_no": "30",
+      "step_title": "Responsiveness",
+      "step_content": ""
+     },
+     {
+      "step_no": "31",
+      "step_title": "Complaint history",
+      "step_content": ""
+     },
+     {
+      "step_no": "32",
+      "step_title": "Corrective action implementation",
+      "step_content": ""
+     },
+     {
+      "step_no": "33",
+      "step_title": "Rejection Rate",
+      "step_content": "<p>Unsatisfactory suppliers may be re-evaluated or removed from the Approved Supplier List.</p>"
+     },
+     {
+      "step_no": "34",
+      "step_title": "Outsourced Processes",
+      "step_content": "<p>Where any process is outsourced, Hatim Carbon shall ensure that applicable quality requirements are communicated, monitored, and verified before acceptance.</p>"
+     },
+     {
+      "step_no": "35",
+      "step_title": "Purchase Order Amendments",
+      "step_content": "<p>Any change to an issued Purchase Order shall be reviewed and approved by authorized personnel before being communicated to the supplier.</p><p>The revised requirements shall clearly identify the changes made.</p><p>Where applicable, affected departments shall be informed of the revised purchase requirements.</p>"
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "REG007",
+      "title": "Approved Suppliers Register"
+     },
+     {
+      "number": "",
+      "title": "FRMxxx – Supplier Evaluation Form"
+     },
+     {
+      "number": "",
+      "title": "Purchase Orders"
+     },
+     {
+      "number": "",
+      "title": "FRMxxx – Supplier Performance Evaluation"
+     },
+     {
+      "number": "",
+      "title": "FRMxxx – Supplier Corrective Action Request (SCAR)"
+     }
+    ],
+    "related_documents": [
+     {
+      "number": "QM001",
+      "title": "Quality Manual"
+     },
+     {
+      "number": "SOP006",
+      "title": "Incoming Material Inspection & Material Identification Procedure"
+     },
+     {
+      "number": "SOP013",
+      "title": "Control of Nonconforming Outputs Procedure"
+     },
+     {
+      "number": "SOP014",
+      "title": "Corrective Action Procedure"
+     }
+    ]
+   }
+  },
+  {
+   "name": "HCCPL/QMS/SOP-006",
+   "legacy_document_number": "SOP006",
+   "title": "Incoming Material Inspection & Material Identification",
+   "document_type": "SOP",
+   "clause_reference": "8.4, 8.6",
+   "department_label": "QA",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null,
+   "sop": {
+    "declared_number": "SOP006",
+    "declared_title": "Incoming Material Inspection & Material Identification",
+    "purpose": "<p>To ensure that all incoming materials are verified against specified purchase requirements before acceptance for production and are properly identified to maintain traceability.</p>",
+    "scope": "<p>This procedure applies to all incoming raw materials, bought-out components, consumables, packing materials, and outsourced products received by Hatim Carbon Co. Pvt. Ltd.</p>",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 8.4 – Control of Externally Provided Processes, Products and Services"
+     },
+     {
+      "reference": "ISO 9001:2015 Clause 8.5.2 – Identification & Traceability"
+     },
+     {
+      "reference": "Purchase Order"
+     },
+     {
+      "reference": "Approved Supplier List"
+     },
+     {
+      "reference": "QM001 - Quality Manual"
+     }
+    ],
+    "definitions": [
+     {
+      "term": "Incoming Inspection",
+      "definition": "Verification of received materials against specified requirements before acceptance."
+     },
+     {
+      "term": "Accepted Material",
+      "definition": "Material approved for production after inspection."
+     },
+     {
+      "term": "Rejected Material",
+      "definition": "Material not meeting specified requirements and segregated to prevent unintended use."
+     },
+     {
+      "term": "Material Test Certificate (MTC)",
+      "definition": "Supplier-issued document confirming the material conforms to specified chemical, mechanical, or other technical requirements."
+     }
+    ],
+    "responsibilities": [
+     {
+      "role": "Purchase Department",
+      "responsibility": "Coordinate with suppliers regarding rejected materials. Arrange replacement or corrective action where required."
+     },
+     {
+      "role": "Quality Department",
+      "responsibility": "Carry out incoming inspection. Verify specifications and quality requirements. Approve or reject received materials."
+     },
+     {
+      "role": "Stores Department",
+      "responsibility": "Receive incoming materials. Verify quantity and accompanying documents. Present materials for inspection."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Receipt of Material",
+      "step_content": ""
+     },
+     {
+      "step_no": "2",
+      "step_title": "On receipt, the Stores Department shall verify:",
+      "step_content": ""
+     },
+     {
+      "step_no": "3",
+      "step_title": "Delivery Challan",
+      "step_content": ""
+     },
+     {
+      "step_no": "4",
+      "step_title": "Purchase Order",
+      "step_content": ""
+     },
+     {
+      "step_no": "5",
+      "step_title": "Invoice",
+      "step_content": ""
+     },
+     {
+      "step_no": "6",
+      "step_title": "Quantity Received",
+      "step_content": ""
+     },
+     {
+      "step_no": "7",
+      "step_title": "Material Identification",
+      "step_content": ""
+     },
+     {
+      "step_no": "8",
+      "step_title": "Material Test Certificate (where applicable)",
+      "step_content": ""
+     },
+     {
+      "step_no": "9",
+      "step_title": "Incoming Inspection",
+      "step_content": ""
+     },
+     {
+      "step_no": "10",
+      "step_title": "The Quality Department shall inspect the material as applicable by:",
+      "step_content": ""
+     },
+     {
+      "step_no": "11",
+      "step_title": "Visual inspection",
+      "step_content": ""
+     },
+     {
+      "step_no": "12",
+      "step_title": "Dimensional verification",
+      "step_content": ""
+     },
+     {
+      "step_no": "13",
+      "step_title": "Material grade verification",
+      "step_content": ""
+     },
+     {
+      "step_no": "14",
+      "step_title": "Quantity verification",
+      "step_content": ""
+     },
+     {
+      "step_no": "15",
+      "step_title": "Review of Material Test Certificate",
+      "step_content": "<p>Any additional tests specified in the Purchase Order or inspection plan.</p>"
+     },
+     {
+      "step_no": "16",
+      "step_title": "Material Identification",
+      "step_content": "<p>Accepted materials shall be identified using appropriate labels, batch numbers, heat numbers, lot numbers or supplier identification, as applicable, to maintain identification and traceability throughout storage and production.</p>"
+     },
+     {
+      "step_no": "17",
+      "step_title": "Acceptance",
+      "step_content": "<p>Materials meeting the specified purchase and inspection requirements shall be accepted, identified with an acceptance status (where applicable), and released to Stores for production use.</p>"
+     },
+     {
+      "step_no": "18",
+      "step_title": "Rejection",
+      "step_content": ""
+     },
+     {
+      "step_no": "19",
+      "step_title": "Materials failing to meet specified requirements shall:",
+      "step_content": "<p>Be clearly identified.</p><p>Be segregated from accepted material.</p><p>Be recorded.</p><p>Be reported to the Purchase Department for appropriate disposition.</p><p>Nonconforming materials shall be handled in accordance with SOP013 – Control of Nonconforming Outputs Procedure.</p>"
+     },
+     {
+      "step_no": "20",
+      "step_title": "Storage",
+      "step_content": "<p>Accepted materials shall be stored in designated locations to prevent damage, deterioration, contamination, or mix-up before issue to production.</p>"
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "",
+      "title": "FRMxxx – Incoming Inspection Report"
+     },
+     {
+      "number": "",
+      "title": "FRMxxx – Goods Receipt Note (GRN)"
+     },
+     {
+      "number": "",
+      "title": "Material Test Certificates (Supplier Documents)"
+     },
+     {
+      "number": "",
+      "title": "FRMxxx – Material Rejection Report"
+     }
+    ],
+    "related_documents": [
+     {
+      "number": "QM001",
+      "title": "Quality Manual"
+     },
+     {
+      "number": "SOP005",
+      "title": "Purchase & Supplier Management Procedure"
+     },
+     {
+      "number": "SOP013",
+      "title": "Control of Nonconforming Outputs Procedure"
+     },
+     {
+      "number": "REG007",
+      "title": "Approved Suppliers Register"
+     },
+     {
+      "number": "",
+      "title": "Applicable Inspection & Test Plan (ITP)"
+     }
+    ]
+   }
+  },
+  {
+   "name": "HCCPL/QMS/SOP-007",
+   "legacy_document_number": "SOP007",
+   "title": "Production Planning & Control",
+   "document_type": "SOP",
+   "clause_reference": "8.1",
+   "department_label": "Production",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null,
+   "sop": {
+    "declared_number": "SOP007",
+    "declared_title": "Production Planning & Control",
+    "purpose": "<p>To establish a systematic process for planning, scheduling, monitoring, and controlling production activities to ensure that customer requirements are fulfilled efficiently, and products are manufactured in accordance with approved specifications.</p>",
+    "scope": "<p>This procedure applies to all production activities carried out at Hatim Carbon Co. Pvt. Ltd., from receipt of a confirmed customer order through production planning until the product is submitted for final inspection and subsequent dispatch.</p>",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 8.1"
+     },
+     {
+      "reference": "QM001 – Quality Manual"
+     },
+     {
+      "reference": "Customer Purchase Orders"
+     },
+     {
+      "reference": "Approved Drawings & Specifications"
+     },
+     {
+      "reference": "Approved Work Instructions"
+     }
+    ],
+    "definitions": [
+     {
+      "term": "Production Plan",
+      "definition": "A schedule prepared to meet customer delivery requirements."
+     },
+     {
+      "term": "Job Card",
+      "definition": "Document containing manufacturing and inspection requirements for a production batch."
+     },
+     {
+      "term": "Batch",
+      "definition": "A defined quantity of products manufactured under similar conditions."
+     },
+     {
+      "term": "Production Schedule",
+      "definition": "Planned sequence and timing of manufacturing activities to meet customer delivery requirements."
+     }
+    ],
+    "responsibilities": [
+     {
+      "role": "Production Supervisors",
+      "responsibility": "Execute production as per the approved Job Card, drawings, and work instructions. Report production delays or abnormalities."
+     },
+     {
+      "role": "Production Manager",
+      "responsibility": "Prepare production plans and schedules. Allocate manpower, m achines, and resources. Monitor production progress."
+     },
+     {
+      "role": "Quality Department",
+      "responsibility": "Carry out stage and final inspections as per the Inspection Plan. Ensure production complies with approved specifications."
+     },
+     {
+      "role": "Stores Department",
+      "responsibility": "Issue materials against approved requisitions. Maintain material availability."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Production Planning",
+      "step_content": ""
+     },
+     {
+      "step_no": "2",
+      "step_title": "Production planning shall be carried out based on:",
+      "step_content": ""
+     },
+     {
+      "step_no": "3",
+      "step_title": "Customer Purchase Orders",
+      "step_content": ""
+     },
+     {
+      "step_no": "4",
+      "step_title": "Delivery schedules",
+      "step_content": ""
+     },
+     {
+      "step_no": "5",
+      "step_title": "Product specifications",
+      "step_content": ""
+     },
+     {
+      "step_no": "6",
+      "step_title": "Material availability",
+      "step_content": ""
+     },
+     {
+      "step_no": "7",
+      "step_title": "Machine capacity",
+      "step_content": ""
+     },
+     {
+      "step_no": "8",
+      "step_title": "Manpower availability",
+      "step_content": ""
+     },
+     {
+      "step_no": "9",
+      "step_title": "Customer priority (where applicable)",
+      "step_content": ""
+     },
+     {
+      "step_no": "10",
+      "step_title": "Production Schedule",
+      "step_content": "<p>The Production Department shall prepare a production schedule indicating:</p>"
+     },
+     {
+      "step_no": "11",
+      "step_title": "Product",
+      "step_content": ""
+     },
+     {
+      "step_no": "12",
+      "step_title": "Quantity",
+      "step_content": ""
+     },
+     {
+      "step_no": "13",
+      "step_title": "Batch",
+      "step_content": "<p>Planned start date.</p><p>Planned completion date.</p>"
+     },
+     {
+      "step_no": "14",
+      "step_title": "Delivery commitment",
+      "step_content": ""
+     },
+     {
+      "step_no": "15",
+      "step_title": "Resource Availability",
+      "step_content": ""
+     },
+     {
+      "step_no": "16",
+      "step_title": "Production shall commence only after confirming the availability of:",
+      "step_content": ""
+     },
+     {
+      "step_no": "17",
+      "step_title": "Approved raw materials",
+      "step_content": ""
+     },
+     {
+      "step_no": "18",
+      "step_title": "Required machinery",
+      "step_content": ""
+     },
+     {
+      "step_no": "19",
+      "step_title": "Qualified manpower",
+      "step_content": ""
+     },
+     {
+      "step_no": "20",
+      "step_title": "Applicable drawings",
+      "step_content": ""
+     },
+     {
+      "step_no": "21",
+      "step_title": "Work Instructions",
+      "step_content": ""
+     },
+     {
+      "step_no": "22",
+      "step_title": "Inspection and measuring equipment",
+      "step_content": ""
+     },
+     {
+      "step_no": "23",
+      "step_title": "Material Issue",
+      "step_content": "<p>Raw materials shall be issued by the Stores Department against an approved Material Requisition or Job Card.</p><p>Only accepted materials shall be issued for production.</p>"
+     },
+     {
+      "step_no": "24",
+      "step_title": "Production Control",
+      "step_content": ""
+     },
+     {
+      "step_no": "25",
+      "step_title": "Production shall be carried out in accordance with:",
+      "step_content": ""
+     },
+     {
+      "step_no": "26",
+      "step_title": "Approved drawings",
+      "step_content": ""
+     },
+     {
+      "step_no": "27",
+      "step_title": "Customer specifications",
+      "step_content": ""
+     },
+     {
+      "step_no": "28",
+      "step_title": "Work Instructions",
+      "step_content": ""
+     },
+     {
+      "step_no": "29",
+      "step_title": "Inspection requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "30",
+      "step_title": "Approved process parameters",
+      "step_content": "<p>Production progress shall be monitored and recorded throughout the manufacturing process.</p>"
+     },
+     {
+      "step_no": "31",
+      "step_title": "Production Changes",
+      "step_content": "<p>Any change affecting production, process parameters, materials or specifications shall be reviewed, approved, and communicated to all affected departments before implementation.</p>"
+     },
+     {
+      "step_no": "32",
+      "step_title": "Production Records",
+      "step_content": "<p>Production records shall be maintained for each batch to ensure traceability and facilitate monitoring of production activities.</p>"
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "",
+      "title": "FRMxxx – Production Plan"
+     },
+     {
+      "number": "",
+      "title": "FRMxxx – Production Schedule"
+     },
+     {
+      "number": "",
+      "title": "FRMxxx – Job Card"
+     },
+     {
+      "number": "",
+      "title": "FRMxxx – Material Requisition"
+     },
+     {
+      "number": "REG016",
+      "title": "Production Register"
+     }
+    ],
+    "related_documents": [
+     {
+      "number": "QM001",
+      "title": "Quality Manual"
+     },
+     {
+      "number": "SOP006",
+      "title": "Incoming Material Inspection & Material Identification"
+     },
+     {
+      "number": "SOP008",
+      "title": "Manufacturing Process Control Procedure"
+     },
+     {
+      "number": "SOP011",
+      "title": "Identification & Traceability Procedure"
+     },
+     {
+      "number": "SOP012",
+      "title": "Monitoring, Measurement, Inspection & Testing Procedure"
+     }
+    ]
+   }
+  },
+  {
+   "name": "HCCPL/QMS/SOP-008",
+   "legacy_document_number": "SOP008",
+   "title": "Manufacturing Process Control",
+   "document_type": "SOP",
+   "clause_reference": "8.5.1",
+   "department_label": "Production",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null,
+   "sop": {
+    "declared_number": "SOP008",
+    "declared_title": "Manufacturing Process Control Procedure",
+    "purpose": "<p>To establish a controlled manufacturing process that ensures products are produced consistently in accordance with approved drawings, specifications, customer requirements, and applicable work instructions.</p>",
+    "scope": "<p>This procedure applies to all manufacturing activities carried out at Hatim Carbon Co. Pvt. Ltd. for carbon brushes, brush holders, slip rings, carbon blocks, and other carbon products.</p>",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 8.5.1"
+     },
+     {
+      "reference": "QM001 – Quality Manual"
+     },
+     {
+      "reference": "Approved Drawings & Specifications"
+     },
+     {
+      "reference": "Applicable Work Instructions"
+     },
+     {
+      "reference": "Inspection & Test Plans (ITPs)"
+     },
+     {
+      "reference": "Job Cards"
+     }
+    ],
+    "definitions": [
+     {
+      "term": "Work Instruction (WI)",
+      "definition": "A detailed document describing how a specific manufacturing operation is performed."
+     },
+     {
+      "term": "Process Control",
+      "definition": "Planned activities to ensure manufacturing is carried out under controlled conditions."
+     },
+     {
+      "term": "Process Parameter",
+      "definition": "A controlled operating condition such as temperature, pressure, speed, curing time, or other specified manufacturing requirement that affects product quality."
+     },
+     {
+      "term": "Job Card",
+      "definition": "Document containing manufacturing and inspection requirements for a production batch."
+     }
+    ],
+    "responsibilities": [
+     {
+      "role": "Production Supervisors",
+      "responsibility": "Ensure operators follow approved Work Instructions. Monitor process parameters and production quality. Report deviations immediately."
+     },
+     {
+      "role": "Production Manager",
+      "responsibility": "Ensure manufacturing is carried out as per approved production plans. Allocate resources and monitor production."
+     },
+     {
+      "role": "Quality Department",
+      "responsibility": "Conduct in-process inspections. Verify compliance with specifications. Authorize continuation of production where applicable."
+     },
+     {
+      "role": "Operators",
+      "responsibility": "Perform manufacturing activities according to approved Work Instructions. Record required production data. Report abnormalities or equipment issues."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Manufacturing Authorization",
+      "step_content": ""
+     },
+     {
+      "step_no": "2",
+      "step_title": "Production shall commence only after:",
+      "step_content": "<p>Approved Job Card is available.</p><p>Required drawings and specifications are available.</p><p>Required measuring and monitoring equipment is available and, where applicable, calibrated.</p><p>Raw materials have been accepted.</p><p>Machines and equipment are ready for use.</p>"
+     },
+     {
+      "step_no": "3",
+      "step_title": "Process Control",
+      "step_content": ""
+     },
+     {
+      "step_no": "4",
+      "step_title": "Manufacturing shall be carried out under controlled conditions using:",
+      "step_content": ""
+     },
+     {
+      "step_no": "5",
+      "step_title": "Approved Work Instructions",
+      "step_content": ""
+     },
+     {
+      "step_no": "6",
+      "step_title": "Approved process parameters",
+      "step_content": ""
+     },
+     {
+      "step_no": "7",
+      "step_title": "Suitable machinery and equipment",
+      "step_content": ""
+     },
+     {
+      "step_no": "8",
+      "step_title": "Qualified personnel",
+      "step_content": ""
+     },
+     {
+      "step_no": "9",
+      "step_title": "Approved measuring instruments",
+      "step_content": ""
+     },
+     {
+      "step_no": "10",
+      "step_title": "Applicable Inspection & Test Plans (ITPs)",
+      "step_content": ""
+     },
+     {
+      "step_no": "11",
+      "step_title": "In-Process Monitoring",
+      "step_content": "<p>Production Supervisors and Quality personnel shall monitor manufacturing to ensure:</p><p>Product conforms to specifications.</p><p>Process parameters remain within approved limits.</p><p>In-process inspections are completed.</p><p>Deviations are identified and addressed promptly.</p><p>Production records are completed during the manufacturing process.</p>"
+     },
+     {
+      "step_no": "12",
+      "step_title": "Handling of Deviations",
+      "step_content": "<p>Any deviation from approved drawings, specifications, or process requirements shall be reported to the Production Manager and Quality Department.</p><p>Affected products shall be identified, segregated where applicable, and controlled in accordance with SOP013 – Control of Nonconforming Outputs Procedure.</p>"
+     },
+     {
+      "step_no": "13",
+      "step_title": "Completion of Production",
+      "step_content": ""
+     },
+     {
+      "step_no": "14",
+      "step_title": "On completion of manufacturing:",
+      "step_content": "<p>Production records shall be completed and verified.</p><p>Products shall be transferred for final inspection.</p><p>Batch identification and traceability shall be maintained.</p>"
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "",
+      "title": "FRMxx – Job Cards"
+     },
+     {
+      "number": "REG016",
+      "title": "Production Records"
+     },
+     {
+      "number": "",
+      "title": "FRMxx – In-Process Inspection Reports"
+     },
+     {
+      "number": "",
+      "title": "FRMxx – Machine Log Sheets"
+     },
+     {
+      "number": "",
+      "title": "FRMxx – Production Deviation Records"
+     }
+    ],
+    "related_documents": [
+     {
+      "number": "QM001",
+      "title": "Quality Manual"
+     },
+     {
+      "number": "SOP007",
+      "title": "Production Planning & Control Procedure"
+     },
+     {
+      "number": "SOP011",
+      "title": "Identification & Traceability Procedure"
+     },
+     {
+      "number": "SOP012",
+      "title": "Monitoring, Measurement, Inspection & Testing Procedure"
+     },
+     {
+      "number": "SOP013",
+      "title": "Control of Nonconforming Outputs Procedure"
+     },
+     {
+      "number": "",
+      "title": "Applicable Work Instructions"
+     }
+    ]
+   }
+  },
+  {
+   "name": "HCCPL/QMS/SOP-009",
+   "legacy_document_number": "SOP009",
+   "title": "Design & Development",
+   "document_type": "SOP",
+   "clause_reference": "8. 3",
+   "department_label": "Design / Engineering",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null,
+   "sop": {
+    "declared_number": "SOP009",
+    "declared_title": "Design & Development Procedure",
+    "purpose": "<p>To establish a systematic process for planning, reviewing, verifying, validating, controlling, and documenting the design and development of new or modified products to ensure that customer, statutory, regulatory and applicable requirements are fulfilled.</p>",
+    "scope": "<p>This procedure applies to the design and development of new products, customer-specific modifications, reverse engineering, manufacturing drawings, tooling designs and engineering changes carried out by Hatim Carbon Co. Pvt. Ltd.</p>",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 8.3"
+     },
+     {
+      "reference": "QM001 - Quality Manual"
+     },
+     {
+      "reference": "SOP001 – Control of Documented Information"
+     },
+     {
+      "reference": "SOP004 – Customer Communication, Sales & Contract Review"
+     },
+     {
+      "reference": "SOP005 – Purchase & Supplier Management"
+     },
+     {
+      "reference": "SOP008 – Manufacturing Process Control"
+     },
+     {
+      "reference": "Customer Drawings & Specifications (where applicable)"
+     }
+    ],
+    "definitions": [
+     {
+      "term": "Design & Development",
+      "definition": "A systematic process of converting customer, statutory and technical requirements into product designs, drawings, and specifications."
+     },
+     {
+      "term": "Design Input",
+      "definition": "Requirements used as the basis for product design, including customer specifications, standards and statutory requirements."
+     },
+     {
+      "term": "Design Output",
+      "definition": "Approved drawings, specifications, BOMs, manufacturing instructions and technical documents resulting from the design process."
+     },
+     {
+      "term": "Design Change",
+      "definition": "Any approved modification made to an existing design, drawing or specification."
+     },
+     {
+      "term": "Verification",
+      "definition": "Confirmation that design outputs meet the specified design input requirements."
+     },
+     {
+      "term": "Validation",
+      "definition": "Confirmation that the final product fulfills its intended use or application."
+     }
+    ],
+    "responsibilities": [
+     {
+      "role": "Managing Director",
+      "responsibility": "Approve major design projects and design changes."
+     },
+     {
+      "role": "Design Engineer",
+      "responsibility": "Prepare designs, drawings, calculations, and technical documents."
+     },
+     {
+      "role": "QA Manager",
+      "responsibility": "Participate in design reviews and verify compliance with customer, statutory and quality requirements."
+     },
+     {
+      "role": "Production Head",
+      "responsibility": "Review manufacturability of the design."
+     },
+     {
+      "role": "Sales / Marketing",
+      "responsibility": "Communicate customer requirements and approvals."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Design & Development Planning",
+      "step_content": ""
+     },
+     {
+      "step_no": "2",
+      "step_title": "Design activities shall be planned considering:",
+      "step_content": ""
+     },
+     {
+      "step_no": "3",
+      "step_title": "Customer requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "4",
+      "step_title": "Product application",
+      "step_content": ""
+     },
+     {
+      "step_no": "5",
+      "step_title": "Technical feasibility",
+      "step_content": ""
+     },
+     {
+      "step_no": "6",
+      "step_title": "Manufacturing capability",
+      "step_content": ""
+     },
+     {
+      "step_no": "7",
+      "step_title": "Applicable standards",
+      "step_content": "<p>Required resources.</p>"
+     },
+     {
+      "step_no": "8",
+      "step_title": "Design Inputs",
+      "step_content": ""
+     },
+     {
+      "step_no": "9",
+      "step_title": "Design inputs may include:",
+      "step_content": ""
+     },
+     {
+      "step_no": "10",
+      "step_title": "Customer drawings",
+      "step_content": ""
+     },
+     {
+      "step_no": "11",
+      "step_title": "Technical specifications",
+      "step_content": ""
+     },
+     {
+      "step_no": "12",
+      "step_title": "Samples",
+      "step_content": ""
+     },
+     {
+      "step_no": "13",
+      "step_title": "Reverse engineering data",
+      "step_content": ""
+     },
+     {
+      "step_no": "14",
+      "step_title": "Applicable standards",
+      "step_content": ""
+     },
+     {
+      "step_no": "15",
+      "step_title": "Previous design experience",
+      "step_content": ""
+     },
+     {
+      "step_no": "16",
+      "step_title": "Statutory requirements",
+      "step_content": "<p>Inputs shall be reviewed for adequacy before commencing design.</p>"
+     },
+     {
+      "step_no": "17",
+      "step_title": "Preparation of Design Outputs",
+      "step_content": ""
+     },
+     {
+      "step_no": "18",
+      "step_title": "The Design Department shall prepare:",
+      "step_content": ""
+     },
+     {
+      "step_no": "19",
+      "step_title": "Engineering drawings",
+      "step_content": ""
+     },
+     {
+      "step_no": "20",
+      "step_title": "CAD models",
+      "step_content": ""
+     },
+     {
+      "step_no": "21",
+      "step_title": "Bills of Materials (BOM)",
+      "step_content": ""
+     },
+     {
+      "step_no": "22",
+      "step_title": "Material specifications",
+      "step_content": ""
+     },
+     {
+      "step_no": "23",
+      "step_title": "Manufacturing requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "24",
+      "step_title": "Product specifications",
+      "step_content": ""
+     },
+     {
+      "step_no": "25",
+      "step_title": "Design Review",
+      "step_content": ""
+     },
+     {
+      "step_no": "26",
+      "step_title": "Design reviews shall be conducted at appropriate stages to verify:",
+      "step_content": "<p>Customer requirements are addressed.</p><p>Manufacturing feasibility.</p><p>Inspection requirements.</p><p>Material suitability.</p><p>Cost considerations.</p>"
+     },
+     {
+      "step_no": "27",
+      "step_title": "Design Verification",
+      "step_content": "<p>Verification shall confirm that the design outputs meet the approved design inputs through activities such as:</p>"
+     },
+     {
+      "step_no": "28",
+      "step_title": "Drawing review",
+      "step_content": "<p>Dimension verification.</p>"
+     },
+     {
+      "step_no": "29",
+      "step_title": "Engineering calculations",
+      "step_content": "<p>Design review meetings.</p>"
+     },
+     {
+      "step_no": "30",
+      "step_title": "Design Validation",
+      "step_content": "<p>Where applicable, validation shall confirm that the product performs as intended through:</p><p>Prototype evaluation.</p><p>Sample approval.</p>"
+     },
+     {
+      "step_no": "31",
+      "step_title": "Customer approval",
+      "step_content": ""
+     },
+     {
+      "step_no": "32",
+      "step_title": "Product performance testing",
+      "step_content": ""
+     },
+     {
+      "step_no": "33",
+      "step_title": "Field trials",
+      "step_content": ""
+     },
+     {
+      "step_no": "34",
+      "step_title": "Design Changes",
+      "step_content": "<p>All design changes shall be reviewed, approved, and documented before implementation.</p>"
+     },
+     {
+      "step_no": "35",
+      "step_title": "Changes shall consider:",
+      "step_content": ""
+     },
+     {
+      "step_no": "36",
+      "step_title": "Product performance",
+      "step_content": ""
+     },
+     {
+      "step_no": "37",
+      "step_title": "Manufacturing impact",
+      "step_content": ""
+     },
+     {
+      "step_no": "38",
+      "step_title": "Customer requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "39",
+      "step_title": "Existing inventory",
+      "step_content": ""
+     },
+     {
+      "step_no": "40",
+      "step_title": "Inspection requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "41",
+      "step_title": "Control of Design Records",
+      "step_content": "<p>Design drawings, specifications, revisions, approvals, and related records shall be maintained as documented information in accordance with SOP001 – Control of Documented Information.</p>"
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "FRM027",
+      "title": "Design & Development Request Form"
+     },
+     {
+      "number": "FRM028",
+      "title": "Design Input Checklist"
+     },
+     {
+      "number": "FRM029",
+      "title": "Design Review Record"
+     },
+     {
+      "number": "FRM030",
+      "title": "Design Verification Record"
+     },
+     {
+      "number": "FRM031",
+      "title": "Design Validation Record (where applicable)"
+     },
+     {
+      "number": "FRM032",
+      "title": "Design Change Request (DCR)"
+     },
+     {
+      "number": "FRM033",
+      "title": "Design Approval Record"
+     },
+     {
+      "number": "REG017",
+      "title": "Design & Development Register"
+     }
+    ],
+    "related_documents": [
+     {
+      "number": "QM001",
+      "title": "Quality Manual"
+     },
+     {
+      "number": "SOP001",
+      "title": "Control of Documented Information"
+     },
+     {
+      "number": "SOP004",
+      "title": "Customer Communication, Sales & Contract Review"
+     },
+     {
+      "number": "SOP007",
+      "title": "Production Planning & Control"
+     },
+     {
+      "number": "SOP008",
+      "title": "Manufacturing Process Control"
+     }
+    ]
+   }
+  },
+  {
+   "name": "HCCPL/QMS/SOP-010",
+   "legacy_document_number": "SOP010",
+   "title": "Preservation, Storage, Packing & Dispatch",
+   "document_type": "SOP",
+   "clause_reference": "8.5.4",
+   "department_label": "Stores",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null,
+   "sop": {
+    "declared_number": "SOP010",
+    "declared_title": "Preservation, Storage, Packing & Dispatch Procedure",
+    "purpose": "<p>To establish a systematic process for the preservation, storage, packing, handling, and dispatch of products to ensure that product conformity is maintained from completion of manufacturing until delivery to the customer.</p>",
+    "scope": "<p>This procedure applies to all raw materials, semi-finished products, finished products, packing materials, storage activities, handling, and dispatch operations carried out at Hatim Carbon Co. Pvt. Ltd.</p>",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 8.5.4 – Preservation"
+     },
+     {
+      "reference": "ISO 9001:2015 Clause 8.6 – Release of Products & Services"
+     },
+     {
+      "reference": "QM001 – Quality Manual"
+     },
+     {
+      "reference": "Customer Specifications"
+     },
+     {
+      "reference": "Packing Requirements (where applicable)"
+     }
+    ],
+    "definitions": [
+     {
+      "term": "Preservation",
+      "definition": "Activities performed to maintain product conformity during storage, handling, packing and transportation."
+     },
+     {
+      "term": "Storage",
+      "definition": "Controlled keeping of materials or products before use or dispatch."
+     },
+     {
+      "term": "Packing",
+      "definition": "Activities performed to protect products during storage and transportation."
+     },
+     {
+      "term": "Dispatch",
+      "definition": "Release and shipment of approved products to the customer."
+     }
+    ],
+    "responsibilities": [
+     {
+      "role": "Production Department",
+      "responsibility": "Transfer finished products to the designated storage area after production completion."
+     },
+     {
+      "role": "Quality Department",
+      "responsibility": "Verify product acceptance before packing and dispatch."
+     },
+     {
+      "role": "Stores Department",
+      "responsibility": "Store products under suitable conditions. Maintain product identification and stock control."
+     },
+     {
+      "role": "Dispatch Department",
+      "responsibility": "Pack products as per customer or company requirements. Verify dispatch documents and arrange shipment."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Product Handling",
+      "step_content": "<p>Products shall be handled using suitable methods and equipment to prevent:</p>"
+     },
+     {
+      "step_no": "2",
+      "step_title": "Damage",
+      "step_content": ""
+     },
+     {
+      "step_no": "3",
+      "step_title": "Deterioration",
+      "step_content": ""
+     },
+     {
+      "step_no": "4",
+      "step_title": "Contamination",
+      "step_content": ""
+     },
+     {
+      "step_no": "5",
+      "step_title": "Mix-up",
+      "step_content": ""
+     },
+     {
+      "step_no": "6",
+      "step_title": "Loss of identification",
+      "step_content": ""
+     },
+     {
+      "step_no": "7",
+      "step_title": "Storage",
+      "step_content": ""
+     },
+     {
+      "step_no": "8",
+      "step_title": "Accepted materials and finished products shall be stored:",
+      "step_content": ""
+     },
+     {
+      "step_no": "9",
+      "step_title": "In designated storage locations",
+      "step_content": ""
+     },
+     {
+      "step_no": "10",
+      "step_title": "Under suitable environmental conditions",
+      "step_content": ""
+     },
+     {
+      "step_no": "11",
+      "step_title": "With proper identification",
+      "step_content": ""
+     },
+     {
+      "step_no": "12",
+      "step_title": "To prevent damage, deterioration or contamination",
+      "step_content": ""
+     },
+     {
+      "step_no": "13",
+      "step_title": "Preservation",
+      "step_content": "<p>Suitable preservation methods shall be applied where necessary, including:</p>"
+     },
+     {
+      "step_no": "14",
+      "step_title": "Protective packing",
+      "step_content": ""
+     },
+     {
+      "step_no": "15",
+      "step_title": "Rust preventive treatment",
+      "step_content": ""
+     },
+     {
+      "step_no": "16",
+      "step_title": "Dust and moisture protection",
+      "step_content": ""
+     },
+     {
+      "step_no": "17",
+      "step_title": "Safe stacking",
+      "step_content": ""
+     },
+     {
+      "step_no": "18",
+      "step_title": "Protection against physical damage",
+      "step_content": ""
+     },
+     {
+      "step_no": "19",
+      "step_title": "Packing",
+      "step_content": ""
+     },
+     {
+      "step_no": "20",
+      "step_title": "Products shall be packed in accordance with:",
+      "step_content": ""
+     },
+     {
+      "step_no": "21",
+      "step_title": "Customer requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "22",
+      "step_title": "Product specifications",
+      "step_content": ""
+     },
+     {
+      "step_no": "23",
+      "step_title": "Transport conditions",
+      "step_content": ""
+     },
+     {
+      "step_no": "24",
+      "step_title": "Internal packing standards",
+      "step_content": "<p>Packing shall ensure adequate protection against damage during storage and transportation.</p>"
+     },
+     {
+      "step_no": "25",
+      "step_title": "Where applicable, the following shall be verified before packing:",
+      "step_content": ""
+     },
+     {
+      "step_no": "26",
+      "step_title": "Product identification",
+      "step_content": ""
+     },
+     {
+      "step_no": "27",
+      "step_title": "Quantity",
+      "step_content": ""
+     },
+     {
+      "step_no": "28",
+      "step_title": "Packing materials",
+      "step_content": ""
+     },
+     {
+      "step_no": "29",
+      "step_title": "Labels",
+      "step_content": ""
+     },
+     {
+      "step_no": "30",
+      "step_title": "Customer-specific marking requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "31",
+      "step_title": "Dispatch",
+      "step_content": "<p>Only products released by the Quality Department shall be dispatched.</p>"
+     },
+     {
+      "step_no": "32",
+      "step_title": "Before dispatch, the Dispatch Department shall verify:",
+      "step_content": ""
+     },
+     {
+      "step_no": "33",
+      "step_title": "Product quantity",
+      "step_content": ""
+     },
+     {
+      "step_no": "34",
+      "step_title": "Product identification",
+      "step_content": ""
+     },
+     {
+      "step_no": "35",
+      "step_title": "Packing condition",
+      "step_content": ""
+     },
+     {
+      "step_no": "36",
+      "step_title": "Delivery Challan",
+      "step_content": ""
+     },
+     {
+      "step_no": "37",
+      "step_title": "Invoice (where applicable)",
+      "step_content": ""
+     },
+     {
+      "step_no": "38",
+      "step_title": "Customer-specific dispatch requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "39",
+      "step_title": "Transportation",
+      "step_content": "<p>Products shall be transported using suitable vehicles and handling methods to prevent damage during transit.</p><p>Special transportation requirements specified by the customer shall be complied with wherever applicable.</p>"
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "",
+      "title": "FRMXX - Packing Checklist"
+     },
+     {
+      "number": "REG024",
+      "title": "Dispatch Register"
+     },
+     {
+      "number": "",
+      "title": "FRMXX - Delivery Challan"
+     },
+     {
+      "number": "",
+      "title": "Transport Documents"
+     },
+     {
+      "number": "",
+      "title": "Customer Dispatch Acknowledgement (where applicable)"
+     }
+    ],
+    "related_documents": [
+     {
+      "number": "QM001",
+      "title": "Quality Manual"
+     },
+     {
+      "number": "SOP011",
+      "title": "Identification & Traceability Procedure"
+     },
+     {
+      "number": "SOP012",
+      "title": "Monitoring, Measurement, Inspection & Testing Procedure"
+     },
+     {
+      "number": "SOP013",
+      "title": "Control of Nonconforming Outputs Procedure"
+     }
+    ]
+   }
+  },
+  {
+   "name": "HCCPL/QMS/SOP-011",
+   "legacy_document_number": "SOP011",
+   "title": "Identification & Traceability",
+   "document_type": "SOP",
+   "clause_reference": "8.5.2",
+   "department_label": "QA",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null,
+   "sop": {
+    "declared_number": "SOP011",
+    "declared_title": "Identification & Traceability Procedure",
+    "purpose": "<p>To establish a system for identifying materials, components, semi-finished products, and finished products throughout the manufacturing process to ensure traceability and prevent product mix-up.</p>",
+    "scope": "<p>This procedure applies to all incoming materials, work-in-progress (WIP), finished products, and dispatched products manufactured by Hatim Carbon Co. Pvt. Ltd.</p>",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 8.5.2"
+     },
+     {
+      "reference": "QM001 – Quality Manual"
+     },
+     {
+      "reference": "SOP006 – Incoming Material Inspection & Material Identification"
+     },
+     {
+      "reference": "SOP007 – Production Planning & Control"
+     },
+     {
+      "reference": "SOP010 – Preservation, Storage, Packing & Dispatch"
+     },
+     {
+      "reference": "Production Job Cards"
+     },
+     {
+      "reference": "Inspection & Test Records"
+     }
+    ],
+    "definitions": [
+     {
+      "term": "Identification",
+      "definition": "Method of recognizing a product, material, or batch by a unique marking or label."
+     },
+     {
+      "term": "Traceability",
+      "definition": "Ability to trace the history, application, and location of a product through recorded identification."
+     },
+     {
+      "term": "Batch",
+      "definition": "A quantity of products manufactured under similar conditions and identified by a unique batch number."
+     },
+     {
+      "term": "Inspection Status",
+      "definition": "The current acceptance status of a product or material, such as Accepted, Rejected, Under Inspection, or Hold."
+     }
+    ],
+    "responsibilities": [
+     {
+      "role": "Production Department",
+      "responsibility": "Maintain product identification throughout manufacturing. Ensure batch details are recorded on Job Cards."
+     },
+     {
+      "role": "Quality Department",
+      "responsibility": "Verify identification and traceability during inspection. Ensure inspection status is properly indicated."
+     },
+     {
+      "role": "Stores Department",
+      "responsibility": "Identify and label incoming materials. Maintain identification and segregation of materials during storage and issue."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Incoming Materials",
+      "step_content": "<p>All incoming materials shall be identified using supplier markings, batch numbers, heat numbers, or internal labels, as applicable. Materials shall retain their identification until issued for production.</p>"
+     },
+     {
+      "step_no": "2",
+      "step_title": "Work-in-Progress",
+      "step_content": "<p>During manufacturing, products shall be identified by appropriate means such as:</p>"
+     },
+     {
+      "step_no": "3",
+      "step_title": "Job Card Number",
+      "step_content": ""
+     },
+     {
+      "step_no": "4",
+      "step_title": "Batch Number",
+      "step_content": ""
+     },
+     {
+      "step_no": "5",
+      "step_title": "Product Code",
+      "step_content": ""
+     },
+     {
+      "step_no": "6",
+      "step_title": "Customer Name (where applicable)",
+      "step_content": "<p>Identification shall be maintained throughout all production stages.</p>"
+     },
+     {
+      "step_no": "7",
+      "step_title": "Finished Products",
+      "step_content": "<p>Finished products shall be identified with applicable information such as:</p>"
+     },
+     {
+      "step_no": "8",
+      "step_title": "Product Name / Part Number",
+      "step_content": ""
+     },
+     {
+      "step_no": "9",
+      "step_title": "Batch Number",
+      "step_content": ""
+     },
+     {
+      "step_no": "10",
+      "step_title": "Quantity",
+      "step_content": ""
+     },
+     {
+      "step_no": "11",
+      "step_title": "Inspection Status",
+      "step_content": ""
+     },
+     {
+      "step_no": "12",
+      "step_title": "Customer Name (where applicable)",
+      "step_content": ""
+     },
+     {
+      "step_no": "13",
+      "step_title": "Inspection Status",
+      "step_content": "<p>Inspection status shall be clearly indicated to prevent unintended use or dispatch of unapproved products.</p>"
+     },
+     {
+      "step_no": "14",
+      "step_title": "Status may include:",
+      "step_content": ""
+     },
+     {
+      "step_no": "15",
+      "step_title": "Accepted",
+      "step_content": ""
+     },
+     {
+      "step_no": "16",
+      "step_title": "Rejected",
+      "step_content": ""
+     },
+     {
+      "step_no": "17",
+      "step_title": "Under Inspection",
+      "step_content": ""
+     },
+     {
+      "step_no": "18",
+      "step_title": "Hold (where applicable)",
+      "step_content": ""
+     },
+     {
+      "step_no": "19",
+      "step_title": "Traceability",
+      "step_content": "<p>Where traceability is required by the customer, regulatory requirements, or internal quality requirements, records shall enable tracing of:</p>"
+     },
+     {
+      "step_no": "20",
+      "step_title": "Raw materials",
+      "step_content": ""
+     },
+     {
+      "step_no": "21",
+      "step_title": "Supplier (where applicable)",
+      "step_content": ""
+     },
+     {
+      "step_no": "22",
+      "step_title": "Manufacturing batch",
+      "step_content": ""
+     },
+     {
+      "step_no": "23",
+      "step_title": "Inspection records",
+      "step_content": ""
+     },
+     {
+      "step_no": "24",
+      "step_title": "Final product",
+      "step_content": ""
+     },
+     {
+      "step_no": "25",
+      "step_title": "Dispatch details",
+      "step_content": ""
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "",
+      "title": "FRMxxx – Job Card"
+     },
+     {
+      "number": "",
+      "title": "FRMxxx – Inspection Report"
+     },
+     {
+      "number": "",
+      "title": "FRMxxx – Dispatch Record"
+     },
+     {
+      "number": "REG016",
+      "title": "Production Register"
+     },
+     {
+      "number": "REG015",
+      "title": "Incoming Material Register"
+     }
+    ],
+    "related_documents": [
+     {
+      "number": "QM001",
+      "title": "Quality Manual"
+     },
+     {
+      "number": "SOP006",
+      "title": "Incoming Material Inspection & Material Identification"
+     },
+     {
+      "number": "SOP007",
+      "title": "Production Planning & Control"
+     },
+     {
+      "number": "SOP008",
+      "title": "Manufacturing Process Control"
+     },
+     {
+      "number": "SOP010",
+      "title": "Preservation, Storage, Packing & Dispatch Procedure"
+     },
+     {
+      "number": "SOP012",
+      "title": "Monitoring, Measurement, Inspection & Testing Procedure"
+     }
+    ]
+   }
+  },
+  {
+   "name": "HCCPL/QMS/SOP-012",
+   "legacy_document_number": "SOP012",
+   "title": "Monitoring, Measurement, Inspection & Testing",
+   "document_type": "SOP",
+   "clause_reference": "8.6, 9.1",
+   "department_label": "QA",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null,
+   "sop": {
+    "declared_number": "SOP010",
+    "declared_title": "Preservation, Storage, Packing & Dispatch Procedure",
+    "purpose": "<p>To establish a systematic process for the handling, storage, preservation, packing, and dispatch of materials and finished products to maintain product conformity until delivery to the customer.</p>",
+    "scope": "<p>This procedure applies to the handling, storage, preservation, packing, and dispatch of incoming materials, work-in-progress (WIP), finished products, and products awaiting dispatch at Hatim Carbon Co. Pvt. Ltd.</p>",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 8.5.4 – Preservation"
+     },
+     {
+      "reference": "QM001 – Quality Manual"
+     },
+     {
+      "reference": "Customer Purchase Orders"
+     },
+     {
+      "reference": "Customer Packing Requirements (where applicable)"
+     }
+    ],
+    "definitions": [
+     {
+      "term": "Preservation",
+      "definition": "Activities performed to maintain product conformity during storage, handling, packing, and transportation."
+     },
+     {
+      "term": "Dispatch",
+      "definition": "Process of delivering approved products to the customer along with the required documents."
+     },
+     {
+      "term": "Packing",
+      "definition": "Process of protecting products against damage during handling and transportation."
+     },
+     {
+      "term": "Storage",
+      "definition": "Controlled keeping of materials or products to prevent deterioration, damage, or mix-up before use or dispatch."
+     }
+    ],
+    "responsibilities": [
+     {
+      "role": "Production Department",
+      "responsibility": "Transfer finished products safely to the designated storage area. Ensure products are clean before packing."
+     },
+     {
+      "role": "Quality Department",
+      "responsibility": "Verify that only accepted products are released for packing and dispatch. Confirm dispatch authorization where applicable."
+     },
+     {
+      "role": "Stores Department",
+      "responsibility": "Store materials and finished products appropriately. Maintain product identification and stock control during storage. Protect materials from damage and deterioration."
+     },
+     {
+      "role": "Dispatch Department",
+      "responsibility": "Pack products according to customer requirements. Prepare dispatch documents. Coordinate transportation."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Storage",
+      "step_content": "<p>Materials and finished products shall be stored in designated locations to prevent:</p>"
+     },
+     {
+      "step_no": "2",
+      "step_title": "Damage",
+      "step_content": ""
+     },
+     {
+      "step_no": "3",
+      "step_title": "Corrosion",
+      "step_content": ""
+     },
+     {
+      "step_no": "4",
+      "step_title": "Contamination",
+      "step_content": ""
+     },
+     {
+      "step_no": "5",
+      "step_title": "Moisture exposure",
+      "step_content": ""
+     },
+     {
+      "step_no": "6",
+      "step_title": "Product mix-up",
+      "step_content": ""
+     },
+     {
+      "step_no": "7",
+      "step_title": "Unauthorized use",
+      "step_content": ""
+     },
+     {
+      "step_no": "8",
+      "step_title": "Preservation",
+      "step_content": "<p>Products shall be handled carefully throughout manufacturing and storage to maintain their quality and identification.</p><p>Suitable protective measures such as protective wrapping, anti-rust treatment, moisture protection, and appropriate stacking shall be adopted where necessary.</p>"
+     },
+     {
+      "step_no": "9",
+      "step_title": "Packing",
+      "step_content": ""
+     },
+     {
+      "step_no": "10",
+      "step_title": "Products shall be packed according to:",
+      "step_content": ""
+     },
+     {
+      "step_no": "11",
+      "step_title": "Customer requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "12",
+      "step_title": "Product characteristics",
+      "step_content": ""
+     },
+     {
+      "step_no": "13",
+      "step_title": "Transportation method",
+      "step_content": ""
+     },
+     {
+      "step_no": "14",
+      "step_title": "Internal packing standards",
+      "step_content": "<p>Packing shall provide adequate protection during handling and transit.</p>"
+     },
+     {
+      "step_no": "15",
+      "step_title": "Dispatch",
+      "step_content": "<p>Only products released by the Quality Department after satisfactory completion of all specified inspection and testing activities shall be dispatched.</p><p>Dispatch documents shall be verified before shipment.</p>"
+     },
+     {
+      "step_no": "16",
+      "step_title": "Delivery Documents",
+      "step_content": ""
+     },
+     {
+      "step_no": "17",
+      "step_title": "The dispatch package may include, where applicable:",
+      "step_content": ""
+     },
+     {
+      "step_no": "18",
+      "step_title": "Delivery Challan",
+      "step_content": ""
+     },
+     {
+      "step_no": "19",
+      "step_title": "Tax Invoice",
+      "step_content": ""
+     },
+     {
+      "step_no": "20",
+      "step_title": "Packing List",
+      "step_content": ""
+     },
+     {
+      "step_no": "21",
+      "step_title": "Inspection Report",
+      "step_content": ""
+     },
+     {
+      "step_no": "22",
+      "step_title": "Material Test Certificate",
+      "step_content": ""
+     },
+     {
+      "step_no": "23",
+      "step_title": "Certificate of Conformity (if required)",
+      "step_content": ""
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "",
+      "title": "FRMxxx – Packing Checklist"
+     },
+     {
+      "number": "REG024",
+      "title": "Dispatch Register"
+     },
+     {
+      "number": "",
+      "title": "FRMxxx – Delivery Challan"
+     },
+     {
+      "number": "",
+      "title": "FRMxxx – Dispatch Checklist"
+     }
+    ],
+    "related_documents": [
+     {
+      "number": "QM001",
+      "title": "Quality Manual"
+     },
+     {
+      "number": "SOP011",
+      "title": "Identification & Traceability Procedure"
+     },
+     {
+      "number": "SOP012",
+      "title": "Monitoring, Measurement, Inspection & Testing Procedure"
+     },
+     {
+      "number": "",
+      "title": "Customer Purchase Order"
+     }
+    ]
+   }
+  },
+  {
+   "name": "HCCPL/QMS/SOP-013",
+   "legacy_document_number": "SOP013",
+   "title": "Control of Nonconforming Outputs",
+   "document_type": "SOP",
+   "clause_reference": "8.7",
+   "department_label": "QA",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null,
+   "sop": {
+    "declared_number": "SOP013",
+    "declared_title": "Control of Nonconforming Outputs Procedure",
+    "purpose": "<p>To establish a systematic process for identifying, segregating, evaluating, and controlling nonconforming materials and products to prevent their unintended use or delivery.</p>",
+    "scope": "<p>This procedure applies to incoming materials, work-in-progress (WIP), finished products, and externally provided products that do not conform to specified requirements.</p>",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 8.7"
+     },
+     {
+      "reference": "QM001 – Quality Manual"
+     },
+     {
+      "reference": "SOP012 – Monitoring, Measurement, Inspection & Testing"
+     },
+     {
+      "reference": "SOP014 – Corrective Action"
+     }
+    ],
+    "definitions": [
+     {
+      "term": "Nonconformity",
+      "definition": "Failure to meet a specified requirement."
+     },
+     {
+      "term": "Nonconforming Product",
+      "definition": "Any material or product that does not comply with applicable specifications, drawings, standards, or customer requirements."
+     },
+     {
+      "term": "Disposition",
+      "definition": "The decision taken regarding a nonconforming product, such as rework, repair, acceptance under concession, return, or scrap."
+     }
+    ],
+    "responsibilities": [
+     {
+      "role": "Production Department",
+      "responsibility": "Stop further processing of identified nonconforming products. Carry out approved rework or correction, where applicable."
+     },
+     {
+      "role": "Quality Department",
+      "responsibility": "Identify and record nonconforming products. Segregate affected products. Evaluate the nonconformity. Recommend appropriate disposition."
+     },
+     {
+      "role": "Purchase Department",
+      "responsibility": "Coordinate with suppliers regarding nonconforming incoming materials."
+     },
+     {
+      "role": "Top Management",
+      "responsibility": "Approve customer concessions or major disposition decisions, where required."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Identification",
+      "step_content": ""
+     },
+     {
+      "step_no": "2",
+      "step_title": "Nonconformities may be identified during:",
+      "step_content": ""
+     },
+     {
+      "step_no": "3",
+      "step_title": "Incoming inspection",
+      "step_content": ""
+     },
+     {
+      "step_no": "4",
+      "step_title": "In-process inspection",
+      "step_content": ""
+     },
+     {
+      "step_no": "5",
+      "step_title": "Final inspection",
+      "step_content": ""
+     },
+     {
+      "step_no": "6",
+      "step_title": "Customer complaints",
+      "step_content": ""
+     },
+     {
+      "step_no": "7",
+      "step_title": "Internal audits",
+      "step_content": ""
+     },
+     {
+      "step_no": "8",
+      "step_title": "Production activities",
+      "step_content": "<p>All identified nonconforming products shall be clearly marked to prevent unintended use.</p>"
+     },
+     {
+      "step_no": "9",
+      "step_title": "Segregation",
+      "step_content": "<p>Where practical, nonconforming materials or products shall be segregated and kept in a designated Nonconforming Material Area until disposition is decided.</p>"
+     },
+     {
+      "step_no": "10",
+      "step_title": "Evaluation",
+      "step_content": "<p>The Quality Department, in consultation with the relevant department, shall evaluate the nonconformity and determine the appropriate disposition.</p>"
+     },
+     {
+      "step_no": "11",
+      "step_title": "Possible dispositions include:",
+      "step_content": ""
+     },
+     {
+      "step_no": "12",
+      "step_title": "Rework",
+      "step_content": ""
+     },
+     {
+      "step_no": "13",
+      "step_title": "Repair",
+      "step_content": ""
+     },
+     {
+      "step_no": "14",
+      "step_title": "Re-grade for an alternative application",
+      "step_content": ""
+     },
+     {
+      "step_no": "15",
+      "step_title": "Return to supplier",
+      "step_content": ""
+     },
+     {
+      "step_no": "16",
+      "step_title": "Acceptance under approved concession",
+      "step_content": ""
+     },
+     {
+      "step_no": "17",
+      "step_title": "Scrap",
+      "step_content": ""
+     },
+     {
+      "step_no": "18",
+      "step_title": "Verification After Rework",
+      "step_content": "<p>Products that have been reworked or repaired shall be re-inspected before being released for further processing or dispatch.</p>"
+     },
+     {
+      "step_no": "19",
+      "step_title": "Customer Notification",
+      "step_content": "<p>Where a nonconformity affects customer requirements or delivery commitments, the customer shall be informed whenever necessary and approval obtained before release under concession.</p>"
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "",
+      "title": "All nonconformities and their dispositions shall be recorded and reviewed to identify recurring issues and opportunities for improvement."
+     },
+     {
+      "number": "FRM020",
+      "title": "Nonconforming Product Report (NCR)"
+     },
+     {
+      "number": "FRM021",
+      "title": "Corrective Action Request (CAR) (where applicable)"
+     },
+     {
+      "number": "REG009",
+      "title": "Nonconforming Product Register"
+     },
+     {
+      "number": "REG018",
+      "title": "Corrective Action Records"
+     }
+    ],
+    "related_documents": [
+     {
+      "number": "QM001",
+      "title": "Quality Manual"
+     },
+     {
+      "number": "SOP006",
+      "title": "Incoming Material Inspection & Material Identification"
+     },
+     {
+      "number": "SOP012",
+      "title": "Monitoring, Measurement, Inspection & Testing"
+     },
+     {
+      "number": "SOP014",
+      "title": "Corrective Action"
+     }
+    ]
+   }
+  },
+  {
+   "name": "HCCPL/QMS/SOP-014",
+   "legacy_document_number": "SOP014",
+   "title": "Corrective Action",
+   "document_type": "SOP",
+   "clause_reference": "10.2",
+   "department_label": "QA",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null,
+   "sop": {
+    "declared_number": "SOP014",
+    "declared_title": "Corrective Action Procedure",
+    "purpose": "<p>To establish a systematic process for identifying the root causes of nonconformities, implementing corrective actions, and verifying their effectiveness to prevent recurrence.</p>",
+    "scope": "<p>This procedure applies to all nonconformities arising from products, processes, customer complaints, supplier issues, internal audits, external audits, and the Quality Management System (QMS).</p>",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 10.2"
+     },
+     {
+      "reference": "QM001 – Quality Manual"
+     },
+     {
+      "reference": "SOP013 – Control of Nonconforming Outputs"
+     },
+     {
+      "reference": "SOP015 – Internal Audit"
+     }
+    ],
+    "definitions": [
+     {
+      "term": "Corrective Action",
+      "definition": "Action taken to eliminate the root cause of a detected nonconformity to prevent its recurrence."
+     },
+     {
+      "term": "Root Cause",
+      "definition": "The underlying reason that caused a nonconformity."
+     },
+     {
+      "term": "Effectiveness Verification",
+      "definition": "Evaluation to confirm that the corrective action has successfully prevented recurrence."
+     }
+    ],
+    "responsibilities": [
+     {
+      "role": "Department Head",
+      "responsibility": "Investigate causes within their departments. Implement agreed corrective actions. Provide evidence of completion."
+     },
+     {
+      "role": "Quality Department",
+      "responsibility": "Record and investigate nonconformities. Coordinate root cause analysis. Monitor implementation of corrective actions. Verify effectiveness before closure."
+     },
+     {
+      "role": "Top Management",
+      "responsibility": "Review significant corrective actions. Provide necessary resources and support."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Identification",
+      "step_content": ""
+     },
+     {
+      "step_no": "2",
+      "step_title": "Corrective actions may be initiated from:",
+      "step_content": ""
+     },
+     {
+      "step_no": "3",
+      "step_title": "Customer complaints",
+      "step_content": ""
+     },
+     {
+      "step_no": "4",
+      "step_title": "Product nonconformities",
+      "step_content": ""
+     },
+     {
+      "step_no": "5",
+      "step_title": "Supplier issues",
+      "step_content": ""
+     },
+     {
+      "step_no": "6",
+      "step_title": "Internal audits",
+      "step_content": ""
+     },
+     {
+      "step_no": "7",
+      "step_title": "External audits",
+      "step_content": ""
+     },
+     {
+      "step_no": "8",
+      "step_title": "Management Review",
+      "step_content": "<p>Process performance analysis.</p>"
+     },
+     {
+      "step_no": "9",
+      "step_title": "Root Cause Analysis",
+      "step_content": "<p>The responsible department shall investigate the root cause using suitable methods such as:</p>"
+     },
+     {
+      "step_no": "10",
+      "step_title": "5 Why Analysis",
+      "step_content": ""
+     },
+     {
+      "step_no": "11",
+      "step_title": "Fishbone (Ishikawa) Diagram",
+      "step_content": ""
+     },
+     {
+      "step_no": "12",
+      "step_title": "Process Review",
+      "step_content": ""
+     },
+     {
+      "step_no": "13",
+      "step_title": "Data Analysis",
+      "step_content": "<p>The objective is to eliminate the cause rather than only correcting the immediate issue.</p>"
+     },
+     {
+      "step_no": "14",
+      "step_title": "Corrective Action Plan",
+      "step_content": "<p>Based on the investigation, an action plan shall be prepared, including:</p><p>Corrective actions to be implemented.</p>"
+     },
+     {
+      "step_no": "15",
+      "step_title": "Responsible person",
+      "step_content": ""
+     },
+     {
+      "step_no": "16",
+      "step_title": "Target completion date",
+      "step_content": "<p>Required resources.</p>"
+     },
+     {
+      "step_no": "17",
+      "step_title": "Implementation",
+      "step_content": "<p>The assigned department shall implement the approved corrective actions within the agreed timeframe.</p>"
+     },
+     {
+      "step_no": "18",
+      "step_title": "Effectiveness Verification",
+      "step_content": ""
+     },
+     {
+      "step_no": "19",
+      "step_title": "The Quality Department shall verify that:",
+      "step_content": "<p>The corrective action has been completed.</p><p>The nonconformity has not recurred.</p><p>The action has effectively addressed the root cause.</p><p>Where necessary, additional actions shall be initiated.</p>"
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "",
+      "title": "Corrective actions shall be closed only after satisfactory verification of effectiveness."
+     },
+     {
+      "number": "",
+      "title": "Records shall be retained as documented information."
+     },
+     {
+      "number": "FRM021",
+      "title": "Corrective Action Request (CAR)"
+     },
+     {
+      "number": "",
+      "title": "Root Cause Analysis Report"
+     },
+     {
+      "number": "REG018",
+      "title": "Corrective Action Records"
+     }
+    ],
+    "related_documents": [
+     {
+      "number": "QM001",
+      "title": "Quality Manual"
+     },
+     {
+      "number": "SOP013",
+      "title": "Control of Nonconforming Outputs"
+     },
+     {
+      "number": "SOP015",
+      "title": "Internal Audit"
+     },
+     {
+      "number": "SOP016",
+      "title": "Management Review"
+     },
+     {
+      "number": "SOP001",
+      "title": "Control of Documented Information"
+     }
+    ]
+   }
+  },
+  {
+   "name": "HCCPL/QMS/SOP-015",
+   "legacy_document_number": "SOP015",
+   "title": "Internal Audit",
+   "document_type": "SOP",
+   "clause_reference": "9. 2",
+   "department_label": "M gmt.",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null,
+   "sop": {
+    "declared_number": "SOP015",
+    "declared_title": "Internal Audit Procedure",
+    "purpose": "<p>To establish a systematic process for planning, conducting, reporting, and following up internal audits to verify the effectiveness and conformity of the Quality Management System (QMS).</p>",
+    "scope": "<p>This procedure applies to all departments, processes, and activities covered under the QMS of Hatim Carbon Co. Pvt. Ltd.</p>",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 9.2"
+     },
+     {
+      "reference": "QM001 – Quality Manual"
+     },
+     {
+      "reference": "SOP014 – Corrective Action Procedure"
+     }
+    ],
+    "definitions": [
+     {
+      "term": "Internal Audit",
+      "definition": "A systematic and independent assessment conducted to verify conformity and effectiveness of the QMS."
+     },
+     {
+      "term": "Audit Finding",
+      "definition": "Result of evaluating audit evidence against audit criteria."
+     },
+     {
+      "term": "Audit Programme",
+      "definition": "Planned schedule of internal audits for a defined period."
+     }
+    ],
+    "responsibilities": [
+     {
+      "role": "Internal Auditor",
+      "responsibility": "Conduct audits objectively. Record observations and findings. Prepare audit reports."
+     },
+     {
+      "role": "Quality Manager",
+      "responsibility": "Prepare the annual audit programme . Assign competent auditors. Review audit reports. Monitor closure of audit findings."
+     },
+     {
+      "role": "Department Heads",
+      "responsibility": "Cooperate during audits. Implement corrective actions for audit findings. Provide evidence of closure."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Audit Planning",
+      "step_content": ""
+     },
+     {
+      "step_no": "2",
+      "step_title": "An annual Internal Audit Programme shall be prepared considering:",
+      "step_content": ""
+     },
+     {
+      "step_no": "3",
+      "step_title": "Importance of processes",
+      "step_content": ""
+     },
+     {
+      "step_no": "4",
+      "step_title": "Previous audit results",
+      "step_content": ""
+     },
+     {
+      "step_no": "5",
+      "step_title": "Customer complaints",
+      "step_content": ""
+     },
+     {
+      "step_no": "6",
+      "step_title": "Process performance",
+      "step_content": ""
+     },
+     {
+      "step_no": "7",
+      "step_title": "Changes affecting the QMS",
+      "step_content": ""
+     },
+     {
+      "step_no": "8",
+      "step_title": "Conducting the Audit",
+      "step_content": "<p>Audits shall be conducted using approved checklists and objective evidence through:</p>"
+     },
+     {
+      "step_no": "9",
+      "step_title": "Interviews",
+      "step_content": ""
+     },
+     {
+      "step_no": "10",
+      "step_title": "Observation of activities",
+      "step_content": ""
+     },
+     {
+      "step_no": "11",
+      "step_title": "Review of documents and records",
+      "step_content": "<p>Auditors shall remain independent of the area being audited, wherever practicable.</p>"
+     },
+     {
+      "step_no": "12",
+      "step_title": "Audit Reporting",
+      "step_content": ""
+     },
+     {
+      "step_no": "13",
+      "step_title": "Audit findings shall be classified as:",
+      "step_content": ""
+     },
+     {
+      "step_no": "14",
+      "step_title": "Conformity",
+      "step_content": ""
+     },
+     {
+      "step_no": "15",
+      "step_title": "Observation",
+      "step_content": ""
+     },
+     {
+      "step_no": "16",
+      "step_title": "Opportunity for Improvement",
+      "step_content": ""
+     },
+     {
+      "step_no": "17",
+      "step_title": "Nonconformity",
+      "step_content": "<p>The audit report shall be issued to the concerned department.</p>"
+     },
+     {
+      "step_no": "18",
+      "step_title": "Corrective Action",
+      "step_content": "<p>Departments shall investigate nonconformities and implement corrective actions in accordance with SOP014 – Corrective Action Procedure.</p>"
+     },
+     {
+      "step_no": "19",
+      "step_title": "Follow-up",
+      "step_content": "<p>The Quality Manager shall verify the effectiveness of corrective actions before closing audit findings.</p>"
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "FRM022",
+      "title": "Internal Audit Checklist"
+     },
+     {
+      "number": "FRM023",
+      "title": "Internal Audit Report"
+     },
+     {
+      "number": "FRM021",
+      "title": "Corrective Action Request (where applicable)"
+     },
+     {
+      "number": "REG010",
+      "title": "Internal Audit Register"
+     }
+    ],
+    "related_documents": [
+     {
+      "number": "QM001",
+      "title": "Quality Manual"
+     },
+     {
+      "number": "SOP014",
+      "title": "Corrective Action Procedure"
+     },
+     {
+      "number": "SOP016",
+      "title": "Management Review"
+     }
+    ]
+   }
+  },
+  {
+   "name": "HCCPL/QMS/SOP-016",
+   "legacy_document_number": "SOP016",
+   "title": "Management Review",
+   "document_type": "SOP",
+   "clause_reference": "9.3",
+   "department_label": "M gmt.",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null,
+   "sop": {
+    "declared_number": "SOP016",
+    "declared_title": "Management Review Procedure",
+    "purpose": "<p>To establish a systematic process for Top Management to review the suitability, adequacy, effectiveness, and continual improvement of the Quality Management System (QMS).</p>",
+    "scope": "<p>This procedure applies to Management Review Meetings conducted for all processes and departments covered under the QMS of Hatim Carbon Co. Pvt. Ltd.</p>",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 9.3"
+     },
+     {
+      "reference": "QM001 – Quality Manual"
+     },
+     {
+      "reference": "SOP015 – Internal Audit Procedure"
+     },
+     {
+      "reference": "SOP014 – Corrective Action Procedure"
+     },
+     {
+      "reference": "SOP002 – Risk & Opportunity Management"
+     }
+    ],
+    "definitions": [
+     {
+      "term": "Management Review",
+      "definition": "A formal review conducted by Top Management to evaluate the performance and effectiveness of the QMS."
+     },
+     {
+      "term": "QMS",
+      "definition": "Quality Management System established in accordance with ISO 9001:2015."
+     }
+    ],
+    "responsibilities": [
+     {
+      "role": "Top Management",
+      "responsibility": "Conduct Management Review Meetings. Evaluate QMS performance. Approve actions for continual improvement. Allocate necessary resources."
+     },
+     {
+      "role": "Quality Manager / Management Representative",
+      "responsibility": "Schedule Management Review Meetings. Prepare meeting agenda and performance data. Record meeting minutes. Monitor completion of action items."
+     },
+     {
+      "role": "Department Heads",
+      "responsibility": "Present departmental performance. Report quality objectives, process performance, and improvement initiatives. Implement assigned actions."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Frequency",
+      "step_content": "<p>Management Review Meetings shall be conducted at least once every year, or more frequently if required due to significant business or quality-related changes.</p>"
+     },
+     {
+      "step_no": "2",
+      "step_title": "Inputs",
+      "step_content": ""
+     },
+     {
+      "step_no": "3",
+      "step_title": "Management Review shall consider, as applicable:",
+      "step_content": ""
+     },
+     {
+      "step_no": "4",
+      "step_title": "Status of previous Management Review actions",
+      "step_content": ""
+     },
+     {
+      "step_no": "5",
+      "step_title": "Customer feedback and complaints",
+      "step_content": ""
+     },
+     {
+      "step_no": "6",
+      "step_title": "Changes in external and internal issues",
+      "step_content": ""
+     },
+     {
+      "step_no": "7",
+      "step_title": "Effectiveness of actions taken to address risks and opportunities",
+      "step_content": ""
+     },
+     {
+      "step_no": "8",
+      "step_title": "Adequacy of resources",
+      "step_content": ""
+     },
+     {
+      "step_no": "9",
+      "step_title": "Effectiveness of actions taken from previous management reviews",
+      "step_content": ""
+     },
+     {
+      "step_no": "10",
+      "step_title": "Quality Objectives, KPIs, and process performance",
+      "step_content": ""
+     },
+     {
+      "step_no": "11",
+      "step_title": "Product conformity",
+      "step_content": ""
+     },
+     {
+      "step_no": "12",
+      "step_title": "Internal and external audit results",
+      "step_content": ""
+     },
+     {
+      "step_no": "13",
+      "step_title": "Supplier performance",
+      "step_content": ""
+     },
+     {
+      "step_no": "14",
+      "step_title": "Nonconformities and corrective actions",
+      "step_content": ""
+     },
+     {
+      "step_no": "15",
+      "step_title": "Risks and opportunities",
+      "step_content": ""
+     },
+     {
+      "step_no": "16",
+      "step_title": "Resource requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "17",
+      "step_title": "Improvement opportunities",
+      "step_content": ""
+     },
+     {
+      "step_no": "18",
+      "step_title": "Outputs",
+      "step_content": ""
+     },
+     {
+      "step_no": "19",
+      "step_title": "Management Review outputs may include decisions regarding:",
+      "step_content": ""
+     },
+     {
+      "step_no": "20",
+      "step_title": "Improvement of the QMS",
+      "step_content": ""
+     },
+     {
+      "step_no": "21",
+      "step_title": "Improvement of products, processes, and services",
+      "step_content": ""
+     },
+     {
+      "step_no": "22",
+      "step_title": "Customer satisfaction",
+      "step_content": ""
+     },
+     {
+      "step_no": "23",
+      "step_title": "Resource requirements",
+      "step_content": ""
+     },
+     {
+      "step_no": "24",
+      "step_title": "Process improvements",
+      "step_content": ""
+     },
+     {
+      "step_no": "25",
+      "step_title": "Changes to Quality Objectives",
+      "step_content": ""
+     },
+     {
+      "step_no": "26",
+      "step_title": "Actions to address risks and opportunities",
+      "step_content": ""
+     },
+     {
+      "step_no": "27",
+      "step_title": "Need for changes to the QMS",
+      "step_content": ""
+     },
+     {
+      "step_no": "28",
+      "step_title": "Follow-up",
+      "step_content": "<p>The Quality Manager shall monitor the implementation of all agreed actions and report their status during the next Management Review Meeting.</p>"
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "FRM024",
+      "title": "Management Review Minutes"
+     },
+     {
+      "number": "",
+      "title": "Management Review Agenda (if separate)"
+     },
+     {
+      "number": "REG019",
+      "title": "Management Review Register"
+     }
+    ],
+    "related_documents": [
+     {
+      "number": "QM001",
+      "title": "Quality Manual"
+     },
+     {
+      "number": "SOP002",
+      "title": "Risk & Opportunity Management"
+     },
+     {
+      "number": "SOP012",
+      "title": "Monitoring, Measurement, Inspection & Testing"
+     },
+     {
+      "number": "SOP014",
+      "title": "Corrective Action Procedure"
+     },
+     {
+      "number": "SOP015",
+      "title": "Internal Audit Procedure"
+     }
+    ]
+   }
+  },
+  {
+   "name": "HCCPL/QMS/SOP-017",
+   "legacy_document_number": "SOP017",
+   "title": "Control of Monitoring & Measuring Equipment (Calibration)",
+   "document_type": "SOP",
+   "clause_reference": "7.1.5",
+   "department_label": "QA",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null,
+   "sop": {
+    "declared_number": "SOP017",
+    "declared_title": "Control of Monitoring & Measuring Equipment (Calibration) Procedure",
+    "purpose": "<p>To ensure that monitoring and measuring equipment used for inspection and testing is identified, calibrated, maintained, and fit for its intended purpose to provide reliable measurement results.</p>",
+    "scope": "<p>This procedure applies to all monitoring and measuring equipment used for product inspection, testing, and quality verification at Hatim Carbon Co. Pvt. Ltd.</p>",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 7.1.5"
+     },
+     {
+      "reference": "QM001 – Quality Manual"
+     },
+     {
+      "reference": "REG011 – Monitoring & Measuring Instruments Register"
+     },
+     {
+      "reference": "FRM025 – Calibration Record"
+     },
+     {
+      "reference": "Equipment Manuals"
+     }
+    ],
+    "definitions": [
+     {
+      "term": "Calibration",
+      "definition": "Comparison of a measuring instrument against a recognized standard to verify its accuracy."
+     },
+     {
+      "term": "Monitoring & Measuring Equipment",
+      "definition": "Instruments used to inspect, test, or measure product characteristics."
+     },
+     {
+      "term": "Calibration Status",
+      "definition": "The current validity of an instrument's calibration."
+     }
+    ],
+    "responsibilities": [
+     {
+      "role": "Quality Department",
+      "responsibility": "Maintain the list of monitoring and measuring equipment. Prepare and monitor the calibration schedule. Verify calibration status before use. Maintain calibration records."
+     },
+     {
+      "role": "Equipment Users",
+      "responsibility": "Handle measuring equipment carefully. Verify calibration labels before use. Report damage, malfunction, or overdue calibration immediately."
+     },
+     {
+      "role": "Department Heads",
+      "responsibility": "Ensure only calibrated equipment is used. Report damaged or malfunctioning equipment."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Equipment Identification",
+      "step_content": "<p>All monitoring and measuring equipment shall be assigned a unique identification number and entered into the Monitoring & Measuring Instruments Register (REG011).</p>"
+     },
+     {
+      "step_no": "2",
+      "step_title": "Calibration",
+      "step_content": ""
+     },
+     {
+      "step_no": "3",
+      "step_title": "Equipment shall be calibrated:",
+      "step_content": "<p>At defined intervals.</p><p>Before first use (where applicable).</p><p>After repair or major maintenance.</p><p>Whenever accuracy is suspected.</p><p>Where applicable, calibration shall be traceable to national or international measurement standards.</p>"
+     },
+     {
+      "step_no": "4",
+      "step_title": "Calibration Status",
+      "step_content": "<p>Each calibrated instrument shall be identified with a calibration label indicating:</p>"
+     },
+     {
+      "step_no": "5",
+      "step_title": "Equipment ID",
+      "step_content": ""
+     },
+     {
+      "step_no": "6",
+      "step_title": "Date of calibration",
+      "step_content": ""
+     },
+     {
+      "step_no": "7",
+      "step_title": "Due date for next calibration",
+      "step_content": ""
+     },
+     {
+      "step_no": "8",
+      "step_title": "Calibration status (where applicable)",
+      "step_content": ""
+     },
+     {
+      "step_no": "9",
+      "step_title": "Handling and Storage",
+      "step_content": ""
+     },
+     {
+      "step_no": "10",
+      "step_title": "Monitoring and measuring equipment shall be:",
+      "step_content": "<p>Protected from damage.</p><p>Stored appropriately after use.</p><p>Handled carefully to maintain accuracy.</p><p>Protected against unauthorized adjustment.</p>"
+     },
+     {
+      "step_no": "11",
+      "step_title": "Out-of-Calibration Equipment",
+      "step_content": "<p>If any equipment is found to be damaged, out of calibration, or unsuitable for use:</p><p>It shall be identified and removed from service.</p><p>The impact on previous inspection or measurement results shall be evaluated.</p><p>Necessary corrective actions shall be initiated in accordance with SOP014 – Corrective Action Procedure. Where affected products are identified, they shall be evaluated in accordance with SOP013 – Control of Nonconforming Outputs Procedure.</p>"
+     },
+     {
+      "step_no": "12",
+      "step_title": "Calibration Records",
+      "step_content": "<p>Calibration records shall be maintained and reviewed periodically to ensure equipment remains fit for use.</p>"
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "FRM025",
+      "title": "Calibration Record"
+     },
+     {
+      "number": "",
+      "title": "Calibration Certificates (from external laboratory, where applicable)"
+     },
+     {
+      "number": "REG011",
+      "title": "Monitoring & Measuring Instruments Register"
+     }
+    ],
+    "related_documents": [
+     {
+      "number": "QM001",
+      "title": "Quality Manual"
+     },
+     {
+      "number": "SOP012",
+      "title": "Monitoring, Measurement, Inspection & Testing Procedure"
+     },
+     {
+      "number": "SOP013",
+      "title": "Control of Nonconforming Outputs Procedure"
+     },
+     {
+      "number": "SOP014",
+      "title": "Corrective Action Procedure"
+     }
+    ]
+   }
+  },
+  {
+   "name": "HCCPL/QMS/SOP-018",
+   "legacy_document_number": "SOP018",
+   "title": "Maintenance Procedure",
+   "document_type": "SOP",
+   "clause_reference": "7.1.3",
+   "department_label": "Maintenance",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null,
+   "sop": {
+    "declared_number": "SOP018",
+    "declared_title": "Maintenance Procedure",
+    "purpose": "<p>To establish a systematic process for the planned preventive and corrective maintenance of machinery, equipment, utilities, and infrastructure to ensure their continued availability, reliability, and safe operation.</p>",
+    "scope": "<p>Applies to all production machinery, inspection equipment (excluding calibration activities), utilities, plant infrastructure, and supporting equipment used at Hatim Carbon Co. Pvt. Ltd.</p>",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 7.1.3"
+     },
+     {
+      "reference": "QM001 – Quality Manual"
+     },
+     {
+      "reference": "SOP017 – Control of Monitoring & Measuring Equipment (Calibration) (where applicable)"
+     },
+     {
+      "reference": "Equipment Manuals"
+     }
+    ],
+    "definitions": [
+     {
+      "term": "Preventive Maintenance",
+      "definition": "Planned maintenance performed at scheduled intervals to reduce equipment failures."
+     },
+     {
+      "term": "Breakdown Maintenance",
+      "definition": "Maintenance carried out after equipment failure to restore operation."
+     },
+     {
+      "term": "Maintenance",
+      "definition": "Activities carried out to keep machinery and equipment in suitable working condition."
+     }
+    ],
+    "responsibilities": [
+     {
+      "role": "Maintenance Department",
+      "responsibility": "Plan and carry out preventive and corrective maintenance."
+     },
+     {
+      "role": "Production Department",
+      "responsibility": "Report equipment abnormalities and stop unsafe equipment."
+     },
+     {
+      "role": "Department Heads",
+      "responsibility": "Ensure equipment is available for scheduled maintenance."
+     },
+     {
+      "role": "Management",
+      "responsibility": "Provide resources for maintenance activities."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Equipment Register",
+      "step_content": "<p>Maintain a list of all machines and critical equipment in REG020 – Machine & Equipment Register.</p>"
+     },
+     {
+      "step_no": "2",
+      "step_title": "Preventive Maintenance",
+      "step_content": "<p>Maintenance shall be carried out according to a planned schedule considering:</p>"
+     },
+     {
+      "step_no": "3",
+      "step_title": "Manufacturer recommendations",
+      "step_content": ""
+     },
+     {
+      "step_no": "4",
+      "step_title": "Equipment usage",
+      "step_content": ""
+     },
+     {
+      "step_no": "5",
+      "step_title": "Operating hours",
+      "step_content": ""
+     },
+     {
+      "step_no": "6",
+      "step_title": "Previous breakdown history",
+      "step_content": ""
+     },
+     {
+      "step_no": "7",
+      "step_title": "Breakdown Maintenance",
+      "step_content": ""
+     },
+     {
+      "step_no": "8",
+      "step_title": "When equipment fails:",
+      "step_content": "<p>Stop the machine safely.</p><p>Raise a Maintenance Request.</p><p>Diagnose the fault.</p><p>Repair or replace defective parts.</p><p>Test before returning to production.</p>"
+     },
+     {
+      "step_no": "9",
+      "step_title": "Maintenance Records",
+      "step_content": ""
+     },
+     {
+      "step_no": "10",
+      "step_title": "All maintenance activities shall be recorded, including:",
+      "step_content": ""
+     },
+     {
+      "step_no": "11",
+      "step_title": "Date",
+      "step_content": ""
+     },
+     {
+      "step_no": "12",
+      "step_title": "Equipment ID",
+      "step_content": ""
+     },
+     {
+      "step_no": "13",
+      "step_title": "Nature of maintenance",
+      "step_content": ""
+     },
+     {
+      "step_no": "14",
+      "step_title": "Parts replaced",
+      "step_content": ""
+     },
+     {
+      "step_no": "15",
+      "step_title": "Person performing maintenance",
+      "step_content": ""
+     },
+     {
+      "step_no": "16",
+      "step_title": "Verification",
+      "step_content": ""
+     },
+     {
+      "step_no": "17",
+      "step_title": "After maintenance:",
+      "step_content": "<p>Verify machine operation.</p><p>Confirm safety devices function correctly.</p><p>Release equipment for production.</p>"
+     },
+     {
+      "step_no": "18",
+      "step_title": "Review",
+      "step_content": "<p>Maintenance history shall be reviewed periodically to identify recurring failures and improvement opportunities.</p>"
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "FRM026",
+      "title": "Maintenance Request"
+     },
+     {
+      "number": "FRM027",
+      "title": "Maintenance Checklist / Preventive Maintenance Record"
+     },
+     {
+      "number": "REG020",
+      "title": "Machine & Equipment Register"
+     },
+     {
+      "number": "REG021",
+      "title": "Maintenance Register"
+     }
+    ],
+    "related_documents": [
+     {
+      "number": "QM001",
+      "title": "Quality Manual"
+     },
+     {
+      "number": "SOP007",
+      "title": "Production Planning & Control"
+     },
+     {
+      "number": "SOP008",
+      "title": "Manufacturing Process Control"
+     },
+     {
+      "number": "SOP017",
+      "title": "Control of Monitoring & Measuring Equipment (Calibration)"
+     }
+    ]
+   }
+  },
+  {
+   "name": "HCCPL/QMS/WI-001",
+   "legacy_document_number": "WI001",
+   "title": "Receiving & Identification of Raw Materials",
+   "document_type": "WI",
+   "clause_reference": "8.4 , 8.5.2",
+   "department_label": "Stores",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/WI-002",
+   "legacy_document_number": "WI002",
+   "title": "Incoming Material Inspection",
+   "document_type": "WI",
+   "clause_reference": "8.4 , 8.6",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/WI-003",
+   "legacy_document_number": "WI003",
+   "title": "Material Issue to Production",
+   "document_type": "WI",
+   "clause_reference": "8.5.1",
+   "department_label": "Stores",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/WI-004",
+   "legacy_document_number": "WI004",
+   "title": "Carbon Brush Manufacturing",
+   "document_type": "WI",
+   "clause_reference": "8.5.1",
+   "department_label": "Production",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/WI-005",
+   "legacy_document_number": "WI005",
+   "title": "Brush Holder Machining",
+   "document_type": "WI",
+   "clause_reference": "8.5.1",
+   "department_label": "Production",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/WI-006",
+   "legacy_document_number": "WI006",
+   "title": "Spring Manufacturing",
+   "document_type": "WI",
+   "clause_reference": "8.5.1",
+   "department_label": "Production",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/WI-007",
+   "legacy_document_number": "WI007",
+   "title": "Copper Shunt Assembly",
+   "document_type": "WI",
+   "clause_reference": "8.5.1",
+   "department_label": "Production",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/WI-008",
+   "legacy_document_number": "WI008",
+   "title": "In-Process Inspection",
+   "document_type": "WI",
+   "clause_reference": "8.6",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/WI-009",
+   "legacy_document_number": "WI009",
+   "title": "Final Inspection & Product Release",
+   "document_type": "WI",
+   "clause_reference": "8.6",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/WI-010",
+   "legacy_document_number": "WI010",
+   "title": "Control of Nonconforming Product",
+   "document_type": "WI",
+   "clause_reference": "8.7",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/WI-011",
+   "legacy_document_number": "WI011",
+   "title": "Final Packing & Labelling",
+   "document_type": "WI",
+   "clause_reference": "8.5.4",
+   "department_label": "Stores",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/WI-012",
+   "legacy_document_number": "WI012",
+   "title": "Dispatch Preparation & Documentation",
+   "document_type": "WI",
+   "clause_reference": "8.5.4 , 8.6",
+   "department_label": "Dispatch",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/WI-013",
+   "legacy_document_number": "WI013",
+   "title": "Calibration of Measuring Instruments",
+   "document_type": "WI",
+   "clause_reference": "7.1.5",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/WI-014",
+   "legacy_document_number": "WI014",
+   "title": "Preventive Maintenance of Machines",
+   "document_type": "WI",
+   "clause_reference": "7.1.3",
+   "department_label": "Maintenance",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/WI-015",
+   "legacy_document_number": "WI015",
+   "title": "Machine Breakdown Reporting",
+   "document_type": "WI",
+   "clause_reference": "7.1.3",
+   "department_label": "Maintenance",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Structured SOP",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-001",
+   "legacy_document_number": "FRM001",
+   "title": "Document Change Request",
+   "document_type": "FRM",
+   "clause_reference": "7.5",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-002",
+   "legacy_document_number": "FRM002",
+   "title": "Customer Enquiry Form",
+   "document_type": "FRM",
+   "clause_reference": "8.2",
+   "department_label": "Sales",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-003",
+   "legacy_document_number": "FRM003",
+   "title": "Contract Review Form",
+   "document_type": "FRM",
+   "clause_reference": "8.2",
+   "department_label": "Sales",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": "Sales Order",
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-004",
+   "legacy_document_number": "FRM004",
+   "title": "Purchase Requisition",
+   "document_type": "FRM",
+   "clause_reference": "8.4",
+   "department_label": "Purchase",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": true,
+   "mapped_doctype": "Material Request",
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-005",
+   "legacy_document_number": "FRM005",
+   "title": "Supplier Evaluation Form",
+   "document_type": "FRM",
+   "clause_reference": "8.4",
+   "department_label": "Purchase",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-006",
+   "legacy_document_number": "FRM006",
+   "title": "Incoming Inspection Report",
+   "document_type": "FRM",
+   "clause_reference": "8.6",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": "Quality Inspection",
+   "mapped_filters": "{\"inspection_type\": \"Incoming\"}"
+  },
+  {
+   "name": "HCCPL/QMS/FRM-007",
+   "legacy_document_number": "FRM007",
+   "title": "Job Card",
+   "document_type": "FRM",
+   "clause_reference": "8.1",
+   "department_label": "Production",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": "Job Card",
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-008",
+   "legacy_document_number": "FRM008",
+   "title": "Material Requisition Slip",
+   "document_type": "FRM",
+   "clause_reference": "8.1",
+   "department_label": "Production",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-009",
+   "legacy_document_number": "FRM009",
+   "title": "In-Process Inspection Report",
+   "document_type": "FRM",
+   "clause_reference": "8.6",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": "Quality Inspection",
+   "mapped_filters": "{\"inspection_type\": \"In Process\"}"
+  },
+  {
+   "name": "HCCPL/QMS/FRM-010",
+   "legacy_document_number": "FRM010",
+   "title": "Final Inspection Report (PDI)",
+   "document_type": "FRM",
+   "clause_reference": "8.6",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": "Quality Inspection",
+   "mapped_filters": "{\"inspection_type\": \"Outgoing\"}"
+  },
+  {
+   "name": "HCCPL/QMS/FRM-011",
+   "legacy_document_number": "FRM011",
+   "title": "Design & Development Request",
+   "document_type": "FRM",
+   "clause_reference": "8.3",
+   "department_label": "Design / Engineering",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-012",
+   "legacy_document_number": "FRM012",
+   "title": "Design Input Checklist",
+   "document_type": "FRM",
+   "clause_reference": "8.3",
+   "department_label": "Design / Engineering",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-013",
+   "legacy_document_number": "FRM013",
+   "title": "Design Review Record",
+   "document_type": "FRM",
+   "clause_reference": "8.3",
+   "department_label": "Design / Engineering",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-014",
+   "legacy_document_number": "FRM014",
+   "title": "Design Verification Record",
+   "document_type": "FRM",
+   "clause_reference": "8.3",
+   "department_label": "Design / Engineering",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-015",
+   "legacy_document_number": "FRM015",
+   "title": "Design Validation Record",
+   "document_type": "FRM",
+   "clause_reference": "8.3",
+   "department_label": "Design / Engineering",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-016",
+   "legacy_document_number": "FRM016",
+   "title": "Design Change Request",
+   "document_type": "FRM",
+   "clause_reference": "8.3",
+   "department_label": "Design / Engineering",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-017",
+   "legacy_document_number": "FRM017",
+   "title": "Design Approval Record",
+   "document_type": "FRM",
+   "clause_reference": "8.3",
+   "department_label": "Design / Engineering",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-018",
+   "legacy_document_number": "FRM018",
+   "title": "Packing Checklist",
+   "document_type": "FRM",
+   "clause_reference": "8.5.4",
+   "department_label": "Stores",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-019",
+   "legacy_document_number": "FRM019",
+   "title": "Dispatch Checklist",
+   "document_type": "FRM",
+   "clause_reference": "8.5.4",
+   "department_label": "Dispatch",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-020",
+   "legacy_document_number": "FRM020",
+   "title": "Nonconforming Product Report (NCR)",
+   "document_type": "FRM",
+   "clause_reference": "8.7",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": "Non Conformance",
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-021",
+   "legacy_document_number": "FRM021",
+   "title": "Corrective Action Request (CAR)",
+   "document_type": "FRM",
+   "clause_reference": "10.2",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": "Quality Action",
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-022",
+   "legacy_document_number": "FRM022",
+   "title": "Internal Audit Checklist",
+   "document_type": "FRM",
+   "clause_reference": "9.2",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-023",
+   "legacy_document_number": "FRM023",
+   "title": "Internal Audit Report",
+   "document_type": "FRM",
+   "clause_reference": "9.2",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-024",
+   "legacy_document_number": "FRM024",
+   "title": "Management Review Minutes",
+   "document_type": "FRM",
+   "clause_reference": "9.3",
+   "department_label": "Mgmt.",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": "Quality Meeting",
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-025",
+   "legacy_document_number": "FRM025",
+   "title": "Calibration Record",
+   "document_type": "FRM",
+   "clause_reference": "7.1.5",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-026",
+   "legacy_document_number": "FRM026",
+   "title": "Maintenance Request",
+   "document_type": "FRM",
+   "clause_reference": "7.1.3",
+   "department_label": "Maintenance",
+   "approval_authority": "Maintenance Head",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-027",
+   "legacy_document_number": "FRM027",
+   "title": "Maintenance Checklist / Preventive Maintenance Record",
+   "document_type": "FRM",
+   "clause_reference": "7.1.3",
+   "department_label": "Maintenance",
+   "approval_authority": "Maintenance Head",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-028",
+   "legacy_document_number": "FRM028",
+   "title": "Customer Complaint Report",
+   "document_type": "FRM",
+   "clause_reference": "8.2.1 , 10.2",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-029",
+   "legacy_document_number": "FRM029",
+   "title": "Product Release Note",
+   "document_type": "FRM",
+   "clause_reference": "8.6",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-030",
+   "legacy_document_number": "FRM030",
+   "title": "Certificate of Conformity (CoC)",
+   "document_type": "FRM",
+   "clause_reference": "8.6",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-031",
+   "legacy_document_number": "FRM031",
+   "title": "Training Evaluation & Effectiveness Record",
+   "document_type": "FRM",
+   "clause_reference": "",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-001",
+   "legacy_document_number": "REG001",
+   "title": "Master Document Register",
+   "document_type": "REG",
+   "clause_reference": "7.5",
+   "department_label": "QA",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": true,
+   "mapped_doctype": "Controlled Document",
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-002",
+   "legacy_document_number": "REG002",
+   "title": "Internal & External Issues Register",
+   "document_type": "REG",
+   "clause_reference": "4.1",
+   "department_label": "Mgmt.",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-003",
+   "legacy_document_number": "REG003",
+   "title": "Interested Parties Review Register",
+   "document_type": "REG",
+   "clause_reference": "4.2",
+   "department_label": "Mgmt.",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-004",
+   "legacy_document_number": "REG004",
+   "title": "Risk & Opportunity Register",
+   "document_type": "REG",
+   "clause_reference": "6.1",
+   "department_label": "All",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-005",
+   "legacy_document_number": "REG005",
+   "title": "Legal & Statutory Requirements Register",
+   "document_type": "REG",
+   "clause_reference": "4.2, 4.4, 8.2, 8.4, 8.5, 9.1",
+   "department_label": "Mgmt.",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-006",
+   "legacy_document_number": "REG006",
+   "title": "Employee Competency Matrix",
+   "document_type": "REG",
+   "clause_reference": "7.2",
+   "department_label": "HR",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": true,
+   "mapped_doctype": "Employee Skill Map",
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-007",
+   "legacy_document_number": "REG007",
+   "title": "Approved Suppliers Register",
+   "document_type": "REG",
+   "clause_reference": "8.4",
+   "department_label": "Purchase",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": true,
+   "mapped_doctype": "Supplier",
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-008",
+   "legacy_document_number": "REG008",
+   "title": "Customer Complaint Register",
+   "document_type": "REG",
+   "clause_reference": "8.2.1, 9.1.2",
+   "department_label": "QA",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-009",
+   "legacy_document_number": "REG009",
+   "title": "Nonconforming Product Register",
+   "document_type": "REG",
+   "clause_reference": "8.7",
+   "department_label": "QA",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": true,
+   "mapped_doctype": "Non Conformance",
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-010",
+   "legacy_document_number": "REG010",
+   "title": "Internal Audit Register",
+   "document_type": "REG",
+   "clause_reference": "9.2",
+   "department_label": "QA",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-011",
+   "legacy_document_number": "REG011",
+   "title": "Monitoring & Measuring Instruments Register",
+   "document_type": "REG",
+   "clause_reference": "7.1.5",
+   "department_label": "QA",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": true,
+   "mapped_doctype": "Asset",
+   "mapped_filters": "{\"asset_category\": \"Measuring Instruments\"}"
+  },
+  {
+   "name": "HCCPL/QMS/REG-012",
+   "legacy_document_number": "REG012",
+   "title": "Training Register",
+   "document_type": "REG",
+   "clause_reference": "7.2",
+   "department_label": "HR",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": true,
+   "mapped_doctype": "Training Event Employee",
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-013",
+   "legacy_document_number": "REG013",
+   "title": "Roles, Responsibilities and Authorities",
+   "document_type": "REG",
+   "clause_reference": "5.3",
+   "department_label": "HR",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": true,
+   "mapped_doctype": "Employee",
+   "mapped_filters": "{\"status\": \"Active\"}"
+  },
+  {
+   "name": "HCCPL/QMS/REG-014",
+   "legacy_document_number": "REG014",
+   "title": "Record Retention Register",
+   "document_type": "REG",
+   "clause_reference": "7.5.3",
+   "department_label": "QA",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-015",
+   "legacy_document_number": "REG015",
+   "title": "Incoming Material Register",
+   "document_type": "REG",
+   "clause_reference": "8.4, 8.6",
+   "department_label": "QA",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": "Quality Inspection",
+   "mapped_filters": "{\"inspection_type\": \"Incoming\", \"docstatus\": 1}"
+  },
+  {
+   "name": "HCCPL/QMS/REG-016",
+   "legacy_document_number": "REG016",
+   "title": "Production Register",
+   "document_type": "REG",
+   "clause_reference": "8.5.1",
+   "department_label": "Production",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": "Work Order",
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-017",
+   "legacy_document_number": "REG017",
+   "title": "Design & Development Register",
+   "document_type": "REG",
+   "clause_reference": "8.3",
+   "department_label": "Design / Engineering",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": true,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-018",
+   "legacy_document_number": "REG018",
+   "title": "Corrective Action Records",
+   "document_type": "REG",
+   "clause_reference": "10.2",
+   "department_label": "QA",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": "Quality Action",
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-019",
+   "legacy_document_number": "REG019",
+   "title": "Management Review Register",
+   "document_type": "REG",
+   "clause_reference": "9.3",
+   "department_label": "Mgmt.",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": "Quality Meeting",
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-020",
+   "legacy_document_number": "REG020",
+   "title": "Machine & Equipment Register",
+   "document_type": "REG",
+   "clause_reference": "7.1.3",
+   "department_label": "Maintenance",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": "Asset",
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-021",
+   "legacy_document_number": "REG021",
+   "title": "Maintenance Register",
+   "document_type": "REG",
+   "clause_reference": "7.1.3",
+   "department_label": "Maintenance",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": "Asset Maintenance",
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-022",
+   "legacy_document_number": "REG022",
+   "title": "PO Amendment Record Register",
+   "document_type": "REG",
+   "clause_reference": "8.2",
+   "department_label": "Sales",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": true,
+   "mapped_doctype": "Purchase Order",
+   "mapped_filters": "{\"amended_from\": [\"!=\", \"\"]}"
+  },
+  {
+   "name": "HCCPL/QMS/REG-023",
+   "legacy_document_number": "REG023",
+   "title": "Annual Training Calendar",
+   "document_type": "REG",
+   "clause_reference": "7.2, 7.3",
+   "department_label": "HR",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": "Training Event",
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-024",
+   "legacy_document_number": "REG024",
+   "title": "Dispatch Register",
+   "document_type": "REG",
+   "clause_reference": "8.6",
+   "department_label": "Stores / Dispatch",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": "Delivery Note",
+   "mapped_filters": "{\"docstatus\": 1}"
+  },
+  {
+   "name": "HCCPL/QMS/REG-025",
+   "legacy_document_number": "REG025",
+   "title": "Customer Feedback Register",
+   "document_type": "REG",
+   "clause_reference": "8.2.1, 9.1.2",
+   "department_label": "Sales",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  },
+  {
+   "name": "HCCPL/QMS/REG-026",
+   "legacy_document_number": "REG026",
+   "title": "Drawing Revision Register",
+   "document_type": "REG",
+   "clause_reference": "8.3",
+   "department_label": "Design / Engineering",
+   "approval_authority": "Director",
+   "issue_number": "01",
+   "issue_date": "2026-04-01",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": null,
+   "mapped_filters": null
+  }
+ ]
+}

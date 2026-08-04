@@ -1,0 +1,310 @@
+# Copyright (c) 2026, Hatim Carbon Co. Pvt. Ltd. and contributors
+# For license information, please see license.txt
+
+"""Load the QMS document set from a reviewed seed file, and remove it again.
+
+The seed file is produced on a workstation from the source Word documents and
+committed to this repo, so what gets imported is reviewable in a diff rather
+than being parsed live out of a zip on the server. That also makes the import
+reproducible: the same file loaded on the clone and on production gives the same
+records.
+
+Everything written here is tagged with a batch token. A purge removes exactly
+what carries that token and nothing else, so documents created by hand are never
+at risk.
+"""
+
+import json
+import os
+
+import frappe
+from frappe import _
+
+SEED_BATCH = "zip-2026-08-04"
+
+TYPES = [
+	("QM", "Quality Manual", "Rich Text", None),
+	("POL", "Policy", "Rich Text", 24),
+	("SOP", "Standard Operating Procedure", "Structured SOP", 12),
+	("WI", "Work Instruction", "Structured SOP", 12),
+	("FRM", "Form", "Mapped Data", 24),
+	("REG", "Register", "Mapped Data", 12),
+]
+
+#: Lifecycle states. Frappe ships only Open/Rejected/Approved/Pending, so the rest
+#: are created here. They are configuration for the document workflow rather than
+#: imported content, so a purge leaves them in place.
+WORKFLOW_STATES = [
+	("Draft", "Danger"),
+	("Under Review", "Warning"),
+	("Approved", "Info"),
+	("Active", "Success"),
+	("Superseded", ""),
+	("Obsolete", ""),
+]
+
+BASELINE_NOTE = (
+	"Baseline entry created when the document was brought under ERPNext document control. "
+	"The source document recorded no evidence of preparation, review or approval, so the "
+	"authority columns are left empty rather than assumed."
+)
+
+
+def seed_file_path() -> str:
+	return os.path.join(
+		frappe.get_app_path("iso_compliance"), "seed_data", "controlled_documents.json"
+	)
+
+
+def load_seed() -> list[dict]:
+	with open(seed_file_path()) as fh:
+		return json.load(fh)["documents"]
+
+
+# ----------------------------------------------------------------------------
+# Import
+# ----------------------------------------------------------------------------
+
+
+def import_seed(batch: str = SEED_BATCH, commit: bool = True) -> dict:
+	"""Create the controlled document set. Safe to re-run: existing names are skipped."""
+	documents = load_seed()
+	_ensure_workflow_states()
+	created_types = _ensure_types(batch)
+
+	# Legacy number -> new document number, so cross-references between documents
+	# resolve to the records actually being created.
+	resolve = {d["legacy_document_number"]: d["name"] for d in documents}
+
+	created, skipped = [], []
+	for entry in documents:
+		if frappe.db.exists("Controlled Document", entry["name"]):
+			skipped.append(entry["name"])
+			continue
+		_create_document(entry, resolve, batch)
+		created.append(entry["name"])
+
+	# Documents cross-reference each other, and a reference can point forward: SOP-001
+	# cites REG-001 and FRM-001, which are created later in the same run. Link fields
+	# are therefore filled once every record exists.
+	linked = _resolve_cross_references(documents, resolve)
+
+	if commit:
+		frappe.db.commit()
+
+	return {
+		"types_created": created_types,
+		"documents_created": len(created),
+		"documents_skipped": len(skipped),
+		"cross_references_linked": linked,
+		"batch": batch,
+	}
+
+
+def _resolve_cross_references(documents: list[dict], resolve: dict) -> int:
+	linked = 0
+	for entry in documents:
+		if not entry.get("sop"):
+			continue
+		doc = frappe.get_doc("Controlled Document", entry["name"])
+		changed = False
+		for table in ("records_generated", "related_documents"):
+			for row in doc.get(table) or []:
+				target = resolve.get(row.document_number) or (
+					row.document_number if frappe.db.exists("Controlled Document", row.document_number) else None
+				)
+				if target and row.document != target:
+					row.document = target
+					changed = True
+					linked += 1
+		if changed:
+			doc.save(ignore_permissions=True)
+	return linked
+
+
+def _ensure_workflow_states():
+	for state, style in WORKFLOW_STATES:
+		if not frappe.db.exists("Workflow State", state):
+			frappe.get_doc(
+				{"doctype": "Workflow State", "workflow_state_name": state, "style": style}
+			).insert(ignore_permissions=True)
+
+
+def _ensure_types(batch: str) -> int:
+	created = 0
+	for abbr, label, mode, review_months in TYPES:
+		if frappe.db.exists("Controlled Document Type", abbr):
+			continue
+		frappe.get_doc(
+			{
+				"doctype": "Controlled Document Type",
+				"abbreviation": abbr,
+				"type_name": label,
+				"body_mode": mode,
+				"naming_series_prefix": f"HCCPL/QMS/{abbr}-",
+				"number_padding": 3,
+				"review_frequency_months": review_months,
+				"enabled": 1,
+				"seed_batch": batch,
+			}
+		).insert(ignore_permissions=True)
+		created += 1
+	return created
+
+
+def _create_document(entry: dict, resolve: dict, batch: str):
+	payload = {
+		"doctype": "Controlled Document",
+		"name": entry["name"],
+		"title": entry["title"],
+		"document_type": entry["document_type"],
+		"legacy_document_number": entry["legacy_document_number"],
+		"clause_reference": entry.get("clause_reference") or None,
+		# in_import skips _set_defaults, so the control block is supplied explicitly.
+		"issue_number": entry.get("issue_number") or "01",
+		"issue_date": entry.get("issue_date"),
+		"revision_number": entry.get("revision_number") or "00",
+		"body_mode": entry.get("body_mode"),
+		"mapped_doctype": entry.get("mapped_doctype"),
+		"mapped_filters": entry.get("mapped_filters"),
+		"workflow_state": "Active" if entry.get("has_source_file") else "Draft",
+		"seed_batch": batch,
+	}
+
+	sop = entry.get("sop")
+	if sop:
+		payload["purpose"] = sop.get("purpose")
+		payload["scope"] = sop.get("scope")
+		payload["references"] = [
+			{"reference": r["reference"]} for r in sop.get("references", []) if r.get("reference")
+		]
+		payload["definitions"] = [
+			{"term": d["term"], "definition": d["definition"]} for d in sop.get("definitions", [])
+		]
+		payload["responsibilities"] = [
+			{"role": r["role"], "responsibility": r["responsibility"]}
+			for r in sop.get("responsibilities", [])
+		]
+		payload["procedure_steps"] = sop.get("procedure_steps", [])
+		payload["records_generated"] = _link_rows(sop.get("records_generated", []), resolve)
+		payload["related_documents"] = _link_rows(sop.get("related_documents", []), resolve)
+
+	# Preserve the historical document numbers exactly. set_new_name only honours a
+	# supplied name under this flag; it also skips _set_defaults, handled above.
+	frappe.flags.in_import = True
+	try:
+		doc = frappe.get_doc(payload)
+		doc.append(
+			"revisions",
+			{
+				"issue_number": doc.issue_number,
+				"issue_date": doc.issue_date,
+				"revision_number": doc.revision_number,
+				"revision_date": None,
+				"clause_section_affected": _("All"),
+				"description_of_change": _baseline_note(entry),
+			},
+		)
+		doc.insert(ignore_permissions=True)
+	finally:
+		frappe.flags.in_import = False
+
+
+def _baseline_note(entry: dict) -> str:
+	note = BASELINE_NOTE
+	declared = (entry.get("sop") or {}).get("declared_number")
+	if declared and declared != entry["legacy_document_number"]:
+		note += (
+			f" Identification defect carried over from the source: the document body declared "
+			f"{declared} while the file was held as {entry['legacy_document_number']}. "
+			f"Recorded here rather than silently corrected."
+		)
+	if not entry.get("has_source_file"):
+		note += " No source document exists for this entry; it is listed in REG-001 but was never written."
+	return note
+
+
+def _link_rows(rows: list[dict], resolve: dict) -> list[dict]:
+	"""Build link rows without the Link field set.
+
+	The number and title are recorded now so nothing is lost if the target does not
+	exist; _resolve_cross_references fills the Link field once every record is in.
+	"""
+	out = []
+	for r in rows:
+		number = r.get("number") or ""
+		out.append(
+			{
+				"document_number": resolve.get(number) or number,
+				"document_title": r.get("title") or "",
+			}
+		)
+	return out
+
+
+# ----------------------------------------------------------------------------
+# Purge
+# ----------------------------------------------------------------------------
+
+
+def purge_seed(batch: str = SEED_BATCH, commit: bool = True) -> dict:
+	"""Remove every record created by a seed import, and nothing else.
+
+	Only records carrying the batch token are touched. Anything created by hand,
+	or by a different batch, is left alone.
+	"""
+	docs = frappe.get_all(
+		"Controlled Document", filters={"seed_batch": batch}, pluck="name", order_by="name asc"
+	)
+
+	# Clear links between seeded documents first, so deletion order cannot trip
+	# link validation on documents that reference each other.
+	for name in docs:
+		frappe.db.set_value("Controlled Document", name, "superseded_by", None, update_modified=False)
+		frappe.db.set_value("Controlled Document", name, "supersedes", None, update_modified=False)
+
+	deleted = 0
+	for name in docs:
+		doc = frappe.get_doc("Controlled Document", name)
+		if doc.docstatus == 1:
+			doc.cancel()
+		doc.delete(ignore_permissions=True, force=True)
+		deleted += 1
+
+	types = frappe.get_all(
+		"Controlled Document Type", filters={"seed_batch": batch}, pluck="name", order_by="name asc"
+	)
+	types_deleted, types_kept = 0, []
+	for name in types:
+		if frappe.db.exists("Controlled Document", {"document_type": name}):
+			# A hand-created document still uses this type, so it stays.
+			types_kept.append(name)
+			continue
+		frappe.delete_doc("Controlled Document Type", name, ignore_permissions=True, force=True)
+		frappe.db.sql("delete from tabSeries where name like %s", (f"HCCPL/QMS/{name}-%",))
+		types_deleted += 1
+
+	if commit:
+		frappe.db.commit()
+
+	return {
+		"documents_deleted": deleted,
+		"types_deleted": types_deleted,
+		"types_kept_in_use": types_kept,
+		"batch": batch,
+	}
+
+
+@frappe.whitelist()
+def purge_seed_ui(batch: str = SEED_BATCH):
+	"""Purge from the desk. Restricted to System Manager."""
+	frappe.only_for("System Manager")
+	result = purge_seed(batch)
+	frappe.msgprint(
+		_("Removed {0} controlled documents and {1} document types from batch {2}.").format(
+			result["documents_deleted"], result["types_deleted"], batch
+		),
+		title=_("Seed Data Purged"),
+		indicator="orange",
+	)
+	return result
