@@ -31,6 +31,15 @@ class ControlledDocument(Document):
 
 		The numbering convention lives on Controlled Document Type, so changing it
 		is a data change rather than a schema change.
+
+		Migrated documents must keep the numbers they were issued under, including
+		any gaps in the historical sequence, because those numbers are cited by
+		documents already in circulation. To preserve an explicit name, the caller
+		sets ``frappe.flags.in_import``: naming.set_new_name only leaves a supplied
+		name in place under that flag, and this method is then never reached.
+
+		Note that the same flag also skips ``_set_defaults``, so an importing
+		caller must supply issue_number and revision_number itself.
 		"""
 		doc_type = frappe.get_cached_doc("Controlled Document Type", self.document_type)
 		self.name = make_autoname(doc_type.get_naming_series(), doc=self)
