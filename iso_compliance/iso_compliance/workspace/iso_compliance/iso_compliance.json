@@ -67,6 +67,17 @@
    "type": "Link"
   },
   {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Form Responsibility by Department",
+   "link_count": 0,
+   "link_to": "Form Responsibility by Department",
+   "link_type": "Report",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
    "hidden": 0,
    "is_query_report": 0,
    "label": "Context and Risk",
@@ -305,7 +316,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-08-05 20:00:00.000000",
+ "modified": "2026-08-06 16:00:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "ISO Compliance",
@@ -357,6 +368,13 @@
    "doc_view": "",
    "label": "Maintenance and Calibration Due",
    "link_to": "Maintenance and Calibration Due",
+   "type": "Report"
+  },
+  {
+   "color": "Green",
+   "doc_view": "",
+   "label": "Form Responsibility by Department",
+   "link_to": "Form Responsibility by Department",
    "type": "Report"
   }
  ],

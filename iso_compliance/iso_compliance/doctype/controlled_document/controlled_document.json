@@ -32,6 +32,8 @@
   "approved_by_name",
   "approved_on",
   "ownership_section",
+  "owning_department",
+  "approval_authority",
   "process_owner",
   "column_break_ownership",
   "department",
@@ -248,6 +250,21 @@
    "fieldname": "ownership_section",
    "fieldtype": "Section Break",
    "label": "Ownership"
+  },
+  {
+   "fieldname": "owning_department",
+   "fieldtype": "Data",
+   "label": "Owning Department",
+   "in_standard_filter": 1,
+   "in_list_view": 0,
+   "description": "The department that fills this document in, as recorded in REG-001. Kept as text because the register names functions that do not all exist as ERPNext Department records."
+  },
+  {
+   "fieldname": "approval_authority",
+   "fieldtype": "Data",
+   "label": "Approval Authority",
+   "in_standard_filter": 1,
+   "description": "The role that approves this document, as recorded in REG-001."
   },
   {
    "fieldname": "process_owner",
@@ -474,7 +491,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-08-04 00:00:00.000000",
+ "modified": "2026-08-06 15:00:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Controlled Document",

@@ -74,6 +74,23 @@ PLACEHOLDER_ALIASES = {
 	"supplier performance evaluation": "FRM005",
 }
 
+#: REG-001 names the department that fills each document in. Five of the thirteen
+#: it names have no Department record in ERPNext, so the register's own label is
+#: kept as text and the Link is set only where a real Department exists. Assigning
+#: scope of work to a department that does not exist in the ERP would be a fiction.
+#: "M gmt." is a typo in the source, carried by two documents.
+DEPARTMENT_MAP = {
+	"QA": "Quality - HCCPL",
+	"Mgmt.": "Management - HCCPL",
+	"M gmt.": "Management - HCCPL",
+	"Sales": "Sales - HCCPL",
+	"Purchase": "Purchase - HCCPL",
+	"Production": "Production - HCCPL",
+	"All": "All Departments",
+	# No ERPNext Department exists for these:
+	# HR, Design / Engineering, Stores, Dispatch, Stores / Dispatch, Maintenance
+}
+
 BASELINE_NOTE = (
 	"Baseline entry created when the document was brought under ERPNext document control. "
 	"The source document recorded no evidence of preparation, review or approval, so the "
@@ -247,8 +264,14 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 		"mapped_doctype": entry.get("mapped_doctype"),
 		"mapped_filters": entry.get("mapped_filters"),
 		"workflow_state": "Active" if entry.get("has_source_file") else "Draft",
+		"owning_department": (entry.get("department_label") or "").replace("M gmt.", "Mgmt.") or None,
+		"approval_authority": entry.get("approval_authority") or None,
 		"seed_batch": batch,
 	}
+
+	erp_department = DEPARTMENT_MAP.get(entry.get("department_label"))
+	if erp_department and frappe.db.exists("Department", erp_department):
+		payload["department"] = erp_department
 
 	# A review interval is only useful if it resolves to a date something can fall
 	# past. Derive it from the issue date so the review-due reporting is live from
