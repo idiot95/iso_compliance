@@ -15,7 +15,7 @@ Installed by `bench install-app`, carried by `bench migrate` on every upgrade:
 | Print Format | `Controlled Document`, one format serving every body type |
 | Workspaces | `ISO Compliance` (home) and `Compliance Dashboard` (child) |
 | Desk apps screen | entry with its own logo, routes to the dashboard |
-| Number Cards | 14 |
+| Number Cards | 13 |
 | Dashboard Charts | 5 |
 | Query Reports | Master Document Register, Compliance Gaps, Maintenance and Calibration Due |
 | Notification | Maintenance or Calibration Due, 14 days ahead |
@@ -26,6 +26,28 @@ app's own DocTypes. Frappe ships only Open, Rejected, Approved and Pending, and
 `Controlled Document.workflow_state` links to Workflow State, so the rest must
 exist. They are created by an `after_install` and `after_migrate` hook, are
 idempotent, and touch nothing that already exists.
+
+## What resolves automatically on your site, and what does not
+
+**Automatic.** All 42 register mappings point at DocTypes that exist wherever
+ERPNext and HRMS are installed: 19 belong to erpnext, 4 to hrms, 7 to this app.
+None depend on india_compliance, crm or hatim_carbon. A mapped register reads live
+data, so on production it shows production's rows the moment the app is installed
+— no re-pointing, no configuration. The cross-references between controlled
+documents are resolved during import, against the documents being imported.
+
+`required_apps = ["erpnext"]` is declared, so installing without it fails at
+install time rather than part-way through a migrate. HRMS is not required: it owns
+four mappings (training records, competency matrix) and without it those four
+registers are simply unmapped.
+
+**Not automatic, by design.** Seeded records are created by the two import
+commands below, not by a migrate hook.
+
+**Nothing to re-point.** No seeded document carries a link to a User, Department
+or Employee — `prepared_by`, `reviewed_by`, `approved_by`, `process_owner` and
+`department` are empty on all 93, because the source documents recorded no such
+evidence. Nothing can dangle against a different user list.
 
 ## Steps
 

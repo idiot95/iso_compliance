@@ -8,7 +8,14 @@ app_license = "mit"
 # Apps
 # ------------------
 
-# required_apps = []
+# Link fields on this app's DocTypes point at Supplier, Department, Designation,
+# Asset and Quality Action, so a migrate without ERPNext fails on the first sync.
+# Declaring it makes that a clear install-time error instead.
+#
+# hrms is deliberately NOT required. It owns four of the forty-two register
+# mappings (training records and the competency matrix); without it those four
+# registers are simply unmapped and the rest of the app is unaffected.
+required_apps = ["erpnext"]
 
 # Shows ISO Compliance on the desk apps screen, opening straight onto the dashboard.
 add_to_apps_screen = [
