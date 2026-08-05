@@ -5425,7 +5425,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": true,
-   "mapped_doctype": "Purchase Order",
+   "mapped_doctype": "Sales Order",
    "mapped_filters": "{\"amended_from\": [\"!=\", \"\"]}"
   },
   {

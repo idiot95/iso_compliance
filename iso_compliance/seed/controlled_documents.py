@@ -83,6 +83,7 @@ DEPARTMENT_MAP = {
 	"QA": "Quality - HCCPL",
 	"Mgmt.": "Management - HCCPL",
 	"M gmt.": "Management - HCCPL",
+	"Management": "Management - HCCPL",
 	"Sales": "Sales - HCCPL",
 	"Purchase": "Purchase - HCCPL",
 	"Production": "Production - HCCPL",
@@ -264,7 +265,7 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 		"mapped_doctype": entry.get("mapped_doctype"),
 		"mapped_filters": entry.get("mapped_filters"),
 		"workflow_state": "Active" if entry.get("has_source_file") else "Draft",
-		"owning_department": (entry.get("department_label") or "").replace("M gmt.", "Mgmt.") or None,
+		"owning_department": _department_label(entry.get("department_label")),
 		"approval_authority": entry.get("approval_authority") or None,
 		"seed_batch": batch,
 	}
@@ -318,6 +319,13 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 		doc.insert(ignore_permissions=True)
 	finally:
 		frappe.flags.in_import = False
+
+
+def _department_label(label: str | None) -> str | None:
+	"""Spell the department out. REG-001 abbreviates, and one row misspells it."""
+	if not label:
+		return None
+	return {"Mgmt.": "Management", "M gmt.": "Management"}.get(label.strip(), label.strip())
 
 
 def _review_months(abbr: str) -> int | None:
