@@ -264,6 +264,7 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 		"body_mode": entry.get("body_mode"),
 		"mapped_doctype": entry.get("mapped_doctype"),
 		"mapped_filters": entry.get("mapped_filters"),
+		"mapped_report": entry.get("mapped_report"),
 		"workflow_state": "Active" if entry.get("has_source_file") else "Draft",
 		"owning_department": _department_label(entry.get("department_label")),
 		"approval_authority": entry.get("approval_authority") or None,

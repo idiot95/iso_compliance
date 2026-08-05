@@ -14,7 +14,8 @@
    "body_mode": "Rich Text",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/POL-001",
@@ -30,7 +31,8 @@
    "body_mode": "Rich Text",
    "has_source_file": true,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/POL-002",
@@ -46,7 +48,8 @@
    "body_mode": "Rich Text",
    "has_source_file": true,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/SOP-001",
@@ -63,6 +66,7 @@
    "has_source_file": true,
    "mapped_doctype": null,
    "mapped_filters": null,
+   "mapped_report": null,
    "sop": {
     "declared_number": "SOP001",
     "declared_title": "Control of Documented Information",
@@ -222,6 +226,7 @@
    "has_source_file": true,
    "mapped_doctype": null,
    "mapped_filters": null,
+   "mapped_report": null,
    "sop": {
     "declared_number": "SOP002",
     "declared_title": "Risk & Opportunity Management Procedure",
@@ -431,6 +436,7 @@
    "has_source_file": true,
    "mapped_doctype": null,
    "mapped_filters": null,
+   "mapped_report": null,
    "sop": {
     "declared_number": "SOP003",
     "declared_title": "Human Resource, Competency & Training Procedure",
@@ -724,6 +730,7 @@
    "has_source_file": true,
    "mapped_doctype": null,
    "mapped_filters": null,
+   "mapped_report": null,
    "sop": {
     "declared_number": "SOP004",
     "declared_title": "Customer Communication, Sales & Contract Review Procedure",
@@ -1027,6 +1034,7 @@
    "has_source_file": true,
    "mapped_doctype": null,
    "mapped_filters": null,
+   "mapped_report": null,
    "sop": {
     "declared_number": "SOP005",
     "declared_title": "Purchase & Supplier Management Procedure",
@@ -1320,6 +1328,7 @@
    "has_source_file": true,
    "mapped_doctype": null,
    "mapped_filters": null,
+   "mapped_report": null,
    "sop": {
     "declared_number": "SOP006",
     "declared_title": "Incoming Material Inspection & Material Identification",
@@ -1533,6 +1542,7 @@
    "has_source_file": true,
    "mapped_doctype": null,
    "mapped_filters": null,
+   "mapped_report": null,
    "sop": {
     "declared_number": "SOP007",
     "declared_title": "Production Planning & Control",
@@ -1814,6 +1824,7 @@
    "has_source_file": true,
    "mapped_doctype": null,
    "mapped_filters": null,
+   "mapped_report": null,
    "sop": {
     "declared_number": "SOP008",
     "declared_title": "Manufacturing Process Control Procedure",
@@ -2012,6 +2023,7 @@
    "has_source_file": true,
    "mapped_doctype": null,
    "mapped_filters": null,
+   "mapped_report": null,
    "sop": {
     "declared_number": "SOP009",
     "declared_title": "Design & Development Procedure",
@@ -2368,6 +2380,7 @@
    "has_source_file": true,
    "mapped_doctype": null,
    "mapped_filters": null,
+   "mapped_report": null,
    "sop": {
     "declared_number": "SOP010",
     "declared_title": "Preservation, Storage, Packing & Dispatch Procedure",
@@ -2680,6 +2693,7 @@
    "has_source_file": true,
    "mapped_doctype": null,
    "mapped_filters": null,
+   "mapped_report": null,
    "sop": {
     "declared_number": "SOP011",
     "declared_title": "Identification & Traceability Procedure",
@@ -2932,6 +2946,7 @@
    "has_source_file": true,
    "mapped_doctype": null,
    "mapped_filters": null,
+   "mapped_report": null,
    "sop": {
     "declared_number": "SOP010",
     "declared_title": "Preservation, Storage, Packing & Dispatch Procedure",
@@ -3157,6 +3172,7 @@
    "has_source_file": true,
    "mapped_doctype": null,
    "mapped_filters": null,
+   "mapped_report": null,
    "sop": {
     "declared_number": "SOP013",
     "declared_title": "Control of Nonconforming Outputs Procedure",
@@ -3362,6 +3378,7 @@
    "has_source_file": true,
    "mapped_doctype": null,
    "mapped_filters": null,
+   "mapped_report": null,
    "sop": {
     "declared_number": "SOP014",
     "declared_title": "Corrective Action Procedure",
@@ -3567,6 +3584,7 @@
    "has_source_file": true,
    "mapped_doctype": null,
    "mapped_filters": null,
+   "mapped_report": null,
    "sop": {
     "declared_number": "SOP015",
     "declared_title": "Internal Audit Procedure",
@@ -3757,6 +3775,7 @@
    "has_source_file": true,
    "mapped_doctype": null,
    "mapped_filters": null,
+   "mapped_report": null,
    "sop": {
     "declared_number": "SOP016",
     "declared_title": "Management Review Procedure",
@@ -3998,6 +4017,7 @@
    "has_source_file": true,
    "mapped_doctype": null,
    "mapped_filters": null,
+   "mapped_report": null,
    "sop": {
     "declared_number": "SOP017",
     "declared_title": "Control of Monitoring & Measuring Equipment (Calibration) Procedure",
@@ -4159,6 +4179,7 @@
    "has_source_file": true,
    "mapped_doctype": null,
    "mapped_filters": null,
+   "mapped_report": null,
    "sop": {
     "declared_number": "SOP018",
     "declared_title": "Maintenance Procedure",
@@ -4354,7 +4375,8 @@
    "body_mode": "Structured SOP",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/WI-002",
@@ -4370,7 +4392,8 @@
    "body_mode": "Structured SOP",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/WI-003",
@@ -4386,7 +4409,8 @@
    "body_mode": "Structured SOP",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/WI-004",
@@ -4402,7 +4426,8 @@
    "body_mode": "Structured SOP",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/WI-005",
@@ -4418,7 +4443,8 @@
    "body_mode": "Structured SOP",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/WI-006",
@@ -4434,7 +4460,8 @@
    "body_mode": "Structured SOP",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/WI-007",
@@ -4450,7 +4477,8 @@
    "body_mode": "Structured SOP",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/WI-008",
@@ -4466,7 +4494,8 @@
    "body_mode": "Structured SOP",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/WI-009",
@@ -4482,7 +4511,8 @@
    "body_mode": "Structured SOP",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/WI-010",
@@ -4498,7 +4528,8 @@
    "body_mode": "Structured SOP",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/WI-011",
@@ -4514,7 +4545,8 @@
    "body_mode": "Structured SOP",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/WI-012",
@@ -4530,7 +4562,8 @@
    "body_mode": "Structured SOP",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/WI-013",
@@ -4546,7 +4579,8 @@
    "body_mode": "Structured SOP",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/WI-014",
@@ -4562,7 +4596,8 @@
    "body_mode": "Structured SOP",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/WI-015",
@@ -4578,7 +4613,8 @@
    "body_mode": "Structured SOP",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-001",
@@ -4594,7 +4630,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Document Change Request",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-002",
@@ -4610,7 +4647,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Opportunity",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-003",
@@ -4626,7 +4664,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Sales Order",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-004",
@@ -4642,7 +4681,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": true,
    "mapped_doctype": "Material Request",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-005",
@@ -4658,7 +4698,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Supplier Scorecard",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-006",
@@ -4674,7 +4715,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Quality Inspection",
-   "mapped_filters": "{\"inspection_type\": \"Incoming\"}"
+   "mapped_filters": "{\"inspection_type\": \"Incoming\"}",
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-007",
@@ -4690,7 +4732,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Job Card",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-008",
@@ -4706,7 +4749,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Stock Entry",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-009",
@@ -4722,7 +4766,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Quality Inspection",
-   "mapped_filters": "{\"inspection_type\": \"In Process\"}"
+   "mapped_filters": "{\"inspection_type\": \"In Process\"}",
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-010",
@@ -4738,7 +4783,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Quality Inspection",
-   "mapped_filters": "{\"inspection_type\": \"Outgoing\"}"
+   "mapped_filters": "{\"inspection_type\": \"Outgoing\"}",
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-011",
@@ -4754,7 +4800,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-012",
@@ -4770,7 +4817,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-013",
@@ -4786,7 +4834,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-014",
@@ -4802,7 +4851,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-015",
@@ -4818,7 +4868,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-016",
@@ -4834,7 +4885,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-017",
@@ -4850,7 +4902,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-018",
@@ -4866,7 +4919,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Packing Slip",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-019",
@@ -4882,7 +4936,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-020",
@@ -4898,7 +4953,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Non Conformance",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-021",
@@ -4914,7 +4970,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Quality Action",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-022",
@@ -4930,7 +4987,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Internal Audit",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-023",
@@ -4946,7 +5004,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Internal Audit",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-024",
@@ -4962,7 +5021,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Quality Meeting",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-025",
@@ -4978,7 +5038,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Asset",
-   "mapped_filters": "{\"asset_category\": \"Measuring Instruments\"}"
+   "mapped_filters": "{\"asset_category\": \"Measuring Instruments\"}",
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-026",
@@ -4994,7 +5055,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Asset Repair",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-027",
@@ -5010,7 +5072,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Asset Maintenance Log",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-028",
@@ -5026,7 +5089,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Issue",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-029",
@@ -5042,7 +5106,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Delivery Note",
-   "mapped_filters": "{\"docstatus\": 1}"
+   "mapped_filters": "{\"docstatus\": 1}",
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-030",
@@ -5058,7 +5123,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/FRM-031",
@@ -5074,7 +5140,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Training Result",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-001",
@@ -5090,7 +5157,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": true,
    "mapped_doctype": "Controlled Document",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": "Master Document Register"
   },
   {
    "name": "HCCPL/QMS/REG-002",
@@ -5106,7 +5174,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": true,
    "mapped_doctype": "Internal External Issue",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-003",
@@ -5122,7 +5191,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": true,
    "mapped_doctype": "Interested Party",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-004",
@@ -5138,7 +5208,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": true,
    "mapped_doctype": "Risk and Opportunity",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-005",
@@ -5154,7 +5225,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": true,
    "mapped_doctype": "Legal Requirement",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-006",
@@ -5170,7 +5242,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": true,
    "mapped_doctype": "Employee Skill Map",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-007",
@@ -5186,7 +5259,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": true,
    "mapped_doctype": "Supplier",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-008",
@@ -5202,7 +5276,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": true,
    "mapped_doctype": "Issue",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-009",
@@ -5218,7 +5293,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": true,
    "mapped_doctype": "Non Conformance",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-010",
@@ -5234,7 +5310,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": true,
    "mapped_doctype": "Internal Audit",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-011",
@@ -5250,7 +5327,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": true,
    "mapped_doctype": "Asset",
-   "mapped_filters": "{\"asset_category\": \"Measuring Instruments\"}"
+   "mapped_filters": "{\"asset_category\": \"Measuring Instruments\"}",
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-012",
@@ -5266,7 +5344,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": true,
    "mapped_doctype": "Training Event Employee",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-013",
@@ -5282,7 +5361,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": true,
    "mapped_doctype": "Employee",
-   "mapped_filters": "{\"status\": \"Active\"}"
+   "mapped_filters": "{\"status\": \"Active\"}",
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-014",
@@ -5298,7 +5378,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": true,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-015",
@@ -5314,7 +5395,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Quality Inspection",
-   "mapped_filters": "{\"inspection_type\": \"Incoming\", \"docstatus\": 1}"
+   "mapped_filters": "{\"inspection_type\": \"Incoming\", \"docstatus\": 1}",
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-016",
@@ -5330,7 +5412,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Work Order",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-017",
@@ -5346,7 +5429,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": true,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-018",
@@ -5362,7 +5446,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Quality Action",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-019",
@@ -5378,7 +5463,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Quality Meeting",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-020",
@@ -5394,7 +5480,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Asset",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-021",
@@ -5410,7 +5497,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Asset Maintenance",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-022",
@@ -5426,7 +5514,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": true,
    "mapped_doctype": "Sales Order",
-   "mapped_filters": "{\"amended_from\": [\"!=\", \"\"]}"
+   "mapped_filters": "{\"amended_from\": [\"!=\", \"\"]}",
+   "mapped_report": "Customer PO Amendment Register"
   },
   {
    "name": "HCCPL/QMS/REG-023",
@@ -5442,7 +5531,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Training Event",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-024",
@@ -5458,7 +5548,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Delivery Note",
-   "mapped_filters": "{\"docstatus\": 1}"
+   "mapped_filters": "{\"docstatus\": 1}",
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-025",
@@ -5474,7 +5565,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": "Quality Feedback",
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   },
   {
    "name": "HCCPL/QMS/REG-026",
@@ -5490,7 +5582,8 @@
    "body_mode": "Mapped Data",
    "has_source_file": false,
    "mapped_doctype": null,
-   "mapped_filters": null
+   "mapped_filters": null,
+   "mapped_report": null
   }
  ]
 }

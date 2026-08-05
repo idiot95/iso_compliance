@@ -175,7 +175,15 @@ class ControlledDocument(Document):
 		printed register is the current data rather than a transcription of it.
 		Ordering is explicit: v16 lists default to `creation`, which is not a
 		defensible order for an evidentiary record.
+
+		A register whose content is not a flat list of one DocType declares a report
+		instead. That is what lets a register be derived from what the system already
+		recorded -- an amendment register is a comparison between two orders plus the
+		framework's own change log -- rather than re-entered into a second form.
 		"""
+		if self.mapped_report:
+			return self.get_report_rows(limit=limit)
+
 		if not self.mapped_doctype:
 			return {"columns": [], "rows": [], "total": 0}
 
@@ -210,6 +218,43 @@ class ControlledDocument(Document):
 			limit_page_length=limit,
 		)
 		return {"columns": columns, "rows": rows, "total": total, "shown": len(rows), "limit": limit}
+
+	def get_report_rows(self, limit: int = 200) -> dict:
+		"""Run the declared report and shape it like register content."""
+		if not frappe.db.exists("Report", self.mapped_report):
+			return {"columns": [], "rows": [], "total": 0, "error": _("Mapped Report no longer exists.")}
+
+		report = frappe.get_doc("Report", self.mapped_report)
+		if not frappe.has_permission(report.ref_doctype, "read"):
+			return {"columns": [], "rows": [], "total": 0, "error": _("Not permitted to read the report's data.")}
+
+		filters = {}
+		if self.mapped_filters:
+			try:
+				filters = json.loads(self.mapped_filters)
+			except ValueError:
+				return {"columns": [], "rows": [], "total": 0, "error": _("Mapped Filters is not valid JSON.")}
+
+		result = report.execute_script_report(frappe._dict(filters))
+		columns = result[0] or []
+		rows = result[1] or []
+
+		# Reports return column dicts; normalise to the same shape the DocType path
+		# produces so the print macro does not care which kind of register this is.
+		norm_columns = [
+			{"fieldname": c.get("fieldname"), "label": c.get("label")}
+			for c in columns
+			if isinstance(c, dict) and c.get("fieldname")
+		][:8]
+
+		return {
+			"columns": norm_columns,
+			"rows": rows[:limit],
+			"total": len(rows),
+			"shown": min(len(rows), limit),
+			"limit": limit,
+			"source": self.mapped_report,
+		}
 
 	def append_revision(self, description_of_change: str, clause_section_affected: str | None = None):
 		"""Freeze the current control block and authority stamps as a history row."""

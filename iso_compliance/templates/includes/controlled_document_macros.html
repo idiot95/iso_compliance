@@ -293,12 +293,17 @@
 
 {%- macro mapped_body(doc) -%}
 <div class="cd-section">
-	{%- if doc.mapped_doctype -%}
+	{%- if doc.mapped_doctype or doc.mapped_report -%}
 		{%- set data = doc.get_register_rows() -%}
 		<h2 class="cd-h2">Register Entries</h2>
 		<p class="cd-source">
+			{%- if doc.mapped_report -%}
+			Derived from <strong>{{ doc.mapped_report }}</strong>, which reads what ERPNext already
+			recorded. Nothing on this register is entered a second time.
+			{%- else -%}
 			Completed in ERPNext against <strong>{{ doc.mapped_doctype }}</strong>{% if doc.mapped_filters %},
 			filtered by <code>{{ doc.mapped_filters }}</code>{% endif %}.
+			{%- endif -%}
 			{%- if data.total %} {{ data.total }} entr{{ "y" if data.total == 1 else "ies" }} at time of printing.
 			{%- if data.shown < data.total %} First {{ data.shown }} shown.{% endif %}{% endif %}
 		</p>
