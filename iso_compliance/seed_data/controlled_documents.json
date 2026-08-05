@@ -4609,7 +4609,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": false,
-   "mapped_doctype": null,
+   "mapped_doctype": "Opportunity",
    "mapped_filters": null
   },
   {
@@ -4865,7 +4865,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": false,
-   "mapped_doctype": null,
+   "mapped_doctype": "Packing Slip",
    "mapped_filters": null
   },
   {
@@ -4993,7 +4993,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": false,
-   "mapped_doctype": null,
+   "mapped_doctype": "Asset Repair",
    "mapped_filters": null
   },
   {

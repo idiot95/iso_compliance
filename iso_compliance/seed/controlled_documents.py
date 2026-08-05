@@ -69,6 +69,9 @@ PLACEHOLDER_ALIASES = {
 	# generated resolves there; REG-024 Dispatch Register is the register of them.
 	"delivery challan": "FRM029",
 	"delivery challans": "FRM029",
+	# Same artefact under a different name in the SOP text.
+	"contract review checklist": "FRM003",
+	"supplier performance evaluation": "FRM005",
 }
 
 BASELINE_NOTE = (
