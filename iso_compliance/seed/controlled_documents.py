@@ -64,6 +64,11 @@ PLACEHOLDER_ALIASES = {
 	"in-process inspection reports": "FRM009",
 	"packing checklist": "FRM018",
 	"dispatch checklist": "FRM019",
+	# The delivery challan is the ERPNext Delivery Note. FRM-029 is the only form in
+	# REG-001 whose data source is Delivery Note, so a challan cited as a record
+	# generated resolves there; REG-024 Dispatch Register is the register of them.
+	"delivery challan": "FRM029",
+	"delivery challans": "FRM029",
 }
 
 BASELINE_NOTE = (
