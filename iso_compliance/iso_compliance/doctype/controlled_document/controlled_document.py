@@ -11,6 +11,21 @@ from frappe.utils import now_datetime
 
 #: Fields of a Document Revision row that constitute the audit record. Once a row
 #: exists, none of these may change.
+#: States in which a document's content is under change control. Draft and
+#: Under Review documents are still being authored and edit freely.
+GUARDED_STATES = ("Approved", "Active", "Superseded", "Obsolete")
+
+#: Fields the system writes itself, or that record the change process rather
+#: than the document's content. Everything else changing on a guarded document
+#: requires an approved Document Change Request.
+UNCONTROLLED_FIELDS = {
+	"workflow_state", "change_request", "seed_batch", "revisions",
+	"prepared_by", "prepared_by_name", "prepared_on",
+	"reviewed_by", "reviewed_by_name", "reviewed_on",
+	"approved_by", "approved_by_name", "approved_on",
+	"next_review_date", "superseded_by", "body_mode",
+}
+
 REVISION_EVIDENCE_FIELDS = (
 	"issue_number",
 	"issue_date",
@@ -50,6 +65,10 @@ class ControlledDocument(Document):
 		self.normalise_control_numbers()
 		self.validate_segregation_of_duty()
 		self.validate_revision_history_is_immutable()
+		self.enforce_change_control()
+
+	def on_update(self):
+		self._stamp_implemented_change_request()
 
 	def before_submit(self):
 		self.stamp_review_and_approval()
@@ -116,6 +135,123 @@ class ControlledDocument(Document):
 			self.approved_by = user
 			self.approved_by_name = full_name
 			self.approved_on = now_datetime()
+
+	# ------------------------------------------------------------------
+	# Change control
+	# ------------------------------------------------------------------
+
+	def enforce_change_control(self):
+		"""No change to a controlled document without an approved change request.
+
+		This is SOP-001's own rule ("changes shall be reviewed, approved and
+		recorded") made mechanical. It guards content, not process: workflow
+		transitions, authority stamps and review scheduling pass freely, but any
+		edit to what the document *says* -- or to its issue and revision numbers --
+		on an Approved or Active document requires a submitted Document Change
+		Request raised against this document. The DCR is consumed when the
+		revision number moves, so one request authorises one revision.
+		"""
+		if (
+			frappe.flags.in_import
+			or frappe.flags.in_patch
+			or frappe.flags.in_migrate
+			or frappe.flags.in_install
+		):
+			return
+
+		previous = self.get_doc_before_save()
+		if not previous or (previous.workflow_state or "") not in GUARDED_STATES:
+			return
+
+		changed = self._controlled_changes(previous)
+		if not changed:
+			return
+
+		self._require_change_request(changed, previous)
+
+	def _controlled_changes(self, previous) -> list[str]:
+		changed = []
+		for field in self.meta.fields:
+			if field.fieldtype in ("Section Break", "Column Break", "Tab Break", "HTML", "Button"):
+				continue
+			if field.fieldname in UNCONTROLLED_FIELDS:
+				continue
+			if field.fieldtype in ("Table", "Table MultiSelect"):
+				if self._table_changed(previous, field.fieldname):
+					changed.append(field.fieldname)
+			elif (self.get(field.fieldname) or "") != (previous.get(field.fieldname) or ""):
+				changed.append(field.fieldname)
+		return changed
+
+	def _table_changed(self, previous, fieldname) -> bool:
+		meta_fields = {
+			"name", "owner", "creation", "modified", "modified_by", "docstatus",
+			"parent", "parentfield", "parenttype", "doctype", "__islocal", "__unsaved",
+		}
+
+		def snapshot(doc):
+			return [
+				{k: v for k, v in row.as_dict().items() if k not in meta_fields}
+				for row in doc.get(fieldname) or []
+			]
+
+		return snapshot(self) != snapshot(previous)
+
+	def _require_change_request(self, changed: list[str], previous):
+		labels = ", ".join(_(self.meta.get_label(f)) for f in changed[:6])
+		if not self.change_request:
+			frappe.throw(
+				_(
+					"{0} is {1} and under change control. Raise a Document Change Request, "
+					"have it approved, and set it in the Change Request field before changing: {2}."
+				).format(frappe.bold(self.name), frappe.bold(previous.workflow_state), labels),
+				title=_("Change Control"),
+			)
+
+		dcr = frappe.db.get_value(
+			"Document Change Request",
+			self.change_request,
+			["controlled_document", "docstatus", "status"],
+			as_dict=True,
+		)
+		if not dcr:
+			frappe.throw(_("Change Request {0} does not exist.").format(self.change_request), title=_("Change Control"))
+		if dcr.controlled_document != self.name:
+			frappe.throw(
+				_("Change Request {0} was raised against {1}, not this document.").format(
+					self.change_request, frappe.bold(dcr.controlled_document)
+				),
+				title=_("Change Control"),
+			)
+		if dcr.docstatus != 1:
+			frappe.throw(
+				_("Change Request {0} has not been approved. Submit it first.").format(self.change_request),
+				title=_("Change Control"),
+			)
+		if (dcr.status or "") == "Implemented":
+			frappe.throw(
+				_(
+					"Change Request {0} has already been implemented. One request authorises one "
+					"revision; raise a new one for a further change."
+				).format(self.change_request),
+				title=_("Change Control"),
+			)
+
+	def _stamp_implemented_change_request(self):
+		"""Mark the DCR implemented once the revision it authorised is recorded."""
+		previous = self.get_doc_before_save()
+		if not previous or not self.change_request:
+			return
+		if (
+			self.revision_number != previous.revision_number
+			or self.issue_number != previous.issue_number
+		):
+			frappe.db.set_value(
+				"Document Change Request",
+				self.change_request,
+				{"status": "Implemented", "resulting_revision": self.revision_number},
+				update_modified=False,
+			)
 
 	# ------------------------------------------------------------------
 	# Change history
@@ -346,14 +482,19 @@ class ControlledDocument(Document):
 
 
 def _shape(rows: list) -> list:
-	"""Trim datetimes to the minute for print. A register column carrying
-	microseconds reads like a database dump, not a record."""
+	"""Make raw values printable: datetimes trimmed to the minute, rich-text
+	fields stripped to their text. A register column carrying microseconds or
+	HTML tags reads like a database dump, not a record."""
 	import datetime
+
+	from frappe.utils import strip_html
 
 	for row in rows:
 		for key, value in list(row.items()):
 			if isinstance(value, datetime.datetime):
 				row[key] = str(value)[:16]
+			elif isinstance(value, str) and "<" in value and ">" in value:
+				row[key] = strip_html(value).strip()
 	return rows
 
 

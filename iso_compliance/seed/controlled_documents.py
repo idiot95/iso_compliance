@@ -126,17 +126,24 @@ def import_seed(batch: str = SEED_BATCH, commit: bool = True) -> dict:
 	resolve = {d["legacy_document_number"]: d["name"] for d in documents}
 
 	created, skipped = [], []
-	for entry in documents:
-		if frappe.db.exists("Controlled Document", entry["name"]):
-			skipped.append(entry["name"])
-			continue
-		_create_document(entry, resolve, batch)
-		created.append(entry["name"])
+	# The flag spans the whole run, not just record creation: the cross-reference
+	# pass below saves Active documents, and the change-control gate would
+	# otherwise demand a Document Change Request from the importer itself.
+	frappe.flags.in_import = True
+	try:
+		for entry in documents:
+			if frappe.db.exists("Controlled Document", entry["name"]):
+				skipped.append(entry["name"])
+				continue
+			_create_document(entry, resolve, batch)
+			created.append(entry["name"])
 
-	# Documents cross-reference each other, and a reference can point forward: SOP-001
-	# cites REG-001 and FRM-001, which are created later in the same run. Link fields
-	# are therefore filled once every record exists.
-	linked = _resolve_cross_references(documents, resolve)
+		# Documents cross-reference each other, and a reference can point forward:
+		# SOP-001 cites REG-001 and FRM-001, which are created later in the same
+		# run. Link fields are therefore filled once every record exists.
+		linked = _resolve_cross_references(documents, resolve)
+	finally:
+		frappe.flags.in_import = False
 	advanced = _advance_naming_series(documents)
 
 	if commit:
@@ -302,25 +309,22 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 		payload["records_generated"] = _link_rows(sop.get("records_generated", []), resolve)
 		payload["related_documents"] = _link_rows(sop.get("related_documents", []), resolve)
 
-	# Preserve the historical document numbers exactly. set_new_name only honours a
-	# supplied name under this flag; it also skips _set_defaults, handled above.
-	frappe.flags.in_import = True
-	try:
-		doc = frappe.get_doc(payload)
-		doc.append(
-			"revisions",
-			{
-				"issue_number": doc.issue_number,
-				"issue_date": doc.issue_date,
-				"revision_number": doc.revision_number,
-				"revision_date": None,
-				"clause_section_affected": _("All"),
-				"description_of_change": _baseline_note(entry),
-			},
-		)
-		doc.insert(ignore_permissions=True)
-	finally:
-		frappe.flags.in_import = False
+	# The importer holds frappe.flags.in_import for the whole run: set_new_name
+	# only honours the supplied historical number under that flag (it also skips
+	# _set_defaults, which is why the control block is supplied explicitly above).
+	doc = frappe.get_doc(payload)
+	doc.append(
+		"revisions",
+		{
+			"issue_number": doc.issue_number,
+			"issue_date": doc.issue_date,
+			"revision_number": doc.revision_number,
+			"revision_date": None,
+			"clause_section_affected": _("All"),
+			"description_of_change": _baseline_note(entry),
+		},
+	)
+	doc.insert(ignore_permissions=True)
 
 
 def _department_label(label: str | None) -> str | None:

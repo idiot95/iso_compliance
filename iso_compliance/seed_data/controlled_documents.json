@@ -5263,6 +5263,10 @@
      "Owner"
     ],
     [
+     "corrective_action",
+     "Action Taken"
+    ],
+    [
      "status",
      "Status"
     ]
@@ -5975,6 +5979,10 @@
     [
      "process_owner",
      "Owner"
+    ],
+    [
+     "corrective_action",
+     "Action Taken"
     ],
     [
      "status",

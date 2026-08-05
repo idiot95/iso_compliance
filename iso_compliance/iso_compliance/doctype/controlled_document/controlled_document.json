@@ -13,6 +13,7 @@
   "workflow_state",
   "clause_reference",
   "legacy_document_number",
+  "change_request",
   "control_block_section",
   "issue_number",
   "issue_date",
@@ -127,6 +128,14 @@
    "label": "Legacy Document Number",
    "search_index": 1,
    "description": "The number this document was previously issued under, e.g. HCCPL-SLS-001. Kept so that copies already in circulation remain traceable to the current document."
+  },
+  {
+   "fieldname": "change_request",
+   "fieldtype": "Link",
+   "label": "Change Request",
+   "options": "Document Change Request",
+   "no_copy": 1,
+   "description": "The approved Document Change Request authorising the current change. Required before an Approved or Active document can be modified; consumed when the revision number moves."
   },
   {
    "fieldname": "control_block_section",
@@ -506,7 +515,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-08-06 20:00:00.000000",
+ "modified": "2026-08-06 22:00:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Controlled Document",
