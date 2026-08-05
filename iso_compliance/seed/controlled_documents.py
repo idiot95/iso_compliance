@@ -45,6 +45,27 @@ WORKFLOW_STATES = [
 	("Obsolete", ""),
 ]
 
+#: SOP bodies cite some forms by an unfilled placeholder -- "FRMxxx - Job Card",
+#: "FRM0XX", "FRMXX" -- even where the form exists in REG-001 with a real number.
+#: FRM-007 Job Card is in the register; three SOPs simply never wrote the number in.
+#:
+#: These are resolved from a reviewed map rather than by matching titles, because
+#: matching gets it wrong in ways that matter: "Supplier Corrective Action Request"
+#: fuzzy-matches SOP-014, a procedure, and "Production Plan" matches SOP-007 itself.
+#: A controlled document citing the wrong document is worse than one citing none.
+#:
+#: Keyed by the placeholder text as it appears in the source, lowercased.
+PLACEHOLDER_ALIASES = {
+	"supplier evaluation form": "FRM005",
+	"incoming inspection report": "FRM006",
+	"job card": "FRM007",
+	"job cards": "FRM007",
+	"material requisition": "FRM008",
+	"in-process inspection reports": "FRM009",
+	"packing checklist": "FRM018",
+	"dispatch checklist": "FRM019",
+}
+
 BASELINE_NOTE = (
 	"Baseline entry created when the document was brought under ERPNext document control. "
 	"The source document recorded no evidence of preparation, review or approval, so the "
@@ -105,6 +126,20 @@ def import_seed(batch: str = SEED_BATCH, commit: bool = True) -> dict:
 	}
 
 
+def _resolve_placeholder(title: str, resolve: dict) -> str | None:
+	"""Link a citation whose number was left as a placeholder in the source.
+
+	Only exact entries in the reviewed map are honoured. A citation that is not in
+	the map keeps its original text and no link, which prints as written and stays
+	visible as something to fix.
+	"""
+	if not title:
+		return None
+	text = re.sub(r"^\s*FRM\s*[xX0-9]*\s*[-–—]\s*", "", title).strip().lower()
+	legacy = PLACEHOLDER_ALIASES.get(text)
+	return resolve.get(legacy) if legacy else None
+
+
 def _advance_naming_series(documents: list[dict]) -> dict:
 	"""Move each type's counter past the highest number the import consumed.
 
@@ -145,8 +180,12 @@ def _resolve_cross_references(documents: list[dict], resolve: dict) -> int:
 				target = resolve.get(row.document_number) or (
 					row.document_number if frappe.db.exists("Controlled Document", row.document_number) else None
 				)
+				if not target:
+					target = _resolve_placeholder(row.document_title, resolve)
 				if target and row.document != target:
 					row.document = target
+					if not row.document_number or row.document_number == row.document_title:
+						row.document_number = target
 					changed = True
 					linked += 1
 		if changed:
