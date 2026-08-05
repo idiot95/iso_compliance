@@ -194,13 +194,7 @@ class ControlledDocument(Document):
 			return {"columns": [], "rows": [], "total": 0, "error": _("Not permitted to read the mapped DocType.")}
 
 		meta = frappe.get_meta(self.mapped_doctype)
-		skip = {"Section Break", "Column Break", "Tab Break", "Table", "HTML", "Button", "Attach", "Text Editor"}
-		columns = [{"fieldname": "name", "label": _("ID")}]
-		for field in meta.fields:
-			if len(columns) >= 7:
-				break
-			if field.in_list_view and field.fieldtype not in skip:
-				columns.append({"fieldname": field.fieldname, "label": _(field.label or field.fieldname)})
+		columns = self._declared_columns(meta) or self._default_columns(meta)
 
 		filters = {}
 		if self.mapped_filters:
@@ -208,6 +202,9 @@ class ControlledDocument(Document):
 				filters = json.loads(self.mapped_filters)
 			except ValueError:
 				return {"columns": [], "rows": [], "total": 0, "error": _("Mapped Filters is not valid JSON.")}
+
+		if meta.istable:
+			return self._child_table_rows(columns, filters, limit)
 
 		total = frappe.db.count(self.mapped_doctype, filters)
 		rows = frappe.get_all(
@@ -217,7 +214,75 @@ class ControlledDocument(Document):
 			order_by="creation asc",
 			limit_page_length=limit,
 		)
-		return {"columns": columns, "rows": rows, "total": total, "shown": len(rows), "limit": limit}
+		return {"columns": columns, "rows": _shape(rows), "total": total, "shown": len(rows), "limit": limit}
+
+	def _declared_columns(self, meta) -> list | None:
+		"""The columns this document says its print should carry.
+
+		Declared per document because the generic fallback prints whatever is in
+		list view, which is chosen for screen browsing, not for evidence. A
+		dispatch register needs the transport receipt; an inspection register
+		needs what was inspected against and who inspected it. Unknown fieldnames
+		are skipped rather than raised: a schema change must not break printing.
+		"""
+		if not self.print_columns:
+			return None
+		try:
+			spec = json.loads(self.print_columns) if isinstance(self.print_columns, str) else self.print_columns
+		except ValueError:
+			return None
+
+		std = {"creation", "modified", "owner", "parent"}
+		columns = [{"fieldname": "name", "label": _("ID")}]
+		for item in spec or []:
+			if isinstance(item, (list, tuple)) and item:
+				fieldname, label = item[0], (item[1] if len(item) > 1 else item[0])
+			elif isinstance(item, dict):
+				fieldname, label = item.get("fieldname"), item.get("label")
+			else:
+				continue
+			if not fieldname or fieldname == "name":
+				continue
+			if fieldname in std or meta.get_field(fieldname):
+				columns.append({"fieldname": fieldname, "label": _(label or fieldname)})
+			if len(columns) >= 11:
+				break
+		return columns if len(columns) > 1 else None
+
+	def _default_columns(self, meta) -> list:
+		skip = {"Section Break", "Column Break", "Tab Break", "Table", "HTML", "Button", "Attach", "Text Editor"}
+		columns = [{"fieldname": "name", "label": _("ID")}]
+		for field in meta.fields:
+			if len(columns) >= 7:
+				break
+			if field.in_list_view and field.fieldtype not in skip:
+				columns.append({"fieldname": field.fieldname, "label": _(field.label or field.fieldname)})
+		return columns
+
+	def _child_table_rows(self, columns, filters, limit) -> dict:
+		"""A register can live in a child table -- the training register is the
+		attendee rows under Training Event, not the events. Permission is checked
+		against the parent DocType, which is where child rows get theirs from."""
+		parent_dt = frappe.db.get_value(
+			"DocField", {"fieldtype": ("in", ["Table", "Table MultiSelect"]), "options": self.mapped_doctype}, "parent"
+		)
+		if parent_dt and not frappe.has_permission(parent_dt, "read"):
+			return {"columns": [], "rows": [], "total": 0, "error": _("Not permitted to read the mapped DocType.")}
+
+		filters = dict(filters or {})
+		if parent_dt:
+			filters["parenttype"] = parent_dt
+
+		total = frappe.db.count(self.mapped_doctype, filters)
+		rows = frappe.get_all(
+			self.mapped_doctype,
+			filters=filters,
+			fields=[c["fieldname"] for c in columns],
+			order_by="creation asc",
+			limit_page_length=limit,
+			parent_doctype=parent_dt,
+		)
+		return {"columns": columns, "rows": _shape(rows), "total": total, "shown": len(rows), "limit": limit}
 
 	def get_report_rows(self, limit: int = 200) -> dict:
 		"""Run the declared report and shape it like register content."""
@@ -278,6 +343,18 @@ class ControlledDocument(Document):
 				"approved_on": self.approved_on,
 			},
 		)
+
+
+def _shape(rows: list) -> list:
+	"""Trim datetimes to the minute for print. A register column carrying
+	microseconds reads like a database dump, not a record."""
+	import datetime
+
+	for row in rows:
+		for key, value in list(row.items()):
+			if isinstance(value, datetime.datetime):
+				row[key] = str(value)[:16]
+	return rows
 
 
 def pad_control_number(value, label: str) -> str:

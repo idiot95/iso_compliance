@@ -45,6 +45,7 @@
   "mapped_doctype",
   "mapped_filters",
   "mapped_report",
+  "print_columns",
   "sop_body_section",
   "purpose",
   "scope",
@@ -332,6 +333,12 @@
    "description": "Use a report as this document's content when a flat list of one DocType is not the register. Takes precedence over Mapped DocType for printing, and lets a register be derived from the audit trail rather than re-entered."
   },
   {
+   "fieldname": "print_columns",
+   "fieldtype": "JSON",
+   "label": "Print Columns",
+   "description": "Columns the printed register shows, as a JSON list of [fieldname, label] pairs. Chosen per document so the print carries the evidence its ISO clause asks for, not whatever happens to be in list view. Unknown fieldnames are skipped so a schema change cannot break the print."
+  },
+  {
    "depends_on": "eval:doc.body_mode=='Structured SOP'",
    "fieldname": "sop_body_section",
    "fieldtype": "Section Break",
@@ -499,7 +506,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-08-06 18:00:00.000000",
+ "modified": "2026-08-06 20:00:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Controlled Document",
