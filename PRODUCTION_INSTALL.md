@@ -12,20 +12,28 @@ Installed by `bench install-app`, carried by `bench migrate` on every upgrade:
 | | |
 | --- | --- |
 | DocTypes | 16, all in the `ISO Compliance` module |
-| Print Format | `Controlled Document`, one format serving every body type |
+| Print Format | `Controlled Document`, one format serving every body type; registers print landscape in their source file's own column layout |
 | Workspaces | `ISO Compliance` (home) and `Compliance Dashboard` (child) |
-| Desk apps screen | entry with its own logo, routes to the dashboard |
+| Desk navigation | Desktop Icon (shield, in the ERPNext group) and Workspace Sidebar, restored by hook — see below |
 | Number Cards | 13 |
 | Dashboard Charts | 5 |
-| Query Reports | Master Document Register, Compliance Gaps, Maintenance and Calibration Due |
+| Script Reports | Master Document Register, Compliance Gaps, Maintenance and Calibration Due, Customer PO Amendment Register, Form Responsibility by Department, Employee Competency Matrix, Measuring Equipment Register, Incoming Material Register, Maintenance Register |
 | Notification | Maintenance or Calibration Due, 14 days ahead |
 | Workflow States | Draft, Under Review, Approved, Active, Superseded, Obsolete |
 
-The workflow states are the one piece of configuration that lives outside this
-app's own DocTypes. Frappe ships only Open, Rejected, Approved and Pending, and
-`Controlled Document.workflow_state` links to Workflow State, so the rest must
-exist. They are created by an `after_install` and `after_migrate` hook, are
-idempotent, and touch nothing that already exists.
+Two pieces of configuration live outside this app's own DocTypes, both created
+by the `after_install` / `after_migrate` hook, idempotent, touching nothing that
+already exists:
+
+- **Workflow States.** Frappe ships only Open, Rejected, Approved and Pending,
+  and `Controlled Document.workflow_state` links to Workflow State, so the rest
+  must exist.
+- **Desk registration.** Frappe 16 builds the desk grid and workspace switcher
+  from Desktop Icon and Workspace Sidebar records grouped by app. For ISO
+  Compliance to be listed alongside Assets and Quality (not in a third-party
+  silo), its records say `app: erpnext` — and migrate's orphan sweep deletes
+  cross-app records on every run, so the hook re-imports them after each
+  migrate. Self-healing; no manual step.
 
 ## What resolves automatically on your site, and what does not
 
