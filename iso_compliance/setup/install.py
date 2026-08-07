@@ -20,10 +20,40 @@ from iso_compliance.seed.controlled_documents import WORKFLOW_STATES
 
 def after_install():
 	ensure_workflow_states()
+	ensure_desk_registration()
 
 
 def after_migrate():
 	ensure_workflow_states()
+	ensure_desk_registration()
+
+
+def ensure_desk_registration():
+	"""Put ISO Compliance in the ERPNext desk, and keep it there.
+
+	Frappe 16 builds the desk grid and the workspace switcher from Desktop Icon
+	and Workspace Sidebar records, grouped by their `app` field. For this module
+	to be listed alongside Assets or Quality -- rather than in a separate app
+	silo the way v16 files third-party apps -- those records must say
+	`app: "erpnext"`. But migrate's orphan sweep looks for each record's source
+	file in the app it *claims* (frappe.get_app_path(record.app)), finds nothing
+	of ours in erpnext/, and deletes both records on every migrate.
+
+	So this hook runs after that sweep and re-imports the two files this app
+	ships. Idempotent, self-healing, and entirely contained in the app.
+	"""
+	import os
+
+	from frappe.modules.import_file import import_file_by_path
+
+	for folder, filename in (
+		("workspace_sidebar", "iso_compliance.json"),
+		("desktop_icon", "iso_compliance.json"),
+	):
+		path = os.path.join(frappe.get_app_path("iso_compliance"), folder, filename)
+		if os.path.exists(path):
+			import_file_by_path(path, force=True, ignore_version=True)
+	frappe.db.commit()
 
 
 def ensure_workflow_states():
