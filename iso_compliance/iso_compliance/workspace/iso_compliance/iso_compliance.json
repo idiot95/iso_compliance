@@ -1,5 +1,5 @@
 {
- "app": "iso_compliance",
+ "app": "erpnext",
  "charts": [],
  "content": "[{\"id\": \"hd0001\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Quality Management System</b></span>\", \"col\": 12}}, {\"id\": \"pg0002\", \"type\": \"paragraph\", \"data\": {\"text\": \"Everything the QMS is recorded through. The Compliance Dashboard, in the sidebar, shows what is outstanding across all of it.\", \"col\": 12}}, {\"id\": \"sc0003\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Controlled Document\", \"col\": 3}}, {\"id\": \"sc0004\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Document Change Request\", \"col\": 3}}, {\"id\": \"sc0005\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Internal Audit\", \"col\": 3}}, {\"id\": \"sc0006\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Compliance Gaps\", \"col\": 3}}, {\"id\": \"hd0007\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Records</b></span>\", \"col\": 12}}, {\"id\": \"cd0008\", \"type\": \"card\", \"data\": {\"card_name\": \"Document Control\", \"col\": 4}}, {\"id\": \"cd0009\", \"type\": \"card\", \"data\": {\"card_name\": \"Context and Risk\", \"col\": 4}}, {\"id\": \"cd0010\", \"type\": \"card\", \"data\": {\"card_name\": \"Audit and Review\", \"col\": 4}}, {\"id\": \"cd0011\", \"type\": \"card\", \"data\": {\"card_name\": \"Nonconformity and Improvement\", \"col\": 4}}, {\"id\": \"cd0012\", \"type\": \"card\", \"data\": {\"card_name\": \"Equipment and Calibration\", \"col\": 4}}, {\"id\": \"cd0013\", \"type\": \"card\", \"data\": {\"card_name\": \"People and Suppliers\", \"col\": 4}}, {\"id\": \"hd0014\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Registers and reports</b></span>\", \"col\": 12}}, {\"id\": \"sc0015\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Master Document Register\", \"col\": 3}}, {\"id\": \"sc0016\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Maintenance and Calibration Due\", \"col\": 3}}]",
  "creation": "2026-08-05 20:00:00.000000",
@@ -8,7 +8,7 @@
  "doctype": "Workspace",
  "for_user": "",
  "hide_custom": 0,
- "icon": "file",
+ "icon": "shield",
  "idx": 0,
  "indicator_color": "green",
  "is_hidden": 0,
@@ -316,7 +316,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-08-06 16:00:00.000000",
+ "modified": "2026-08-08 14:00:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "ISO Compliance",
