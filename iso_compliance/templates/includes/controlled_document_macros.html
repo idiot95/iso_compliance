@@ -297,13 +297,61 @@
 {%- endmacro -%}
 
 
+{%- macro register_head(columns) -%}
+{#- One- or two-row header. A column with a `group` shares a banner cell with
+    its neighbours in the same group, the way the source registers draw
+    Make / Model / Serial under one "Machine Description" band. -#}
+{%- set grouped = columns | selectattr("group", "defined") | list -%}
+{%- if grouped -%}
+	<tr>
+	{%- for c in columns -%}
+		{%- if c.group -%}
+			{%- if loop.first or columns[loop.index0 - 1].group != c.group -%}
+				{%- set span = columns[loop.index0:] | selectattr("group", "equalto", c.group) | list | length -%}
+				<th colspan="{{ span }}" class="cd-th-group">{{ c.group }}</th>
+			{%- endif -%}
+		{%- else -%}
+			<th rowspan="2"{% if c.width %} style="width:{{ c.width }}"{% endif %}>{{ c.label }}</th>
+		{%- endif -%}
+	{%- endfor -%}
+	</tr>
+	<tr>
+	{%- for c in columns if c.group -%}
+		<th{% if c.width %} style="width:{{ c.width }}"{% endif %}>{{ c.label }}</th>
+	{%- endfor -%}
+	</tr>
+{%- else -%}
+	<tr>{% for c in columns %}<th{% if c.width %} style="width:{{ c.width }}"{% endif %}>{{ c.label }}</th>{% endfor %}</tr>
+{%- endif -%}
+{%- endmacro -%}
+
+
+{%- macro register_form(data) -%}
+{#- One record per block, Particular / Details rows -- the layout of the
+    Design & Development register, which is a dossier per project, not a list. -#}
+{%- for row in data.rows -%}
+<table class="cd-table cd-register cd-regform">
+	<tbody>
+	{%- for c in data.columns -%}
+		<tr><td class="cd-strong cd-regform-label">{{ c.label }}</td>
+			<td>{{ row.get(c.fieldname) if row.get(c.fieldname) is not none else "" }}</td></tr>
+	{%- endfor -%}
+	</tbody>
+</table>
+{%- endfor -%}
+{%- endmacro -%}
+
+
 {%- macro mapped_body(doc) -%}
 <div class="cd-section">
-	{%- if doc.mapped_doctype or doc.mapped_report -%}
+	{%- if doc.static_table or doc.mapped_doctype or doc.mapped_report -%}
 		{%- set data = doc.get_register_rows() -%}
 		<h2 class="cd-h2">Register Entries</h2>
 		<p class="cd-source">
-			{%- if doc.mapped_report -%}
+			{%- if data.static -%}
+			The rows below are part of this controlled document: they change through a
+			Document Change Request, not through day-to-day transactions.
+			{%- elif doc.mapped_report -%}
 			Derived from <strong>{{ doc.mapped_report }}</strong>, which reads what ERPNext already
 			recorded. Nothing on this register is entered a second time.
 			{%- else -%}
@@ -316,14 +364,22 @@
 
 		{%- if data.error -%}
 			<div class="cd-empty">{{ data.error }}</div>
-		{%- elif data.rows -%}
+		{%- elif data.rows and doc.print_layout == "Form" -%}
+			{{ register_form(data) }}
+		{%- elif data.columns -%}
 		<table class="cd-table cd-register">
 			<thead>
-				<tr>{% for c in data.columns %}<th>{{ c.label }}</th>{% endfor %}</tr>
+				{{ register_head(data.columns) }}
 			</thead>
 			<tbody>
 			{%- for row in data.rows -%}
-				<tr>{% for c in data.columns %}<td>{{ row.get(c.fieldname) if row.get(c.fieldname) is not none else "" }}</td>{% endfor %}</tr>
+				<tr>{% for c in data.columns %}<td>{{ row.get(c.fieldname) if c.fieldname and row.get(c.fieldname) is not none else "" }}</td>{% endfor %}</tr>
+			{%- else -%}
+				{#- An empty register still prints as the source template does: its
+				    headed table with blank lines, ready to carry entries. -#}
+				{%- for _ in range(3) -%}
+				<tr>{% for c in data.columns %}<td>&nbsp;</td>{% endfor %}</tr>
+				{%- endfor -%}
 			{%- endfor -%}
 			</tbody>
 		</table>

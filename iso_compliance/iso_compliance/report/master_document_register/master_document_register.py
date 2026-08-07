@@ -23,6 +23,8 @@ def get_columns():
 		{"label": _("Document No."), "fieldname": "name", "fieldtype": "Link", "options": "Controlled Document", "width": 175},
 		{"label": _("Title"), "fieldname": "title", "fieldtype": "Data", "width": 280},
 		{"label": _("Type"), "fieldname": "document_type", "fieldtype": "Link", "options": "Controlled Document Type", "width": 70},
+		{"label": _("Department"), "fieldname": "owning_department", "fieldtype": "Data", "width": 90},
+		{"label": _("Approval Authority"), "fieldname": "approval_authority", "fieldtype": "Data", "width": 110},
 		{"label": _("Clause"), "fieldname": "clause_reference", "fieldtype": "Data", "width": 80},
 		{"label": _("Issue"), "fieldname": "issue_number", "fieldtype": "Data", "width": 55},
 		{"label": _("Issue Date"), "fieldname": "issue_date", "fieldtype": "Date", "width": 95},
@@ -51,7 +53,8 @@ def get_data(filters):
 		"Controlled Document",
 		filters=conditions,
 		fields=[
-			"name", "title", "document_type", "clause_reference", "issue_number",
+			"name", "title", "document_type", "owning_department", "approval_authority",
+			"clause_reference", "issue_number",
 			"issue_date", "revision_number", "revision_date", "workflow_state",
 			"prepared_by_name", "reviewed_by_name", "approved_by_name",
 			"next_review_date", "mapped_doctype", "legacy_document_number",

@@ -317,6 +317,9 @@ class ControlledDocument(Document):
 		recorded -- an amendment register is a comparison between two orders plus the
 		framework's own change log -- rather than re-entered into a second form.
 		"""
+		if self.static_table:
+			return self.get_static_rows()
+
 		if self.mapped_report:
 			return self.get_report_rows(limit=limit)
 
@@ -346,11 +349,39 @@ class ControlledDocument(Document):
 		rows = frappe.get_all(
 			self.mapped_doctype,
 			filters=filters,
-			fields=[c["fieldname"] for c in columns],
+			fields=[c["fieldname"] for c in columns if c["fieldname"]],
 			order_by="creation asc",
 			limit_page_length=limit,
 		)
 		return {"columns": columns, "rows": _shape(rows), "total": total, "shown": len(rows), "limit": limit}
+
+	def get_static_rows(self) -> dict:
+		"""A register whose rows are part of the controlled document itself.
+
+		The retention register is policy: its rows change when the policy does,
+		through a change request, not when a transaction happens. Held as JSON
+		{"columns": [...], "rows": [[...]]} in the static_table field, which is
+		content and therefore guarded by change control like the rest.
+		"""
+		try:
+			spec = json.loads(self.static_table) if isinstance(self.static_table, str) else self.static_table
+		except ValueError:
+			return {"columns": [], "rows": [], "total": 0, "error": _("Static Table is not valid JSON.")}
+
+		columns = []
+		for item in spec.get("columns") or []:
+			if isinstance(item, dict):
+				columns.append({"fieldname": item.get("fieldname"), "label": _(item.get("label") or ""),
+					**{k: item[k] for k in ("width", "group") if item.get(k)}})
+			else:
+				columns.append({"fieldname": None, "label": _(str(item))})
+		rows = [
+			{columns[i]["fieldname"] or f"c{i}": v for i, v in enumerate(row) if i < len(columns)}
+			for row in spec.get("rows") or []
+		]
+		for i, c in enumerate(columns):
+			c["fieldname"] = c["fieldname"] or f"c{i}"
+		return {"columns": columns, "rows": rows, "total": len(rows), "shown": len(rows), "static": True}
 
 	def _declared_columns(self, meta) -> list | None:
 		"""The columns this document says its print should carry.
@@ -360,6 +391,14 @@ class ControlledDocument(Document):
 		dispatch register needs the transport receipt; an inspection register
 		needs what was inspected against and who inspected it. Unknown fieldnames
 		are skipped rather than raised: a schema change must not break printing.
+
+		A column entry is either a `[fieldname, label]` pair or a dict adding
+		`width` (CSS width of the column), `group` (spans a two-row header, so
+		Make / Model / Serial can sit under one "Machine Description" band the
+		way the source register draws it), or no fieldname at all -- a blank
+		column, printed empty under its source heading until the field it is
+		waiting on exists. The blank keeps the printed page identical to the
+		template people already fill by hand.
 		"""
 		if not self.print_columns:
 			return None
@@ -371,17 +410,23 @@ class ControlledDocument(Document):
 		std = {"creation", "modified", "owner", "parent"}
 		columns = [{"fieldname": "name", "label": _("ID")}]
 		for item in spec or []:
+			extra = {}
 			if isinstance(item, (list, tuple)) and item:
 				fieldname, label = item[0], (item[1] if len(item) > 1 else item[0])
 			elif isinstance(item, dict):
 				fieldname, label = item.get("fieldname"), item.get("label")
+				extra = {k: item[k] for k in ("width", "group") if item.get(k)}
 			else:
 				continue
-			if not fieldname or fieldname == "name":
+			if fieldname == "name":
+				continue
+			if not fieldname:
+				if label:  # blank column: heading with nothing to fetch
+					columns.append({"fieldname": None, "label": _(label), **extra})
 				continue
 			if fieldname in std or meta.get_field(fieldname):
-				columns.append({"fieldname": fieldname, "label": _(label or fieldname)})
-			if len(columns) >= 11:
+				columns.append({"fieldname": fieldname, "label": _(label or fieldname), **extra})
+			if len(columns) >= 15:
 				break
 		return columns if len(columns) > 1 else None
 
@@ -413,7 +458,7 @@ class ControlledDocument(Document):
 		rows = frappe.get_all(
 			self.mapped_doctype,
 			filters=filters,
-			fields=[c["fieldname"] for c in columns],
+			fields=[c["fieldname"] for c in columns if c["fieldname"]],
 			order_by="creation asc",
 			limit_page_length=limit,
 			parent_doctype=parent_dt,
@@ -446,7 +491,31 @@ class ControlledDocument(Document):
 			{"fieldname": c.get("fieldname"), "label": c.get("label")}
 			for c in columns
 			if isinstance(c, dict) and c.get("fieldname")
-		][:8]
+		][:14]
+
+		# The document's declared columns override the report's own: same
+		# fieldnames, but the register's headings, widths, header groups and
+		# ordering -- and blank columns the report cannot fill.
+		if self.print_columns:
+			try:
+				spec = json.loads(self.print_columns) if isinstance(self.print_columns, str) else self.print_columns
+			except ValueError:
+				spec = None
+			if spec:
+				known = {c["fieldname"] for c in norm_columns}
+				declared = []
+				for item in spec:
+					if isinstance(item, (list, tuple)) and item:
+						item = {"fieldname": item[0], "label": item[1] if len(item) > 1 else item[0]}
+					if not isinstance(item, dict):
+						continue
+					fieldname = item.get("fieldname")
+					if fieldname and fieldname not in known:
+						continue
+					declared.append({"fieldname": fieldname or None, "label": _(item.get("label") or fieldname),
+						**{k: item[k] for k in ("width", "group") if item.get(k)}})
+				if declared:
+					norm_columns = declared
 
 		return {
 			"columns": norm_columns,

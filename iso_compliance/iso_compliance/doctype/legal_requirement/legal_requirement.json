@@ -13,6 +13,7 @@
   "responsible_function",
   "responsible",
   "compliance_status",
+  "frequency",
   "sb_detail",
   "applicability",
   "evidence_of_compliance",
@@ -78,6 +79,12 @@
    "in_standard_filter": 1
   },
   {
+   "fieldname": "frequency",
+   "fieldtype": "Select",
+   "label": "Frequency",
+   "options": "\nOne-time\nAnnual\nHalf-Yearly\nQuarterly\nMonthly\nOn Renewal"
+  },
+  {
    "fieldname": "sb_detail",
    "fieldtype": "Section Break",
    "label": "Applicability"
@@ -130,7 +137,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-08-05 12:00:00.000000",
+ "modified": "2026-08-08 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Legal Requirement",

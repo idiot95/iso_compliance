@@ -65,6 +65,50 @@ the group.
 | `custom_approved_by` | Link (User) | Approved By | Who granted it |
 | `custom_reapproval_due` | Date | Re-approval Due | Drives periodic re-evaluation required by 8.4 |
 
+### 2. Register columns awaiting fields (2026-08-07 register-format alignment)
+
+The printed registers now follow the column layout of the source register files.
+Where a source column has no ERPNext field, the print shows the column **blank**
+(the heading is there, the cells are empty) until the field below exists. Each
+field is additive, ships as a fixture, and its only purpose is to let the named
+register column carry live data. Approving a row here and installing the fixture
+makes the corresponding blank column fill in; nothing else changes.
+
+| Target DocType | Fieldname | Type | Register column it fills |
+| --- | --- | --- | --- |
+| Issue | `custom_product` | Data | REG-008 "Product" |
+| Issue | `custom_root_cause` | Small Text | REG-008 "Investigation / Root Cause" |
+| Non Conformance | `custom_supplier` | Link (Supplier) | REG-009 "Supplier" |
+| Non Conformance | `custom_product` | Data | REG-009 "Product / Part No." |
+| Non Conformance | `custom_batch_wo` | Data | REG-009 "Batch / WO No." |
+| Non Conformance | `custom_qty` | Float | REG-009 "Qty." |
+| Non Conformance | `custom_disposition` | Select (Rework / Repair / Reject / Use As Is / Return) | REG-009 "Disposition" |
+| Non Conformance | `custom_approved_by` | Link (User) | REG-009 "Approved By" |
+| Non Conformance | `custom_closure_date` | Date | REG-009 "Closure Date" |
+| Asset | `custom_make` | Data | REG-011 "Make" / REG-020 "Make / Manufacturer" |
+| Asset | `custom_model` | Data | REG-020 "Model" |
+| Asset | `custom_serial_no` | Data | REG-011 / REG-020 "Serial No." |
+| Asset | `custom_range` | Data | REG-011 "Range" |
+| Asset | `custom_least_count` | Data | REG-011 "Least Count (mm)" |
+| Asset | `custom_critical_equipment` | Check | REG-020 "Critical Equipment (Y/N)" |
+| Quality Action | `custom_related_reference` | Data | REG-018 "Related NCR / Audit / Complaint" |
+| Quality Action | `custom_root_cause` | Small Text | REG-018 "Root Cause" |
+| Quality Action | `custom_target_date` | Date | REG-018 "Target Date" |
+| Quality Action | `custom_completion_date` | Date | REG-018 "Completion Date" |
+| Quality Action | `custom_effectiveness_verified` | Select (Pending / Yes / No) | REG-018 "Effectiveness Verified (Y/N)" |
+| Quality Meeting | `custom_meeting_date` | Date | REG-019 "Meeting Date" (today: creation date) |
+| Quality Meeting | `custom_review_period` | Data | REG-019 "Review Period" |
+| Quality Meeting | `custom_chairperson` | Data | REG-019 "Chairperson" |
+| Quality Feedback | `custom_mode` | Select (Email / Phone / Survey / Verbal) | REG-025 "Mode of Feedback" |
+| Quality Feedback | `custom_feedback_type` | Select (Positive / Suggestion / Complaint) | REG-025 "Feedback Type" |
+| Quality Feedback | `custom_summary` | Small Text | REG-025 "Feedback Summary" |
+| Quality Feedback | `custom_action_required` | Select (Yes / No) | REG-025 "Action Required" |
+| Quality Feedback | `custom_feedback_status` | Select (Open / Closed) | REG-025 "Status" |
+| Employee | `custom_roles_responsibilities` | Small Text | REG-013 "Roles & Responsibilities" |
+| Employee | `custom_authority` | Small Text | REG-013 "Authority" |
+| Supplier | `custom_category_critical` | Select (Critical / Non-Critical) | REG-007 "Category" (joins proposal 1's approval fields) |
+| Supplier | `custom_qualification_method` | Data | REG-007 "Qualification Method" |
+
 ## Observations about the site (no change made)
 
 ### Print Settings still selects wkhtmltopdf

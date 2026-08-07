@@ -18,6 +18,8 @@
   "monitoring_method",
   "cb_review",
   "last_reviewed_on",
+  "review_frequency",
+  "status",
   "next_review_date",
   "seed_batch"
  ],
@@ -100,6 +102,20 @@
    "label": "Last Reviewed On"
   },
   {
+   "fieldname": "review_frequency",
+   "fieldtype": "Select",
+   "label": "Review Frequency",
+   "options": "\nAnnual\nHalf-Yearly\nQuarterly",
+   "default": "Annual"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Active\nInactive",
+   "default": "Active"
+  },
+  {
    "fieldname": "next_review_date",
    "fieldtype": "Date",
    "label": "Next Review Date"
@@ -117,7 +133,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-08-05 12:00:00.000000",
+ "modified": "2026-08-08 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Interested Party",

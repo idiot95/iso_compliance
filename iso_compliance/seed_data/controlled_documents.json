@@ -3922,7 +3922,57 @@
    "mapped_doctype": "Controlled Document",
    "mapped_filters": null,
    "mapped_report": "Master Document Register",
-   "print_columns": null
+   "print_columns": [
+    {
+     "fieldname": "name",
+     "label": "Document No.",
+     "width": "11%"
+    },
+    {
+     "fieldname": "title",
+     "label": "Document Title"
+    },
+    {
+     "fieldname": "document_type",
+     "label": "Document Type",
+     "width": "6%"
+    },
+    {
+     "fieldname": "owning_department",
+     "label": "Department",
+     "width": "7%"
+    },
+    {
+     "fieldname": "clause_reference",
+     "label": "ISO Clause",
+     "width": "6%"
+    },
+    {
+     "fieldname": "revision_number",
+     "label": "Rev. No.",
+     "width": "5%"
+    },
+    {
+     "fieldname": "issue_date",
+     "label": "Effective Date",
+     "width": "7%"
+    },
+    {
+     "fieldname": "approval_authority",
+     "label": "Approval Authority",
+     "width": "9%"
+    },
+    {
+     "fieldname": "workflow_state",
+     "label": "Status",
+     "width": "7%"
+    },
+    {
+     "fieldname": null,
+     "label": "Remarks",
+     "width": "8%"
+    }
+   ]
   },
   {
    "name": "HCCPL/QMS/REG-002",
@@ -3941,30 +3991,43 @@
    "mapped_filters": null,
    "mapped_report": null,
    "print_columns": [
-    [
-     "issue_context",
-     "Context"
-    ],
-    [
-     "issue_title",
-     "Issue"
-    ],
-    [
-     "effect_on_qms",
-     "Impact on QMS"
-    ],
-    [
-     "responsible_function",
-     "Responsible"
-    ],
-    [
-     "last_reviewed_on",
-     "Last Review"
-    ],
-    [
-     "status",
-     "Status"
-    ]
+    {
+     "fieldname": "issue_context",
+     "label": "Issue Type",
+     "width": "7%"
+    },
+    {
+     "fieldname": "issue_title",
+     "label": "Issue"
+    },
+    {
+     "fieldname": "effect_on_qms",
+     "label": "Impact on QMS"
+    },
+    {
+     "fieldname": "action_taken",
+     "label": "Current Controls"
+    },
+    {
+     "fieldname": "review_frequency_months",
+     "label": "Review Frequency (Months)",
+     "width": "7%"
+    },
+    {
+     "fieldname": "last_reviewed_on",
+     "label": "Last Review",
+     "width": "8%"
+    },
+    {
+     "fieldname": "responsible_function",
+     "label": "Responsible Function",
+     "width": "9%"
+    },
+    {
+     "fieldname": "status",
+     "label": "Status",
+     "width": "6%"
+    }
    ]
   },
   {
@@ -3984,30 +4047,43 @@
    "mapped_filters": null,
    "mapped_report": null,
    "print_columns": [
-    [
-     "party_name",
-     "Interested Party"
-    ],
-    [
-     "party_type",
-     "Type"
-    ],
-    [
-     "needs_and_expectations",
-     "Needs / Expectations"
-    ],
-    [
-     "how_addressed",
-     "How Addressed"
-    ],
-    [
-     "responsible_function",
-     "Owner"
-    ],
-    [
-     "last_reviewed_on",
-     "Last Review"
-    ]
+    {
+     "fieldname": "party_name",
+     "label": "Interested Party",
+     "width": "11%"
+    },
+    {
+     "fieldname": "needs_and_expectations",
+     "label": "Needs / Expectations"
+    },
+    {
+     "fieldname": "how_addressed",
+     "label": "Relevant QMS Considerations / Actions"
+    },
+    {
+     "fieldname": "monitoring_method",
+     "label": "ERPNext Control Mapping"
+    },
+    {
+     "fieldname": "responsible_function",
+     "label": "Process Owner",
+     "width": "8%"
+    },
+    {
+     "fieldname": "review_frequency",
+     "label": "Review Frequency",
+     "width": "7%"
+    },
+    {
+     "fieldname": "last_reviewed_on",
+     "label": "Last Review",
+     "width": "8%"
+    },
+    {
+     "fieldname": "status",
+     "label": "Status",
+     "width": "6%"
+    }
    ]
   },
   {
@@ -4027,42 +4103,54 @@
    "mapped_filters": null,
    "mapped_report": null,
    "print_columns": [
-    [
-     "category",
-     "Process"
-    ],
-    [
-     "entry_type",
-     "Type"
-    ],
-    [
-     "title",
-     "Risk / Opportunity"
-    ],
-    [
-     "likelihood",
-     "L"
-    ],
-    [
-     "impact",
-     "S"
-    ],
-    [
-     "risk_score",
-     "RPN"
-    ],
-    [
-     "risk_level",
-     "Level"
-    ],
-    [
-     "responsible_function",
-     "Responsibility"
-    ],
-    [
-     "status",
-     "Status"
-    ]
+    {
+     "fieldname": "category",
+     "label": "Process",
+     "width": "9%"
+    },
+    {
+     "fieldname": "entry_type",
+     "label": "Type",
+     "width": "6%"
+    },
+    {
+     "fieldname": "description",
+     "label": "Risk / Opportunity"
+    },
+    {
+     "fieldname": "likelihood",
+     "label": "L",
+     "width": "3.5%"
+    },
+    {
+     "fieldname": "impact",
+     "label": "S",
+     "width": "3.5%"
+    },
+    {
+     "fieldname": "risk_score",
+     "label": "RPN",
+     "width": "4.5%"
+    },
+    {
+     "fieldname": "risk_level",
+     "label": "Level",
+     "width": "6%"
+    },
+    {
+     "fieldname": "action_required",
+     "label": "Action Required"
+    },
+    {
+     "fieldname": "responsible_function",
+     "label": "Responsibility",
+     "width": "8%"
+    },
+    {
+     "fieldname": "status",
+     "label": "Status",
+     "width": "6%"
+    }
    ]
   },
   {
@@ -4082,26 +4170,49 @@
    "mapped_filters": null,
    "mapped_report": null,
    "print_columns": [
-    [
-     "requirement",
-     "Act / Rule"
-    ],
-    [
-     "authority",
-     "Issuing Authority"
-    ],
-    [
-     "reference_number",
-     "Licence No."
-    ],
-    [
-     "compliance_status",
-     "Compliance"
-    ],
-    [
-     "renewal_date",
-     "Valid Till"
-    ]
+    {
+     "fieldname": "requirement",
+     "label": "Act / Rules / Notification",
+     "width": "14%"
+    },
+    {
+     "fieldname": "applicability",
+     "label": "Compliance"
+    },
+    {
+     "fieldname": "authority",
+     "label": "Issuing Authority",
+     "width": "11%"
+    },
+    {
+     "fieldname": "evidence_of_compliance",
+     "label": "Reports / Records"
+    },
+    {
+     "fieldname": "reference_number",
+     "label": "Certificate / License No.",
+     "width": "10%"
+    },
+    {
+     "fieldname": "frequency",
+     "label": "Frequency",
+     "width": "7%"
+    },
+    {
+     "fieldname": "responsible_function",
+     "label": "Responsibility",
+     "width": "8%"
+    },
+    {
+     "fieldname": "last_reviewed_on",
+     "label": "Compliance Date",
+     "width": "8%"
+    },
+    {
+     "fieldname": "renewal_date",
+     "label": "Valid Till",
+     "width": "8%"
+    }
    ]
   },
   {
@@ -4117,18 +4228,37 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": true,
-   "mapped_doctype": "Employee Skill Map",
-   "mapped_filters": null,
-   "mapped_report": null,
+   "mapped_report": "Employee Competency Matrix",
    "print_columns": [
-    [
-     "employee_name",
-     "Employee"
-    ],
-    [
-     "designation",
-     "Designation"
-    ]
+    {
+     "fieldname": "employee_name",
+     "label": "EMP. Name",
+     "width": "14%"
+    },
+    {
+     "fieldname": "designation",
+     "label": "Designation",
+     "width": "12%"
+    },
+    {
+     "fieldname": "experience_yrs",
+     "label": "Exp. (Yrs)",
+     "width": "6%"
+    },
+    {
+     "fieldname": "qualification",
+     "label": "Qualification",
+     "width": "16%"
+    },
+    {
+     "fieldname": "skill_actual",
+     "label": "Skill"
+    },
+    {
+     "fieldname": "training_need",
+     "label": "Training Need",
+     "width": "18%"
+    }
    ]
   },
   {
@@ -4145,25 +4275,44 @@
    "body_mode": "Mapped Data",
    "has_source_file": true,
    "mapped_doctype": "Supplier",
-   "mapped_filters": null,
+   "mapped_filters": "{\"disabled\": 0}",
    "mapped_report": null,
    "print_columns": [
-    [
-     "supplier_name",
-     "Supplier"
-    ],
-    [
-     "supplier_type",
-     "Type"
-    ],
-    [
-     "country",
-     "Country"
-    ],
-    [
-     "pan",
-     "PAN"
-    ]
+    {
+     "fieldname": "supplier_name",
+     "label": "Supplier Name",
+     "width": "16%"
+    },
+    {
+     "fieldname": "supplier_group",
+     "label": "Material / Service",
+     "width": "10%"
+    },
+    {
+     "fieldname": null,
+     "label": "Category (Critical / Non-Critical)",
+     "width": "8%"
+    },
+    {
+     "fieldname": null,
+     "label": "Qualification Method",
+     "width": "9%"
+    },
+    {
+     "fieldname": null,
+     "label": "Approved On",
+     "width": "7%"
+    },
+    {
+     "fieldname": null,
+     "label": "Performance Rating",
+     "width": "8%"
+    },
+    {
+     "fieldname": null,
+     "label": "Remarks (Approved / Conditional / Rejected)",
+     "width": "10%"
+    }
    ]
   },
   {
@@ -4183,26 +4332,50 @@
    "mapped_filters": null,
    "mapped_report": null,
    "print_columns": [
-    [
-     "opening_date",
-     "Date"
-    ],
-    [
-     "subject",
-     "Complaint"
-    ],
-    [
-     "customer",
-     "Customer"
-    ],
-    [
-     "raised_by",
-     "Raised By"
-    ],
-    [
-     "status",
-     "Status"
-    ]
+    {
+     "fieldname": "opening_date",
+     "label": "Date",
+     "width": "7%"
+    },
+    {
+     "fieldname": "customer_name",
+     "label": "Customer",
+     "width": "11%"
+    },
+    {
+     "fieldname": null,
+     "label": "Product",
+     "width": "8%"
+    },
+    {
+     "fieldname": "subject",
+     "label": "Complaint Description"
+    },
+    {
+     "fieldname": null,
+     "label": "Investigation / Root Cause",
+     "width": "12%"
+    },
+    {
+     "fieldname": "resolution_details",
+     "label": "Action Taken",
+     "width": "12%"
+    },
+    {
+     "fieldname": "sla_resolution_date",
+     "label": "Complaint Closed On",
+     "width": "8%"
+    },
+    {
+     "fieldname": "status",
+     "label": "Status",
+     "width": "6%"
+    },
+    {
+     "fieldname": null,
+     "label": "Remarks",
+     "width": "7%"
+    }
    ]
   },
   {
@@ -4222,30 +4395,55 @@
    "mapped_filters": null,
    "mapped_report": null,
    "print_columns": [
-    [
-     "creation",
-     "Raised On"
-    ],
-    [
-     "subject",
-     "Subject"
-    ],
-    [
-     "procedure",
-     "Source Procedure"
-    ],
-    [
-     "process_owner",
-     "Owner"
-    ],
-    [
-     "corrective_action",
-     "Action Taken"
-    ],
-    [
-     "status",
-     "Status"
-    ]
+    {
+     "fieldname": "creation",
+     "label": "Date",
+     "width": "7%"
+    },
+    {
+     "fieldname": null,
+     "label": "Supplier",
+     "width": "9%"
+    },
+    {
+     "fieldname": null,
+     "label": "Product / Part No.",
+     "width": "8%"
+    },
+    {
+     "fieldname": null,
+     "label": "Batch / WO No.",
+     "width": "8%"
+    },
+    {
+     "fieldname": "subject",
+     "label": "Nonconformity Description"
+    },
+    {
+     "fieldname": null,
+     "label": "Qty.",
+     "width": "4%"
+    },
+    {
+     "fieldname": null,
+     "label": "Disposition (Rework / Repair / Reject / Use As Is)",
+     "width": "9%"
+    },
+    {
+     "fieldname": null,
+     "label": "Approved By",
+     "width": "7%"
+    },
+    {
+     "fieldname": null,
+     "label": "Closure Date",
+     "width": "7%"
+    },
+    {
+     "fieldname": "status",
+     "label": "Status",
+     "width": "6%"
+    }
    ]
   },
   {
@@ -4265,26 +4463,40 @@
    "mapped_filters": null,
    "mapped_report": null,
    "print_columns": [
-    [
-     "audit_date",
-     "Date"
-    ],
-    [
-     "audit_title",
-     "Audit"
-    ],
-    [
-     "audit_type",
-     "Type"
-    ],
-    [
-     "lead_auditor",
-     "Lead Auditor"
-    ],
-    [
-     "department",
-     "Department"
-    ]
+    {
+     "fieldname": "audit_date",
+     "label": "Audit Date",
+     "width": "8%"
+    },
+    {
+     "fieldname": "audit_type",
+     "label": "Audit Type",
+     "width": "8%"
+    },
+    {
+     "fieldname": "department",
+     "label": "Process / Department Audited"
+    },
+    {
+     "fieldname": "lead_auditor",
+     "label": "Auditor",
+     "width": "12%"
+    },
+    {
+     "fieldname": "nc_count",
+     "label": "No. of NCs",
+     "width": "6%"
+    },
+    {
+     "fieldname": "audit_status",
+     "label": "Audit Status",
+     "width": "8%"
+    },
+    {
+     "fieldname": null,
+     "label": "Remarks",
+     "width": "10%"
+    }
    ]
   },
   {
@@ -4300,30 +4512,57 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": true,
-   "mapped_doctype": "Asset",
-   "mapped_filters": "{\"asset_category\": \"Measuring Instruments\"}",
-   "mapped_report": null,
+   "mapped_report": "Measuring Equipment Register",
    "print_columns": [
-    [
-     "asset_name",
-     "Instrument"
-    ],
-    [
-     "item_code",
-     "Item"
-    ],
-    [
-     "location",
-     "Location"
-    ],
-    [
-     "purchase_date",
-     "Purchased"
-    ],
-    [
-     "status",
-     "Status"
-    ]
+    {
+     "fieldname": "name",
+     "label": "Equipment ID",
+     "width": "10%"
+    },
+    {
+     "fieldname": "asset_name",
+     "label": "MME Description"
+    },
+    {
+     "fieldname": null,
+     "label": "Make",
+     "width": "8%"
+    },
+    {
+     "fieldname": null,
+     "label": "Serial No.",
+     "width": "8%"
+    },
+    {
+     "fieldname": "location",
+     "label": "Location",
+     "width": "9%"
+    },
+    {
+     "fieldname": null,
+     "label": "Range",
+     "width": "7%"
+    },
+    {
+     "fieldname": null,
+     "label": "Least Count (mm)",
+     "width": "6%"
+    },
+    {
+     "fieldname": "last_calibration",
+     "label": "Date of Calibration",
+     "width": "8%"
+    },
+    {
+     "fieldname": "calibration_due",
+     "label": "Due Date of Calibration",
+     "width": "8%"
+    },
+    {
+     "fieldname": "status",
+     "label": "Status",
+     "width": "7%"
+    }
    ]
   },
   {
@@ -4339,30 +4578,33 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": true,
-   "mapped_doctype": "Training Event Employee",
-   "mapped_filters": null,
+   "mapped_doctype": "Training Event",
    "mapped_report": null,
    "print_columns": [
-    [
-     "parent",
-     "Training Event"
-    ],
-    [
-     "employee",
-     "Employee"
-    ],
-    [
-     "department",
-     "Department"
-    ],
-    [
-     "attendance",
-     "Attendance"
-    ],
-    [
-     "status",
-     "Status"
-    ]
+    {
+     "fieldname": "event_name",
+     "label": "Training Topic"
+    },
+    {
+     "fieldname": "type",
+     "label": "Training Type",
+     "width": "9%"
+    },
+    {
+     "fieldname": "start_time",
+     "label": "Training Date",
+     "width": "9%"
+    },
+    {
+     "fieldname": null,
+     "label": "Effectiveness Evaluation Date",
+     "width": "9%"
+    },
+    {
+     "fieldname": null,
+     "label": "Remarks",
+     "width": "10%"
+    }
    ]
   },
   {
@@ -4382,26 +4624,24 @@
    "mapped_filters": "{\"status\": \"Active\"}",
    "mapped_report": null,
    "print_columns": [
-    [
-     "employee_name",
-     "Name"
-    ],
-    [
-     "designation",
-     "Designation"
-    ],
-    [
-     "department",
-     "Department"
-    ],
-    [
-     "date_of_joining",
-     "Joined"
-    ],
-    [
-     "status",
-     "Status"
-    ]
+    {
+     "fieldname": "employee_name",
+     "label": "Name",
+     "width": "13%"
+    },
+    {
+     "fieldname": "designation",
+     "label": "Designation",
+     "width": "12%"
+    },
+    {
+     "fieldname": null,
+     "label": "Roles & Responsibilities"
+    },
+    {
+     "fieldname": null,
+     "label": "Authority"
+    }
    ]
   },
   {
@@ -4417,10 +4657,130 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": true,
-   "mapped_doctype": null,
-   "mapped_filters": null,
-   "mapped_report": null,
-   "print_columns": null
+   "static_table": {
+    "columns": [
+     "Sl. No.",
+     "Document No.",
+     "Record Name",
+     "Department",
+     "Record Owner",
+     "Storage Location",
+     "Retention Period",
+     "Disposal Method"
+    ],
+    "rows": [
+     [
+      "1",
+      "POL-001",
+      "Quality Policy",
+      "QA",
+      "MR",
+      "Soft Copy / Hard Copy",
+      "Obsolete version + Current",
+      "Shred / Delete"
+     ],
+     [
+      "2",
+      "QM-001",
+      "Quality Manual",
+      "QA",
+      "MR",
+      "Soft Copy / Hard Copy",
+      "Obsolete version + Current",
+      "Shred / Delete"
+     ],
+     [
+      "3",
+      "SOP-001",
+      "Control of Documented Information",
+      "QA",
+      "MR",
+      "Soft Copy",
+      "Obsolete version + Current",
+      "Delete"
+     ],
+     [
+      "4",
+      "FRM-040",
+      "Incoming Material Inspection Report",
+      "QA",
+      "QA Incharge",
+      "QA File / ERPNext",
+      "3 Years",
+      "Shred"
+     ],
+     [
+      "5",
+      "FRM-042",
+      "Final Inspection Report",
+      "QA",
+      "QA Incharge",
+      "QA File / ERPNext",
+      "3 Years",
+      "Shred"
+     ],
+     [
+      "6",
+      "FRM-046",
+      "Nonconformance Report (NCR)",
+      "QA",
+      "QA Incharge",
+      "QA File",
+      "5 Years",
+      "Shred"
+     ],
+     [
+      "7",
+      "FRM-051",
+      "Corrective Action Request",
+      "QA",
+      "MR",
+      "QA File",
+      "5 Years",
+      "Shred"
+     ],
+     [
+      "8",
+      "FRM-058",
+      "Internal Audit Report",
+      "QA",
+      "MR",
+      "QA File",
+      "5 Years",
+      "Shred"
+     ],
+     [
+      "9",
+      "FRM-063",
+      "Management Review Minutes",
+      "Top Management",
+      "MR",
+      "Management File",
+      "10 Years",
+      "N/A"
+     ],
+     [
+      "10",
+      "FRM-066",
+      "Calibration Record",
+      "QA",
+      "QA Incharge",
+      "Calibration File",
+      "3 Years",
+      "Shred"
+     ],
+     [
+      "11",
+      "FRM-073",
+      "Breakdown Maintenance Report",
+      "Maintenance",
+      "Maintenance Head",
+      "Maintenance File",
+      "3 Years",
+      "Shred"
+     ]
+    ]
+   }
   },
   {
    "name": "HCCPL/QMS/REG-015",
@@ -4435,34 +4795,57 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": true,
-   "mapped_doctype": "Quality Inspection",
-   "mapped_filters": "{\"inspection_type\": \"Incoming\", \"docstatus\": 1}",
-   "mapped_report": null,
+   "mapped_report": "Incoming Material Register",
    "print_columns": [
-    [
-     "report_date",
-     "Date"
-    ],
-    [
-     "item_code",
-     "Item"
-    ],
-    [
-     "item_name",
-     "Description"
-    ],
-    [
-     "reference_name",
-     "Receipt"
-    ],
-    [
-     "status",
-     "Result"
-    ],
-    [
-     "inspected_by",
-     "Inspected By"
-    ]
+    {
+     "fieldname": "posting_date",
+     "label": "Receipt Date",
+     "width": "7%"
+    },
+    {
+     "fieldname": "name",
+     "label": "GRN / Challan No.",
+     "width": "10%"
+    },
+    {
+     "fieldname": "supplier_name",
+     "label": "Supplier",
+     "width": "12%"
+    },
+    {
+     "fieldname": "purchase_order",
+     "label": "PO No.",
+     "width": "10%"
+    },
+    {
+     "fieldname": "item_name",
+     "label": "Material Description"
+    },
+    {
+     "fieldname": "qty_ordered",
+     "label": "Quantity Ordered",
+     "width": "6%"
+    },
+    {
+     "fieldname": "received_qty",
+     "label": "Quantity Received",
+     "width": "6%"
+    },
+    {
+     "fieldname": "quality_inspection",
+     "label": "Inspection Report Ref.",
+     "width": "9%"
+    },
+    {
+     "fieldname": "inspection_status",
+     "label": "Inspection Status",
+     "width": "7%"
+    },
+    {
+     "fieldname": null,
+     "label": "Remarks",
+     "width": "7%"
+    }
    ]
   },
   {
@@ -4482,30 +4865,55 @@
    "mapped_filters": null,
    "mapped_report": null,
    "print_columns": [
-    [
-     "planned_start_date",
-     "Planned Start"
-    ],
-    [
-     "production_item",
-     "Item"
-    ],
-    [
-     "item_name",
-     "Description"
-    ],
-    [
-     "qty",
-     "Qty"
-    ],
-    [
-     "produced_qty",
-     "Produced"
-    ],
-    [
-     "status",
-     "Status"
-    ]
+    {
+     "fieldname": "bom_no",
+     "label": "BOM No.",
+     "width": "10%"
+    },
+    {
+     "fieldname": "item_name",
+     "label": "Material Description"
+    },
+    {
+     "fieldname": "production_item",
+     "label": "HCC Part No.",
+     "width": "9%"
+    },
+    {
+     "fieldname": null,
+     "label": "Priority",
+     "width": "5%"
+    },
+    {
+     "fieldname": "qty",
+     "label": "Quantity Planned",
+     "width": "6%"
+    },
+    {
+     "fieldname": "produced_qty",
+     "label": "Quantity Produced",
+     "width": "6%"
+    },
+    {
+     "fieldname": null,
+     "label": "Quantity Accepted",
+     "width": "6%"
+    },
+    {
+     "fieldname": null,
+     "label": "Quantity Rejected",
+     "width": "6%"
+    },
+    {
+     "fieldname": "status",
+     "label": "Production Status",
+     "width": "8%"
+    },
+    {
+     "fieldname": null,
+     "label": "Remarks",
+     "width": "7%"
+    }
    ]
   },
   {
@@ -4521,10 +4929,35 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": true,
-   "mapped_doctype": null,
-   "mapped_filters": null,
-   "mapped_report": null,
-   "print_columns": null
+   "static_table": {
+    "columns": [
+     "Project No.",
+     "Product Name",
+     "Customer Name",
+     "Product Category",
+     "Project Start Date",
+     "Planned Completion Date",
+     "Actual Completion Date",
+     "Design Leader",
+     "Project Team",
+     "Revision No."
+    ],
+    "rows": [
+     [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+     ]
+    ]
+   },
+   "print_layout": "Form"
   },
   {
    "name": "HCCPL/QMS/REG-018",
@@ -4543,22 +4976,60 @@
    "mapped_filters": null,
    "mapped_report": null,
    "print_columns": [
-    [
-     "date",
-     "Date"
-    ],
-    [
-     "corrective_preventive",
-     "Type"
-    ],
-    [
-     "procedure",
-     "Procedure"
-    ],
-    [
-     "status",
-     "Status"
-    ]
+    {
+     "fieldname": "date",
+     "label": "Date Raised",
+     "width": "7%"
+    },
+    {
+     "fieldname": "corrective_preventive",
+     "label": "Type",
+     "width": "7%"
+    },
+    {
+     "fieldname": null,
+     "label": "Source of Nonconformity",
+     "width": "9%"
+    },
+    {
+     "fieldname": null,
+     "label": "Related NCR / Audit / Complaint",
+     "width": "9%"
+    },
+    {
+     "fieldname": null,
+     "label": "Problem Description"
+    },
+    {
+     "fieldname": null,
+     "label": "Root Cause",
+     "width": "10%"
+    },
+    {
+     "fieldname": null,
+     "label": "Corrective Action",
+     "width": "11%"
+    },
+    {
+     "fieldname": null,
+     "label": "Target Date",
+     "width": "6%"
+    },
+    {
+     "fieldname": null,
+     "label": "Completion Date",
+     "width": "6%"
+    },
+    {
+     "fieldname": null,
+     "label": "Effectiveness Verified (Y/N)",
+     "width": "6%"
+    },
+    {
+     "fieldname": "status",
+     "label": "Status",
+     "width": "6%"
+    }
    ]
   },
   {
@@ -4578,14 +5049,49 @@
    "mapped_filters": null,
    "mapped_report": null,
    "print_columns": [
-    [
-     "creation",
-     "Date"
-    ],
-    [
-     "status",
-     "Status"
-    ]
+    {
+     "fieldname": "creation",
+     "label": "Meeting Date",
+     "width": "8%"
+    },
+    {
+     "fieldname": null,
+     "label": "Review Period",
+     "width": "8%"
+    },
+    {
+     "fieldname": null,
+     "label": "Chairperson",
+     "width": "9%"
+    },
+    {
+     "fieldname": null,
+     "label": "Major Inputs Reviewed"
+    },
+    {
+     "fieldname": null,
+     "label": "Key Decisions / Outputs"
+    },
+    {
+     "fieldname": null,
+     "label": "Action Items Raised",
+     "width": "10%"
+    },
+    {
+     "fieldname": null,
+     "label": "Target Completion",
+     "width": "7%"
+    },
+    {
+     "fieldname": "status",
+     "label": "Status (Open / Closed)",
+     "width": "7%"
+    },
+    {
+     "fieldname": null,
+     "label": "FRM024 Ref.",
+     "width": "7%"
+    }
    ]
   },
   {
@@ -4605,26 +5111,54 @@
    "mapped_filters": null,
    "mapped_report": null,
    "print_columns": [
-    [
-     "asset_name",
-     "Asset"
-    ],
-    [
-     "asset_category",
-     "Category"
-    ],
-    [
-     "location",
-     "Location"
-    ],
-    [
-     "purchase_date",
-     "Purchased"
-    ],
-    [
-     "status",
-     "Status"
-    ]
+    {
+     "fieldname": "asset_name",
+     "label": "Machine / Equipment Name",
+     "width": "14%"
+    },
+    {
+     "fieldname": null,
+     "label": "Make / Manufacturer",
+     "width": "9%",
+     "group": "Machine / Equipment Description"
+    },
+    {
+     "fieldname": null,
+     "label": "Model",
+     "width": "8%",
+     "group": "Machine / Equipment Description"
+    },
+    {
+     "fieldname": null,
+     "label": "Serial No.",
+     "width": "8%",
+     "group": "Machine / Equipment Description"
+    },
+    {
+     "fieldname": "available_for_use_date",
+     "label": "Installation Date",
+     "width": "8%"
+    },
+    {
+     "fieldname": null,
+     "label": "Critical Equipment (Y/N)",
+     "width": "6%"
+    },
+    {
+     "fieldname": null,
+     "label": "Preventive Maintenance Frequency",
+     "width": "8%"
+    },
+    {
+     "fieldname": "status",
+     "label": "Status",
+     "width": "8%"
+    },
+    {
+     "fieldname": null,
+     "label": "Remarks",
+     "width": "8%"
+    }
    ]
   },
   {
@@ -4640,22 +5174,52 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": true,
-   "mapped_doctype": "Asset Maintenance",
-   "mapped_filters": null,
-   "mapped_report": null,
+   "mapped_report": "Maintenance Register",
    "print_columns": [
-    [
-     "asset_name",
-     "Asset"
-    ],
-    [
-     "asset_category",
-     "Category"
-    ],
-    [
-     "maintenance_manager_name",
-     "Maintenance Manager"
-    ]
+    {
+     "fieldname": "asset",
+     "label": "Equipment ID",
+     "width": "10%"
+    },
+    {
+     "fieldname": "asset_display_name",
+     "label": "Machine / Equipment Name"
+    },
+    {
+     "fieldname": "maintenance_task",
+     "label": "Maintenance Task",
+     "width": "12%"
+    },
+    {
+     "fieldname": "maintenance_type",
+     "label": "Maintenance Type (Preventive / Calibration)",
+     "width": "9%"
+    },
+    {
+     "fieldname": "periodicity",
+     "label": "Frequency",
+     "width": "7%"
+    },
+    {
+     "fieldname": "assign_to_name",
+     "label": "Assigned To",
+     "width": "9%"
+    },
+    {
+     "fieldname": "last_completion_date",
+     "label": "Last Done",
+     "width": "7%"
+    },
+    {
+     "fieldname": "next_due_date",
+     "label": "Next Due",
+     "width": "7%"
+    },
+    {
+     "fieldname": "maintenance_status",
+     "label": "Status",
+     "width": "8%"
+    }
    ]
   },
   {
@@ -4674,7 +5238,57 @@
    "mapped_doctype": "Sales Order",
    "mapped_filters": "{\"amended_from\": [\"!=\", \"\"]}",
    "mapped_report": "Customer PO Amendment Register",
-   "print_columns": null
+   "print_columns": [
+    {
+     "fieldname": "name",
+     "label": "Amendment",
+     "width": "10%"
+    },
+    {
+     "fieldname": "amended_on",
+     "label": "Amendment Date",
+     "width": "7%"
+    },
+    {
+     "fieldname": "customer",
+     "label": "Customer Name",
+     "width": "11%"
+    },
+    {
+     "fieldname": "po_no",
+     "label": "Original PO No.",
+     "width": "8%"
+    },
+    {
+     "fieldname": "changes",
+     "label": "Amendment Details (Qty / Spec / Delivery / Price)"
+    },
+    {
+     "fieldname": "reason",
+     "label": "Reason for Amendment",
+     "width": "12%"
+    },
+    {
+     "fieldname": null,
+     "label": "Item Type (Traded / Manufactured)",
+     "width": "7%"
+    },
+    {
+     "fieldname": null,
+     "label": "Stock Availability (Yes / No)",
+     "width": "6%"
+    },
+    {
+     "fieldname": null,
+     "label": "RM Required (Yes / No)",
+     "width": "6%"
+    },
+    {
+     "fieldname": null,
+     "label": "Revised Delivery Date",
+     "width": "7%"
+    }
+   ]
   },
   {
    "name": "HCCPL/QMS/REG-023",
@@ -4693,26 +5307,30 @@
    "mapped_filters": null,
    "mapped_report": null,
    "print_columns": [
-    [
-     "start_time",
-     "Date"
-    ],
-    [
-     "event_name",
-     "Training"
-    ],
-    [
-     "type",
-     "Type"
-    ],
-    [
-     "location",
-     "Location"
-    ],
-    [
-     "event_status",
-     "Status"
-    ]
+    {
+     "fieldname": "event_name",
+     "label": "Name of Training Program"
+    },
+    {
+     "fieldname": null,
+     "label": "For Whom",
+     "width": "9%"
+    },
+    {
+     "fieldname": "start_time",
+     "label": "Scheduled Date",
+     "width": "10%"
+    },
+    {
+     "fieldname": "end_time",
+     "label": "Actual Date",
+     "width": "10%"
+    },
+    {
+     "fieldname": "event_status",
+     "label": "Status",
+     "width": "9%"
+    }
    ]
   },
   {
@@ -4775,14 +5393,45 @@
    "mapped_filters": null,
    "mapped_report": null,
    "print_columns": [
-    [
-     "creation",
-     "Date"
-    ],
-    [
-     "template",
-     "Feedback Template"
-    ]
+    {
+     "fieldname": "creation",
+     "label": "Date",
+     "width": "8%"
+    },
+    {
+     "fieldname": "document_name",
+     "label": "Customer Name",
+     "width": "12%"
+    },
+    {
+     "fieldname": null,
+     "label": "Mode of Feedback (Email / Phone / Survey / Verbal)",
+     "width": "9%"
+    },
+    {
+     "fieldname": null,
+     "label": "Feedback Type (Positive / Suggestion / Complaint)",
+     "width": "9%"
+    },
+    {
+     "fieldname": null,
+     "label": "Feedback Summary"
+    },
+    {
+     "fieldname": null,
+     "label": "Action Required (Yes / No)",
+     "width": "7%"
+    },
+    {
+     "fieldname": null,
+     "label": "Status",
+     "width": "6%"
+    },
+    {
+     "fieldname": null,
+     "label": "Remarks",
+     "width": "8%"
+    }
    ]
   },
   {
@@ -4798,10 +5447,101 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": true,
-   "mapped_doctype": null,
-   "mapped_filters": null,
-   "mapped_report": null,
-   "print_columns": null
+   "static_table": {
+    "columns": [
+     "Sl. No.",
+     "Drawing No.",
+     "Drawing Title / Part Name",
+     "Customer (If Applicable)",
+     "Current Revision",
+     "Revision Date",
+     "Nature of Revision",
+     "Revised By",
+     "Approved By",
+     "Status (Active / Obsolete)",
+     "Remarks"
+    ],
+    "rows": [
+     [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+     ],
+     [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+     ],
+     [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+     ],
+     [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+     ],
+     [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+     ],
+     [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+     ]
+    ]
+   }
   }
  ]
 }

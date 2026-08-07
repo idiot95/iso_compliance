@@ -47,6 +47,8 @@
   "mapped_filters",
   "mapped_report",
   "print_columns",
+  "print_layout",
+  "static_table",
   "sop_body_section",
   "purpose",
   "scope",
@@ -348,6 +350,20 @@
    "description": "Columns the printed register shows, as a JSON list of [fieldname, label] pairs. Chosen per document so the print carries the evidence its ISO clause asks for, not whatever happens to be in list view. Unknown fieldnames are skipped so a schema change cannot break the print."
   },
   {
+   "fieldname": "print_layout",
+   "fieldtype": "Select",
+   "label": "Print Layout",
+   "options": "Table\nForm",
+   "default": "Table",
+   "description": "How the register content prints. Table is the ordinary row register; Form prints each record as a vertical Particular / Details block, the way the Design & Development register is laid out."
+  },
+  {
+   "fieldname": "static_table",
+   "fieldtype": "JSON",
+   "label": "Static Table",
+   "description": "Rows that are part of the document itself rather than live ERP data, as {\"columns\": [...], \"rows\": [[...]]}. For registers that are policy (record retention) or have no system of record yet (drawing revisions). Content under change control like everything else."
+  },
+  {
    "depends_on": "eval:doc.body_mode=='Structured SOP'",
    "fieldname": "sop_body_section",
    "fieldtype": "Section Break",
@@ -515,7 +531,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-08-06 22:00:00.000000",
+ "modified": "2026-08-08 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Controlled Document",

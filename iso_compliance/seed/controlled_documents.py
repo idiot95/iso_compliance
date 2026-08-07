@@ -273,6 +273,8 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 		"mapped_filters": entry.get("mapped_filters"),
 		"mapped_report": entry.get("mapped_report"),
 		"print_columns": json.dumps(entry["print_columns"]) if entry.get("print_columns") else None,
+		"print_layout": entry.get("print_layout") or "Table",
+		"static_table": json.dumps(entry["static_table"]) if entry.get("static_table") else None,
 		"workflow_state": "Active" if entry.get("has_source_file") else "Draft",
 		"owning_department": _department_label(entry.get("department_label")),
 		"approval_authority": entry.get("approval_authority") or None,

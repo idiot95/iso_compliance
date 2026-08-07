@@ -11,6 +11,8 @@
   "cb_head",
   "audit_date",
   "lead_auditor",
+  "audit_status",
+  "nc_count",
   "department",
   "sb_scope",
   "clauses_covered",
@@ -64,6 +66,21 @@
    "label": "Lead Auditor",
    "options": "User",
    "reqd": 1
+  },
+  {
+   "fieldname": "audit_status",
+   "fieldtype": "Select",
+   "label": "Audit Status",
+   "options": "Planned\nIn Progress\nCompleted\nClosed",
+   "default": "Planned",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "nc_count",
+   "fieldtype": "Int",
+   "label": "No. of NCs",
+   "read_only": 1,
+   "description": "Counted from the findings below on save; a register column, not an opinion."
   },
   {
    "fieldname": "department",
@@ -125,7 +142,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-08-05 06:00:00.000000",
+ "modified": "2026-08-08 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Internal Audit",
