@@ -22,7 +22,7 @@ import frappe
 from frappe import _
 from frappe.utils import add_months, getdate
 
-SEED_BATCH = "zip-2026-08-04"
+SEED_BATCH = "zip-2026-08-07"
 
 TYPES = [
 	("QM", "Quality Manual", "Rich Text", None),

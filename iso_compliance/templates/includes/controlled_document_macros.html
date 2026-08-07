@@ -233,12 +233,18 @@
 
 	{%- if doc.procedure_steps -%}
 	<div class="cd-section"><h2 class="cd-h2">6. Procedure</h2>
-		{%- for s in doc.procedure_steps -%}
-		<div class="cd-step">
-			<h3 class="cd-h3">{{ s.step_no or loop.index }}. {{ s.step_title }}</h3>
-			<div class="cd-rich">{{ s.step_content or "" }}</div>
-		</div>
-		{%- endfor -%}
+		<table class="cd-table cd-proc">
+			<thead><tr><th style="width:7%">Step</th><th style="width:24%">Activity</th><th>Details</th></tr></thead>
+			<tbody>
+			{%- for s in doc.procedure_steps -%}
+			<tr>
+				<td class="cd-strong" style="text-align:center">{{ s.step_no or loop.index }}</td>
+				<td class="cd-strong">{{ s.step_title }}</td>
+				<td class="cd-rich">{{ s.step_content or "" }}</td>
+			</tr>
+			{%- endfor -%}
+			</tbody>
+		</table>
 	</div>
 	{%- endif -%}
 

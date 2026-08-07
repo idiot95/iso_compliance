@@ -141,50 +141,25 @@
      {
       "step_no": "3",
       "step_title": "Document Identification",
-      "step_content": ""
+      "step_content": "<p>Each document shall contain:</p><ul><li>Document Number</li><li>Title</li><li>Revision No.</li><li>Issue Date</li><li>Page Number</li></ul>"
      },
      {
       "step_no": "4",
-      "step_title": "Each document shall contain:",
-      "step_content": ""
-     },
-     {
-      "step_no": "5",
-      "step_title": "Document Number",
-      "step_content": ""
-     },
-     {
-      "step_no": "6",
-      "step_title": "Title",
-      "step_content": "<p>Revision No.</p>"
-     },
-     {
-      "step_no": "7",
-      "step_title": "Issue Date",
-      "step_content": ""
-     },
-     {
-      "step_no": "8",
-      "step_title": "Page Number",
-      "step_content": ""
-     },
-     {
-      "step_no": "9",
       "step_title": "Distribution",
       "step_content": "<p>Controlled documents shall be made available through the ERPNext document management system. Uncontrolled copies shall be identified accordingly.</p>"
      },
      {
-      "step_no": "10",
+      "step_no": "5",
       "step_title": "Revision",
       "step_content": "<p>Changes shall be reviewed, approved, and recorded. Superseded versions shall be withdrawn from use.</p>"
      },
      {
-      "step_no": "11",
+      "step_no": "6",
       "step_title": "External Documents",
       "step_content": "<p>Applicable standards, customer drawings, specifications, and supplier documents shall be identified and controlled.</p>"
      },
      {
-      "step_no": "12",
+      "step_no": "7",
       "step_title": "Record Retention",
       "step_content": "<p>Documents and records shall be stored, protected, retained, and disposed of in accordance with the Record Retention Register.</p>"
      }
@@ -284,112 +259,22 @@
      {
       "step_no": "1",
       "step_title": "Identification",
-      "step_content": ""
+      "step_content": "<p>Risks and opportunities shall be identified through:</p><ul><li>Management Review Meetings</li><li>Customer feedback and complaints</li><li>Internal and external audits</li><li>Process performance monitoring.</li><li>Supplier evaluations</li><li>Production and quality issues</li><li>Market and statutory changes</li></ul>"
      },
      {
       "step_no": "2",
-      "step_title": "Risks and opportunities shall be identified through:",
-      "step_content": ""
+      "step_title": "Evaluation",
+      "step_content": "<p>Each identified risk shall be evaluated based on:</p><ul><li>Likelihood of occurrence</li><li>Potential impact</li><li>Existing controls(if any)</li></ul><p>Risks shall be prioritized for appropriate action.</p>"
      },
      {
       "step_no": "3",
-      "step_title": "Management Review Meetings",
-      "step_content": ""
+      "step_title": "Action Planning",
+      "step_content": "<p>Appropriate actions may include:</p><ul><li>Eliminating the risk</li><li>Reducing the likelihood or impact</li><li>Establishing additional controls</li><li>Assigning responsibilities</li><li>Setting completion timelines</li></ul><p>Opportunities for improvement shall also be documented and implemented where feasible.</p>"
      },
      {
       "step_no": "4",
-      "step_title": "Customer feedback and complaints",
-      "step_content": ""
-     },
-     {
-      "step_no": "5",
-      "step_title": "Internal and external audits",
-      "step_content": "<p>Process performance monitoring.</p>"
-     },
-     {
-      "step_no": "6",
-      "step_title": "Supplier evaluations",
-      "step_content": ""
-     },
-     {
-      "step_no": "7",
-      "step_title": "Production and quality issues",
-      "step_content": ""
-     },
-     {
-      "step_no": "8",
-      "step_title": "Market and statutory changes",
-      "step_content": ""
-     },
-     {
-      "step_no": "9",
-      "step_title": "Evaluation",
-      "step_content": ""
-     },
-     {
-      "step_no": "10",
-      "step_title": "Each identified risk shall be evaluated based on:",
-      "step_content": ""
-     },
-     {
-      "step_no": "11",
-      "step_title": "Likelihood of occurrence",
-      "step_content": ""
-     },
-     {
-      "step_no": "12",
-      "step_title": "Potential impact",
-      "step_content": ""
-     },
-     {
-      "step_no": "13",
-      "step_title": "Existing controls(if any)",
-      "step_content": "<p>Risks shall be prioritized for appropriate action.</p>"
-     },
-     {
-      "step_no": "14",
-      "step_title": "Action Planning",
-      "step_content": ""
-     },
-     {
-      "step_no": "15",
-      "step_title": "Appropriate actions may include:",
-      "step_content": ""
-     },
-     {
-      "step_no": "16",
-      "step_title": "Eliminating the risk",
-      "step_content": ""
-     },
-     {
-      "step_no": "17",
-      "step_title": "Reducing the likelihood or impact",
-      "step_content": ""
-     },
-     {
-      "step_no": "18",
-      "step_title": "Establishing additional controls",
-      "step_content": ""
-     },
-     {
-      "step_no": "19",
-      "step_title": "Assigning responsibilities",
-      "step_content": ""
-     },
-     {
-      "step_no": "20",
-      "step_title": "Setting completion timelines",
-      "step_content": "<p>Opportunities for improvement shall also be documented and implemented where feasible.</p>"
-     },
-     {
-      "step_no": "21",
       "step_title": "Monitoring",
-      "step_content": "<p>The Quality Manager shall periodically review the Risk & Opportunity Register to verify:</p>"
-     },
-     {
-      "step_no": "22",
-      "step_title": "Completion of planned actions",
-      "step_content": "<p>Effectiveness of implemented controls.</p><p>Need for additional actions.</p><p>The register shall be reviewed during Management Review Meetings or whenever significant changes to the organization, or its processes occur.</p>"
+      "step_content": "<p>The Quality Manager shall periodically review the Risk &amp; Opportunity Register to verify:</p><ul><li>Completion of planned actions</li><li>Effectiveness of implemented controls.</li><li>Need for additional actions.</li></ul><p>The register shall be reviewed during Management Review Meetings or whenever significant changes to the organization, or its processes occur.</p>"
      }
     ],
     "records_generated": [
@@ -498,177 +383,32 @@
      {
       "step_no": "1",
       "step_title": "Recruitment",
-      "step_content": "<p>Personnel shall be recruited based on the qualification, experience, and competency requirements of the respective position.</p>"
+      "step_content": "<ul><li>Personnel shall be recruited based on the qualification, experience, and competency requirements of the respective position.</li></ul>"
      },
      {
       "step_no": "2",
       "step_title": "Induction",
-      "step_content": ""
+      "step_content": "<p>All new employees shall undergo induction training covering:</p><ul><li>Company profile</li><li>Quality Policy and Quality Objectives</li><li>QMS awareness</li><li>Safety requirements</li><li>Departmental responsibilities</li><li>Applicable procedures and work instructions</li></ul>"
      },
      {
       "step_no": "3",
-      "step_title": "All new employees shall undergo induction training covering:",
-      "step_content": ""
+      "step_title": "Competency Evaluation",
+      "step_content": "<p>Department Heads shall periodically assess employee competency based on:</p><ul><li>Education and qualifications</li><li>Experience</li><li>Job performance</li><li>Skill level</li><li>Training effectiveness</li></ul>"
      },
      {
       "step_no": "4",
-      "step_title": "Company profile",
-      "step_content": ""
+      "step_title": "Training",
+      "step_content": "<p>Training may include:</p><ul><li>Technical training</li><li>Quality awareness</li><li>Process-specific training.</li><li>Safety training</li><li>Customer-specific requirements</li><li>Equipment or machine operation</li></ul><p>Training may be conducted internally or externally.</p>"
      },
      {
       "step_no": "5",
-      "step_title": "Quality Policy and Quality Objectives",
-      "step_content": ""
+      "step_title": "Effectiveness of Training",
+      "step_content": "<p>The effectiveness of training shall be evaluated through one or more of the following:</p><ul><li>Observation of job performance</li><li>Practical demonstration</li><li>Supervisor feedback</li><li>Skill assessment</li><li>Reduction in errors or nonconformities</li></ul><p>Additional training shall be provided where necessary.</p>"
      },
      {
       "step_no": "6",
-      "step_title": "QMS awareness",
-      "step_content": ""
-     },
-     {
-      "step_no": "7",
-      "step_title": "Safety requirements",
-      "step_content": ""
-     },
-     {
-      "step_no": "8",
-      "step_title": "Departmental responsibilities",
-      "step_content": ""
-     },
-     {
-      "step_no": "9",
-      "step_title": "Applicable procedures and work instructions",
-      "step_content": ""
-     },
-     {
-      "step_no": "10",
-      "step_title": "Competency Evaluation",
-      "step_content": "<p>Department Heads shall periodically assess employee competency based on:</p>"
-     },
-     {
-      "step_no": "11",
-      "step_title": "Education and qualifications",
-      "step_content": ""
-     },
-     {
-      "step_no": "12",
-      "step_title": "Experience",
-      "step_content": ""
-     },
-     {
-      "step_no": "13",
-      "step_title": "Job performance",
-      "step_content": ""
-     },
-     {
-      "step_no": "14",
-      "step_title": "Skill level",
-      "step_content": ""
-     },
-     {
-      "step_no": "15",
-      "step_title": "Training effectiveness",
-      "step_content": ""
-     },
-     {
-      "step_no": "16",
-      "step_title": "Training",
-      "step_content": ""
-     },
-     {
-      "step_no": "17",
-      "step_title": "Training may include:",
-      "step_content": ""
-     },
-     {
-      "step_no": "18",
-      "step_title": "Technical training",
-      "step_content": ""
-     },
-     {
-      "step_no": "19",
-      "step_title": "Quality awareness",
-      "step_content": "<p>Process-specific training.</p>"
-     },
-     {
-      "step_no": "20",
-      "step_title": "Safety training",
-      "step_content": ""
-     },
-     {
-      "step_no": "21",
-      "step_title": "Customer-specific requirements",
-      "step_content": ""
-     },
-     {
-      "step_no": "22",
-      "step_title": "Equipment or machine operation",
-      "step_content": "<p>Training may be conducted internally or externally.</p>"
-     },
-     {
-      "step_no": "23",
-      "step_title": "Effectiveness of Training",
-      "step_content": "<p>The effectiveness of training shall be evaluated through one or more of the following:</p>"
-     },
-     {
-      "step_no": "24",
-      "step_title": "Observation of job performance",
-      "step_content": ""
-     },
-     {
-      "step_no": "25",
-      "step_title": "Practical demonstration",
-      "step_content": ""
-     },
-     {
-      "step_no": "26",
-      "step_title": "Supervisor feedback",
-      "step_content": ""
-     },
-     {
-      "step_no": "27",
-      "step_title": "Skill assessment",
-      "step_content": ""
-     },
-     {
-      "step_no": "28",
-      "step_title": "Reduction in errors or nonconformities",
-      "step_content": "<p>Additional training shall be provided where necessary.</p>"
-     },
-     {
-      "step_no": "29",
       "step_title": "Awareness",
-      "step_content": ""
-     },
-     {
-      "step_no": "30",
-      "step_title": "Employees shall be made aware of:",
-      "step_content": ""
-     },
-     {
-      "step_no": "31",
-      "step_title": "The Quality Policy",
-      "step_content": ""
-     },
-     {
-      "step_no": "32",
-      "step_title": "Quality Objectives",
-      "step_content": ""
-     },
-     {
-      "step_no": "33",
-      "step_title": "Their contribution to product quality",
-      "step_content": ""
-     },
-     {
-      "step_no": "34",
-      "step_title": "Customer requirements",
-      "step_content": ""
-     },
-     {
-      "step_no": "35",
-      "step_title": "Consequences of nonconforming work",
-      "step_content": ""
+      "step_content": "<p>Employees shall be made aware of:</p><ul><li>The Quality Policy</li><li>Quality Objectives</li><li>Their contribution to product quality</li><li>Customer requirements</li><li>Consequences of nonconforming work</li></ul>"
      }
     ],
     "records_generated": [
@@ -801,187 +541,32 @@
      {
       "step_no": "1",
       "step_title": "Receipt of Enquiry",
-      "step_content": ""
+      "step_content": "<p>Customer enquiries may be received through:</p><ul><li>Email</li><li>Telephone</li><li>Customer visit</li><li>Online portal</li><li>Tender documents</li></ul><p>The Sales Department shall record the enquiry and collect all applicable technical and commercial requirements.</p>"
      },
      {
       "step_no": "2",
-      "step_title": "Customer enquiries may be received through:",
-      "step_content": ""
+      "step_title": "Review of Requirements",
+      "step_content": "<p>Customer requirements shall be reviewed to confirm:</p><ul><li>Product specifications</li><li>Drawings or samples</li><li>Material grade</li><li>Quantity</li><li>Delivery schedule</li><li>Inspection requirements</li><li>Testing requirements</li><li>Packaging requirements</li><li>Statutory or regulatory requirements (if applicable)</li></ul><p>Any ambiguity shall be clarified with the customer before submission of the quotation.</p>"
      },
      {
       "step_no": "3",
-      "step_title": "Email",
-      "step_content": ""
+      "step_title": "Quotation",
+      "step_content": "<p>The Sales Department shall prepare the quotation based on approved technical and commercial inputs.</p><p>The quotation shall include, where applicable:</p><ul><li>Product description</li><li>Quantity</li><li>Price</li><li>Delivery period</li><li>Payment terms</li><li>Validity</li><li>Applicable taxes</li><li>Special conditions</li></ul>"
      },
      {
       "step_no": "4",
-      "step_title": "Telephone",
-      "step_content": ""
+      "step_title": "Order Acceptance",
+      "step_content": "<ul><li>Upon receipt of the Purchase Order, the Sales Department shall verify that it matches the quoted technical and commercial requirements.</li><li>Any deviations shall be resolved with the customer before acceptance.</li><li>Order acknowledgement shall be issued where applicable.</li></ul><p>Accepted orders shall be communicated to the concerned departments for planning and execution.</p>"
      },
      {
       "step_no": "5",
-      "step_title": "Customer visit",
-      "step_content": ""
+      "step_title": "Customer Communication",
+      "step_content": "<p>Customer communication shall be maintained regarding:</p><ul><li>Order status.</li><li>Delivery schedule</li><li>Technical clarifications</li><li>Design changes.</li><li>Customer complaints</li><li>Product feedback</li><li>After-sales support</li></ul>"
      },
      {
       "step_no": "6",
-      "step_title": "Online portal",
-      "step_content": ""
-     },
-     {
-      "step_no": "7",
-      "step_title": "Tender documents",
-      "step_content": "<p>The Sales Department shall record the enquiry and collect all applicable technical and commercial requirements.</p>"
-     },
-     {
-      "step_no": "8",
-      "step_title": "Review of Requirements",
-      "step_content": ""
-     },
-     {
-      "step_no": "9",
-      "step_title": "Customer requirements shall be reviewed to confirm:",
-      "step_content": ""
-     },
-     {
-      "step_no": "10",
-      "step_title": "Product specifications",
-      "step_content": ""
-     },
-     {
-      "step_no": "11",
-      "step_title": "Drawings or samples",
-      "step_content": ""
-     },
-     {
-      "step_no": "12",
-      "step_title": "Material grade",
-      "step_content": ""
-     },
-     {
-      "step_no": "13",
-      "step_title": "Quantity",
-      "step_content": ""
-     },
-     {
-      "step_no": "14",
-      "step_title": "Delivery schedule",
-      "step_content": ""
-     },
-     {
-      "step_no": "15",
-      "step_title": "Inspection requirements",
-      "step_content": ""
-     },
-     {
-      "step_no": "16",
-      "step_title": "Testing requirements",
-      "step_content": ""
-     },
-     {
-      "step_no": "17",
-      "step_title": "Packaging requirements",
-      "step_content": ""
-     },
-     {
-      "step_no": "18",
-      "step_title": "Statutory or regulatory requirements (if applicable)",
-      "step_content": "<p>Any ambiguity shall be clarified with the customer before submission of the quotation.</p>"
-     },
-     {
-      "step_no": "19",
-      "step_title": "Quotation",
-      "step_content": "<p>The Sales Department shall prepare the quotation based on approved technical and commercial inputs.</p>"
-     },
-     {
-      "step_no": "20",
-      "step_title": "The quotation shall include, where applicable:",
-      "step_content": ""
-     },
-     {
-      "step_no": "21",
-      "step_title": "Product description",
-      "step_content": ""
-     },
-     {
-      "step_no": "22",
-      "step_title": "Quantity",
-      "step_content": ""
-     },
-     {
-      "step_no": "23",
-      "step_title": "Price",
-      "step_content": ""
-     },
-     {
-      "step_no": "24",
-      "step_title": "Delivery period",
-      "step_content": ""
-     },
-     {
-      "step_no": "25",
-      "step_title": "Payment terms",
-      "step_content": ""
-     },
-     {
-      "step_no": "26",
-      "step_title": "Validity",
-      "step_content": ""
-     },
-     {
-      "step_no": "27",
-      "step_title": "Applicable taxes",
-      "step_content": ""
-     },
-     {
-      "step_no": "28",
-      "step_title": "Special conditions",
-      "step_content": ""
-     },
-     {
-      "step_no": "29",
-      "step_title": "Order Acceptance",
-      "step_content": "<p>Upon receipt of the Purchase Order, the Sales Department shall verify that it matches the quoted technical and commercial requirements.</p><p>Any deviations shall be resolved with the customer before acceptance.</p><p>Order acknowledgement shall be issued where applicable.</p><p>Accepted orders shall be communicated to the concerned departments for planning and execution.</p>"
-     },
-     {
-      "step_no": "30",
-      "step_title": "Customer Communication",
-      "step_content": ""
-     },
-     {
-      "step_no": "31",
-      "step_title": "Customer communication shall be maintained regarding:",
-      "step_content": "<p>Order status.</p>"
-     },
-     {
-      "step_no": "32",
-      "step_title": "Delivery schedule",
-      "step_content": ""
-     },
-     {
-      "step_no": "33",
-      "step_title": "Technical clarifications",
-      "step_content": "<p>Design changes.</p>"
-     },
-     {
-      "step_no": "34",
-      "step_title": "Customer complaints",
-      "step_content": ""
-     },
-     {
-      "step_no": "35",
-      "step_title": "Product feedback",
-      "step_content": ""
-     },
-     {
-      "step_no": "36",
-      "step_title": "After-sales support",
-      "step_content": ""
-     },
-     {
-      "step_no": "37",
       "step_title": "Changes to Orders",
-      "step_content": "<p>Any change requested by the customer after order acceptance shall be reviewed for its impact on quality, cost, delivery, and production.</p><p>Approved changes shall be documented and communicated to all affected departments before implementation to ensure relevant documented information is updated.</p>"
+      "step_content": "<ul><li>Any change requested by the customer after order acceptance shall be reviewed for its impact on quality, cost, delivery, and production.</li><li>Approved changes shall be documented and communicated to all affected departments before implementation to ensure relevant documented information is updated.</li></ul>"
      }
     ],
     "records_generated": [
@@ -1106,177 +691,32 @@
      {
       "step_no": "1",
       "step_title": "Supplier Selection",
-      "step_content": ""
+      "step_content": "<p>Suppliers shall be selected based on:</p><ul><li>Product quality</li><li>Technical capability</li><li>Delivery performance</li><li>Commercial terms</li><li>Previous performance</li><li>Certifications (where applicable)</li></ul>"
      },
      {
       "step_no": "2",
-      "step_title": "Suppliers shall be selected based on:",
-      "step_content": ""
+      "step_title": "Supplier Approval",
+      "step_content": "<p>New suppliers shall be evaluated before approval.</p><p>Evaluation may consider:</p><ul><li>Product samples</li><li>Manufacturing capability</li><li>Past performance</li><li>Customer references</li><li>Quality certifications</li></ul><p>Approved suppliers shall be listed in the REG007 - Approved Supplier List.</p>"
      },
      {
       "step_no": "3",
-      "step_title": "Product quality",
-      "step_content": ""
+      "step_title": "Purchase Order",
+      "step_content": "<p>Purchase Orders shall clearly specify:</p><ul><li>Product description</li><li>Material grade</li><li>Quantity</li><li>Applicable drawings/specifications</li><li>Delivery schedule</li><li>Inspection requirements</li><li>Packaging requirements</li><li>Commercial terms</li></ul><p>Only authorized personnel shall issue Purchase Orders.</p>"
      },
      {
       "step_no": "4",
-      "step_title": "Technical capability",
-      "step_content": ""
+      "step_title": "Monitoring Supplier Performance",
+      "step_content": "<p>Supplier performance shall be periodically reviewed based on:</p><ul><li>Quality of supplied materials</li><li>On-time delivery</li><li>Responsiveness</li><li>Complaint history</li><li>Corrective action implementation</li><li>Rejection Rate</li></ul><p>Unsatisfactory suppliers may be re-evaluated or removed from the Approved Supplier List.</p>"
      },
      {
       "step_no": "5",
-      "step_title": "Delivery performance",
-      "step_content": ""
-     },
-     {
-      "step_no": "6",
-      "step_title": "Commercial terms",
-      "step_content": ""
-     },
-     {
-      "step_no": "7",
-      "step_title": "Previous performance",
-      "step_content": ""
-     },
-     {
-      "step_no": "8",
-      "step_title": "Certifications (where applicable)",
-      "step_content": ""
-     },
-     {
-      "step_no": "9",
-      "step_title": "Supplier Approval",
-      "step_content": "<p>New suppliers shall be evaluated before approval.</p>"
-     },
-     {
-      "step_no": "10",
-      "step_title": "Evaluation may consider:",
-      "step_content": ""
-     },
-     {
-      "step_no": "11",
-      "step_title": "Product samples",
-      "step_content": ""
-     },
-     {
-      "step_no": "12",
-      "step_title": "Manufacturing capability",
-      "step_content": ""
-     },
-     {
-      "step_no": "13",
-      "step_title": "Past performance",
-      "step_content": ""
-     },
-     {
-      "step_no": "14",
-      "step_title": "Customer references",
-      "step_content": ""
-     },
-     {
-      "step_no": "15",
-      "step_title": "Quality certifications",
-      "step_content": "<p>Approved suppliers shall be listed in the REG007 - Approved Supplier List.</p>"
-     },
-     {
-      "step_no": "16",
-      "step_title": "Purchase Order",
-      "step_content": ""
-     },
-     {
-      "step_no": "17",
-      "step_title": "Purchase Orders shall clearly specify:",
-      "step_content": ""
-     },
-     {
-      "step_no": "18",
-      "step_title": "Product description",
-      "step_content": ""
-     },
-     {
-      "step_no": "19",
-      "step_title": "Material grade",
-      "step_content": ""
-     },
-     {
-      "step_no": "20",
-      "step_title": "Quantity",
-      "step_content": ""
-     },
-     {
-      "step_no": "21",
-      "step_title": "Applicable drawings/specifications",
-      "step_content": ""
-     },
-     {
-      "step_no": "22",
-      "step_title": "Delivery schedule",
-      "step_content": ""
-     },
-     {
-      "step_no": "23",
-      "step_title": "Inspection requirements",
-      "step_content": ""
-     },
-     {
-      "step_no": "24",
-      "step_title": "Packaging requirements",
-      "step_content": ""
-     },
-     {
-      "step_no": "25",
-      "step_title": "Commercial terms",
-      "step_content": "<p>Only authorized personnel shall issue Purchase Orders.</p>"
-     },
-     {
-      "step_no": "26",
-      "step_title": "Monitoring Supplier Performance",
-      "step_content": ""
-     },
-     {
-      "step_no": "27",
-      "step_title": "Supplier performance shall be periodically reviewed based on:",
-      "step_content": ""
-     },
-     {
-      "step_no": "28",
-      "step_title": "Quality of supplied materials",
-      "step_content": ""
-     },
-     {
-      "step_no": "29",
-      "step_title": "On-time delivery",
-      "step_content": ""
-     },
-     {
-      "step_no": "30",
-      "step_title": "Responsiveness",
-      "step_content": ""
-     },
-     {
-      "step_no": "31",
-      "step_title": "Complaint history",
-      "step_content": ""
-     },
-     {
-      "step_no": "32",
-      "step_title": "Corrective action implementation",
-      "step_content": ""
-     },
-     {
-      "step_no": "33",
-      "step_title": "Rejection Rate",
-      "step_content": "<p>Unsatisfactory suppliers may be re-evaluated or removed from the Approved Supplier List.</p>"
-     },
-     {
-      "step_no": "34",
       "step_title": "Outsourced Processes",
       "step_content": "<p>Where any process is outsourced, Hatim Carbon shall ensure that applicable quality requirements are communicated, monitored, and verified before acceptance.</p>"
      },
      {
-      "step_no": "35",
+      "step_no": "6",
       "step_title": "Purchase Order Amendments",
-      "step_content": "<p>Any change to an issued Purchase Order shall be reviewed and approved by authorized personnel before being communicated to the supplier.</p><p>The revised requirements shall clearly identify the changes made.</p><p>Where applicable, affected departments shall be informed of the revised purchase requirements.</p>"
+      "step_content": "<ul><li>Any change to an issued Purchase Order shall be reviewed and approved by authorized personnel before being communicated to the supplier.</li><li>The revised requirements shall clearly identify the changes made.</li><li>Where applicable, affected departments shall be informed of the revised purchase requirements.</li></ul>"
      }
     ],
     "records_generated": [
@@ -1396,100 +836,30 @@
      {
       "step_no": "1",
       "step_title": "Receipt of Material",
-      "step_content": ""
+      "step_content": "<p>On receipt, the Stores Department shall verify:</p><ul><li>Delivery Challan</li><li>Purchase Order</li><li>Invoice</li><li>Quantity Received</li><li>Material Identification</li><li>Material Test Certificate (where applicable)</li></ul>"
      },
      {
       "step_no": "2",
-      "step_title": "On receipt, the Stores Department shall verify:",
-      "step_content": ""
+      "step_title": "Incoming Inspection",
+      "step_content": "<p>The Quality Department shall inspect the material as applicable by:</p><ul><li>Visual inspection</li><li>Dimensional verification</li><li>Material grade verification</li><li>Quantity verification</li><li>Review of Material Test Certificate</li><li>Any additional tests specified in the Purchase Order or inspection plan.</li></ul>"
      },
      {
       "step_no": "3",
-      "step_title": "Delivery Challan",
-      "step_content": ""
-     },
-     {
-      "step_no": "4",
-      "step_title": "Purchase Order",
-      "step_content": ""
-     },
-     {
-      "step_no": "5",
-      "step_title": "Invoice",
-      "step_content": ""
-     },
-     {
-      "step_no": "6",
-      "step_title": "Quantity Received",
-      "step_content": ""
-     },
-     {
-      "step_no": "7",
-      "step_title": "Material Identification",
-      "step_content": ""
-     },
-     {
-      "step_no": "8",
-      "step_title": "Material Test Certificate (where applicable)",
-      "step_content": ""
-     },
-     {
-      "step_no": "9",
-      "step_title": "Incoming Inspection",
-      "step_content": ""
-     },
-     {
-      "step_no": "10",
-      "step_title": "The Quality Department shall inspect the material as applicable by:",
-      "step_content": ""
-     },
-     {
-      "step_no": "11",
-      "step_title": "Visual inspection",
-      "step_content": ""
-     },
-     {
-      "step_no": "12",
-      "step_title": "Dimensional verification",
-      "step_content": ""
-     },
-     {
-      "step_no": "13",
-      "step_title": "Material grade verification",
-      "step_content": ""
-     },
-     {
-      "step_no": "14",
-      "step_title": "Quantity verification",
-      "step_content": ""
-     },
-     {
-      "step_no": "15",
-      "step_title": "Review of Material Test Certificate",
-      "step_content": "<p>Any additional tests specified in the Purchase Order or inspection plan.</p>"
-     },
-     {
-      "step_no": "16",
       "step_title": "Material Identification",
       "step_content": "<p>Accepted materials shall be identified using appropriate labels, batch numbers, heat numbers, lot numbers or supplier identification, as applicable, to maintain identification and traceability throughout storage and production.</p>"
      },
      {
-      "step_no": "17",
+      "step_no": "4",
       "step_title": "Acceptance",
       "step_content": "<p>Materials meeting the specified purchase and inspection requirements shall be accepted, identified with an acceptance status (where applicable), and released to Stores for production use.</p>"
      },
      {
-      "step_no": "18",
+      "step_no": "5",
       "step_title": "Rejection",
-      "step_content": ""
+      "step_content": "<p>Materials failing to meet specified requirements shall:</p><ul><li>Be clearly identified.</li><li>Be segregated from accepted material.</li><li>Be recorded.</li><li>Be reported to the Purchase Department for appropriate disposition.</li></ul><p>Nonconforming materials shall be handled in accordance with SOP013 – Control of Nonconforming Outputs Procedure.</p>"
      },
      {
-      "step_no": "19",
-      "step_title": "Materials failing to meet specified requirements shall:",
-      "step_content": "<p>Be clearly identified.</p><p>Be segregated from accepted material.</p><p>Be recorded.</p><p>Be reported to the Purchase Department for appropriate disposition.</p><p>Nonconforming materials shall be handled in accordance with SOP013 – Control of Nonconforming Outputs Procedure.</p>"
-     },
-     {
-      "step_no": "20",
+      "step_no": "6",
       "step_title": "Storage",
       "step_content": "<p>Accepted materials shall be stored in designated locations to prevent damage, deterioration, contamination, or mix-up before issue to production.</p>"
      }
@@ -1600,7 +970,7 @@
      },
      {
       "role": "Production Manager",
-      "responsibility": "Prepare production plans and schedules. Allocate manpower, m achines, and resources. Monitor production progress."
+      "responsibility": "Prepare production plans and schedules. Allocate manpower, machines, and resources. Monitor production progress."
      },
      {
       "role": "Quality Department",
@@ -1615,160 +985,35 @@
      {
       "step_no": "1",
       "step_title": "Production Planning",
-      "step_content": ""
+      "step_content": "<p>Production planning shall be carried out based on:</p><ul><li>Customer Purchase Orders</li><li>Delivery schedules</li><li>Product specifications</li><li>Material availability</li><li>Machine capacity</li><li>Manpower availability</li><li>Customer priority (where applicable)</li></ul>"
      },
      {
       "step_no": "2",
-      "step_title": "Production planning shall be carried out based on:",
-      "step_content": ""
+      "step_title": "Production Schedule",
+      "step_content": "<p>The Production Department shall prepare a production schedule indicating:</p><ul><li>Product</li><li>Quantity</li><li>Batch</li><li>Planned start date.</li><li>Planned completion date.</li><li>Delivery commitment</li></ul>"
      },
      {
       "step_no": "3",
-      "step_title": "Customer Purchase Orders",
-      "step_content": ""
+      "step_title": "Resource Availability",
+      "step_content": "<p>Production shall commence only after confirming the availability of:</p><ul><li>Approved raw materials</li><li>Required machinery</li><li>Qualified manpower</li><li>Applicable drawings</li><li>Work Instructions</li><li>Inspection and measuring equipment</li></ul>"
      },
      {
       "step_no": "4",
-      "step_title": "Delivery schedules",
-      "step_content": ""
-     },
-     {
-      "step_no": "5",
-      "step_title": "Product specifications",
-      "step_content": ""
-     },
-     {
-      "step_no": "6",
-      "step_title": "Material availability",
-      "step_content": ""
-     },
-     {
-      "step_no": "7",
-      "step_title": "Machine capacity",
-      "step_content": ""
-     },
-     {
-      "step_no": "8",
-      "step_title": "Manpower availability",
-      "step_content": ""
-     },
-     {
-      "step_no": "9",
-      "step_title": "Customer priority (where applicable)",
-      "step_content": ""
-     },
-     {
-      "step_no": "10",
-      "step_title": "Production Schedule",
-      "step_content": "<p>The Production Department shall prepare a production schedule indicating:</p>"
-     },
-     {
-      "step_no": "11",
-      "step_title": "Product",
-      "step_content": ""
-     },
-     {
-      "step_no": "12",
-      "step_title": "Quantity",
-      "step_content": ""
-     },
-     {
-      "step_no": "13",
-      "step_title": "Batch",
-      "step_content": "<p>Planned start date.</p><p>Planned completion date.</p>"
-     },
-     {
-      "step_no": "14",
-      "step_title": "Delivery commitment",
-      "step_content": ""
-     },
-     {
-      "step_no": "15",
-      "step_title": "Resource Availability",
-      "step_content": ""
-     },
-     {
-      "step_no": "16",
-      "step_title": "Production shall commence only after confirming the availability of:",
-      "step_content": ""
-     },
-     {
-      "step_no": "17",
-      "step_title": "Approved raw materials",
-      "step_content": ""
-     },
-     {
-      "step_no": "18",
-      "step_title": "Required machinery",
-      "step_content": ""
-     },
-     {
-      "step_no": "19",
-      "step_title": "Qualified manpower",
-      "step_content": ""
-     },
-     {
-      "step_no": "20",
-      "step_title": "Applicable drawings",
-      "step_content": ""
-     },
-     {
-      "step_no": "21",
-      "step_title": "Work Instructions",
-      "step_content": ""
-     },
-     {
-      "step_no": "22",
-      "step_title": "Inspection and measuring equipment",
-      "step_content": ""
-     },
-     {
-      "step_no": "23",
       "step_title": "Material Issue",
       "step_content": "<p>Raw materials shall be issued by the Stores Department against an approved Material Requisition or Job Card.</p><p>Only accepted materials shall be issued for production.</p>"
      },
      {
-      "step_no": "24",
+      "step_no": "5",
       "step_title": "Production Control",
-      "step_content": ""
+      "step_content": "<p>Production shall be carried out in accordance with:</p><ul><li>Approved drawings</li><li>Customer specifications</li><li>Work Instructions</li><li>Inspection requirements</li><li>Approved process parameters</li></ul><p>Production progress shall be monitored and recorded throughout the manufacturing process.</p>"
      },
      {
-      "step_no": "25",
-      "step_title": "Production shall be carried out in accordance with:",
-      "step_content": ""
-     },
-     {
-      "step_no": "26",
-      "step_title": "Approved drawings",
-      "step_content": ""
-     },
-     {
-      "step_no": "27",
-      "step_title": "Customer specifications",
-      "step_content": ""
-     },
-     {
-      "step_no": "28",
-      "step_title": "Work Instructions",
-      "step_content": ""
-     },
-     {
-      "step_no": "29",
-      "step_title": "Inspection requirements",
-      "step_content": ""
-     },
-     {
-      "step_no": "30",
-      "step_title": "Approved process parameters",
-      "step_content": "<p>Production progress shall be monitored and recorded throughout the manufacturing process.</p>"
-     },
-     {
-      "step_no": "31",
+      "step_no": "6",
       "step_title": "Production Changes",
       "step_content": "<p>Any change affecting production, process parameters, materials or specifications shall be reviewed, approved, and communicated to all affected departments before implementation.</p>"
      },
      {
-      "step_no": "32",
+      "step_no": "7",
       "step_title": "Production Records",
       "step_content": "<p>Production records shall be maintained for each batch to ensure traceability and facilitate monitoring of production activities.</p>"
      }
@@ -1901,72 +1146,27 @@
      {
       "step_no": "1",
       "step_title": "Manufacturing Authorization",
-      "step_content": ""
+      "step_content": "<p>Production shall commence only after:</p><ul><li>Approved Job Card is available.</li><li>Required drawings and specifications are available.</li><li>Required measuring and monitoring equipment is available and, where applicable, calibrated.</li><li>Raw materials have been accepted.</li><li>Machines and equipment are ready for use.</li></ul>"
      },
      {
       "step_no": "2",
-      "step_title": "Production shall commence only after:",
-      "step_content": "<p>Approved Job Card is available.</p><p>Required drawings and specifications are available.</p><p>Required measuring and monitoring equipment is available and, where applicable, calibrated.</p><p>Raw materials have been accepted.</p><p>Machines and equipment are ready for use.</p>"
+      "step_title": "Process Control",
+      "step_content": "<p>Manufacturing shall be carried out under controlled conditions using:</p><ul><li>Approved Work Instructions</li><li>Approved process parameters</li><li>Suitable machinery and equipment</li><li>Qualified personnel</li><li>Approved measuring instruments</li><li>Applicable Inspection &amp; Test Plans (ITPs)</li></ul>"
      },
      {
       "step_no": "3",
-      "step_title": "Process Control",
-      "step_content": ""
+      "step_title": "In-Process Monitoring",
+      "step_content": "<p>Production Supervisors and Quality personnel shall monitor manufacturing to ensure:</p><ul><li>Product conforms to specifications.</li><li>Process parameters remain within approved limits.</li><li>In-process inspections are completed.</li><li>Deviations are identified and addressed promptly.</li><li>Production records are completed during the manufacturing process.</li></ul>"
      },
      {
       "step_no": "4",
-      "step_title": "Manufacturing shall be carried out under controlled conditions using:",
-      "step_content": ""
-     },
-     {
-      "step_no": "5",
-      "step_title": "Approved Work Instructions",
-      "step_content": ""
-     },
-     {
-      "step_no": "6",
-      "step_title": "Approved process parameters",
-      "step_content": ""
-     },
-     {
-      "step_no": "7",
-      "step_title": "Suitable machinery and equipment",
-      "step_content": ""
-     },
-     {
-      "step_no": "8",
-      "step_title": "Qualified personnel",
-      "step_content": ""
-     },
-     {
-      "step_no": "9",
-      "step_title": "Approved measuring instruments",
-      "step_content": ""
-     },
-     {
-      "step_no": "10",
-      "step_title": "Applicable Inspection & Test Plans (ITPs)",
-      "step_content": ""
-     },
-     {
-      "step_no": "11",
-      "step_title": "In-Process Monitoring",
-      "step_content": "<p>Production Supervisors and Quality personnel shall monitor manufacturing to ensure:</p><p>Product conforms to specifications.</p><p>Process parameters remain within approved limits.</p><p>In-process inspections are completed.</p><p>Deviations are identified and addressed promptly.</p><p>Production records are completed during the manufacturing process.</p>"
-     },
-     {
-      "step_no": "12",
       "step_title": "Handling of Deviations",
       "step_content": "<p>Any deviation from approved drawings, specifications, or process requirements shall be reported to the Production Manager and Quality Department.</p><p>Affected products shall be identified, segregated where applicable, and controlled in accordance with SOP013 – Control of Nonconforming Outputs Procedure.</p>"
      },
      {
-      "step_no": "13",
+      "step_no": "5",
       "step_title": "Completion of Production",
-      "step_content": ""
-     },
-     {
-      "step_no": "14",
-      "step_title": "On completion of manufacturing:",
-      "step_content": "<p>Production records shall be completed and verified.</p><p>Products shall be transferred for final inspection.</p><p>Batch identification and traceability shall be maintained.</p>"
+      "step_content": "<p>On completion of manufacturing:</p><ul><li>Production records shall be completed and verified.</li><li>Products shall be transferred for final inspection.</li><li>Batch identification and traceability shall be maintained.</li></ul>"
      }
     ],
     "records_generated": [
@@ -2116,205 +1316,40 @@
      {
       "step_no": "1",
       "step_title": "Design & Development Planning",
-      "step_content": ""
+      "step_content": "<p>Design activities shall be planned considering:</p><ul><li>Customer requirements</li><li>Product application</li><li>Technical feasibility</li><li>Manufacturing capability</li><li>Applicable standards</li><li>Required resources.</li></ul>"
      },
      {
       "step_no": "2",
-      "step_title": "Design activities shall be planned considering:",
-      "step_content": ""
+      "step_title": "Design Inputs",
+      "step_content": "<p>Design inputs may include:</p><ul><li>Customer drawings</li><li>Technical specifications</li><li>Samples</li><li>Reverse engineering data</li><li>Applicable standards</li><li>Previous design experience</li><li>Statutory requirements</li></ul><p>Inputs shall be reviewed for adequacy before commencing design.</p>"
      },
      {
       "step_no": "3",
-      "step_title": "Customer requirements",
-      "step_content": ""
+      "step_title": "Preparation of Design Outputs",
+      "step_content": "<p>The Design Department shall prepare:</p><ul><li>Engineering drawings</li><li>CAD models</li><li>Bills of Materials (BOM)</li><li>Material specifications</li><li>Manufacturing requirements</li><li>Product specifications</li></ul>"
      },
      {
       "step_no": "4",
-      "step_title": "Product application",
-      "step_content": ""
+      "step_title": "Design Review",
+      "step_content": "<p>Design reviews shall be conducted at appropriate stages to verify:</p><ul><li>Customer requirements are addressed.</li><li>Manufacturing feasibility.</li><li>Inspection requirements.</li><li>Material suitability.</li><li>Cost considerations.</li></ul>"
      },
      {
       "step_no": "5",
-      "step_title": "Technical feasibility",
-      "step_content": ""
+      "step_title": "Design Verification",
+      "step_content": "<p>Verification shall confirm that the design outputs meet the approved design inputs through activities such as:</p><ul><li>Drawing review</li><li>Dimension verification.</li><li>Engineering calculations</li><li>Design review meetings.</li></ul>"
      },
      {
       "step_no": "6",
-      "step_title": "Manufacturing capability",
-      "step_content": ""
+      "step_title": "Design Validation",
+      "step_content": "<p>Where applicable, validation shall confirm that the product performs as intended through:</p><ul><li>Prototype evaluation.</li><li>Sample approval.</li><li>Customer approval</li><li>Product performance testing</li><li>Field trials</li></ul>"
      },
      {
       "step_no": "7",
-      "step_title": "Applicable standards",
-      "step_content": "<p>Required resources.</p>"
+      "step_title": "Design Changes",
+      "step_content": "<p>All design changes shall be reviewed, approved, and documented before implementation.</p><p>Changes shall consider:</p><ul><li>Product performance</li><li>Manufacturing impact</li><li>Customer requirements</li><li>Existing inventory</li><li>Inspection requirements</li></ul>"
      },
      {
       "step_no": "8",
-      "step_title": "Design Inputs",
-      "step_content": ""
-     },
-     {
-      "step_no": "9",
-      "step_title": "Design inputs may include:",
-      "step_content": ""
-     },
-     {
-      "step_no": "10",
-      "step_title": "Customer drawings",
-      "step_content": ""
-     },
-     {
-      "step_no": "11",
-      "step_title": "Technical specifications",
-      "step_content": ""
-     },
-     {
-      "step_no": "12",
-      "step_title": "Samples",
-      "step_content": ""
-     },
-     {
-      "step_no": "13",
-      "step_title": "Reverse engineering data",
-      "step_content": ""
-     },
-     {
-      "step_no": "14",
-      "step_title": "Applicable standards",
-      "step_content": ""
-     },
-     {
-      "step_no": "15",
-      "step_title": "Previous design experience",
-      "step_content": ""
-     },
-     {
-      "step_no": "16",
-      "step_title": "Statutory requirements",
-      "step_content": "<p>Inputs shall be reviewed for adequacy before commencing design.</p>"
-     },
-     {
-      "step_no": "17",
-      "step_title": "Preparation of Design Outputs",
-      "step_content": ""
-     },
-     {
-      "step_no": "18",
-      "step_title": "The Design Department shall prepare:",
-      "step_content": ""
-     },
-     {
-      "step_no": "19",
-      "step_title": "Engineering drawings",
-      "step_content": ""
-     },
-     {
-      "step_no": "20",
-      "step_title": "CAD models",
-      "step_content": ""
-     },
-     {
-      "step_no": "21",
-      "step_title": "Bills of Materials (BOM)",
-      "step_content": ""
-     },
-     {
-      "step_no": "22",
-      "step_title": "Material specifications",
-      "step_content": ""
-     },
-     {
-      "step_no": "23",
-      "step_title": "Manufacturing requirements",
-      "step_content": ""
-     },
-     {
-      "step_no": "24",
-      "step_title": "Product specifications",
-      "step_content": ""
-     },
-     {
-      "step_no": "25",
-      "step_title": "Design Review",
-      "step_content": ""
-     },
-     {
-      "step_no": "26",
-      "step_title": "Design reviews shall be conducted at appropriate stages to verify:",
-      "step_content": "<p>Customer requirements are addressed.</p><p>Manufacturing feasibility.</p><p>Inspection requirements.</p><p>Material suitability.</p><p>Cost considerations.</p>"
-     },
-     {
-      "step_no": "27",
-      "step_title": "Design Verification",
-      "step_content": "<p>Verification shall confirm that the design outputs meet the approved design inputs through activities such as:</p>"
-     },
-     {
-      "step_no": "28",
-      "step_title": "Drawing review",
-      "step_content": "<p>Dimension verification.</p>"
-     },
-     {
-      "step_no": "29",
-      "step_title": "Engineering calculations",
-      "step_content": "<p>Design review meetings.</p>"
-     },
-     {
-      "step_no": "30",
-      "step_title": "Design Validation",
-      "step_content": "<p>Where applicable, validation shall confirm that the product performs as intended through:</p><p>Prototype evaluation.</p><p>Sample approval.</p>"
-     },
-     {
-      "step_no": "31",
-      "step_title": "Customer approval",
-      "step_content": ""
-     },
-     {
-      "step_no": "32",
-      "step_title": "Product performance testing",
-      "step_content": ""
-     },
-     {
-      "step_no": "33",
-      "step_title": "Field trials",
-      "step_content": ""
-     },
-     {
-      "step_no": "34",
-      "step_title": "Design Changes",
-      "step_content": "<p>All design changes shall be reviewed, approved, and documented before implementation.</p>"
-     },
-     {
-      "step_no": "35",
-      "step_title": "Changes shall consider:",
-      "step_content": ""
-     },
-     {
-      "step_no": "36",
-      "step_title": "Product performance",
-      "step_content": ""
-     },
-     {
-      "step_no": "37",
-      "step_title": "Manufacturing impact",
-      "step_content": ""
-     },
-     {
-      "step_no": "38",
-      "step_title": "Customer requirements",
-      "step_content": ""
-     },
-     {
-      "step_no": "39",
-      "step_title": "Existing inventory",
-      "step_content": ""
-     },
-     {
-      "step_no": "40",
-      "step_title": "Inspection requirements",
-      "step_content": ""
-     },
-     {
-      "step_no": "41",
       "step_title": "Control of Design Records",
       "step_content": "<p>Design drawings, specifications, revisions, approvals, and related records shall be maintained as documented information in accordance with SOP001 – Control of Documented Information.</p>"
      }
@@ -2456,195 +1491,30 @@
      {
       "step_no": "1",
       "step_title": "Product Handling",
-      "step_content": "<p>Products shall be handled using suitable methods and equipment to prevent:</p>"
+      "step_content": "<p>Products shall be handled using suitable methods and equipment to prevent:</p><ul><li>Damage</li><li>Deterioration</li><li>Contamination</li><li>Mix-up</li><li>Loss of identification</li></ul>"
      },
      {
       "step_no": "2",
-      "step_title": "Damage",
-      "step_content": ""
+      "step_title": "Storage",
+      "step_content": "<p>Accepted materials and finished products shall be stored:</p><ul><li>In designated storage locations</li><li>Under suitable environmental conditions</li><li>With proper identification</li><li>To prevent damage, deterioration or contamination</li></ul>"
      },
      {
       "step_no": "3",
-      "step_title": "Deterioration",
-      "step_content": ""
+      "step_title": "Preservation",
+      "step_content": "<p>Suitable preservation methods shall be applied where necessary, including:</p><ul><li>Protective packing</li><li>Rust preventive treatment</li><li>Dust and moisture protection</li><li>Safe stacking</li><li>Protection against physical damage</li></ul>"
      },
      {
       "step_no": "4",
-      "step_title": "Contamination",
-      "step_content": ""
+      "step_title": "Packing",
+      "step_content": "<p>Products shall be packed in accordance with:</p><ul><li>Customer requirements</li><li>Product specifications</li><li>Transport conditions</li><li>Internal packing standards</li></ul><p>Packing shall ensure adequate protection against damage during storage and transportation.</p><p>Where applicable, the following shall be verified before packing:</p><ul><li>Product identification</li><li>Quantity</li><li>Packing materials</li><li>Labels</li><li>Customer-specific marking requirements</li></ul>"
      },
      {
       "step_no": "5",
-      "step_title": "Mix-up",
-      "step_content": ""
+      "step_title": "Dispatch",
+      "step_content": "<p>Only products released by the Quality Department shall be dispatched.</p><p>Before dispatch, the Dispatch Department shall verify:</p><ul><li>Product quantity</li><li>Product identification</li><li>Packing condition</li><li>Delivery Challan</li><li>Invoice (where applicable)</li><li>Customer-specific dispatch requirements</li></ul>"
      },
      {
       "step_no": "6",
-      "step_title": "Loss of identification",
-      "step_content": ""
-     },
-     {
-      "step_no": "7",
-      "step_title": "Storage",
-      "step_content": ""
-     },
-     {
-      "step_no": "8",
-      "step_title": "Accepted materials and finished products shall be stored:",
-      "step_content": ""
-     },
-     {
-      "step_no": "9",
-      "step_title": "In designated storage locations",
-      "step_content": ""
-     },
-     {
-      "step_no": "10",
-      "step_title": "Under suitable environmental conditions",
-      "step_content": ""
-     },
-     {
-      "step_no": "11",
-      "step_title": "With proper identification",
-      "step_content": ""
-     },
-     {
-      "step_no": "12",
-      "step_title": "To prevent damage, deterioration or contamination",
-      "step_content": ""
-     },
-     {
-      "step_no": "13",
-      "step_title": "Preservation",
-      "step_content": "<p>Suitable preservation methods shall be applied where necessary, including:</p>"
-     },
-     {
-      "step_no": "14",
-      "step_title": "Protective packing",
-      "step_content": ""
-     },
-     {
-      "step_no": "15",
-      "step_title": "Rust preventive treatment",
-      "step_content": ""
-     },
-     {
-      "step_no": "16",
-      "step_title": "Dust and moisture protection",
-      "step_content": ""
-     },
-     {
-      "step_no": "17",
-      "step_title": "Safe stacking",
-      "step_content": ""
-     },
-     {
-      "step_no": "18",
-      "step_title": "Protection against physical damage",
-      "step_content": ""
-     },
-     {
-      "step_no": "19",
-      "step_title": "Packing",
-      "step_content": ""
-     },
-     {
-      "step_no": "20",
-      "step_title": "Products shall be packed in accordance with:",
-      "step_content": ""
-     },
-     {
-      "step_no": "21",
-      "step_title": "Customer requirements",
-      "step_content": ""
-     },
-     {
-      "step_no": "22",
-      "step_title": "Product specifications",
-      "step_content": ""
-     },
-     {
-      "step_no": "23",
-      "step_title": "Transport conditions",
-      "step_content": ""
-     },
-     {
-      "step_no": "24",
-      "step_title": "Internal packing standards",
-      "step_content": "<p>Packing shall ensure adequate protection against damage during storage and transportation.</p>"
-     },
-     {
-      "step_no": "25",
-      "step_title": "Where applicable, the following shall be verified before packing:",
-      "step_content": ""
-     },
-     {
-      "step_no": "26",
-      "step_title": "Product identification",
-      "step_content": ""
-     },
-     {
-      "step_no": "27",
-      "step_title": "Quantity",
-      "step_content": ""
-     },
-     {
-      "step_no": "28",
-      "step_title": "Packing materials",
-      "step_content": ""
-     },
-     {
-      "step_no": "29",
-      "step_title": "Labels",
-      "step_content": ""
-     },
-     {
-      "step_no": "30",
-      "step_title": "Customer-specific marking requirements",
-      "step_content": ""
-     },
-     {
-      "step_no": "31",
-      "step_title": "Dispatch",
-      "step_content": "<p>Only products released by the Quality Department shall be dispatched.</p>"
-     },
-     {
-      "step_no": "32",
-      "step_title": "Before dispatch, the Dispatch Department shall verify:",
-      "step_content": ""
-     },
-     {
-      "step_no": "33",
-      "step_title": "Product quantity",
-      "step_content": ""
-     },
-     {
-      "step_no": "34",
-      "step_title": "Product identification",
-      "step_content": ""
-     },
-     {
-      "step_no": "35",
-      "step_title": "Packing condition",
-      "step_content": ""
-     },
-     {
-      "step_no": "36",
-      "step_title": "Delivery Challan",
-      "step_content": ""
-     },
-     {
-      "step_no": "37",
-      "step_title": "Invoice (where applicable)",
-      "step_content": ""
-     },
-     {
-      "step_no": "38",
-      "step_title": "Customer-specific dispatch requirements",
-      "step_content": ""
-     },
-     {
-      "step_no": "39",
       "step_title": "Transportation",
       "step_content": "<p>Products shall be transported using suitable vehicles and handling methods to prevent damage during transit.</p><p>Special transportation requirements specified by the customer shall be complied with wherever applicable.</p>"
      }
@@ -2777,122 +1647,22 @@
      {
       "step_no": "2",
       "step_title": "Work-in-Progress",
-      "step_content": "<p>During manufacturing, products shall be identified by appropriate means such as:</p>"
+      "step_content": "<p>During manufacturing, products shall be identified by appropriate means such as:</p><ul><li>Job Card Number</li><li>Batch Number</li><li>Product Code</li><li>Customer Name (where applicable)</li></ul><p>Identification shall be maintained throughout all production stages.</p>"
      },
      {
       "step_no": "3",
-      "step_title": "Job Card Number",
-      "step_content": ""
+      "step_title": "Finished Products",
+      "step_content": "<p>Finished products shall be identified with applicable information such as:</p><ul><li>Product Name / Part Number</li><li>Batch Number</li><li>Quantity</li><li>Inspection Status</li><li>Customer Name (where applicable)</li></ul>"
      },
      {
       "step_no": "4",
-      "step_title": "Batch Number",
-      "step_content": ""
+      "step_title": "Inspection Status",
+      "step_content": "<p>Inspection status shall be clearly indicated to prevent unintended use or dispatch of unapproved products.</p><p>Status may include:</p><ul><li>Accepted</li><li>Rejected</li><li>Under Inspection</li><li>Hold (where applicable)</li></ul>"
      },
      {
       "step_no": "5",
-      "step_title": "Product Code",
-      "step_content": ""
-     },
-     {
-      "step_no": "6",
-      "step_title": "Customer Name (where applicable)",
-      "step_content": "<p>Identification shall be maintained throughout all production stages.</p>"
-     },
-     {
-      "step_no": "7",
-      "step_title": "Finished Products",
-      "step_content": "<p>Finished products shall be identified with applicable information such as:</p>"
-     },
-     {
-      "step_no": "8",
-      "step_title": "Product Name / Part Number",
-      "step_content": ""
-     },
-     {
-      "step_no": "9",
-      "step_title": "Batch Number",
-      "step_content": ""
-     },
-     {
-      "step_no": "10",
-      "step_title": "Quantity",
-      "step_content": ""
-     },
-     {
-      "step_no": "11",
-      "step_title": "Inspection Status",
-      "step_content": ""
-     },
-     {
-      "step_no": "12",
-      "step_title": "Customer Name (where applicable)",
-      "step_content": ""
-     },
-     {
-      "step_no": "13",
-      "step_title": "Inspection Status",
-      "step_content": "<p>Inspection status shall be clearly indicated to prevent unintended use or dispatch of unapproved products.</p>"
-     },
-     {
-      "step_no": "14",
-      "step_title": "Status may include:",
-      "step_content": ""
-     },
-     {
-      "step_no": "15",
-      "step_title": "Accepted",
-      "step_content": ""
-     },
-     {
-      "step_no": "16",
-      "step_title": "Rejected",
-      "step_content": ""
-     },
-     {
-      "step_no": "17",
-      "step_title": "Under Inspection",
-      "step_content": ""
-     },
-     {
-      "step_no": "18",
-      "step_title": "Hold (where applicable)",
-      "step_content": ""
-     },
-     {
-      "step_no": "19",
       "step_title": "Traceability",
-      "step_content": "<p>Where traceability is required by the customer, regulatory requirements, or internal quality requirements, records shall enable tracing of:</p>"
-     },
-     {
-      "step_no": "20",
-      "step_title": "Raw materials",
-      "step_content": ""
-     },
-     {
-      "step_no": "21",
-      "step_title": "Supplier (where applicable)",
-      "step_content": ""
-     },
-     {
-      "step_no": "22",
-      "step_title": "Manufacturing batch",
-      "step_content": ""
-     },
-     {
-      "step_no": "23",
-      "step_title": "Inspection records",
-      "step_content": ""
-     },
-     {
-      "step_no": "24",
-      "step_title": "Final product",
-      "step_content": ""
-     },
-     {
-      "step_no": "25",
-      "step_title": "Dispatch details",
-      "step_content": ""
+      "step_content": "<p>Where traceability is required by the customer, regulatory requirements, or internal quality requirements, records shall enable tracing of:</p><ul><li>Raw materials</li><li>Supplier (where applicable)</li><li>Manufacturing batch</li><li>Inspection records</li><li>Final product</li><li>Dispatch details</li></ul>"
      }
     ],
     "records_generated": [
@@ -3021,117 +1791,27 @@
      {
       "step_no": "1",
       "step_title": "Storage",
-      "step_content": "<p>Materials and finished products shall be stored in designated locations to prevent:</p>"
+      "step_content": "<p>Materials and finished products shall be stored in designated locations to prevent:</p><ul><li>Damage</li><li>Corrosion</li><li>Contamination</li><li>Moisture exposure</li><li>Product mix-up</li><li>Unauthorized use</li></ul>"
      },
      {
       "step_no": "2",
-      "step_title": "Damage",
-      "step_content": ""
-     },
-     {
-      "step_no": "3",
-      "step_title": "Corrosion",
-      "step_content": ""
-     },
-     {
-      "step_no": "4",
-      "step_title": "Contamination",
-      "step_content": ""
-     },
-     {
-      "step_no": "5",
-      "step_title": "Moisture exposure",
-      "step_content": ""
-     },
-     {
-      "step_no": "6",
-      "step_title": "Product mix-up",
-      "step_content": ""
-     },
-     {
-      "step_no": "7",
-      "step_title": "Unauthorized use",
-      "step_content": ""
-     },
-     {
-      "step_no": "8",
       "step_title": "Preservation",
       "step_content": "<p>Products shall be handled carefully throughout manufacturing and storage to maintain their quality and identification.</p><p>Suitable protective measures such as protective wrapping, anti-rust treatment, moisture protection, and appropriate stacking shall be adopted where necessary.</p>"
      },
      {
-      "step_no": "9",
+      "step_no": "3",
       "step_title": "Packing",
-      "step_content": ""
+      "step_content": "<p>Products shall be packed according to:</p><ul><li>Customer requirements</li><li>Product characteristics</li><li>Transportation method</li><li>Internal packing standards</li></ul><p>Packing shall provide adequate protection during handling and transit.</p>"
      },
      {
-      "step_no": "10",
-      "step_title": "Products shall be packed according to:",
-      "step_content": ""
-     },
-     {
-      "step_no": "11",
-      "step_title": "Customer requirements",
-      "step_content": ""
-     },
-     {
-      "step_no": "12",
-      "step_title": "Product characteristics",
-      "step_content": ""
-     },
-     {
-      "step_no": "13",
-      "step_title": "Transportation method",
-      "step_content": ""
-     },
-     {
-      "step_no": "14",
-      "step_title": "Internal packing standards",
-      "step_content": "<p>Packing shall provide adequate protection during handling and transit.</p>"
-     },
-     {
-      "step_no": "15",
+      "step_no": "4",
       "step_title": "Dispatch",
       "step_content": "<p>Only products released by the Quality Department after satisfactory completion of all specified inspection and testing activities shall be dispatched.</p><p>Dispatch documents shall be verified before shipment.</p>"
      },
      {
-      "step_no": "16",
+      "step_no": "5",
       "step_title": "Delivery Documents",
-      "step_content": ""
-     },
-     {
-      "step_no": "17",
-      "step_title": "The dispatch package may include, where applicable:",
-      "step_content": ""
-     },
-     {
-      "step_no": "18",
-      "step_title": "Delivery Challan",
-      "step_content": ""
-     },
-     {
-      "step_no": "19",
-      "step_title": "Tax Invoice",
-      "step_content": ""
-     },
-     {
-      "step_no": "20",
-      "step_title": "Packing List",
-      "step_content": ""
-     },
-     {
-      "step_no": "21",
-      "step_title": "Inspection Report",
-      "step_content": ""
-     },
-     {
-      "step_no": "22",
-      "step_title": "Material Test Certificate",
-      "step_content": ""
-     },
-     {
-      "step_no": "23",
-      "step_title": "Certificate of Conformity (if required)",
-      "step_content": ""
+      "step_content": "<p>The dispatch package may include, where applicable:</p><ul><li>Delivery Challan</li><li>Tax Invoice</li><li>Packing List</li><li>Inspection Report</li><li>Material Test Certificate</li><li>Certificate of Conformity (if required)</li></ul>"
      }
     ],
     "records_generated": [
@@ -3244,104 +1924,35 @@
      {
       "step_no": "1",
       "step_title": "Identification",
-      "step_content": ""
+      "step_content": "<p>Nonconformities may be identified during:</p><ul><li>Incoming inspection</li><li>In-process inspection</li><li>Final inspection</li><li>Customer complaints</li><li>Internal audits</li><li>Production activities</li></ul><p>All identified nonconforming products shall be clearly marked to prevent unintended use.</p>"
      },
      {
       "step_no": "2",
-      "step_title": "Nonconformities may be identified during:",
-      "step_content": ""
-     },
-     {
-      "step_no": "3",
-      "step_title": "Incoming inspection",
-      "step_content": ""
-     },
-     {
-      "step_no": "4",
-      "step_title": "In-process inspection",
-      "step_content": ""
-     },
-     {
-      "step_no": "5",
-      "step_title": "Final inspection",
-      "step_content": ""
-     },
-     {
-      "step_no": "6",
-      "step_title": "Customer complaints",
-      "step_content": ""
-     },
-     {
-      "step_no": "7",
-      "step_title": "Internal audits",
-      "step_content": ""
-     },
-     {
-      "step_no": "8",
-      "step_title": "Production activities",
-      "step_content": "<p>All identified nonconforming products shall be clearly marked to prevent unintended use.</p>"
-     },
-     {
-      "step_no": "9",
       "step_title": "Segregation",
       "step_content": "<p>Where practical, nonconforming materials or products shall be segregated and kept in a designated Nonconforming Material Area until disposition is decided.</p>"
      },
      {
-      "step_no": "10",
+      "step_no": "3",
       "step_title": "Evaluation",
-      "step_content": "<p>The Quality Department, in consultation with the relevant department, shall evaluate the nonconformity and determine the appropriate disposition.</p>"
+      "step_content": "<p>The Quality Department, in consultation with the relevant department, shall evaluate the nonconformity and determine the appropriate disposition.</p><p>Possible dispositions include:</p><ul><li>Rework</li><li>Repair</li><li>Re-grade for an alternative application</li><li>Return to supplier</li><li>Acceptance under approved concession</li><li>Scrap</li></ul>"
      },
      {
-      "step_no": "11",
-      "step_title": "Possible dispositions include:",
-      "step_content": ""
-     },
-     {
-      "step_no": "12",
-      "step_title": "Rework",
-      "step_content": ""
-     },
-     {
-      "step_no": "13",
-      "step_title": "Repair",
-      "step_content": ""
-     },
-     {
-      "step_no": "14",
-      "step_title": "Re-grade for an alternative application",
-      "step_content": ""
-     },
-     {
-      "step_no": "15",
-      "step_title": "Return to supplier",
-      "step_content": ""
-     },
-     {
-      "step_no": "16",
-      "step_title": "Acceptance under approved concession",
-      "step_content": ""
-     },
-     {
-      "step_no": "17",
-      "step_title": "Scrap",
-      "step_content": ""
-     },
-     {
-      "step_no": "18",
+      "step_no": "4",
       "step_title": "Verification After Rework",
       "step_content": "<p>Products that have been reworked or repaired shall be re-inspected before being released for further processing or dispatch.</p>"
      },
      {
-      "step_no": "19",
+      "step_no": "5",
       "step_title": "Customer Notification",
       "step_content": "<p>Where a nonconformity affects customer requirements or delivery commitments, the customer shall be informed whenever necessary and approval obtained before release under concession.</p>"
+     },
+     {
+      "step_no": "6",
+      "step_title": "Records",
+      "step_content": "<p>All nonconformities and their dispositions shall be recorded and reviewed to identify recurring issues and opportunities for improvement.</p>"
      }
     ],
     "records_generated": [
-     {
-      "number": "",
-      "title": "All nonconformities and their dispositions shall be recorded and reviewed to identify recurring issues and opportunities for improvement."
-     },
      {
       "number": "FRM020",
       "title": "Nonconforming Product Report (NCR)"
@@ -3447,108 +2058,35 @@
      {
       "step_no": "1",
       "step_title": "Identification",
-      "step_content": ""
+      "step_content": "<p>Corrective actions may be initiated from:</p><ul><li>Customer complaints</li><li>Product nonconformities</li><li>Supplier issues</li><li>Internal audits</li><li>External audits</li><li>Management Review</li><li>Process performance analysis.</li></ul>"
      },
      {
       "step_no": "2",
-      "step_title": "Corrective actions may be initiated from:",
-      "step_content": ""
+      "step_title": "Root Cause Analysis",
+      "step_content": "<p>The responsible department shall investigate the root cause using suitable methods such as:</p><ul><li>5 Why Analysis</li><li>Fishbone (Ishikawa) Diagram</li><li>Process Review</li><li>Data Analysis</li></ul><p>The objective is to eliminate the cause rather than only correcting the immediate issue.</p>"
      },
      {
       "step_no": "3",
-      "step_title": "Customer complaints",
-      "step_content": ""
+      "step_title": "Corrective Action Plan",
+      "step_content": "<p>Based on the investigation, an action plan shall be prepared, including:</p><ul><li>Corrective actions to be implemented.</li><li>Responsible person</li><li>Target completion date</li><li>Required resources.</li></ul>"
      },
      {
       "step_no": "4",
-      "step_title": "Product nonconformities",
-      "step_content": ""
-     },
-     {
-      "step_no": "5",
-      "step_title": "Supplier issues",
-      "step_content": ""
-     },
-     {
-      "step_no": "6",
-      "step_title": "Internal audits",
-      "step_content": ""
-     },
-     {
-      "step_no": "7",
-      "step_title": "External audits",
-      "step_content": ""
-     },
-     {
-      "step_no": "8",
-      "step_title": "Management Review",
-      "step_content": "<p>Process performance analysis.</p>"
-     },
-     {
-      "step_no": "9",
-      "step_title": "Root Cause Analysis",
-      "step_content": "<p>The responsible department shall investigate the root cause using suitable methods such as:</p>"
-     },
-     {
-      "step_no": "10",
-      "step_title": "5 Why Analysis",
-      "step_content": ""
-     },
-     {
-      "step_no": "11",
-      "step_title": "Fishbone (Ishikawa) Diagram",
-      "step_content": ""
-     },
-     {
-      "step_no": "12",
-      "step_title": "Process Review",
-      "step_content": ""
-     },
-     {
-      "step_no": "13",
-      "step_title": "Data Analysis",
-      "step_content": "<p>The objective is to eliminate the cause rather than only correcting the immediate issue.</p>"
-     },
-     {
-      "step_no": "14",
-      "step_title": "Corrective Action Plan",
-      "step_content": "<p>Based on the investigation, an action plan shall be prepared, including:</p><p>Corrective actions to be implemented.</p>"
-     },
-     {
-      "step_no": "15",
-      "step_title": "Responsible person",
-      "step_content": ""
-     },
-     {
-      "step_no": "16",
-      "step_title": "Target completion date",
-      "step_content": "<p>Required resources.</p>"
-     },
-     {
-      "step_no": "17",
       "step_title": "Implementation",
       "step_content": "<p>The assigned department shall implement the approved corrective actions within the agreed timeframe.</p>"
      },
      {
-      "step_no": "18",
+      "step_no": "5",
       "step_title": "Effectiveness Verification",
-      "step_content": ""
+      "step_content": "<p>The Quality Department shall verify that:</p><ul><li>The corrective action has been completed.</li><li>The nonconformity has not recurred.</li><li>The action has effectively addressed the root cause.</li></ul><p>Where necessary, additional actions shall be initiated.</p>"
      },
      {
-      "step_no": "19",
-      "step_title": "The Quality Department shall verify that:",
-      "step_content": "<p>The corrective action has been completed.</p><p>The nonconformity has not recurred.</p><p>The action has effectively addressed the root cause.</p><p>Where necessary, additional actions shall be initiated.</p>"
+      "step_no": "6",
+      "step_title": "Records",
+      "step_content": "<p>Corrective actions shall be closed only after satisfactory verification of effectiveness.</p><p>Records shall be retained as documented information.</p>"
      }
     ],
     "records_generated": [
-     {
-      "number": "",
-      "title": "Corrective actions shall be closed only after satisfactory verification of effectiveness."
-     },
-     {
-      "number": "",
-      "title": "Records shall be retained as documented information."
-     },
      {
       "number": "FRM021",
       "title": "Corrective Action Request (CAR)"
@@ -3640,7 +2178,7 @@
      },
      {
       "role": "Quality Manager",
-      "responsibility": "Prepare the annual audit programme . Assign competent auditors. Review audit reports. Monitor closure of audit findings."
+      "responsibility": "Prepare the annual audit programme. Assign competent auditors. Review audit reports. Monitor closure of audit findings."
      },
      {
       "role": "Department Heads",
@@ -3651,95 +2189,25 @@
      {
       "step_no": "1",
       "step_title": "Audit Planning",
-      "step_content": ""
+      "step_content": "<p>An annual Internal Audit Programme shall be prepared considering:</p><ul><li>Importance of processes</li><li>Previous audit results</li><li>Customer complaints</li><li>Process performance</li><li>Changes affecting the QMS</li></ul>"
      },
      {
       "step_no": "2",
-      "step_title": "An annual Internal Audit Programme shall be prepared considering:",
-      "step_content": ""
+      "step_title": "Conducting the Audit",
+      "step_content": "<p>Audits shall be conducted using approved checklists and objective evidence through:</p><ul><li>Interviews</li><li>Observation of activities</li><li>Review of documents and records</li></ul><p>Auditors shall remain independent of the area being audited, wherever practicable.</p>"
      },
      {
       "step_no": "3",
-      "step_title": "Importance of processes",
-      "step_content": ""
+      "step_title": "Audit Reporting",
+      "step_content": "<p>Audit findings shall be classified as:</p><ul><li>Conformity</li><li>Observation</li><li>Opportunity for Improvement</li><li>Nonconformity</li></ul><p>The audit report shall be issued to the concerned department.</p>"
      },
      {
       "step_no": "4",
-      "step_title": "Previous audit results",
-      "step_content": ""
-     },
-     {
-      "step_no": "5",
-      "step_title": "Customer complaints",
-      "step_content": ""
-     },
-     {
-      "step_no": "6",
-      "step_title": "Process performance",
-      "step_content": ""
-     },
-     {
-      "step_no": "7",
-      "step_title": "Changes affecting the QMS",
-      "step_content": ""
-     },
-     {
-      "step_no": "8",
-      "step_title": "Conducting the Audit",
-      "step_content": "<p>Audits shall be conducted using approved checklists and objective evidence through:</p>"
-     },
-     {
-      "step_no": "9",
-      "step_title": "Interviews",
-      "step_content": ""
-     },
-     {
-      "step_no": "10",
-      "step_title": "Observation of activities",
-      "step_content": ""
-     },
-     {
-      "step_no": "11",
-      "step_title": "Review of documents and records",
-      "step_content": "<p>Auditors shall remain independent of the area being audited, wherever practicable.</p>"
-     },
-     {
-      "step_no": "12",
-      "step_title": "Audit Reporting",
-      "step_content": ""
-     },
-     {
-      "step_no": "13",
-      "step_title": "Audit findings shall be classified as:",
-      "step_content": ""
-     },
-     {
-      "step_no": "14",
-      "step_title": "Conformity",
-      "step_content": ""
-     },
-     {
-      "step_no": "15",
-      "step_title": "Observation",
-      "step_content": ""
-     },
-     {
-      "step_no": "16",
-      "step_title": "Opportunity for Improvement",
-      "step_content": ""
-     },
-     {
-      "step_no": "17",
-      "step_title": "Nonconformity",
-      "step_content": "<p>The audit report shall be issued to the concerned department.</p>"
-     },
-     {
-      "step_no": "18",
       "step_title": "Corrective Action",
       "step_content": "<p>Departments shall investigate nonconformities and implement corrective actions in accordance with SOP014 – Corrective Action Procedure.</p>"
      },
      {
-      "step_no": "19",
+      "step_no": "5",
       "step_title": "Follow-up",
       "step_content": "<p>The Quality Manager shall verify the effectiveness of corrective actions before closing audit findings.</p>"
      }
@@ -3850,135 +2318,15 @@
      {
       "step_no": "2",
       "step_title": "Inputs",
-      "step_content": ""
+      "step_content": "<p>Management Review shall consider, as applicable:</p><ul><li>Status of previous Management Review actions</li><li>Customer feedback and complaints</li><li>Changes in external and internal issues</li><li>Effectiveness of actions taken to address risks and opportunities</li><li>Adequacy of resources</li><li>Effectiveness of actions taken from previous management reviews</li><li>Quality Objectives, KPIs, and process performance</li><li>Product conformity</li><li>Internal and external audit results</li><li>Supplier performance</li><li>Nonconformities and corrective actions</li><li>Risks and opportunities</li><li>Resource requirements</li><li>Improvement opportunities</li></ul>"
      },
      {
       "step_no": "3",
-      "step_title": "Management Review shall consider, as applicable:",
-      "step_content": ""
+      "step_title": "Outputs",
+      "step_content": "<p>Management Review outputs may include decisions regarding:</p><ul><li>Improvement of the QMS</li><li>Improvement of products, processes, and services</li><li>Customer satisfaction</li><li>Resource requirements</li><li>Process improvements</li><li>Changes to Quality Objectives</li><li>Actions to address risks and opportunities</li><li>Need for changes to the QMS</li></ul>"
      },
      {
       "step_no": "4",
-      "step_title": "Status of previous Management Review actions",
-      "step_content": ""
-     },
-     {
-      "step_no": "5",
-      "step_title": "Customer feedback and complaints",
-      "step_content": ""
-     },
-     {
-      "step_no": "6",
-      "step_title": "Changes in external and internal issues",
-      "step_content": ""
-     },
-     {
-      "step_no": "7",
-      "step_title": "Effectiveness of actions taken to address risks and opportunities",
-      "step_content": ""
-     },
-     {
-      "step_no": "8",
-      "step_title": "Adequacy of resources",
-      "step_content": ""
-     },
-     {
-      "step_no": "9",
-      "step_title": "Effectiveness of actions taken from previous management reviews",
-      "step_content": ""
-     },
-     {
-      "step_no": "10",
-      "step_title": "Quality Objectives, KPIs, and process performance",
-      "step_content": ""
-     },
-     {
-      "step_no": "11",
-      "step_title": "Product conformity",
-      "step_content": ""
-     },
-     {
-      "step_no": "12",
-      "step_title": "Internal and external audit results",
-      "step_content": ""
-     },
-     {
-      "step_no": "13",
-      "step_title": "Supplier performance",
-      "step_content": ""
-     },
-     {
-      "step_no": "14",
-      "step_title": "Nonconformities and corrective actions",
-      "step_content": ""
-     },
-     {
-      "step_no": "15",
-      "step_title": "Risks and opportunities",
-      "step_content": ""
-     },
-     {
-      "step_no": "16",
-      "step_title": "Resource requirements",
-      "step_content": ""
-     },
-     {
-      "step_no": "17",
-      "step_title": "Improvement opportunities",
-      "step_content": ""
-     },
-     {
-      "step_no": "18",
-      "step_title": "Outputs",
-      "step_content": ""
-     },
-     {
-      "step_no": "19",
-      "step_title": "Management Review outputs may include decisions regarding:",
-      "step_content": ""
-     },
-     {
-      "step_no": "20",
-      "step_title": "Improvement of the QMS",
-      "step_content": ""
-     },
-     {
-      "step_no": "21",
-      "step_title": "Improvement of products, processes, and services",
-      "step_content": ""
-     },
-     {
-      "step_no": "22",
-      "step_title": "Customer satisfaction",
-      "step_content": ""
-     },
-     {
-      "step_no": "23",
-      "step_title": "Resource requirements",
-      "step_content": ""
-     },
-     {
-      "step_no": "24",
-      "step_title": "Process improvements",
-      "step_content": ""
-     },
-     {
-      "step_no": "25",
-      "step_title": "Changes to Quality Objectives",
-      "step_content": ""
-     },
-     {
-      "step_no": "26",
-      "step_title": "Actions to address risks and opportunities",
-      "step_content": ""
-     },
-     {
-      "step_no": "27",
-      "step_title": "Need for changes to the QMS",
-      "step_content": ""
-     },
-     {
-      "step_no": "28",
       "step_title": "Follow-up",
       "step_content": "<p>The Quality Manager shall monitor the implementation of all agreed actions and report their status during the next Management Review Meeting.</p>"
      }
@@ -4092,60 +2440,30 @@
      {
       "step_no": "1",
       "step_title": "Equipment Identification",
-      "step_content": "<p>All monitoring and measuring equipment shall be assigned a unique identification number and entered into the Monitoring & Measuring Instruments Register (REG011).</p>"
+      "step_content": "<p>All monitoring and measuring equipment shall be assigned a unique identification number and entered into the Monitoring &amp; Measuring Instruments Register (REG011).</p>"
      },
      {
       "step_no": "2",
       "step_title": "Calibration",
-      "step_content": ""
+      "step_content": "<p>Equipment shall be calibrated:</p><ul><li>At defined intervals.</li><li>Before first use (where applicable).</li><li>After repair or major maintenance.</li><li>Whenever accuracy is suspected.</li></ul><p>Where applicable, calibration shall be traceable to national or international measurement standards.</p>"
      },
      {
       "step_no": "3",
-      "step_title": "Equipment shall be calibrated:",
-      "step_content": "<p>At defined intervals.</p><p>Before first use (where applicable).</p><p>After repair or major maintenance.</p><p>Whenever accuracy is suspected.</p><p>Where applicable, calibration shall be traceable to national or international measurement standards.</p>"
+      "step_title": "Calibration Status",
+      "step_content": "<p>Each calibrated instrument shall be identified with a calibration label indicating:</p><ul><li>Equipment ID</li><li>Date of calibration</li><li>Due date for next calibration</li><li>Calibration status (where applicable)</li></ul>"
      },
      {
       "step_no": "4",
-      "step_title": "Calibration Status",
-      "step_content": "<p>Each calibrated instrument shall be identified with a calibration label indicating:</p>"
+      "step_title": "Handling and Storage",
+      "step_content": "<p>Monitoring and measuring equipment shall be:</p><ul><li>Protected from damage.</li><li>Stored appropriately after use.</li><li>Handled carefully to maintain accuracy.</li><li>Protected against unauthorized adjustment.</li></ul>"
      },
      {
       "step_no": "5",
-      "step_title": "Equipment ID",
-      "step_content": ""
+      "step_title": "Out-of-Calibration Equipment",
+      "step_content": "<p>If any equipment is found to be damaged, out of calibration, or unsuitable for use:</p><ul><li>It shall be identified and removed from service.</li><li>The impact on previous inspection or measurement results shall be evaluated.</li><li>Necessary corrective actions shall be initiated in accordance with SOP014 – Corrective Action Procedure. Where affected products are identified, they shall be evaluated in accordance with SOP013 – Control of Nonconforming Outputs Procedure.</li></ul>"
      },
      {
       "step_no": "6",
-      "step_title": "Date of calibration",
-      "step_content": ""
-     },
-     {
-      "step_no": "7",
-      "step_title": "Due date for next calibration",
-      "step_content": ""
-     },
-     {
-      "step_no": "8",
-      "step_title": "Calibration status (where applicable)",
-      "step_content": ""
-     },
-     {
-      "step_no": "9",
-      "step_title": "Handling and Storage",
-      "step_content": ""
-     },
-     {
-      "step_no": "10",
-      "step_title": "Monitoring and measuring equipment shall be:",
-      "step_content": "<p>Protected from damage.</p><p>Stored appropriately after use.</p><p>Handled carefully to maintain accuracy.</p><p>Protected against unauthorized adjustment.</p>"
-     },
-     {
-      "step_no": "11",
-      "step_title": "Out-of-Calibration Equipment",
-      "step_content": "<p>If any equipment is found to be damaged, out of calibration, or unsuitable for use:</p><p>It shall be identified and removed from service.</p><p>The impact on previous inspection or measurement results shall be evaluated.</p><p>Necessary corrective actions shall be initiated in accordance with SOP014 – Corrective Action Procedure. Where affected products are identified, they shall be evaluated in accordance with SOP013 – Control of Nonconforming Outputs Procedure.</p>"
-     },
-     {
-      "step_no": "12",
       "step_title": "Calibration Records",
       "step_content": "<p>Calibration records shall be maintained and reviewed periodically to ensure equipment remains fit for use.</p>"
      }
@@ -4256,90 +2574,30 @@
      {
       "step_no": "1",
       "step_title": "Equipment Register",
-      "step_content": "<p>Maintain a list of all machines and critical equipment in REG020 – Machine & Equipment Register.</p>"
+      "step_content": "<p>Maintain a list of all machines and critical equipment in REG020 – Machine &amp; Equipment Register.</p>"
      },
      {
       "step_no": "2",
       "step_title": "Preventive Maintenance",
-      "step_content": "<p>Maintenance shall be carried out according to a planned schedule considering:</p>"
+      "step_content": "<p>Maintenance shall be carried out according to a planned schedule considering:</p><ul><li>Manufacturer recommendations</li><li>Equipment usage</li><li>Operating hours</li><li>Previous breakdown history</li></ul>"
      },
      {
       "step_no": "3",
-      "step_title": "Manufacturer recommendations",
-      "step_content": ""
+      "step_title": "Breakdown Maintenance",
+      "step_content": "<p>When equipment fails:</p><ul><li>Stop the machine safely.</li><li>Raise a Maintenance Request.</li><li>Diagnose the fault.</li><li>Repair or replace defective parts.</li><li>Test before returning to production.</li></ul>"
      },
      {
       "step_no": "4",
-      "step_title": "Equipment usage",
-      "step_content": ""
+      "step_title": "Maintenance Records",
+      "step_content": "<p>All maintenance activities shall be recorded, including:</p><ul><li>Date</li><li>Equipment ID</li><li>Nature of maintenance</li><li>Parts replaced</li><li>Person performing maintenance</li></ul>"
      },
      {
       "step_no": "5",
-      "step_title": "Operating hours",
-      "step_content": ""
+      "step_title": "Verification",
+      "step_content": "<p>After maintenance:</p><ul><li>Verify machine operation.</li><li>Confirm safety devices function correctly.</li><li>Release equipment for production.</li></ul>"
      },
      {
       "step_no": "6",
-      "step_title": "Previous breakdown history",
-      "step_content": ""
-     },
-     {
-      "step_no": "7",
-      "step_title": "Breakdown Maintenance",
-      "step_content": ""
-     },
-     {
-      "step_no": "8",
-      "step_title": "When equipment fails:",
-      "step_content": "<p>Stop the machine safely.</p><p>Raise a Maintenance Request.</p><p>Diagnose the fault.</p><p>Repair or replace defective parts.</p><p>Test before returning to production.</p>"
-     },
-     {
-      "step_no": "9",
-      "step_title": "Maintenance Records",
-      "step_content": ""
-     },
-     {
-      "step_no": "10",
-      "step_title": "All maintenance activities shall be recorded, including:",
-      "step_content": ""
-     },
-     {
-      "step_no": "11",
-      "step_title": "Date",
-      "step_content": ""
-     },
-     {
-      "step_no": "12",
-      "step_title": "Equipment ID",
-      "step_content": ""
-     },
-     {
-      "step_no": "13",
-      "step_title": "Nature of maintenance",
-      "step_content": ""
-     },
-     {
-      "step_no": "14",
-      "step_title": "Parts replaced",
-      "step_content": ""
-     },
-     {
-      "step_no": "15",
-      "step_title": "Person performing maintenance",
-      "step_content": ""
-     },
-     {
-      "step_no": "16",
-      "step_title": "Verification",
-      "step_content": ""
-     },
-     {
-      "step_no": "17",
-      "step_title": "After maintenance:",
-      "step_content": "<p>Verify machine operation.</p><p>Confirm safety devices function correctly.</p><p>Release equipment for production.</p>"
-     },
-     {
-      "step_no": "18",
       "step_title": "Review",
       "step_content": "<p>Maintenance history shall be reviewed periodically to identify recurring failures and improvement opportunities.</p>"
      }
@@ -4664,7 +2922,7 @@
    "issue_date": "2026-04-01",
    "revision_number": "00",
    "body_mode": "Mapped Data",
-   "has_source_file": false,
+   "has_source_file": true,
    "mapped_doctype": "Document Change Request",
    "mapped_filters": null,
    "mapped_report": null,
@@ -4703,7 +2961,7 @@
    "issue_date": "2026-04-01",
    "revision_number": "00",
    "body_mode": "Mapped Data",
-   "has_source_file": false,
+   "has_source_file": true,
    "mapped_doctype": "Opportunity",
    "mapped_filters": null,
    "mapped_report": null,
@@ -6176,7 +4434,7 @@
    "issue_date": "2026-04-01",
    "revision_number": "00",
    "body_mode": "Mapped Data",
-   "has_source_file": false,
+   "has_source_file": true,
    "mapped_doctype": "Quality Inspection",
    "mapped_filters": "{\"inspection_type\": \"Incoming\", \"docstatus\": 1}",
    "mapped_report": null,
@@ -6219,7 +4477,7 @@
    "issue_date": "2026-04-01",
    "revision_number": "00",
    "body_mode": "Mapped Data",
-   "has_source_file": false,
+   "has_source_file": true,
    "mapped_doctype": "Work Order",
    "mapped_filters": null,
    "mapped_report": null,
@@ -6280,7 +4538,7 @@
    "issue_date": "2026-04-01",
    "revision_number": "00",
    "body_mode": "Mapped Data",
-   "has_source_file": false,
+   "has_source_file": true,
    "mapped_doctype": "Quality Action",
    "mapped_filters": null,
    "mapped_report": null,
@@ -6315,7 +4573,7 @@
    "issue_date": "2026-04-01",
    "revision_number": "00",
    "body_mode": "Mapped Data",
-   "has_source_file": false,
+   "has_source_file": true,
    "mapped_doctype": "Quality Meeting",
    "mapped_filters": null,
    "mapped_report": null,
@@ -6342,7 +4600,7 @@
    "issue_date": "2026-04-01",
    "revision_number": "00",
    "body_mode": "Mapped Data",
-   "has_source_file": false,
+   "has_source_file": true,
    "mapped_doctype": "Asset",
    "mapped_filters": null,
    "mapped_report": null,
@@ -6381,7 +4639,7 @@
    "issue_date": "2026-04-01",
    "revision_number": "00",
    "body_mode": "Mapped Data",
-   "has_source_file": false,
+   "has_source_file": true,
    "mapped_doctype": "Asset Maintenance",
    "mapped_filters": null,
    "mapped_report": null,
@@ -6430,7 +4688,7 @@
    "issue_date": "2026-04-01",
    "revision_number": "00",
    "body_mode": "Mapped Data",
-   "has_source_file": false,
+   "has_source_file": true,
    "mapped_doctype": "Training Event",
    "mapped_filters": null,
    "mapped_report": null,
@@ -6512,7 +4770,7 @@
    "issue_date": "2026-04-01",
    "revision_number": "00",
    "body_mode": "Mapped Data",
-   "has_source_file": false,
+   "has_source_file": true,
    "mapped_doctype": "Quality Feedback",
    "mapped_filters": null,
    "mapped_report": null,
@@ -6539,7 +4797,7 @@
    "issue_date": "2026-04-01",
    "revision_number": "00",
    "body_mode": "Mapped Data",
-   "has_source_file": false,
+   "has_source_file": true,
    "mapped_doctype": null,
    "mapped_filters": null,
    "mapped_report": null,
