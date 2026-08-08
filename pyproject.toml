@@ -4,7 +4,7 @@ authors = [
     { name = "Hatim Carbon Co. Pvt. Ltd.", email = "da@alvazarat.org"}
 ]
 description = "ISO 9001 document control, revision history and QMS records"
-requires-python = ">=3.14"
+requires-python = ">=3.10"
 readme = "README.md"
 dynamic = ["version"]
 dependencies = [
@@ -14,6 +14,12 @@ dependencies = [
 [build-system]
 requires = ["flit_core >=3.4,<4"]
 build-backend = "flit_core.buildapi"
+
+# Frappe Cloud reads this to check the app against the bench before deploying.
+# Built and verified on frappe 16.29 / erpnext 16.30.
+[tool.bench.frappe-dependencies]
+frappe = ">=16.0.0,<17.0.0"
+erpnext = ">=16.0.0,<17.0.0"
 
 # These dependencies are only installed when developer mode is enabled
 [tool.bench.dev-dependencies]
