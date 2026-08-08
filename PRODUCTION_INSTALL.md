@@ -20,6 +20,7 @@ Installed by `bench install-app`, carried by `bench migrate` on every upgrade:
 | Script Reports | Master Document Register, Compliance Gaps, Maintenance and Calibration Due, Customer PO Amendment Register, Form Responsibility by Department, Employee Competency Matrix, Measuring Equipment Register, Incoming Material Register, Maintenance Register |
 | Notification | Maintenance or Calibration Due, 14 days ahead |
 | Workflow States | Draft, Under Review, Approved, Active, Superseded, Obsolete |
+| Role permissions | Quality Manager: full control of every QMS DocType. Employee: read and print everything, raise (not approve) Document Change Requests. Assign ERPNext's existing Quality Manager role to whoever runs the QMS — at least two people, because a DCR's requester cannot approve it. "All" is deliberately not used: it includes portal logins (customers, suppliers). |
 
 Two pieces of configuration live outside this app's own DocTypes, both created
 by the `after_install` / `after_migrate` hook, idempotent, touching nothing that
