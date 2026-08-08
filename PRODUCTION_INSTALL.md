@@ -62,7 +62,7 @@ evidence. Nothing can dangle against a different user list.
 
 ```bash
 # 1. Install the app (Frappe Cloud: add it to the bench from the git repo,
-#    then install it on the site).
+#    deploy the bench, update the site, then install it on the site).
 bench --site <site> install-app iso_compliance
 
 # 2. Load the document set: 93 controlled documents and 6 document types.
@@ -72,7 +72,18 @@ bench --site <site> execute iso_compliance.seed.controlled_documents.import_seed
 bench --site <site> execute iso_compliance.seed.qms_registers.import_registers
 ```
 
-Both imports are idempotent. Running them twice creates nothing the second time.
+**No shell? (shared Frappe Cloud bench.)** Log in as a System Manager, open the
+browser console on the desk (F12), and run:
+
+```js
+frappe.call({method: "iso_compliance.seed.api.import_all"})
+	.then(r => console.log(r.message))
+```
+
+`iso_compliance.seed.api.purge_all` is the same door for removal. Both are
+POST-only and refuse anyone below System Manager.
+
+All imports are idempotent. Running them twice creates nothing the second time.
 
 Seed loading is deliberately **not** in a migrate hook. A routine upgrade must
 never write 93 controlled documents into production on its own.
