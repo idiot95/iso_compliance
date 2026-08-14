@@ -151,7 +151,9 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Issue No.",
-   "reqd": 1
+   "reqd": 1,
+   "read_only": 1,
+   "description": "Set by the system: revisions 01–09 amend an issue; the tenth change re-issues the document and this number moves up."
   },
   {
    "fieldname": "issue_date",
@@ -169,12 +171,16 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Revision No.",
-   "reqd": 1
+   "reqd": 1,
+   "read_only": 1,
+   "description": "Set by the system on every authorised change. Not typed: set the approved Change Request, save your edit, and the number advances by the rule."
   },
   {
    "fieldname": "revision_date",
    "fieldtype": "Date",
-   "label": "Revision Date"
+   "label": "Revision Date",
+   "read_only": 1,
+   "description": "Set by the system when a change is saved."
   },
   {
    "fieldname": "authority_section",
@@ -532,7 +538,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-08-14 10:00:00.000000",
+ "modified": "2026-08-14 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Controlled Document",
