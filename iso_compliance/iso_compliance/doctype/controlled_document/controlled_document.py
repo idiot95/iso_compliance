@@ -7,7 +7,7 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.model.naming import make_autoname
-from frappe.utils import now_datetime
+from frappe.utils import cint, now_datetime, nowdate
 
 #: Fields of a Document Revision row that constitute the audit record. Once a row
 #: exists, none of these may change.
@@ -168,6 +168,63 @@ class ControlledDocument(Document):
 			return
 
 		self._require_change_request(changed, previous)
+		self._advance_numbers(previous)
+
+	def _next_numbers(self, previous) -> tuple[str, str]:
+		"""The numbering rule: revisions 01 to 09 amend an issue; the tenth change
+		does not become revision 10 -- it re-issues the document, issue number up,
+		revision back to 00. The eleventh change is then revision 01 of the new
+		issue. Ten changes per edition, the way the paper headers already count."""
+		rev = cint(previous.revision_number) + 1
+		if rev >= 10:
+			return f"{cint(previous.issue_number) + 1:02d}", "00"
+		return (previous.issue_number or "01"), f"{rev:02d}"
+
+	def _advance_numbers(self, previous):
+		"""Move the control block for an authorised change, or verify a manual move.
+
+		Runs only after the change request has been validated. If the author left
+		the numbers alone, the system advances them by the rule and writes the
+		Change History row from the request itself; if the author moved them by
+		hand, anything other than the rule's next value is refused, so the
+		numbering cannot drift however it is edited.
+		"""
+		next_issue, next_rev = self._next_numbers(previous)
+		user_moved = (
+			self.revision_number != previous.revision_number
+			or self.issue_number != previous.issue_number
+		)
+
+		if user_moved and (self.issue_number, self.revision_number) != (next_issue, next_rev):
+			frappe.throw(
+				_(
+					"The next change to {0} must be Issue {1} / Revision {2} (ten changes per "
+					"issue, then a re-issue). Leave the numbers unchanged and the system will "
+					"set them."
+				).format(frappe.bold(self.name), next_issue, next_rev),
+				title=_("Issue / Revision Numbering"),
+			)
+
+		self.issue_number, self.revision_number = next_issue, next_rev
+		today = nowdate()
+		self.revision_date = today
+		if next_rev == "00":
+			self.issue_date = today
+
+		# The Change History row comes from the request, unless the author already
+		# wrote one in this save.
+		if len(self.revisions or []) <= len(previous.revisions or []):
+			dcr = frappe.db.get_value(
+				"Document Change Request",
+				self.change_request,
+				["reason_for_change", "clause_section_affected"],
+				as_dict=True,
+			)
+			description = (dcr.reason_for_change or "").strip() or _("Authorised change")
+			self.append_revision(
+				_("{0} (via {1})").format(description, self.change_request),
+				dcr.clause_section_affected,
+			)
 
 	def _controlled_changes(self, previous) -> list[str]:
 		changed = []

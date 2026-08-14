@@ -79,17 +79,15 @@ PLACEHOLDER_ALIASES = {
 #: kept as text and the Link is set only where a real Department exists. Assigning
 #: scope of work to a department that does not exist in the ERP would be a fiction.
 #: "M gmt." is a typo in the source, carried by two documents.
+#: Keyed on the six folded departments (see DEPARTMENT_BUCKETS below), so every
+#: document also carries the real ERPNext Department link where one exists.
 DEPARTMENT_MAP = {
-	"QA": "Quality - HCCPL",
-	"Mgmt.": "Management - HCCPL",
-	"M gmt.": "Management - HCCPL",
+	"Quality": "Quality - HCCPL",
 	"Management": "Management - HCCPL",
-	"Sales": "Sales - HCCPL",
+	"Sales & Marketing": "Sales - HCCPL",
 	"Purchase": "Purchase - HCCPL",
 	"Production": "Production - HCCPL",
-	"All": "All Departments",
-	# No ERPNext Department exists for these:
-	# HR, Design / Engineering, Stores, Dispatch, Stores / Dispatch, Maintenance
+	"Accounts": "Accounts - HCCPL",
 }
 
 BASELINE_NOTE = (
@@ -281,7 +279,7 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 		"seed_batch": batch,
 	}
 
-	erp_department = DEPARTMENT_MAP.get(entry.get("department_label"))
+	erp_department = DEPARTMENT_MAP.get(_department_label(entry.get("department_label")))
 	if erp_department and frappe.db.exists("Department", erp_department):
 		payload["department"] = erp_department
 
@@ -329,11 +327,36 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 	doc.insert(ignore_permissions=True)
 
 
+#: The thirteen department spellings REG-001 uses, folded into the six
+#: departments the company actually filters by. Functions without their own
+#: department land where they report: Design/Engineering and Maintenance under
+#: Production, Stores under Purchase (the materials function), Dispatch under
+#: Sales (outbound), HR and company-wide documents under Management. Accounts
+#: exists as a bucket for future documents; none of the 93 belong to it today.
+DEPARTMENT_BUCKETS = {
+	"QA": "Quality",
+	"Mgmt.": "Management",
+	"M gmt.": "Management",
+	"Management": "Management",
+	"HR": "Management",
+	"All": "Management",
+	"Production": "Production",
+	"Design / Engineering": "Production",
+	"Maintenance": "Production",
+	"Sales": "Sales & Marketing",
+	"Dispatch": "Sales & Marketing",
+	"Stores / Dispatch": "Sales & Marketing",
+	"Purchase": "Purchase",
+	"Stores": "Purchase",
+	"Accounts": "Accounts",
+}
+
+
 def _department_label(label: str | None) -> str | None:
-	"""Spell the department out. REG-001 abbreviates, and one row misspells it."""
+	"""Fold REG-001's thirteen spellings into the six filterable departments."""
 	if not label:
 		return None
-	return {"Mgmt.": "Management", "M gmt.": "Management"}.get(label.strip(), label.strip())
+	return DEPARTMENT_BUCKETS.get(label.strip(), label.strip())
 
 
 def _review_months(abbr: str) -> int | None:
