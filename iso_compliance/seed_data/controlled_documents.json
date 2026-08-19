@@ -34,7 +34,8 @@
    "mapped_doctype": null,
    "mapped_filters": null,
    "mapped_report": null,
-   "print_columns": null
+   "print_columns": null,
+   "body_content": "<h2 style=\"text-align:center; letter-spacing:1px; margin:10pt 0 16pt\">QUALITY POLICY</h2><p>Hatim Carbon Company Private Limited is committed to delivering products that perform reliably in their intended applications, with a strong focus on application engineering.</p><p>We ensure consistent, defect-free output through continual improvement of our manufacturing processes and quality systems, while providing accurate technical guidance for correct product use.</p><p>We are committed to maintain an effective integrated Management System in compliance with the applicable National and International standards for continual improvements.</p><p>We are dedicated to customer satisfaction and continuous improvement in line with ISO standards—ensuring quality proven in application.</p><p>Hatim Carbon Company Private Limited is committed to comply with the applicable Legal and Statutory requirements.</p><p style=\"margin-top:28pt\"><strong>HATIM A. MOGUL</strong><br>Managing Director<br>Date: 01-JAN-2026</p><div class=\"cd-page-break\"></div><h2 style=\"text-align:center; letter-spacing:1px; margin:10pt 0 16pt\">গুণমান নীতি</h2><p>Hatim Carbon Company Private Limited নির্ধারিত প্রয়োগে নির্ভরযোগ্যভাবে কার্যকর এমন পণ্য সরবরাহে প্রতিশ্রুতিবদ্ধ, যেখানে অ্যাপ্লিকেশন ইঞ্জিনিয়ারিং-এর উপর বিশেষ গুরুত্ব প্রদান করা হয়।</p><p>আমরা আমাদের উৎপাদন প্রক্রিয়া এবং গুণমান ব্যবস্থার ধারাবাহিক উন্নতির মাধ্যমে সঙ্গতিপূর্ণ ও ত্রুটিমুক্ত উৎপাদন নিশ্চিত করি, পাশাপাশি পণ্যের সঠিক ব্যবহার নিশ্চিত করতে নির্ভুল প্রযুক্তিগত দিকনির্দেশনা প্রদান করি।</p><p>আমরা প্রযোজ্য জাতীয় ও আন্তর্জাতিক মানদণ্ডের সাথে সামঞ্জস্য রেখে একটি কার্যকর সমন্বিত ব্যবস্থাপনা পদ্ধতি (Integrated Management System) বজায় রাখতে প্রতিশ্রুতিবদ্ধ, যা ধারাবাহিক উন্নয়ন নিশ্চিত করে।</p><p>আমরা গ্রাহক সন্তুষ্টি এবং ধারাবাহিক উন্নয়নে প্রতিশ্রুতিবদ্ধ, ISO মানদণ্ডের সাথে সামঞ্জস্য রেখে—যা প্রয়োগে প্রমাণিত গুণমান নিশ্চিত করে।</p><p>Hatim Carbon Company Private Limited প্রযোজ্য সকল আইনগত ও বিধিবদ্ধ প্রয়োজনীয়তা মেনে চলতে প্রতিশ্রুতিবদ্ধ।</p><p style=\"margin-top:28pt\"><strong>HATIM A. MOGUL</strong><br>Managing Director<br>Date: 01-JAN-2026</p><div class=\"cd-page-break\"></div><h2 style=\"text-align:center; letter-spacing:1px; margin:10pt 0 16pt\">गुणवत्ता नीति</h2><p>Hatim Carbon Company Private Limited अपने उत्पादों को उनके निर्धारित उपयोग में विश्वसनीय प्रदर्शन सुनिश्चित करने के लिए प्रतिबद्ध है, जिसमें एप्लिकेशन इंजीनियरिंग पर विशेष ध्यान दिया जाता है।</p><p>हम अपनी विनिर्माण प्रक्रियाओं और गुणवत्ता प्रणालियों के निरंतर सुधार के माध्यम से सुसंगत और दोषरहित उत्पादन सुनिश्चित करते हैं, साथ ही उत्पाद के सही उपयोग के लिए सटीक तकनीकी मार्गदर्शन प्रदान करते हैं।</p><p>हम लागू राष्ट्रीय और अंतरराष्ट्रीय मानकों के अनुरूप एक प्रभावी एकीकृत प्रबंधन प्रणाली (Integrated Management System) को बनाए रखने के लिए प्रतिबद्ध हैं, जिससे निरंतर सुधार सुनिश्चित होता है।</p><p>हम ग्राहक संतुष्टि और निरंतर सुधार के प्रति समर्पित हैं, जो ISO मानकों के अनुरूप है—और यह सुनिश्चित करता है कि गुणवत्ता का प्रदर्शन वास्तविक उपयोग में प्रमाणित हो।</p><p>Hatim Carbon Company Private Limited सभी लागू कानूनी और वैधानिक आवश्यकताओं का पालन करने के लिए प्रतिबद्ध है।</p><p style=\"margin-top:28pt\"><strong>HATIM A. MOGUL</strong><br>Managing Director<br>Date: 01-JAN-2026</p>"
   },
   {
    "name": "HCCPL/QMS/POL-002",
@@ -52,7 +53,140 @@
    "mapped_doctype": null,
    "mapped_filters": null,
    "mapped_report": null,
-   "print_columns": null
+   "print_columns": null,
+   "static_table": {
+    "columns": [
+     {
+      "label": "Quality Objective",
+      "width": "16%"
+     },
+     {
+      "label": "Department / Function",
+      "width": "11%"
+     },
+     {
+      "label": "Target / Measure",
+      "width": "13%"
+     },
+     {
+      "label": "Planned Actions"
+     },
+     {
+      "label": "Responsibility",
+      "width": "12%"
+     },
+     {
+      "label": "ERP Next Monitoring / Control",
+      "width": "13%"
+     }
+    ],
+    "rows": [
+     [
+      "Improve customer satisfaction",
+      "Sales / Customer Service",
+      "≥ 95% positive feedback",
+      "Monitor feedback, timely complaint resolution",
+      "Head – Sales & CS",
+      "CRM, Support, Reports"
+     ],
+     [
+      "Increase sales volume",
+      "Sales / Marketing",
+      "≥ 15% year-on-year growth",
+      "Market expansion, customer retention, promotions",
+      "Head – Marketing & Sales",
+      "Selling, CRM, Reports"
+     ],
+     [
+      "Achieve on-time delivery",
+      "Production / Logistics",
+      "≥ 98% on-time dispatch",
+      "Production planning, delivery tracking",
+      "Operations Manager",
+      "Selling, Stock, Delivery"
+     ],
+     [
+      "Reduce product non-conformities",
+      "Quality / Production",
+      "≤ 1% rejection rate",
+      "Inspection, root cause analysis, corrective action",
+      "Quality Manager",
+      "Quality, Projects"
+     ],
+     [
+      "Improve supplier performance",
+      "Purchase / Quality",
+      "≥ 95% supplier rating",
+      "Supplier evaluation, audits, corrective actions",
+      "Purchase Manager",
+      "Buying, Quality"
+     ],
+     [
+      "Reduce internal process errors",
+      "All Departments",
+      "≥ 10% year-on-year reduction",
+      "Process review, standardization",
+      "Department Heads",
+      "Manufacturing, Reports"
+     ],
+     [
+      "Improve equipment reliability",
+      "Maintenance / Production",
+      "≥ 95% equipment availability",
+      "Preventive maintenance, breakdown analysis",
+      "Maintenance Manager",
+      "Assets, Maintenance, Reports"
+     ],
+     [
+      "Reduce unplanned breakdowns",
+      "Maintenance",
+      "≤ 5% unplanned downtime",
+      "Scheduled maintenance, root cause analysis",
+      "Maintenance Manager",
+      "Assets, Maintenance"
+     ],
+     [
+      "Improve employee competency",
+      "Human Resources",
+      "100% planned training completed",
+      "Training programs, skill evaluation",
+      "HR Manager",
+      "HR"
+     ],
+     [
+      "Reduce employee absenteeism",
+      "Human Resources",
+      "≤ 3% absenteeism rate",
+      "Attendance monitoring, engagement initiatives",
+      "HR Manager",
+      "HR, Reports"
+     ],
+     [
+      "Reduce employee attrition",
+      "Human Resources",
+      "≤ 10% annual attrition",
+      "Employee engagement, career development",
+      "HR Manager",
+      "HR, Reports"
+     ],
+     [
+      "Improve inventory accuracy",
+      "Stores / Inventory",
+      "≥ 99% stock accuracy",
+      "Cycle count, reconciliation",
+      "Stores Manager",
+      "Stock, Reports"
+     ],
+     [
+      "Enhance continual improvement culture",
+      "Management / All Functions",
+      "Minimum 2 projects per year",
+      "Identify and track improvement initiatives",
+      "Top Management",
+      "Projects"
+     ]
+    ]
+   }
   },
   {
    "name": "HCCPL/QMS/SOP-001",

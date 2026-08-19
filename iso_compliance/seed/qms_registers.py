@@ -59,6 +59,20 @@ def import_registers(batch: str = SEED_BATCH, commit: bool = True) -> dict:
 			created += 1
 		result[doctype] = {"created": created, "skipped": skipped}
 
+	# POL-002's measurable objectives, grouped per responsible function so each
+	# owner reviews their own set. Quality Goal has no seed_batch field, so
+	# import matches on the goal name and purge removes exactly the named goals.
+	created = skipped = 0
+	for entry in data.get("quality_goals") or []:
+		if frappe.db.exists("Quality Goal", {"goal": entry["goal"]}):
+			skipped += 1
+			continue
+		payload = dict(entry)
+		payload["doctype"] = "Quality Goal"
+		frappe.get_doc(payload).insert(ignore_permissions=True)
+		created += 1
+	result["Quality Goal"] = {"created": created, "skipped": skipped}
+
 	if commit:
 		frappe.db.commit()
 	return result
@@ -91,6 +105,17 @@ def purge_registers(batch: str = SEED_BATCH, commit: bool = True) -> dict:
 				doc.cancel()
 			doc.delete(ignore_permissions=True, force=True)
 		result[doctype] = len(names)
+
+	seeded_goals = [g["goal"] for g in load_seed().get("quality_goals") or []]
+	names = (
+		frappe.get_all("Quality Goal", filters={"goal": ("in", seeded_goals)}, pluck="name")
+		if seeded_goals
+		else []
+	)
+	for name in names:
+		frappe.delete_doc("Quality Goal", name, ignore_permissions=True, force=True)
+	result["Quality Goal"] = len(names)
+
 	if commit:
 		frappe.db.commit()
 	return result

@@ -1154,5 +1154,115 @@
    "responsible_function": "Design & Marketing",
    "status": "Open"
   }
+ ],
+ "quality_goals": [
+  {
+   "goal": "Sales & Customer Service — Quality Objectives",
+   "frequency": "Quarterly",
+   "date": "1",
+   "objectives": [
+    {
+     "objective": "Improve customer satisfaction (monitor feedback, timely complaint resolution)",
+     "target": "≥ 95% positive feedback"
+    },
+    {
+     "objective": "Increase sales volume (market expansion, customer retention)",
+     "target": "≥ 15% year-on-year growth"
+    }
+   ]
+  },
+  {
+   "goal": "Production & Logistics — Quality Objectives",
+   "frequency": "Monthly",
+   "date": "1",
+   "objectives": [
+    {
+     "objective": "Achieve on-time delivery (production planning, delivery tracking)",
+     "target": "≥ 98% on-time dispatch"
+    },
+    {
+     "objective": "Reduce internal process errors (process review, standardization)",
+     "target": "≥ 10% year-on-year reduction"
+    }
+   ]
+  },
+  {
+   "goal": "Quality — Quality Objectives",
+   "frequency": "Monthly",
+   "date": "1",
+   "objectives": [
+    {
+     "objective": "Reduce product non-conformities (inspection, root cause analysis, corrective action)",
+     "target": "≤ 1% rejection rate"
+    }
+   ]
+  },
+  {
+   "goal": "Purchase — Quality Objectives",
+   "frequency": "Quarterly",
+   "date": "1",
+   "objectives": [
+    {
+     "objective": "Improve supplier performance (supplier evaluation, audits, corrective actions)",
+     "target": "≥ 95% supplier rating"
+    }
+   ]
+  },
+  {
+   "goal": "Maintenance — Quality Objectives",
+   "frequency": "Monthly",
+   "date": "1",
+   "objectives": [
+    {
+     "objective": "Improve equipment reliability (preventive maintenance, breakdown analysis)",
+     "target": "≥ 95% equipment availability"
+    },
+    {
+     "objective": "Reduce unplanned breakdowns (scheduled maintenance, root cause analysis)",
+     "target": "≤ 5% unplanned downtime"
+    }
+   ]
+  },
+  {
+   "goal": "Human Resources — Quality Objectives",
+   "frequency": "Quarterly",
+   "date": "1",
+   "objectives": [
+    {
+     "objective": "Improve employee competency (training programs, skill evaluation)",
+     "target": "100% planned training completed"
+    },
+    {
+     "objective": "Reduce employee absenteeism (attendance monitoring, engagement initiatives)",
+     "target": "≤ 3% absenteeism rate"
+    },
+    {
+     "objective": "Reduce employee attrition (employee engagement, career development)",
+     "target": "≤ 10% annual attrition"
+    }
+   ]
+  },
+  {
+   "goal": "Stores — Quality Objectives",
+   "frequency": "Monthly",
+   "date": "1",
+   "objectives": [
+    {
+     "objective": "Improve inventory accuracy (cycle count, reconciliation)",
+     "target": "≥ 99% stock accuracy"
+    }
+   ]
+  },
+  {
+   "goal": "Management — Quality Objectives",
+   "frequency": "Quarterly",
+   "date": "1",
+   "objectives": [
+    {
+     "objective": "Enhance continual improvement culture (identify and track improvement initiatives)",
+     "target": "Minimum 2 projects per year"
+    }
+   ]
+  }
  ]
 }

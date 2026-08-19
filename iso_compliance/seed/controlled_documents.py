@@ -267,6 +267,7 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 		"issue_date": entry.get("issue_date"),
 		"revision_number": entry.get("revision_number") or "00",
 		"body_mode": entry.get("body_mode"),
+		"body_content": entry.get("body_content"),
 		"mapped_doctype": entry.get("mapped_doctype"),
 		"mapped_filters": entry.get("mapped_filters"),
 		"mapped_report": entry.get("mapped_report"),

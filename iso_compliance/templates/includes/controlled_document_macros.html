@@ -112,30 +112,17 @@
 
 
 {%- macro authority_block(doc) -%}
+{#- A slim strip, not a signature panel: the stamps are electronic, so the print
+    reports them in one line each instead of leaving room to sign. -#}
 <table class="cd-authority">
 	<tr>
-		<th>Prepared By</th>
-		<th>Reviewed By</th>
-		<th>Approved By</th>
-	</tr>
-	<tr>
-		<td>
-			<div class="cd-sig-name">{{ doc.prepared_by_name or doc.prepared_by or "&mdash;" }}</div>
-			<div class="cd-sig-date">{{ doc.get_formatted("prepared_on") or "" }}</div>
-		</td>
-		<td>
-			<div class="cd-sig-name">{{ doc.reviewed_by_name or doc.reviewed_by or "&mdash;" }}</div>
-			<div class="cd-sig-date">{{ doc.get_formatted("reviewed_on") or "" }}</div>
-		</td>
-		<td>
-			<div class="cd-sig-name">{{ doc.approved_by_name or doc.approved_by or "&mdash;" }}</div>
-			<div class="cd-sig-date">{{ doc.get_formatted("approved_on") or "" }}</div>
-		</td>
+		<td><span class="cd-auth-role">Prepared</span> {{ doc.prepared_by_name or doc.prepared_by or "&mdash;" }}{% if doc.prepared_on %} &middot; {{ doc.get_formatted("prepared_on") }}{% endif %}</td>
+		<td><span class="cd-auth-role">Reviewed</span> {{ doc.reviewed_by_name or doc.reviewed_by or "&mdash;" }}{% if doc.reviewed_on %} &middot; {{ doc.get_formatted("reviewed_on") }}{% endif %}</td>
+		<td><span class="cd-auth-role">Approved</span> {{ doc.approved_by_name or doc.approved_by or "&mdash;" }}{% if doc.approved_on %} &middot; {{ doc.get_formatted("approved_on") }}{% endif %}</td>
 	</tr>
 </table>
 <div class="cd-authority-note">
-	Prepared, reviewed and approved electronically in ERPNext. The stamps above are written by
-	workflow transitions and cannot be typed in.
+	Stamped electronically by ERPNext workflow transitions; not typed, not signed by hand.
 </div>
 {%- endmacro -%}
 
@@ -346,7 +333,7 @@
 <div class="cd-section">
 	{%- if doc.static_table or doc.mapped_doctype or doc.mapped_report -%}
 		{%- set data = doc.get_register_rows() -%}
-		<h2 class="cd-h2">Register Entries</h2>
+		{%- if not data.static -%}<h2 class="cd-h2">Register Entries</h2>{%- endif -%}
 		<p class="cd-source">
 			{%- if data.static -%}
 			The rows below are part of this controlled document: they change through a
@@ -406,7 +393,10 @@
 		{{ rich_body(doc) }}
 	{%- endif -%}
 
-	{%- if mode != "Mapped Data" and doc.mapped_doctype -%}
+	{#- A document of any body mode can also carry live mapped data or a static
+	    table -- the Quality Objectives policy prints its objectives table after
+	    its body even though its type reads as rich text. -#}
+	{%- if mode != "Mapped Data" and (doc.mapped_doctype or doc.mapped_report or doc.static_table) -%}
 		{{ mapped_body(doc) }}
 	{%- endif -%}
 {%- endmacro -%}
