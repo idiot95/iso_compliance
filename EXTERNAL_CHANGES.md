@@ -139,4 +139,5 @@ page. Worth revisiting when frappe ships the missing asset.
 
 | Date | Target DocType | Field / Change | Type | Reason | Fixture |
 | ---- | -------------- | -------------- | ---- | ------ | ------- |
-| —    | —              | —              | —    | —      | —       |
+| 2026-08-16 | Quality Meeting | `custom_minutes_guidance` | HTML (display only) | Explains, above the minutes table, when a minute links to a Quality Review, Quality Action or Quality Feedback and what to write. Prints as a note on FRM-024's blank form. Requested by the developer. | yes |
+| 2026-08-14 | Quality Meeting | Document Naming Rule `HCCPL/QMS/FRM-024-` | Naming rule (record, not schema) | Meeting records number themselves as the form the register knows them by. Created by the ensure hook; deleting the rule reverts naming. | via hook |

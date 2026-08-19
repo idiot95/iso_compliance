@@ -333,7 +333,9 @@
 			{%- for col in s.columns if col -%}
 			<div class="cd-formcol">
 				{%- for f in col -%}
-					{%- if f.kind == "check" -%}
+					{%- if f.kind == "note" -%}
+					<div class="cd-formnote">{{ f.content }}</div>
+					{%- elif f.kind == "check" -%}
 					<div class="cd-formcheck">&#9744;&nbsp; {{ f.label }}</div>
 					{%- else -%}
 					<div class="cd-formfield">

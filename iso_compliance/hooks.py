@@ -17,6 +17,16 @@ app_license = "mit"
 # registers are simply unmapped and the rest of the app is unaffected.
 required_apps = ["erpnext"]
 
+# The only records this app writes into another app's DocTypes, each one
+# approved and logged in EXTERNAL_CHANGES.md first. Named explicitly so an
+# export can never sweep up another app's custom fields.
+fixtures = [
+	{
+		"dt": "Custom Field",
+		"filters": [["name", "in", ["Quality Meeting-custom_minutes_guidance"]]],
+	}
+]
+
 # Shows ISO Compliance on the desk apps screen, opening straight onto the dashboard.
 add_to_apps_screen = [
 	{

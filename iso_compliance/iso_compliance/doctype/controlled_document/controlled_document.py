@@ -482,7 +482,16 @@ class ControlledDocument(Document):
 			if f.fieldtype == "Column Break":
 				section["columns"].append([])
 				continue
-			if f.hidden or f.print_hide or not f.label:
+			if f.hidden or f.print_hide:
+				continue
+			# Guidance this app itself placed on the doctype (a custom HTML field
+			# with content) prints as a note on the blank form; core HTML widgets
+			# never do.
+			if f.fieldtype == "HTML":
+				if f.get("is_custom_field") and (f.options or "").strip():
+					section["columns"][-1].append({"kind": "note", "content": f.options})
+				continue
+			if not f.label:
 				continue
 			if f.fieldtype in ("Table", "Table MultiSelect"):
 				child = frappe.get_meta(f.options)

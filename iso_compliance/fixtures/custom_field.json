@@ -1,0 +1,13 @@
+[
+ {
+  "doctype": "Custom Field",
+  "name": "Quality Meeting-custom_minutes_guidance",
+  "dt": "Quality Meeting",
+  "fieldname": "custom_minutes_guidance",
+  "fieldtype": "HTML",
+  "label": "How to Record Minutes",
+  "insert_after": "sb_01",
+  "module": "ISO Compliance",
+  "options": "<div style=\"font-size: 12px; line-height: 1.5; padding: 8px 12px; background: var(--bg-light-gray, #f8f8f8); border-left: 3px solid var(--green-600, #1f5d3f); border-radius: 4px; margin-bottom: 8px;\"><b>How to record minutes.</b> One row per discussion item or decision, linked to the record it concerns:<ul style=\"margin: 6px 0 6px 18px; padding: 0;\"><li><b>Quality Review</b> — discussing results against a Quality Goal (<i>we measured</i>). Write the conclusion the meeting drew from the review.</li><li><b>Quality Action</b> — the meeting decides to correct or prevent something (<i>we are fixing</i>). Raise the Quality Action first, link it here, and write the decision with owner and target date.</li><li><b>Quality Feedback</b> — discussing what a customer or employee reported (<i>we were told</i>). Write what was noted and any follow-up agreed.</li></ul>A management review normally <i>reads</i> reviews and feedback and <i>produces</i> actions. Assign a ToDo for every action item so follow-up is tracked to the next meeting. This record is the filled <b>FRM-024</b>; REG-019 registers it automatically.</div>"
+ }
+]
