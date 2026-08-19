@@ -257,7 +257,11 @@ class ControlledDocument(Document):
 			if field.fieldtype in ("Table", "Table MultiSelect"):
 				if self._table_changed(previous, field.fieldname):
 					changed.append(field.fieldname)
-			elif (self.get(field.fieldname) or "") != (previous.get(field.fieldname) or ""):
+			# cstr on both sides: the stored document carries date objects, a
+			# browser save sends the same dates back as strings. Compare the
+			# value, not the Python type, or an untouched Issue Date blocks
+			# every form save behind a phantom change.
+			elif cstr(self.get(field.fieldname)).strip() != cstr(previous.get(field.fieldname)).strip():
 				changed.append(field.fieldname)
 		return changed
 
@@ -269,7 +273,7 @@ class ControlledDocument(Document):
 
 		def snapshot(doc):
 			return [
-				{k: v for k, v in row.as_dict().items() if k not in meta_fields}
+				{k: cstr(v).strip() for k, v in row.as_dict().items() if k not in meta_fields}
 				for row in doc.get(fieldname) or []
 			]
 

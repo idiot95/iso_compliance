@@ -285,12 +285,16 @@
       "title": "Risk & Opportunity Register"
      },
      {
-      "number": "MRM001",
+      "number": "REG018",
+      "title": "Corrective Action Records (where applicable)"
+     },
+     {
+      "number": "FRM024",
       "title": "Management Review Minutes"
      },
      {
-      "number": "REG018",
-      "title": "Corrective Action Records (where applicable)"
+      "number": "REG019",
+      "title": "Management Review Register"
      }
     ]
    }
