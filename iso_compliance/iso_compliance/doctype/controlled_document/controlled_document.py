@@ -447,6 +447,62 @@ class ControlledDocument(Document):
 		)
 		return {"columns": columns, "rows": _shape(rows), "total": total, "shown": len(rows), "limit": limit}
 
+	def get_form_layout(self) -> dict:
+		"""The mapped doctype's fields as a blank form template.
+
+		A Form-type controlled document is not a register of records -- it is the
+		template people fill, whose ERP equivalent is the mapped doctype's entry
+		screen. So the print mirrors that screen: the doctype's own sections,
+		columns and labels, drawn as empty boxes. The doctype's print_hide,
+		hidden and read_only judgements are honoured, which is what keeps a
+		600-field Sales Order printable as a one-page contract review form.
+		"""
+		if not self.mapped_doctype or not frappe.db.exists("DocType", self.mapped_doctype):
+			return {}
+		meta = frappe.get_meta(self.mapped_doctype)
+
+		skip_types = {"Tab Break", "HTML", "Button", "Image", "Attach Image", "Attach",
+			"Barcode", "Signature", "Heading", "Icon", "Color", "Geolocation", "JSON", "Code"}
+		sections: list[dict] = []
+		section = {"label": None, "columns": [[]], "tables": []}
+
+		def push():
+			if section["tables"] or any(section["columns"]):
+				sections.append(section)
+
+		for f in meta.fields:
+			if f.fieldtype in ("Section Break", "Tab Break"):
+				push()
+				section = {"label": None if f.hidden else f.label, "columns": [[]], "tables": []}
+				continue
+			if f.fieldtype == "Column Break":
+				section["columns"].append([])
+				continue
+			if f.hidden or f.print_hide or not f.label:
+				continue
+			if f.fieldtype in ("Table", "Table MultiSelect"):
+				child = frappe.get_meta(f.options)
+				cols = [c.label for c in child.fields
+					if c.in_list_view and not c.hidden and c.label] or [
+					c.label for c in child.fields if c.label][:4]
+				section["tables"].append({"label": f.label, "columns": cols[:8]})
+				continue
+			if f.read_only or f.fieldtype in skip_types:
+				continue
+			entry = {"kind": "field", "label": f.label}
+			if f.fieldtype == "Check":
+				entry["kind"] = "check"
+			elif f.fieldtype == "Select" and f.options:
+				opts = [o for o in f.options.split("\n") if o.strip()]
+				if opts:
+					entry["options"] = " / ".join(opts)[:90]
+			elif f.fieldtype in ("Text", "Small Text", "Long Text", "Text Editor"):
+				entry["tall"] = True
+			section["columns"][-1].append(entry)
+		push()
+
+		return {"doctype": self.mapped_doctype, "sections": sections}
+
 	def get_static_rows(self) -> dict:
 		"""A register whose rows are part of the controlled document itself.
 

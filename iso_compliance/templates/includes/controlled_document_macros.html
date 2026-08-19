@@ -317,7 +317,52 @@
 {%- endmacro -%}
 
 
+{%- macro form_body(doc) -%}
+{#- A form is a template, not a register: the mapped doctype's own sections,
+    columns and labels drawn as blank boxes, the way the paper form looked. -#}
+{%- set layout = doc.get_form_layout() -%}
+<div class="cd-section">
+	<p class="cd-source">Completed in ERPNext as <strong>{{ layout.doctype }}</strong>.
+		This template mirrors its entry screen, for reference and for manual use when the system
+		is unavailable; a manually completed copy is transcribed into ERPNext.</p>
+	{%- for s in layout.sections -%}
+	<div class="cd-formsec">
+		{%- if s.label -%}<div class="cd-formsec-title">{{ s.label }}</div>{%- endif -%}
+		{%- if s.columns | map("length") | sum -%}
+		<div class="cd-formcols">
+			{%- for col in s.columns if col -%}
+			<div class="cd-formcol">
+				{%- for f in col -%}
+					{%- if f.kind == "check" -%}
+					<div class="cd-formcheck">&#9744;&nbsp; {{ f.label }}</div>
+					{%- else -%}
+					<div class="cd-formfield">
+						<span class="cd-lbl">{{ f.label }}{% if f.options %} <span class="cd-formopts">({{ f.options }})</span>{% endif %}</span>
+						<span class="cd-formbox{% if f.tall %} tall{% endif %}">&nbsp;</span>
+					</div>
+					{%- endif -%}
+				{%- endfor -%}
+			</div>
+			{%- endfor -%}
+		</div>
+		{%- endif -%}
+		{%- for t in s.tables -%}
+		<div class="cd-lbl" style="margin-top:4pt">{{ t.label }}</div>
+		<table class="cd-table cd-formtable">
+			<thead><tr>{% for c in t.columns %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+			<tbody>{% for _ in range(4) %}<tr>{% for c in t.columns %}<td>&nbsp;</td>{% endfor %}</tr>{% endfor %}</tbody>
+		</table>
+		{%- endfor -%}
+	</div>
+	{%- endfor -%}
+</div>
+{%- endmacro -%}
+
+
 {%- macro mapped_body(doc) -%}
+{%- if doc.document_type == "FRM" and doc.mapped_doctype and not doc.static_table -%}
+{{ form_body(doc) }}
+{%- else -%}
 <div class="cd-section">
 	{%- if doc.static_table or doc.mapped_doctype or doc.mapped_report -%}
 		{%- set data = doc.get_register_rows() -%}
@@ -366,6 +411,7 @@
 		<div class="cd-empty">No ERPNext data source has been mapped to this document yet.</div>
 	{%- endif -%}
 </div>
+{%- endif -%}
 {%- endmacro -%}
 
 
