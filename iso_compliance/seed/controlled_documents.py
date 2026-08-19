@@ -393,7 +393,8 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 		"print_columns": json.dumps(entry["print_columns"]) if entry.get("print_columns") else None,
 		"print_layout": entry.get("print_layout") or "Table",
 		"static_table": json.dumps(entry["static_table"]) if entry.get("static_table") else None,
-		"workflow_state": "Active" if entry.get("has_source_file") else "Draft",
+		"workflow_state": entry.get("workflow_state")
+		or ("Active" if entry.get("has_source_file") else "Draft"),
 		"approval_authority": _canonical_role(entry.get("approval_authority")),
 		"seed_batch": batch,
 	}

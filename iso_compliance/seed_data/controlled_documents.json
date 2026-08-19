@@ -1244,7 +1244,8 @@
       "title": "Design & Development Register"
      }
     ]
-   }
+   },
+   "workflow_state": "Draft"
   },
   {
    "name": "HCCPL/QMS/SOP-010",
@@ -1525,101 +1526,102 @@
    "sop": {
     "declared_number": "SOP010",
     "declared_title": "Preservation, Storage, Packing & Dispatch Procedure",
-    "purpose": "<p>To establish a systematic process for the handling, storage, preservation, packing, and dispatch of materials and finished products to maintain product conformity until delivery to the customer.</p>",
-    "scope": "<p>This procedure applies to the handling, storage, preservation, packing, and dispatch of incoming materials, work-in-progress (WIP), finished products, and products awaiting dispatch at Hatim Carbon Co. Pvt. Ltd.</p>",
+    "purpose": "<p>To establish a systematic process for the monitoring, measurement, inspection and testing of products at the incoming, in-process and final stages, so that conformity to specified requirements is verified and evidenced before release.</p>",
+    "scope": "<p>This procedure applies to all inspection and testing of purchased materials, work-in-progress and finished products at Hatim Carbon Company Private Limited.</p>",
     "references": [
      {
-      "reference": "ISO 9001:2015 Clause 8.5.4 – Preservation"
+      "reference": "ISO 9001:2015 Clause 9.1.1 – Monitoring, Measurement, Analysis and Evaluation"
+     },
+     {
+      "reference": "ISO 9001:2015 Clause 8.6 – Release of Products and Services"
      },
      {
       "reference": "QM001 – Quality Manual"
      },
      {
-      "reference": "Customer Purchase Orders"
+      "reference": "SOP006 – Incoming Material Inspection & Material Identification"
      },
      {
-      "reference": "Customer Packing Requirements (where applicable)"
+      "reference": "SOP008 – Manufacturing Process Control"
+     },
+     {
+      "reference": "SOP013 – Control of Nonconforming Outputs"
+     },
+     {
+      "reference": "SOP017 – Control of Monitoring & Measuring Equipment (Calibration)"
      }
     ],
     "definitions": [
      {
-      "term": "Preservation",
-      "definition": "Activities performed to maintain product conformity during storage, handling, packing, and transportation."
+      "term": "Inspection",
+      "definition": "Examination of a product against specified requirements, recorded as a Quality Inspection."
      },
      {
-      "term": "Dispatch",
-      "definition": "Process of delivering approved products to the customer along with the required documents."
+      "term": "Acceptance Criteria",
+      "definition": "The limits or requirements a characteristic must satisfy for the product to be accepted."
      },
      {
-      "term": "Packing",
-      "definition": "Process of protecting products against damage during handling and transportation."
-     },
-     {
-      "term": "Storage",
-      "definition": "Controlled keeping of materials or products to prevent deterioration, damage, or mix-up before use or dispatch."
+      "term": "Release",
+      "definition": "Authorisation for a product to proceed to the next stage or to dispatch after satisfactory inspection."
      }
     ],
     "responsibilities": [
      {
-      "role": "Production Department",
-      "responsibility": "Transfer finished products safely to the designated storage area. Ensure products are clean before packing."
+      "role": "Quality Manager / Management Representative",
+      "responsibility": "Define inspection stages, templates and acceptance criteria. Review inspection results and authorise release. Ensure inspection is performed with calibrated equipment."
      },
      {
-      "role": "Quality Department",
-      "responsibility": "Verify that only accepted products are released for packing and dispatch. Confirm dispatch authorization where applicable."
+      "role": "Production Lead",
+      "responsibility": "Ensure in-process and final inspections are carried out and recorded before products move to the next stage."
      },
      {
-      "role": "Stores Department",
-      "responsibility": "Store materials and finished products appropriately. Maintain product identification and stock control during storage. Protect materials from damage and deterioration."
-     },
-     {
-      "role": "Dispatch Department",
-      "responsibility": "Pack products according to customer requirements. Prepare dispatch documents. Coordinate transportation."
+      "role": "Purchase Executive",
+      "responsibility": "Ensure incoming material is presented for inspection before acceptance into stock."
      }
     ],
     "procedure_steps": [
      {
       "step_no": "1",
-      "step_title": "Storage",
-      "step_content": "<p>Materials and finished products shall be stored in designated locations to prevent:</p><ul><li>Damage</li><li>Corrosion</li><li>Contamination</li><li>Moisture exposure</li><li>Product mix-up</li><li>Unauthorized use</li></ul>"
+      "step_title": "Inspection Stages",
+      "step_content": "<p>Monitoring and measurement shall be carried out at three stages: incoming inspection of purchased material (SOP001-referenced in SOP006), in-process inspection during manufacturing (SOP008), and final inspection before release for dispatch.</p>"
      },
      {
       "step_no": "2",
-      "step_title": "Preservation",
-      "step_content": "<p>Products shall be handled carefully throughout manufacturing and storage to maintain their quality and identification.</p><p>Suitable protective measures such as protective wrapping, anti-rust treatment, moisture protection, and appropriate stacking shall be adopted where necessary.</p>"
+      "step_title": "Inspection Records",
+      "step_content": "<p>Each inspection shall be recorded as a Quality Inspection in ERPNext, identifying the item, the batch or work order, the characteristics checked, the person inspecting, and the result.</p>"
      },
      {
       "step_no": "3",
-      "step_title": "Packing",
-      "step_content": "<p>Products shall be packed according to:</p><ul><li>Customer requirements</li><li>Product characteristics</li><li>Transportation method</li><li>Internal packing standards</li></ul><p>Packing shall provide adequate protection during handling and transit.</p>"
+      "step_title": "Acceptance Criteria",
+      "step_content": "<p>Inspection shall be performed against approved drawings, specifications and customer requirements. Observations shall be recorded against the defined acceptance criteria of the applicable inspection template.</p>"
      },
      {
       "step_no": "4",
-      "step_title": "Dispatch",
-      "step_content": "<p>Only products released by the Quality Department after satisfactory completion of all specified inspection and testing activities shall be dispatched.</p><p>Dispatch documents shall be verified before shipment.</p>"
+      "step_title": "Inspection Status",
+      "step_content": "<p>The inspection result determines the product status in accordance with SOP011 – Identification & Traceability. Rejected material shall be handled in accordance with SOP013 – Control of Nonconforming Outputs.</p>"
      },
      {
       "step_no": "5",
-      "step_title": "Delivery Documents",
-      "step_content": "<p>The dispatch package may include, where applicable:</p><ul><li>Delivery Challan</li><li>Tax Invoice</li><li>Packing List</li><li>Inspection Report</li><li>Material Test Certificate</li><li>Certificate of Conformity (if required)</li></ul>"
+      "step_title": "Release for Dispatch",
+      "step_content": "<p>Only products with satisfactory completion of all specified inspection and testing shall be released. Release evidence shall accompany the dispatch documents where required by the customer.</p>"
      }
     ],
     "records_generated": [
      {
-      "number": "",
-      "title": "FRMxxx – Packing Checklist"
+      "number": "FRM006",
+      "title": "Incoming Inspection Report"
      },
      {
-      "number": "REG024",
-      "title": "Dispatch Register"
+      "number": "FRM009",
+      "title": "In-Process Inspection Report"
      },
      {
-      "number": "",
-      "title": "FRMxxx – Delivery Challan"
+      "number": "FRM010",
+      "title": "Final Inspection Report (PDI)"
      },
      {
-      "number": "",
-      "title": "FRMxxx – Dispatch Checklist"
+      "number": "FRM020",
+      "title": "Nonconforming Product Report (NCR)"
      }
     ]
    }
@@ -4617,7 +4619,8 @@
      ]
     ]
    },
-   "print_layout": "Form"
+   "print_layout": "Form",
+   "workflow_state": "Draft"
   },
   {
    "name": "HCCPL/QMS/REG-018",
