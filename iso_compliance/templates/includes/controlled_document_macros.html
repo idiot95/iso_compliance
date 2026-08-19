@@ -186,7 +186,7 @@
 	<div class="cd-section"><h2 class="cd-h2">3. References</h2>
 		<ul class="cd-list">
 		{%- for r in doc.references -%}
-			<li>{{ r.reference }}{% if r.clause %} &mdash; cl. {{ r.clause }}{% endif %}</li>
+			<li>{{ r.reference }}{% if r.clause %} &mdash; cl. {{ r.clause }}{% endif %}{% if r.linked_document %} <span class="cd-refnum">&rarr; {{ r.linked_document }}</span>{% endif %}</li>
 		{%- endfor -%}
 		</ul>
 	</div>

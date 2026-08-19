@@ -219,9 +219,30 @@ def _resolve_cross_references(documents: list[dict], resolve: dict) -> int:
 						row.document_number = target
 					changed = True
 					linked += 1
+
+		# References citing an internal document by its legacy number ("QM001 -
+		# Quality Manual") link to the controlled document itself; standards and
+		# other external citations stay as text.
+		for row in doc.get("references") or []:
+			target = _reference_target(row.reference, resolve)
+			if target and row.linked_document != target:
+				row.linked_document = target
+				changed = True
+				linked += 1
 		if changed:
 			doc.save(ignore_permissions=True)
 	return linked
+
+
+#: "QM001", "REG 001", "FRM-020" at the start of a citation line.
+_REFERENCE_NUMBER = re.compile(r"^\s*([A-Z]{2,4})\s*-?\s*0*(\d{1,4})\b")
+
+
+def _reference_target(text: str | None, resolve: dict) -> str | None:
+	match = _REFERENCE_NUMBER.match(text or "")
+	if not match:
+		return None
+	return resolve.get(f"{match.group(1)}{int(match.group(2)):03d}")
 
 
 def _ensure_workflow_states():

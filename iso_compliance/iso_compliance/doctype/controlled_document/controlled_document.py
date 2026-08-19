@@ -7,7 +7,7 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.model.naming import make_autoname
-from frappe.utils import cint, now_datetime, nowdate
+from frappe.utils import cint, cstr, now_datetime, nowdate
 
 #: Fields of a Document Revision row that constitute the audit record. Once a row
 #: exists, none of these may change.
@@ -335,10 +335,16 @@ class ControlledDocument(Document):
 				title=_("Immutable Revision History"),
 			)
 
+		def frozen(value) -> str:
+			# The stored row carries date/datetime objects; a browser save sends
+			# the same values back as strings. Compare the evidence, not the
+			# Python type, or an unchanged date reads as tampering.
+			return cstr(value).strip()
+
 		for row_name, old_row in old_rows.items():
 			new_row = new_rows[row_name]
 			for fieldname in REVISION_EVIDENCE_FIELDS:
-				if old_row.get(fieldname) != new_row.get(fieldname):
+				if frozen(old_row.get(fieldname)) != frozen(new_row.get(fieldname)):
 					frappe.throw(
 						_("Change History row {0} cannot be modified. {1} was changed from {2} to {3}.").format(
 							old_row.idx,
