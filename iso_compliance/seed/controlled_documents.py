@@ -117,6 +117,7 @@ def import_seed(batch: str = SEED_BATCH, commit: bool = True) -> dict:
 	"""Create the controlled document set. Safe to re-run: existing names are skipped."""
 	documents = load_seed()
 	_ensure_workflow_states()
+	_ensure_designations(documents)
 	created_types = _ensure_types(batch)
 
 	# Legacy number -> new document number, so cross-references between documents
@@ -267,6 +268,46 @@ def _reference_target(text: str | None, resolve: dict) -> str | None:
 	return resolve.get(f"{match.group(1)}{int(match.group(2)):03d}")
 
 
+#: The source SOPs name the same actor five different ways. Folded here so the
+#: Designation master gets one record per real role, not one per spelling.
+ROLE_CANON = {
+	"Quality Manager / MR": "Quality Manager / Management Representative",
+	"Quality Manager": "Quality Manager / Management Representative",
+	"Department Heads": "Department Head",
+	"Management": "Top Management",
+	"Director": "Managing Director",
+	"Sales / Marketing": "Sales & Marketing Department",
+	"Production Head": "Production Manager",
+	"Design / Engineering Department (where applicable)": "Design / Engineering Department",
+}
+
+
+def _canonical_role(role: str | None) -> str | None:
+	if not role:
+		return None
+	role = role.strip()
+	return ROLE_CANON.get(role, role)
+
+
+def _ensure_designations(documents: list[dict]):
+	"""Approval authorities are positions, linked to the Designation master.
+
+	REG-001 names three -- Director, QA Manager, Maintenance Head -- and a site
+	need not have them as Designations already. Created if missing, idempotent,
+	and left in place by a purge: they are master data, not imported content.
+	"""
+	positions = {d.get("approval_authority") for d in documents if d.get("approval_authority")}
+	for doc in documents:
+		for row in (doc.get("sop") or {}).get("responsibilities", []):
+			positions.add(_canonical_role(row.get("role")))
+	positions.discard(None)
+	for authority in sorted(positions):
+		if not frappe.db.exists("Designation", authority):
+			frappe.get_doc({"doctype": "Designation", "designation_name": authority}).insert(
+				ignore_permissions=True
+			)
+
+
 def _ensure_workflow_states():
 	for state, style in WORKFLOW_STATES:
 		if not frappe.db.exists("Workflow State", state):
@@ -345,7 +386,7 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 			{"term": d["term"], "definition": d["definition"]} for d in sop.get("definitions", [])
 		]
 		payload["responsibilities"] = [
-			{"role": r["role"], "responsibility": r["responsibility"]}
+			{"role": _canonical_role(r["role"]), "responsibility": r["responsibility"]}
 			for r in sop.get("responsibilities", [])
 		]
 		payload["procedure_steps"] = sop.get("procedure_steps", [])

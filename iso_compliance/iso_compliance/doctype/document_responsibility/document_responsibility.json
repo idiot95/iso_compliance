@@ -12,11 +12,12 @@
  "fields": [
   {
    "fieldname": "role",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "Role",
    "in_list_view": 1,
    "columns": 3,
-   "reqd": 1
+   "reqd": 1,
+   "options": "Designation"
   },
   {
    "fieldname": "designation",
@@ -36,7 +37,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-08-04 00:00:00.000000",
+ "modified": "2026-08-15 11:30:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Document Responsibility",
