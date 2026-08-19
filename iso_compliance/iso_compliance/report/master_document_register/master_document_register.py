@@ -49,7 +49,7 @@ def get_data(filters):
 	if not filters.get("include_retired"):
 		conditions["workflow_state"] = ("not in", ("Superseded", "Obsolete"))
 
-	return frappe.get_all(
+	rows = frappe.get_all(
 		"Controlled Document",
 		filters=conditions,
 		fields=[
@@ -60,6 +60,12 @@ def get_data(filters):
 			"next_review_date", "mapped_doctype", "legacy_document_number",
 		],
 		# Explicit. v16 lists default to `creation`, which is not a register order.
-		order_by="document_type asc, name asc",
+		order_by="name asc",
 		limit_page_length=0,
 	)
+
+	# The register reads in document hierarchy, not alphabetically: the manual,
+	# then policies, procedures, work instructions, registers, and forms last.
+	rank = {"QM": 0, "POL": 1, "SOP": 2, "WI": 3, "REG": 4, "FRM": 5}
+	rows.sort(key=lambda r: (rank.get(r.document_type, 9), r.name))
+	return rows
