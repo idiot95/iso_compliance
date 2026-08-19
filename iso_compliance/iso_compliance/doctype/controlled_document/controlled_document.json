@@ -63,7 +63,6 @@
   "records_generated_section",
   "records_generated",
   "related_documents_section",
-  "related_documents",
   "rich_body_section",
   "body_content",
   "attachment_section",
@@ -122,7 +121,9 @@
    "fieldname": "clause_reference",
    "fieldtype": "Data",
    "label": "ISO Clause Reference",
-   "description": "Clause of ISO 9001 this document addresses, e.g. 7.5.3."
+   "description": "Derived from the References table: the clause values of ISO citation rows, joined. Feeds the title block and REG-001's ISO Clause column; not entered here.",
+   "hidden": 1,
+   "read_only": 1
   },
   {
    "fieldname": "legacy_document_number",
@@ -456,12 +457,6 @@
    "label": "Related Documents"
   },
   {
-   "fieldname": "related_documents",
-   "fieldtype": "Table",
-   "label": "Related Documents",
-   "options": "Document Link Item"
-  },
-  {
    "depends_on": "eval:['Rich Text','Matrix'].includes(doc.body_mode)",
    "fieldname": "rich_body_section",
    "fieldtype": "Section Break",
@@ -538,7 +533,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-08-14 12:00:00.000000",
+ "modified": "2026-08-14 21:00:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Controlled Document",

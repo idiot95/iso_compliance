@@ -46,7 +46,7 @@ SECTION_KEYS = {
 	"responsibilities": "responsibilities",
 	"procedure": "procedure",
 	"records": "records_generated",
-	"related documents": "related_documents",
+	"related documents": None,  # dropped from the QMS: 47% duplicated References/Records
 	"process flow": None,
 	"revision history": None,
 }
@@ -169,7 +169,6 @@ def extract_sop(path: str) -> tuple[dict, list]:
 		"responsibilities": [],
 		"procedure_steps": [],
 		"records_generated": [],
-		"related_documents": [],
 	}
 
 	for kind, style, _n, _i, text in items:
@@ -308,8 +307,7 @@ def main() -> int:
 		print(
 			f"{legacy}: {len(sop['procedure_steps'])} steps, "
 			f"{len(sop['definitions'])} definitions, {len(sop['responsibilities'])} roles, "
-			f"{len(sop['references'])} references, {len(sop['records_generated'])} records, "
-			f"{len(sop['related_documents'])} related"
+			f"{len(sop['references'])} references, {len(sop['records_generated'])} records"
 		)
 
 	if args.dry_run:

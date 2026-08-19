@@ -63,9 +63,30 @@ class ControlledDocument(Document):
 
 	def validate(self):
 		self.normalise_control_numbers()
+		self.derive_from_references()
 		self.validate_segregation_of_duty()
 		self.validate_revision_history_is_immutable()
 		self.enforce_change_control()
+
+	def derive_from_references(self):
+		"""The References table is the single entry point for clause and record links.
+
+		The hidden clause_reference field -- which the title block and REG-001's
+		ISO Clause column read -- is the joined clause values of the reference
+		rows. A record row's number follows its Link, so picking the document is
+		the whole entry. Changing a reference row is a controlled change, and the
+		derived value rides the same change request.
+		"""
+		clauses = []
+		for row in self.references or []:
+			if row.clause and row.clause not in clauses:
+				clauses.append(row.clause)
+		if clauses:
+			self.clause_reference = ", ".join(clauses)
+
+		for row in self.records_generated or []:
+			if row.document:
+				row.document_number = row.document
 
 	def on_update(self):
 		self._stamp_implemented_change_request()

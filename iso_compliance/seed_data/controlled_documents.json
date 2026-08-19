@@ -189,20 +189,6 @@
       "number": "FRM001",
       "title": "Document Change Request"
      }
-    ],
-    "related_documents": [
-     {
-      "number": "QM001",
-      "title": "Quality Manual"
-     },
-     {
-      "number": "REG001",
-      "title": "Master Document List"
-     },
-     {
-      "number": "FRM001",
-      "title": "Document Change Request"
-     }
     ]
    }
   },
@@ -305,24 +291,6 @@
      {
       "number": "REG018",
       "title": "Corrective Action Records (where applicable)"
-     }
-    ],
-    "related_documents": [
-     {
-      "number": "QM001",
-      "title": "Quality Manual"
-     },
-     {
-      "number": "REG001",
-      "title": "Master Document List"
-     },
-     {
-      "number": "REG004",
-      "title": "Risk & Opportunity Register"
-     },
-     {
-      "number": "MRM001",
-      "title": "Management Review Minutes"
      }
     ]
    }
@@ -451,28 +419,6 @@
      {
       "number": "REG023",
       "title": "Annual Training Calendar"
-     }
-    ],
-    "related_documents": [
-     {
-      "number": "QM001",
-      "title": "Quality Manual"
-     },
-     {
-      "number": "POL001",
-      "title": "Quality Policy"
-     },
-     {
-      "number": "POL002",
-      "title": "Quality Objectives"
-     },
-     {
-      "number": "REG006",
-      "title": "Employee Competency Matrix"
-     },
-     {
-      "number": "REG012",
-      "title": "Training Register"
      }
     ]
    }
@@ -606,24 +552,6 @@
       "number": "",
       "title": "FRMXX – Contract Review Checklist"
      }
-    ],
-    "related_documents": [
-     {
-      "number": "QM001",
-      "title": "Quality Manual"
-     },
-     {
-      "number": "SOP007",
-      "title": "Production Planning & Control Procedure"
-     },
-     {
-      "number": "SOP013",
-      "title": "Control of Nonconforming Outputs Procedure"
-     },
-     {
-      "number": "SOP014",
-      "title": "Corrective Action Procedure"
-     }
     ]
    }
   },
@@ -756,24 +684,6 @@
       "number": "",
       "title": "FRMxxx – Supplier Corrective Action Request (SCAR)"
      }
-    ],
-    "related_documents": [
-     {
-      "number": "QM001",
-      "title": "Quality Manual"
-     },
-     {
-      "number": "SOP006",
-      "title": "Incoming Material Inspection & Material Identification Procedure"
-     },
-     {
-      "number": "SOP013",
-      "title": "Control of Nonconforming Outputs Procedure"
-     },
-     {
-      "number": "SOP014",
-      "title": "Corrective Action Procedure"
-     }
     ]
    }
   },
@@ -896,28 +806,6 @@
      {
       "number": "",
       "title": "FRMxxx – Material Rejection Report"
-     }
-    ],
-    "related_documents": [
-     {
-      "number": "QM001",
-      "title": "Quality Manual"
-     },
-     {
-      "number": "SOP005",
-      "title": "Purchase & Supplier Management Procedure"
-     },
-     {
-      "number": "SOP013",
-      "title": "Control of Nonconforming Outputs Procedure"
-     },
-     {
-      "number": "REG007",
-      "title": "Approved Suppliers Register"
-     },
-     {
-      "number": "",
-      "title": "Applicable Inspection & Test Plan (ITP)"
      }
     ]
    }
@@ -1055,28 +943,6 @@
       "number": "REG016",
       "title": "Production Register"
      }
-    ],
-    "related_documents": [
-     {
-      "number": "QM001",
-      "title": "Quality Manual"
-     },
-     {
-      "number": "SOP006",
-      "title": "Incoming Material Inspection & Material Identification"
-     },
-     {
-      "number": "SOP008",
-      "title": "Manufacturing Process Control Procedure"
-     },
-     {
-      "number": "SOP011",
-      "title": "Identification & Traceability Procedure"
-     },
-     {
-      "number": "SOP012",
-      "title": "Monitoring, Measurement, Inspection & Testing Procedure"
-     }
     ]
    }
   },
@@ -1205,32 +1071,6 @@
      {
       "number": "",
       "title": "FRMxx – Production Deviation Records"
-     }
-    ],
-    "related_documents": [
-     {
-      "number": "QM001",
-      "title": "Quality Manual"
-     },
-     {
-      "number": "SOP007",
-      "title": "Production Planning & Control Procedure"
-     },
-     {
-      "number": "SOP011",
-      "title": "Identification & Traceability Procedure"
-     },
-     {
-      "number": "SOP012",
-      "title": "Monitoring, Measurement, Inspection & Testing Procedure"
-     },
-     {
-      "number": "SOP013",
-      "title": "Control of Nonconforming Outputs Procedure"
-     },
-     {
-      "number": "",
-      "title": "Applicable Work Instructions"
      }
     ]
    }
@@ -1403,28 +1243,6 @@
       "number": "REG017",
       "title": "Design & Development Register"
      }
-    ],
-    "related_documents": [
-     {
-      "number": "QM001",
-      "title": "Quality Manual"
-     },
-     {
-      "number": "SOP001",
-      "title": "Control of Documented Information"
-     },
-     {
-      "number": "SOP004",
-      "title": "Customer Communication, Sales & Contract Review"
-     },
-     {
-      "number": "SOP007",
-      "title": "Production Planning & Control"
-     },
-     {
-      "number": "SOP008",
-      "title": "Manufacturing Process Control"
-     }
     ]
    }
   },
@@ -1556,24 +1374,6 @@
       "number": "",
       "title": "Customer Dispatch Acknowledgement (where applicable)"
      }
-    ],
-    "related_documents": [
-     {
-      "number": "QM001",
-      "title": "Quality Manual"
-     },
-     {
-      "number": "SOP011",
-      "title": "Identification & Traceability Procedure"
-     },
-     {
-      "number": "SOP012",
-      "title": "Monitoring, Measurement, Inspection & Testing Procedure"
-     },
-     {
-      "number": "SOP013",
-      "title": "Control of Nonconforming Outputs Procedure"
-     }
     ]
    }
   },
@@ -1702,32 +1502,6 @@
       "number": "REG015",
       "title": "Incoming Material Register"
      }
-    ],
-    "related_documents": [
-     {
-      "number": "QM001",
-      "title": "Quality Manual"
-     },
-     {
-      "number": "SOP006",
-      "title": "Incoming Material Inspection & Material Identification"
-     },
-     {
-      "number": "SOP007",
-      "title": "Production Planning & Control"
-     },
-     {
-      "number": "SOP008",
-      "title": "Manufacturing Process Control"
-     },
-     {
-      "number": "SOP010",
-      "title": "Preservation, Storage, Packing & Dispatch Procedure"
-     },
-     {
-      "number": "SOP012",
-      "title": "Monitoring, Measurement, Inspection & Testing Procedure"
-     }
     ]
    }
   },
@@ -1846,24 +1620,6 @@
      {
       "number": "",
       "title": "FRMxxx – Dispatch Checklist"
-     }
-    ],
-    "related_documents": [
-     {
-      "number": "QM001",
-      "title": "Quality Manual"
-     },
-     {
-      "number": "SOP011",
-      "title": "Identification & Traceability Procedure"
-     },
-     {
-      "number": "SOP012",
-      "title": "Monitoring, Measurement, Inspection & Testing Procedure"
-     },
-     {
-      "number": "",
-      "title": "Customer Purchase Order"
      }
     ]
    }
@@ -1985,24 +1741,6 @@
       "number": "REG018",
       "title": "Corrective Action Records"
      }
-    ],
-    "related_documents": [
-     {
-      "number": "QM001",
-      "title": "Quality Manual"
-     },
-     {
-      "number": "SOP006",
-      "title": "Incoming Material Inspection & Material Identification"
-     },
-     {
-      "number": "SOP012",
-      "title": "Monitoring, Measurement, Inspection & Testing"
-     },
-     {
-      "number": "SOP014",
-      "title": "Corrective Action"
-     }
     ]
    }
   },
@@ -2115,28 +1853,6 @@
       "number": "REG018",
       "title": "Corrective Action Records"
      }
-    ],
-    "related_documents": [
-     {
-      "number": "QM001",
-      "title": "Quality Manual"
-     },
-     {
-      "number": "SOP013",
-      "title": "Control of Nonconforming Outputs"
-     },
-     {
-      "number": "SOP015",
-      "title": "Internal Audit"
-     },
-     {
-      "number": "SOP016",
-      "title": "Management Review"
-     },
-     {
-      "number": "SOP001",
-      "title": "Control of Documented Information"
-     }
     ]
    }
   },
@@ -2245,20 +1961,6 @@
       "number": "REG010",
       "title": "Internal Audit Register"
      }
-    ],
-    "related_documents": [
-     {
-      "number": "QM001",
-      "title": "Quality Manual"
-     },
-     {
-      "number": "SOP014",
-      "title": "Corrective Action Procedure"
-     },
-     {
-      "number": "SOP016",
-      "title": "Management Review"
-     }
     ]
    }
   },
@@ -2359,28 +2061,6 @@
      {
       "number": "REG019",
       "title": "Management Review Register"
-     }
-    ],
-    "related_documents": [
-     {
-      "number": "QM001",
-      "title": "Quality Manual"
-     },
-     {
-      "number": "SOP002",
-      "title": "Risk & Opportunity Management"
-     },
-     {
-      "number": "SOP012",
-      "title": "Monitoring, Measurement, Inspection & Testing"
-     },
-     {
-      "number": "SOP014",
-      "title": "Corrective Action Procedure"
-     },
-     {
-      "number": "SOP015",
-      "title": "Internal Audit Procedure"
      }
     ]
    }
@@ -2496,24 +2176,6 @@
      {
       "number": "REG011",
       "title": "Monitoring & Measuring Instruments Register"
-     }
-    ],
-    "related_documents": [
-     {
-      "number": "QM001",
-      "title": "Quality Manual"
-     },
-     {
-      "number": "SOP012",
-      "title": "Monitoring, Measurement, Inspection & Testing Procedure"
-     },
-     {
-      "number": "SOP013",
-      "title": "Control of Nonconforming Outputs Procedure"
-     },
-     {
-      "number": "SOP014",
-      "title": "Corrective Action Procedure"
      }
     ]
    }
@@ -2634,24 +2296,6 @@
      {
       "number": "REG021",
       "title": "Maintenance Register"
-     }
-    ],
-    "related_documents": [
-     {
-      "number": "QM001",
-      "title": "Quality Manual"
-     },
-     {
-      "number": "SOP007",
-      "title": "Production Planning & Control"
-     },
-     {
-      "number": "SOP008",
-      "title": "Manufacturing Process Control"
-     },
-     {
-      "number": "SOP017",
-      "title": "Control of Monitoring & Measuring Equipment (Calibration)"
      }
     ]
    }

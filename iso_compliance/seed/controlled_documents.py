@@ -206,7 +206,7 @@ def _resolve_cross_references(documents: list[dict], resolve: dict) -> int:
 			continue
 		doc = frappe.get_doc("Controlled Document", entry["name"])
 		changed = False
-		for table in ("records_generated", "related_documents"):
+		for table in ("records_generated",):
 			for row in doc.get(table) or []:
 				target = resolve.get(row.document_number) or (
 					row.document_number if frappe.db.exists("Controlled Document", row.document_number) else None
@@ -232,6 +232,28 @@ def _resolve_cross_references(documents: list[dict], resolve: dict) -> int:
 		if changed:
 			doc.save(ignore_permissions=True)
 	return linked
+
+
+_ISO_CLAUSE = re.compile(r"ISO\s*9001(?:\s*:\s*2015)?\s*[,\u2013\u2014-]?\s*Clause\s*([\d.]+)", re.I)
+
+
+def _reference_rows(entry: dict, sop: dict | None) -> list[dict]:
+	rows = []
+	has_iso = False
+	for r in (sop or {}).get("references", []):
+		text = r.get("reference")
+		if not text:
+			continue
+		row = {"reference": text}
+		match = _ISO_CLAUSE.search(text)
+		if match:
+			row["clause"] = match.group(1)
+			has_iso = True
+		rows.append(row)
+	clause = entry.get("clause_reference")
+	if clause and not has_iso:
+		rows.insert(0, {"reference": "ISO 9001:2015", "clause": clause})
+	return rows
 
 
 #: "QM001", "REG 001", "FRM-020" at the start of a citation line.
@@ -317,9 +339,7 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 	if sop:
 		payload["purpose"] = sop.get("purpose")
 		payload["scope"] = sop.get("scope")
-		payload["references"] = [
-			{"reference": r["reference"]} for r in sop.get("references", []) if r.get("reference")
-		]
+		pass  # references built below for every entry, SOP or not
 		payload["definitions"] = [
 			{"term": d["term"], "definition": d["definition"]} for d in sop.get("definitions", [])
 		]
@@ -329,7 +349,12 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 		]
 		payload["procedure_steps"] = sop.get("procedure_steps", [])
 		payload["records_generated"] = _link_rows(sop.get("records_generated", []), resolve)
-		payload["related_documents"] = _link_rows(sop.get("related_documents", []), resolve)
+
+	# Every document cites at least the ISO clause it answers to. SOP citations
+	# come with their own texts; other documents get a bare ISO 9001:2015 row
+	# carrying the clause, so the References table is the single home of clause
+	# information and the hidden header field derives from it.
+	payload["references"] = _reference_rows(entry, sop)
 
 	# The importer holds frappe.flags.in_import for the whole run: set_new_name
 	# only honours the supplied historical number under that flag (it also skips

@@ -248,18 +248,6 @@
 	</div>
 	{%- endif -%}
 
-	{%- if doc.related_documents -%}
-	<div class="cd-section"><h2 class="cd-h2">8. Related Documents</h2>
-		<table class="cd-table">
-			<thead><tr><th style="width:24%">Document No.</th><th>Title</th></tr></thead>
-			<tbody>
-			{%- for r in doc.related_documents -%}
-				<tr><td class="cd-strong">{{ r.document_number or r.document or "" }}</td><td>{{ r.document_title or "" }}</td></tr>
-			{%- endfor -%}
-			</tbody>
-		</table>
-	</div>
-	{%- endif -%}
 {%- endmacro -%}
 
 
