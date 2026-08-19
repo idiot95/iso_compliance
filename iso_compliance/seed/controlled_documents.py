@@ -241,9 +241,16 @@ _ISO_CLAUSE = re.compile(r"ISO\s*9001(?:\s*:\s*2015)?\s*[,\u2013\u2014-]?\s*Clau
 def _reference_rows(entry: dict, sop: dict | None) -> list[dict]:
 	rows = []
 	has_iso = False
+	# A document is either something this SOP stands on or something it
+	# produces -- never both. A citation that duplicates a Records Generated
+	# entry is dropped from References; the output table is its home.
+	produced = {r.get("number") for r in (sop or {}).get("records_generated", []) if r.get("number")}
 	for r in (sop or {}).get("references", []):
 		text = r.get("reference")
 		if not text:
+			continue
+		match = _REFERENCE_NUMBER.match(text)
+		if match and f"{match.group(1)}{int(match.group(2)):03d}" in produced:
 			continue
 		row = {"reference": text}
 		match = _ISO_CLAUSE.search(text)
