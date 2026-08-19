@@ -34,3 +34,13 @@ def run():
 	ok("quality manager writes Legal Requirement", frappe.has_permission("Legal Requirement", "write"))
 
 	frappe.set_user("Administrator")
+
+
+def run_pol2():
+	"""A child-table-mapped register must print for an ordinary employee."""
+	frappe.set_user(EMPLOYEE)
+	html = frappe.get_print("Controlled Document", "HCCPL/QMS/POL-002", "Controlled Document")
+	ok("no permission error in the print", "Not permitted" not in html)
+	ok("objectives table renders for an employee", "Goal / Function" in html and "Target / Measure" in html)
+	ok("rows present", "Improve inventory accuracy" in html)
+	frappe.set_user("Administrator")

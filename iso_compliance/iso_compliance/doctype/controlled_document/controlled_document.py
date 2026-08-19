@@ -386,10 +386,13 @@ class ControlledDocument(Document):
 		if not frappe.db.exists("DocType", self.mapped_doctype):
 			return {"columns": [], "rows": [], "total": 0, "error": _("Mapped DocType no longer exists.")}
 
-		if not frappe.has_permission(self.mapped_doctype, "read"):
-			return {"columns": [], "rows": [], "total": 0, "error": _("Not permitted to read the mapped DocType.")}
-
 		meta = frappe.get_meta(self.mapped_doctype)
+
+		# A child table has no permissions of its own -- has_permission on one is
+		# False for everybody except Administrator. Its access question is the
+		# parent's, which _child_table_rows asks before reading anything.
+		if not meta.istable and not frappe.has_permission(self.mapped_doctype, "read"):
+			return {"columns": [], "rows": [], "total": 0, "error": _("Not permitted to read the mapped DocType.")}
 		columns = self._declared_columns(meta) or self._default_columns(meta)
 
 		# A child row's name is a hash, which is not a register column. The row's
