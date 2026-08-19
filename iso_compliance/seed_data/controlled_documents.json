@@ -50,143 +50,25 @@
    "revision_number": "00",
    "body_mode": "Rich Text",
    "has_source_file": true,
-   "mapped_doctype": null,
+   "mapped_doctype": "Quality Goal Objective",
    "mapped_filters": null,
    "mapped_report": null,
-   "print_columns": null,
-   "static_table": {
-    "columns": [
-     {
-      "label": "Quality Objective",
-      "width": "16%"
-     },
-     {
-      "label": "Department / Function",
-      "width": "11%"
-     },
-     {
-      "label": "Target / Measure",
-      "width": "13%"
-     },
-     {
-      "label": "Planned Actions"
-     },
-     {
-      "label": "Responsibility",
-      "width": "12%"
-     },
-     {
-      "label": "ERP Next Monitoring / Control",
-      "width": "13%"
-     }
-    ],
-    "rows": [
-     [
-      "Improve customer satisfaction",
-      "Sales / Customer Service",
-      "≥ 95% positive feedback",
-      "Monitor feedback, timely complaint resolution",
-      "Head – Sales & CS",
-      "CRM, Support, Reports"
-     ],
-     [
-      "Increase sales volume",
-      "Sales / Marketing",
-      "≥ 15% year-on-year growth",
-      "Market expansion, customer retention, promotions",
-      "Head – Marketing & Sales",
-      "Selling, CRM, Reports"
-     ],
-     [
-      "Achieve on-time delivery",
-      "Production / Logistics",
-      "≥ 98% on-time dispatch",
-      "Production planning, delivery tracking",
-      "Operations Manager",
-      "Selling, Stock, Delivery"
-     ],
-     [
-      "Reduce product non-conformities",
-      "Quality / Production",
-      "≤ 1% rejection rate",
-      "Inspection, root cause analysis, corrective action",
-      "Quality Manager",
-      "Quality, Projects"
-     ],
-     [
-      "Improve supplier performance",
-      "Purchase / Quality",
-      "≥ 95% supplier rating",
-      "Supplier evaluation, audits, corrective actions",
-      "Purchase Manager",
-      "Buying, Quality"
-     ],
-     [
-      "Reduce internal process errors",
-      "All Departments",
-      "≥ 10% year-on-year reduction",
-      "Process review, standardization",
-      "Department Heads",
-      "Manufacturing, Reports"
-     ],
-     [
-      "Improve equipment reliability",
-      "Maintenance / Production",
-      "≥ 95% equipment availability",
-      "Preventive maintenance, breakdown analysis",
-      "Maintenance Manager",
-      "Assets, Maintenance, Reports"
-     ],
-     [
-      "Reduce unplanned breakdowns",
-      "Maintenance",
-      "≤ 5% unplanned downtime",
-      "Scheduled maintenance, root cause analysis",
-      "Maintenance Manager",
-      "Assets, Maintenance"
-     ],
-     [
-      "Improve employee competency",
-      "Human Resources",
-      "100% planned training completed",
-      "Training programs, skill evaluation",
-      "HR Manager",
-      "HR"
-     ],
-     [
-      "Reduce employee absenteeism",
-      "Human Resources",
-      "≤ 3% absenteeism rate",
-      "Attendance monitoring, engagement initiatives",
-      "HR Manager",
-      "HR, Reports"
-     ],
-     [
-      "Reduce employee attrition",
-      "Human Resources",
-      "≤ 10% annual attrition",
-      "Employee engagement, career development",
-      "HR Manager",
-      "HR, Reports"
-     ],
-     [
-      "Improve inventory accuracy",
-      "Stores / Inventory",
-      "≥ 99% stock accuracy",
-      "Cycle count, reconciliation",
-      "Stores Manager",
-      "Stock, Reports"
-     ],
-     [
-      "Enhance continual improvement culture",
-      "Management / All Functions",
-      "Minimum 2 projects per year",
-      "Identify and track improvement initiatives",
-      "Top Management",
-      "Projects"
-     ]
-    ]
-   }
+   "print_columns": [
+    {
+     "fieldname": "parent",
+     "label": "Goal / Function",
+     "width": "22%"
+    },
+    {
+     "fieldname": "objective",
+     "label": "Quality Objective"
+    },
+    {
+     "fieldname": "target",
+     "label": "Target / Measure",
+     "width": "18%"
+    }
+   ]
   },
   {
    "name": "HCCPL/QMS/SOP-001",

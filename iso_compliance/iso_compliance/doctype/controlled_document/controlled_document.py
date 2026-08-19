@@ -392,6 +392,11 @@ class ControlledDocument(Document):
 		meta = frappe.get_meta(self.mapped_doctype)
 		columns = self._declared_columns(meta) or self._default_columns(meta)
 
+		# A child row's name is a hash, which is not a register column. The row's
+		# identity in print is whatever the declared columns say it is.
+		if meta.istable and len(columns) > 1:
+			columns = [c for c in columns if c["fieldname"] != "name"]
+
 		filters = {}
 		if self.mapped_filters:
 			try:
