@@ -3142,7 +3142,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": false,
-   "mapped_doctype": null,
+   "mapped_doctype": "Delivery Note",
    "mapped_filters": null,
    "mapped_report": null,
    "print_columns": null
@@ -3534,7 +3534,7 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": false,
-   "mapped_doctype": null,
+   "mapped_doctype": "Delivery Note",
    "mapped_filters": null,
    "mapped_report": null,
    "print_columns": null
