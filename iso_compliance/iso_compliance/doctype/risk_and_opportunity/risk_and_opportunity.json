@@ -12,13 +12,12 @@
   "cb_head",
   "source",
   "process_activity",
-  "status",
   "sb_issue",
   "issue_description",
+  "existing_controls",
   "cb_issue",
   "issue_type",
   "interested_parties",
-  "existing_controls",
   "sb_assess",
   "description",
   "cb_assess",
@@ -32,6 +31,7 @@
   "cb_action",
   "responsibility",
   "target_date",
+  "status",
   "last_reviewed_on",
   "seed_batch"
  ],
@@ -50,7 +50,8 @@
    "fieldtype": "Data",
    "label": "Title",
    "reqd": 1,
-   "in_list_view": 1
+   "in_list_view": 1,
+   "description": "A short name this entry will be known by."
   },
   {
    "fieldname": "entry_type",
@@ -59,7 +60,8 @@
    "options": "Risk\nOpportunity",
    "reqd": 1,
    "in_list_view": 1,
-   "in_standard_filter": 1
+   "in_standard_filter": 1,
+   "description": "Risk: something that could go wrong. Opportunity: something that could be gained."
   },
   {
    "fieldname": "department",
@@ -67,7 +69,8 @@
    "label": "Department",
    "options": "\nManagement\nQuality\nProduction\nSales & Marketing\nPurchase\nAccounts",
    "in_standard_filter": 1,
-   "in_list_view": 1
+   "in_list_view": 1,
+   "description": "The department that owns this entry."
   },
   {
    "fieldname": "cb_head",
@@ -76,31 +79,31 @@
   {
    "fieldname": "source",
    "fieldtype": "Data",
-   "label": "Source / Process Area"
+   "label": "Source / Process Area",
+   "description": "Where it was spotted: a process area, an audit, a review, customer feedback."
   },
   {
    "fieldname": "process_activity",
    "fieldtype": "Data",
-   "label": "Process / Activity"
-  },
-  {
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "label": "Status",
-   "options": "Open\nIn Progress\nClosed",
-   "default": "Open",
-   "in_list_view": 1,
-   "in_standard_filter": 1
+   "label": "Process / Activity",
+   "description": "The specific process or activity it concerns."
   },
   {
    "fieldname": "sb_issue",
    "fieldtype": "Section Break",
-   "label": "Issue"
+   "label": "Context"
   },
   {
    "fieldname": "issue_description",
    "fieldtype": "Small Text",
-   "label": "Issue Description"
+   "label": "Issue Description",
+   "description": "What is happening today that gives rise to this risk or opportunity."
+  },
+  {
+   "fieldname": "existing_controls",
+   "fieldtype": "Small Text",
+   "label": "Existing Controls",
+   "description": "What is already in place today to manage this."
   },
   {
    "fieldname": "cb_issue",
@@ -110,17 +113,14 @@
    "fieldname": "issue_type",
    "fieldtype": "Select",
    "label": "Type of Issue",
-   "options": "\nInternal\nExternal\nInternal & External"
+   "options": "\nInternal\nExternal\nInternal & External",
+   "description": "Internal: within the company. External: market, suppliers, regulations."
   },
   {
    "fieldname": "interested_parties",
    "fieldtype": "Data",
-   "label": "Interested Parties"
-  },
-  {
-   "fieldname": "existing_controls",
-   "fieldtype": "Small Text",
-   "label": "Existing Controls"
+   "label": "Interested Parties",
+   "description": "Who is affected: customers, employees, suppliers, regulators."
   },
   {
    "fieldname": "sb_assess",
@@ -131,7 +131,8 @@
    "fieldname": "description",
    "fieldtype": "Small Text",
    "label": "Risk / Opportunity Statement",
-   "reqd": 1
+   "reqd": 1,
+   "description": "One sentence: what could go wrong, or what could be gained."
   },
   {
    "fieldname": "cb_assess",
@@ -144,7 +145,7 @@
    "options": "1\n2\n3\n4\n5",
    "depends_on": "eval:doc.entry_type==\"Risk\"",
    "mandatory_depends_on": "eval:doc.entry_type==\"Risk\"",
-   "description": "1 Insignificant · 2 Minor · 3 Moderate · 4 Major · 5 Critical"
+   "description": "How bad if it happens: 1 Insignificant → 5 Critical."
   },
   {
    "fieldname": "benefit",
@@ -153,7 +154,7 @@
    "options": "1\n2\n3\n4\n5",
    "depends_on": "eval:doc.entry_type==\"Opportunity\"",
    "mandatory_depends_on": "eval:doc.entry_type==\"Opportunity\"",
-   "description": "1 Very Low · 2 Low · 3 Moderate · 4 High · 5 Very High benefit"
+   "description": "How much is gained: 1 Very Low → 5 Very High."
   },
   {
    "fieldname": "probability",
@@ -161,7 +162,7 @@
    "label": "Probability (P)",
    "options": "1\n2\n3\n4\n5",
    "reqd": 1,
-   "description": "1 Rare · 2 Unlikely · 3 Possible · 4 Likely · 5 Almost Certain"
+   "description": "How likely: 1 Rare → 5 Almost Certain."
   },
   {
    "fieldname": "score",
@@ -169,7 +170,8 @@
    "label": "Score",
    "read_only": 1,
    "in_list_view": 1,
-   "description": "Severity × Probability for a risk; Benefit × Probability for an opportunity. Computed on save."
+   "description": "Calculated on save: Severity × Probability for a risk, Benefit × Probability for an opportunity.",
+   "bold": 1
   },
   {
    "fieldname": "priority",
@@ -178,17 +180,19 @@
    "read_only": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "description": "Risks: 1–5 Low, 6–10 Medium, 11–15 High, 16–25 Very High. Opportunities: Low / Moderate / High / Excellent on the same bands."
+   "description": "Set from the score: 1–5 Low · 6–10 Medium / Moderate · 11–15 High · 16–25 Very High / Excellent.",
+   "bold": 1
   },
   {
    "fieldname": "sb_action",
    "fieldtype": "Section Break",
-   "label": "Action"
+   "label": "Action Plan"
   },
   {
    "fieldname": "action_required",
    "fieldtype": "Text Editor",
-   "label": "Action Plan"
+   "label": "Action Plan",
+   "description": "What will be done to reduce the risk or seize the opportunity."
   },
   {
    "fieldname": "cb_action",
@@ -198,17 +202,30 @@
    "fieldname": "responsibility",
    "fieldtype": "Link",
    "label": "Responsibility",
-   "options": "Designation"
+   "options": "Designation",
+   "description": "The position accountable for the action."
   },
   {
    "fieldname": "target_date",
    "fieldtype": "Date",
-   "label": "Target Date"
+   "label": "Target Date",
+   "description": "When the action should be complete."
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Open\nIn Progress\nClosed",
+   "default": "Open",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "description": "Open until the action starts, In Progress while it runs, Closed when done and verified."
   },
   {
    "fieldname": "last_reviewed_on",
    "fieldtype": "Date",
-   "label": "Last Reviewed On"
+   "label": "Last Reviewed On",
+   "description": "When this entry was last confirmed still valid."
   },
   {
    "fieldname": "seed_batch",
@@ -223,7 +240,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-08-19 20:00:00.000000",
+ "modified": "2026-08-19 21:30:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Risk and Opportunity",
