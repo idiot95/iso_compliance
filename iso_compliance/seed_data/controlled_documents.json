@@ -3770,52 +3770,81 @@
    "mapped_report": null,
    "print_columns": [
     {
-     "fieldname": "category",
-     "label": "Process",
-     "width": "9%"
+     "fieldname": "department",
+     "label": "Department",
+     "width": "5%"
+    },
+    {
+     "fieldname": "source",
+     "label": "Source",
+     "width": "6%"
+    },
+    {
+     "fieldname": "process_activity",
+     "label": "Process / Activities",
+     "width": "7%"
+    },
+    {
+     "fieldname": "issue_description",
+     "label": "Issue Description"
+    },
+    {
+     "fieldname": "issue_type",
+     "label": "Type",
+     "width": "4%"
+    },
+    {
+     "fieldname": "interested_parties",
+     "label": "Interested Parties",
+     "width": "7%"
     },
     {
      "fieldname": "entry_type",
-     "label": "Type",
-     "width": "6%"
+     "label": "R / O",
+     "width": "4%"
     },
     {
      "fieldname": "description",
      "label": "Risk / Opportunity"
     },
     {
-     "fieldname": "likelihood",
-     "label": "L",
-     "width": "3.5%"
-    },
-    {
-     "fieldname": "impact",
+     "fieldname": "severity",
      "label": "S",
+     "width": "2.5%"
+    },
+    {
+     "fieldname": "benefit",
+     "label": "B",
+     "width": "2.5%"
+    },
+    {
+     "fieldname": "probability",
+     "label": "P",
+     "width": "2.5%"
+    },
+    {
+     "fieldname": "score",
+     "label": "Score",
      "width": "3.5%"
     },
     {
-     "fieldname": "risk_score",
-     "label": "RPN",
+     "fieldname": "priority",
+     "label": "Priority",
      "width": "4.5%"
     },
     {
-     "fieldname": "risk_level",
-     "label": "Level",
-     "width": "6%"
-    },
-    {
      "fieldname": "action_required",
-     "label": "Action Required"
+     "label": "Action Plan"
     },
     {
-     "fieldname": "responsible_function",
+     "fieldname": "responsibility",
      "label": "Responsibility",
-     "width": "8%"
+     "width": "6%"
     },
     {
-     "fieldname": "status",
-     "label": "Status",
-     "width": "6%"
+     "fieldname": "target_date",
+     "label": "Target Date",
+     "width": "5%"
     }
    ]
   },

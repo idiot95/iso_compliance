@@ -8,25 +8,30 @@
   "naming_series",
   "title",
   "entry_type",
+  "department",
   "cb_head",
-  "context",
-  "category",
-  "responsible_function",
-  "process_owner",
+  "source",
+  "process_activity",
+  "status",
+  "sb_issue",
+  "issue_description",
+  "cb_issue",
+  "issue_type",
+  "interested_parties",
+  "existing_controls",
   "sb_assess",
   "description",
-  "existing_controls",
   "cb_assess",
-  "likelihood",
-  "impact",
-  "risk_score",
-  "risk_level",
+  "severity",
+  "benefit",
+  "probability",
+  "score",
+  "priority",
   "sb_action",
   "action_required",
-  "target_date",
   "cb_action",
-  "status",
-  "residual_score",
+  "responsibility",
+  "target_date",
   "last_reviewed_on",
   "seed_batch"
  ],
@@ -52,51 +57,65 @@
    "fieldtype": "Select",
    "label": "Type",
    "options": "Risk\nOpportunity",
-   "default": "Risk",
    "reqd": 1,
    "in_list_view": 1,
    "in_standard_filter": 1
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Select",
+   "label": "Department",
+   "options": "\nManagement\nQuality\nProduction\nSales & Marketing\nPurchase\nAccounts",
+   "in_standard_filter": 1,
+   "in_list_view": 1
   },
   {
    "fieldname": "cb_head",
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "context",
+   "fieldname": "source",
+   "fieldtype": "Data",
+   "label": "Source / Process Area"
+  },
+  {
+   "fieldname": "process_activity",
+   "fieldtype": "Data",
+   "label": "Process / Activity"
+  },
+  {
+   "fieldname": "status",
    "fieldtype": "Select",
-   "label": "Context",
-   "options": "Internal\nExternal",
-   "default": "Internal",
+   "label": "Status",
+   "options": "Open\nIn Progress\nClosed",
+   "default": "Open",
+   "in_list_view": 1,
    "in_standard_filter": 1
   },
   {
-   "fieldname": "category",
-   "fieldtype": "Data",
-   "label": "Category"
-  },
-  {
-   "fieldname": "responsible_function",
-   "fieldtype": "Data",
-   "label": "Responsible Function",
-   "in_list_view": 1,
-   "description": "The role accountable, as recorded in REG-013. Kept separate from the user link because the registers name functions, not accounts."
-  },
-  {
-   "fieldname": "process_owner",
-   "fieldtype": "Link",
-   "label": "Owner",
-   "options": "User"
-  },
-  {
-   "fieldname": "sb_assess",
+   "fieldname": "sb_issue",
    "fieldtype": "Section Break",
-   "label": "Assessment"
+   "label": "Issue"
   },
   {
-   "fieldname": "description",
+   "fieldname": "issue_description",
    "fieldtype": "Small Text",
-   "label": "Description",
-   "reqd": 1
+   "label": "Issue Description"
+  },
+  {
+   "fieldname": "cb_issue",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "issue_type",
+   "fieldtype": "Select",
+   "label": "Type of Issue",
+   "options": "\nInternal\nExternal\nInternal & External"
+  },
+  {
+   "fieldname": "interested_parties",
+   "fieldtype": "Data",
+   "label": "Interested Parties"
   },
   {
    "fieldname": "existing_controls",
@@ -104,37 +123,62 @@
    "label": "Existing Controls"
   },
   {
+   "fieldname": "sb_assess",
+   "fieldtype": "Section Break",
+   "label": "Assessment & Score"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Risk / Opportunity Statement",
+   "reqd": 1
+  },
+  {
    "fieldname": "cb_assess",
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "likelihood",
+   "fieldname": "severity",
    "fieldtype": "Select",
-   "label": "Likelihood (1-5)",
+   "label": "Severity (S)",
    "options": "1\n2\n3\n4\n5",
-   "default": "3"
+   "depends_on": "eval:doc.entry_type==\"Risk\"",
+   "mandatory_depends_on": "eval:doc.entry_type==\"Risk\"",
+   "description": "1 Insignificant · 2 Minor · 3 Moderate · 4 Major · 5 Critical"
   },
   {
-   "fieldname": "impact",
+   "fieldname": "benefit",
    "fieldtype": "Select",
-   "label": "Impact (1-5)",
+   "label": "Benefit Factor (B)",
    "options": "1\n2\n3\n4\n5",
-   "default": "3"
+   "depends_on": "eval:doc.entry_type==\"Opportunity\"",
+   "mandatory_depends_on": "eval:doc.entry_type==\"Opportunity\"",
+   "description": "1 Very Low · 2 Low · 3 Moderate · 4 High · 5 Very High benefit"
   },
   {
-   "fieldname": "risk_score",
+   "fieldname": "probability",
+   "fieldtype": "Select",
+   "label": "Probability (P)",
+   "options": "1\n2\n3\n4\n5",
+   "reqd": 1,
+   "description": "1 Rare · 2 Unlikely · 3 Possible · 4 Likely · 5 Almost Certain"
+  },
+  {
+   "fieldname": "score",
    "fieldtype": "Int",
    "label": "Score",
    "read_only": 1,
-   "in_list_view": 1
+   "in_list_view": 1,
+   "description": "Severity × Probability for a risk; Benefit × Probability for an opportunity. Computed on save."
   },
   {
-   "fieldname": "risk_level",
-   "fieldtype": "Select",
-   "label": "Risk Level",
-   "options": "\nLow\nMedium\nHigh\nVery High",
+   "fieldname": "priority",
+   "fieldtype": "Data",
+   "label": "Priority",
+   "read_only": 1,
    "in_list_view": 1,
-   "in_standard_filter": 1
+   "in_standard_filter": 1,
+   "description": "Risks: 1–5 Low, 6–10 Medium, 11–15 High, 16–25 Very High. Opportunities: Low / Moderate / High / Excellent on the same bands."
   },
   {
    "fieldname": "sb_action",
@@ -144,30 +188,22 @@
   {
    "fieldname": "action_required",
    "fieldtype": "Text Editor",
-   "label": "Action Required"
-  },
-  {
-   "fieldname": "target_date",
-   "fieldtype": "Date",
-   "label": "Target Date"
+   "label": "Action Plan"
   },
   {
    "fieldname": "cb_action",
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "label": "Status",
-   "options": "Open\nIn Progress\nClosed\nAccepted",
-   "default": "Open",
-   "in_list_view": 1,
-   "in_standard_filter": 1
+   "fieldname": "responsibility",
+   "fieldtype": "Link",
+   "label": "Responsibility",
+   "options": "Designation"
   },
   {
-   "fieldname": "residual_score",
-   "fieldtype": "Int",
-   "label": "Residual Score"
+   "fieldname": "target_date",
+   "fieldtype": "Date",
+   "label": "Target Date"
   },
   {
    "fieldname": "last_reviewed_on",
@@ -187,7 +223,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-08-08 16:00:00.000000",
+ "modified": "2026-08-19 20:00:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Risk and Opportunity",

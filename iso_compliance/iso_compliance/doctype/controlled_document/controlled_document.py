@@ -587,7 +587,7 @@ class ControlledDocument(Document):
 				continue
 			if fieldname in std or meta.get_field(fieldname):
 				columns.append({"fieldname": fieldname, "label": _(label or fieldname), **extra})
-			if len(columns) >= 15:
+			if len(columns) >= 18:
 				break
 		return columns if len(columns) > 1 else None
 
