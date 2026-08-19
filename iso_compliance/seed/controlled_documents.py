@@ -318,14 +318,15 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 		"print_layout": entry.get("print_layout") or "Table",
 		"static_table": json.dumps(entry["static_table"]) if entry.get("static_table") else None,
 		"workflow_state": "Active" if entry.get("has_source_file") else "Draft",
-		"owning_department": _department_label(entry.get("department_label")),
 		"approval_authority": entry.get("approval_authority") or None,
 		"seed_batch": batch,
 	}
 
+	# One department field, linked to the ERP master. The guard keeps an install
+	# on a site without these Department records importing cleanly, just unowned.
 	erp_department = DEPARTMENT_MAP.get(_department_label(entry.get("department_label")))
 	if erp_department and frappe.db.exists("Department", erp_department):
-		payload["department"] = erp_department
+		payload["owning_department"] = erp_department
 
 	# A review interval is only useful if it resolves to a date something can fall
 	# past. Derive it from the issue date so the review-due reporting is live from
