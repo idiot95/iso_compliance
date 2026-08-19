@@ -295,6 +295,10 @@
      {
       "number": "REG019",
       "title": "Management Review Register"
+     },
+     {
+      "number": "FRM032",
+      "title": "Risk & Opportunity Assessment"
      }
     ]
    }
@@ -423,6 +427,10 @@
      {
       "number": "REG023",
       "title": "Annual Training Calendar"
+     },
+     {
+      "number": "FRM031",
+      "title": "Training Evaluation & Effectiveness Record"
      }
     ]
    }
@@ -555,6 +563,18 @@
      {
       "number": "",
       "title": "FRMXX – Contract Review Checklist"
+     },
+     {
+      "number": "FRM002",
+      "title": "Customer Enquiry Form"
+     },
+     {
+      "number": "FRM003",
+      "title": "Contract Review Form"
+     },
+     {
+      "number": "REG022",
+      "title": "PO Amendment Record Register"
      }
     ]
    }
@@ -687,6 +707,14 @@
      {
       "number": "",
       "title": "FRMxxx – Supplier Corrective Action Request (SCAR)"
+     },
+     {
+      "number": "FRM004",
+      "title": "Purchase Requisition"
+     },
+     {
+      "number": "FRM005",
+      "title": "Supplier Evaluation Form"
      }
     ]
    }
@@ -810,6 +838,18 @@
      {
       "number": "",
       "title": "FRMxxx – Material Rejection Report"
+     },
+     {
+      "number": "FRM006",
+      "title": "Incoming Inspection Report"
+     },
+     {
+      "number": "FRM020",
+      "title": "Nonconforming Product Report (NCR)"
+     },
+     {
+      "number": "REG015",
+      "title": "Incoming Material Register"
      }
     ]
    }
@@ -946,6 +986,14 @@
      {
       "number": "REG016",
       "title": "Production Register"
+     },
+     {
+      "number": "FRM007",
+      "title": "Job Card"
+     },
+     {
+      "number": "FRM008",
+      "title": "Material Requisition Slip"
      }
     ]
    }
@@ -1075,6 +1123,14 @@
      {
       "number": "",
       "title": "FRMxx – Production Deviation Records"
+     },
+     {
+      "number": "FRM007",
+      "title": "Job Card"
+     },
+     {
+      "number": "FRM009",
+      "title": "In-Process Inspection Report"
      }
     ]
    }
@@ -1216,31 +1272,31 @@
     ],
     "records_generated": [
      {
-      "number": "FRM027",
+      "number": "FRM011",
       "title": "Design & Development Request Form"
      },
      {
-      "number": "FRM028",
+      "number": "FRM012",
       "title": "Design Input Checklist"
      },
      {
-      "number": "FRM029",
+      "number": "FRM013",
       "title": "Design Review Record"
      },
      {
-      "number": "FRM030",
+      "number": "FRM014",
       "title": "Design Verification Record"
      },
      {
-      "number": "FRM031",
+      "number": "FRM015",
       "title": "Design Validation Record (where applicable)"
      },
      {
-      "number": "FRM032",
+      "number": "FRM016",
       "title": "Design Change Request (DCR)"
      },
      {
-      "number": "FRM033",
+      "number": "FRM017",
       "title": "Design Approval Record"
      },
      {
@@ -1378,6 +1434,22 @@
      {
       "number": "",
       "title": "Customer Dispatch Acknowledgement (where applicable)"
+     },
+     {
+      "number": "FRM018",
+      "title": "Packing Checklist"
+     },
+     {
+      "number": "FRM019",
+      "title": "Dispatch Checklist"
+     },
+     {
+      "number": "FRM029",
+      "title": "Product Release Note"
+     },
+     {
+      "number": "FRM030",
+      "title": "Certificate of Conformity (CoC)"
      }
     ]
    }
@@ -2182,6 +2254,10 @@
      {
       "number": "REG011",
       "title": "Monitoring & Measuring Instruments Register"
+     },
+     {
+      "number": "FRM027",
+      "title": "Calibration / Maintenance Completion Record"
      }
     ]
    }
@@ -3571,6 +3647,25 @@
      "Recorded On"
     ]
    ]
+  },
+  {
+   "name": "HCCPL/QMS/FRM-032",
+   "legacy_document_number": "FRM032",
+   "title": "Risk & Opportunity Assessment",
+   "document_type": "FRM",
+   "clause_reference": "6.1",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-08-19",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "workflow_state": "Active",
+   "mapped_doctype": "Risk and Opportunity",
+   "mapped_filters": null,
+   "mapped_report": null,
+   "print_columns": null
   },
   {
    "name": "HCCPL/QMS/REG-001",
