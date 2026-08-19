@@ -15,10 +15,12 @@ Rules for this file:
 4. Core ERPNext behaviour is not modified. Additive Custom Fields only — no changes to
    existing field definitions, no monkeypatching, no overridden core methods.
 
-## Status: no external changes made
+## Status: two applied changes, both display/naming only
 
-No Custom Fields, Property Setters or other modifications have been applied to any
-DocType outside this app.
+One display-only HTML Custom Field (Quality Meeting minutes guidance) and one
+Document Naming Rule (Quality Meeting numbers as FRM-024). Both additive, both
+reversible, both in the Approved and applied table at the end of this file. No
+data-bearing Custom Field exists on any external DocType; those remain proposals.
 
 ## Proposed — awaiting approval
 
