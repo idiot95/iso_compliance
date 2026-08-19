@@ -271,14 +271,35 @@ def _reference_target(text: str | None, resolve: dict) -> str | None:
 #: The source SOPs name the same actor five different ways. Folded here so the
 #: Designation master gets one record per real role, not one per spelling.
 ROLE_CANON = {
+	# spelling folds
 	"Quality Manager / MR": "Quality Manager / Management Representative",
 	"Quality Manager": "Quality Manager / Management Representative",
 	"Department Heads": "Department Head",
-	"Management": "Top Management",
+	# folds onto designations real employees hold (the org chart is the truth):
+	"Management": "Managing Director",
+	"Top Management": "Managing Director",
 	"Director": "Managing Director",
-	"Sales / Marketing": "Sales & Marketing Department",
-	"Production Head": "Production Manager",
-	"Design / Engineering Department (where applicable)": "Design / Engineering Department",
+	"Sales / Marketing": "Sales Executive",
+	"Sales & Marketing Department": "Sales Executive",
+	"Dispatch Department": "Sales Executive",
+	"Production Head": "Production Lead",
+	"Production Manager": "Production Lead",
+	"Production Department": "Production Lead",
+	"Production Supervisors": "Foreman",
+	"Purchase Department": "Purchase Executive",
+	"Maintenance Department": "Engineer",
+	"Maintenance Head": "Engineer",
+	"Design / Engineering Department (where applicable)": "Engineer",
+	"Design / Engineering Department": "Engineer",
+	"Design Engineer": "Engineer",
+	"Operators": "Technician",
+	"Equipment Users": "Technician",
+	# NOT folded, deliberately: Quality Manager / Management Representative,
+	# QA Manager, Quality Department, Internal Auditor, Stores Department,
+	# HR Department -- no employee holds these functions yet, and mapping a
+	# quality duty onto a sales designation would falsify the SOP. They stay
+	# as unstaffed positions until the org chart assigns them.
+	# All Employees and Department Head are collective by design.
 }
 
 
@@ -296,7 +317,7 @@ def _ensure_designations(documents: list[dict]):
 	need not have them as Designations already. Created if missing, idempotent,
 	and left in place by a purge: they are master data, not imported content.
 	"""
-	positions = {d.get("approval_authority") for d in documents if d.get("approval_authority")}
+	positions = {_canonical_role(d.get("approval_authority")) for d in documents if d.get("approval_authority")}
 	for doc in documents:
 		for row in (doc.get("sop") or {}).get("responsibilities", []):
 			positions.add(_canonical_role(row.get("role")))
@@ -359,7 +380,7 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 		"print_layout": entry.get("print_layout") or "Table",
 		"static_table": json.dumps(entry["static_table"]) if entry.get("static_table") else None,
 		"workflow_state": "Active" if entry.get("has_source_file") else "Draft",
-		"approval_authority": entry.get("approval_authority") or None,
+		"approval_authority": _canonical_role(entry.get("approval_authority")),
 		"seed_batch": batch,
 	}
 
