@@ -294,13 +294,27 @@ ROLE_CANON = {
 	"Design Engineer": "Engineer",
 	"Operators": "Technician",
 	"Equipment Users": "Technician",
-	# NOT folded, deliberately: Quality Manager / Management Representative,
-	# QA Manager, Quality Department, Internal Auditor, Stores Department,
-	# HR Department -- no employee holds these functions yet, and mapping a
-	# quality duty onto a sales designation would falsify the SOP. They stay
-	# as unstaffed positions until the org chart assigns them.
-	# All Employees and Department Head are collective by design.
+	# accountability folding: a department cannot be audited, its head can
+	"Quality Department": "Quality Manager / Management Representative",
+	"QA Manager": "Quality Manager / Management Representative",
+	"Stores Department": "Purchase Executive",
+	"HR Department": "Business Development Manager",
+	# NOT folded: Quality Manager / Management Representative and Internal
+	# Auditor are real positions awaiting a holder; Department Head is the one
+	# generic that survives -- it means the head of whichever department
+	# applies, which a single link cannot enumerate. All Employees rows are
+	# handled specially: the Department Head becomes the accountable enforcer
+	# and the duty text keeps its everyone scope.
 }
+
+
+def _responsibility_row(r: dict) -> dict:
+	"""One accountable position per row. A duty of everyone keeps its scope in
+	the text while the department head carries the accountability."""
+	role, text = (r.get("role") or "").strip(), r.get("responsibility") or ""
+	if role == "All Employees":
+		return {"role": "Department Head", "responsibility": _("Ensure all employees: ") + text}
+	return {"role": _canonical_role(role), "responsibility": text}
 
 
 def _canonical_role(role: str | None) -> str | None:
@@ -407,8 +421,7 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 			{"term": d["term"], "definition": d["definition"]} for d in sop.get("definitions", [])
 		]
 		payload["responsibilities"] = [
-			{"role": _canonical_role(r["role"]), "responsibility": r["responsibility"]}
-			for r in sop.get("responsibilities", [])
+			_responsibility_row(r) for r in sop.get("responsibilities", [])
 		]
 		payload["procedure_steps"] = sop.get("procedure_steps", [])
 		payload["records_generated"] = _link_rows(sop.get("records_generated", []), resolve)
