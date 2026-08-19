@@ -4749,11 +4749,6 @@
      "fieldname": "status",
      "label": "Status (Open / Closed)",
      "width": "7%"
-    },
-    {
-     "fieldname": null,
-     "label": "FRM024 Ref.",
-     "width": "7%"
     }
    ]
   },

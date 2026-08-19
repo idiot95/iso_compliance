@@ -21,11 +21,36 @@ from iso_compliance.seed.controlled_documents import WORKFLOW_STATES
 def after_install():
 	ensure_workflow_states()
 	ensure_desk_registration()
+	ensure_naming_rules()
 
 
 def after_migrate():
 	ensure_workflow_states()
 	ensure_desk_registration()
+	ensure_naming_rules()
+
+
+def ensure_naming_rules():
+	"""A record that fills a controlled form is numbered as that form.
+
+	Management Review minutes are Quality Meetings; the master document
+	register knows the minutes as FRM-024, so the meeting records carry that
+	identity: HCCPL/QMS/FRM-024-0001, 0002... A Document Naming Rule is
+	additive site configuration -- deleting it reverts naming untouched.
+	"""
+	if frappe.db.exists("Document Naming Rule", {"document_type": "Quality Meeting", "disabled": 0}):
+		return
+	frappe.get_doc(
+		{
+			"doctype": "Document Naming Rule",
+			"document_type": "Quality Meeting",
+			"prefix": "HCCPL/QMS/FRM-024-",
+			"prefix_digits": 4,
+			"priority": 10,
+		}
+	).insert(ignore_permissions=True)
+	frappe.db.commit()
+	print("iso_compliance: naming rule created for Quality Meeting (FRM-024)")
 
 
 def ensure_desk_registration():
