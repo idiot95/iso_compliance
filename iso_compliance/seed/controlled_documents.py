@@ -257,6 +257,10 @@ def _reference_rows(entry: dict, sop: dict | None) -> list[dict]:
 		if match:
 			row["clause"] = match.group(1)
 			has_iso = True
+			# The clause lives in its own column; the citation text does not
+			# repeat it. "ISO 9001:2015 Clause 7.5 - Documented Information"
+			# prints as the standard, the title, and the clause in its column.
+			row["reference"] = re.sub(r"\s*,?\s*Clause\s*[\d.]+\s*", " ", text).strip(" -\u2013\u2014,")
 		rows.append(row)
 	clause = entry.get("clause_reference")
 	if clause and not has_iso:
