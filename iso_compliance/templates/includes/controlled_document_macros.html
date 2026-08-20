@@ -121,9 +121,7 @@
 		<td><span class="cd-auth-role">Approved</span> {{ doc.approved_by_name or doc.approved_by or "&mdash;" }}{% if doc.approved_on %} &middot; {{ doc.get_formatted("approved_on") }}{% endif %}</td>
 	</tr>
 </table>
-<div class="cd-authority-note">
-	Stamped electronically by ERPNext workflow transitions; not typed, not signed by hand.
-</div>
+<div class="cd-authority-note">Stamped electronically by workflow; not typed.</div>
 {%- endmacro -%}
 
 
@@ -322,9 +320,7 @@
     columns and labels drawn as blank boxes, the way the paper form looked. -#}
 {%- set layout = doc.get_form_layout() -%}
 <div class="cd-section">
-	<p class="cd-source">Completed in ERPNext as <strong>{{ layout.doctype }}</strong>.
-		This template mirrors its entry screen, for reference and for manual use when the system
-		is unavailable; a manually completed copy is transcribed into ERPNext.</p>
+	<p class="cd-source">Completed in ERPNext as <strong>{{ layout.doctype }}</strong>; manual copies are transcribed into the system.</p>
 	{%- for s in layout.sections -%}
 	<div class="cd-formsec">
 		{%- if s.label -%}<div class="cd-formsec-title">{{ s.label }}</div>{%- endif -%}
@@ -371,14 +367,11 @@
 		{%- if not data.static -%}<h2 class="cd-h2">Register Entries</h2>{%- endif -%}
 		<p class="cd-source">
 			{%- if data.static -%}
-			The rows below are part of this controlled document: they change through a
-			Document Change Request, not through day-to-day transactions.
+			Content of this controlled document; amended only through a Document Change Request.
 			{%- elif doc.mapped_report -%}
-			Derived from <strong>{{ doc.mapped_report }}</strong>, which reads what ERPNext already
-			recorded. Nothing on this register is entered a second time.
+			Live register, derived from <strong>{{ doc.mapped_report }}</strong>.
 			{%- else -%}
-			Completed in ERPNext against <strong>{{ doc.mapped_doctype }}</strong>{% if doc.mapped_filters %},
-			filtered by <code>{{ doc.mapped_filters }}</code>{% endif %}.
+			Live register, completed in ERPNext as <strong>{{ doc.mapped_doctype }}</strong>.
 			{%- endif -%}
 			{%- if data.total %} {{ data.total }} entr{{ "y" if data.total == 1 else "ies" }} at time of printing.
 			{%- if data.shown < data.total %} First {{ data.shown }} shown.{% endif %}{% endif %}
