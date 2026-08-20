@@ -413,16 +413,16 @@
       "title": "Employee Competency Matrix"
      },
      {
-      "number": "",
-      "title": "FRM0XX – Employee Competency Evaluation Record"
+      "number": "FRM033",
+      "title": "Employee Competency Evaluation Record"
      },
      {
-      "number": "",
-      "title": "FRM0XX – Training Attendance Record"
+      "number": "REG027",
+      "title": "Training Attendance Register"
      },
      {
-      "number": "",
-      "title": "FRM0XX – Induction Training Checklist"
+      "number": "FRM034",
+      "title": "Induction Training Checklist"
      },
      {
       "number": "REG023",
@@ -3668,6 +3668,44 @@
    "print_columns": null
   },
   {
+   "name": "HCCPL/QMS/FRM-033",
+   "legacy_document_number": "FRM033",
+   "title": "Employee Competency Evaluation Record",
+   "document_type": "FRM",
+   "clause_reference": "7.2",
+   "department_label": "HR",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-08-20",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "workflow_state": "Active",
+   "mapped_doctype": "Employee Skill Map",
+   "mapped_filters": null,
+   "mapped_report": null,
+   "print_columns": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-034",
+   "legacy_document_number": "FRM034",
+   "title": "Induction Training Checklist",
+   "document_type": "FRM",
+   "clause_reference": "7.2, 7.3",
+   "department_label": "HR",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-08-20",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "workflow_state": "Active",
+   "mapped_doctype": "Employee Onboarding",
+   "mapped_filters": null,
+   "mapped_report": null,
+   "print_columns": null
+  },
+  {
    "name": "HCCPL/QMS/REG-001",
    "legacy_document_number": "REG001",
    "title": "Master Document Register",
@@ -5328,6 +5366,65 @@
      ]
     ]
    }
+  },
+  {
+   "name": "HCCPL/QMS/REG-027",
+   "legacy_document_number": "REG027",
+   "title": "Training Attendance Register",
+   "document_type": "REG",
+   "clause_reference": "7.2",
+   "department_label": "HR",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-08-20",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "workflow_state": "Active",
+   "mapped_doctype": null,
+   "mapped_filters": null,
+   "mapped_report": "Training Attendance Register",
+   "print_columns": [
+    {
+     "fieldname": "event",
+     "label": "Training Event",
+     "width": "11%"
+    },
+    {
+     "fieldname": "event_name",
+     "label": "Training Topic"
+    },
+    {
+     "fieldname": "event_type",
+     "label": "Type",
+     "width": "7%"
+    },
+    {
+     "fieldname": "training_date",
+     "label": "Date",
+     "width": "8%"
+    },
+    {
+     "fieldname": "employee",
+     "label": "Employee",
+     "width": "9%"
+    },
+    {
+     "fieldname": "employee_name",
+     "label": "Name",
+     "width": "14%"
+    },
+    {
+     "fieldname": "attendance",
+     "label": "Attendance",
+     "width": "8%"
+    },
+    {
+     "fieldname": "status",
+     "label": "Status",
+     "width": "9%"
+    }
+   ]
   }
  ]
 }
