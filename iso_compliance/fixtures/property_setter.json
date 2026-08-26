@@ -1,0 +1,24 @@
+[
+ {
+  "doctype": "Property Setter",
+  "name": "BOM-inspection_required-description",
+  "doctype_or_field": "DocField",
+  "doc_type": "BOM",
+  "field_name": "inspection_required",
+  "property": "description",
+  "property_type": "Small Text",
+  "value": "When checked: finishing a Work Order made with this BOM will require a Quality Inspection of the produced item (using the template below) before the manufacture entry can be submitted. This is the final inspection (PDI) gate.",
+  "module": "ISO Compliance"
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "Item-inspection_required_before_delivery-description",
+  "doctype_or_field": "DocField",
+  "doc_type": "Item",
+  "field_name": "inspection_required_before_delivery",
+  "property": "description",
+  "property_type": "Small Text",
+  "value": "When checked: a Delivery Note containing this item cannot be submitted until an accepted Outgoing Quality Inspection exists for it. This is the dispatch gate — nothing ships uninspected.",
+  "module": "ISO Compliance"
+ }
+]

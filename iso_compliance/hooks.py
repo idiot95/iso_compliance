@@ -24,7 +24,20 @@ fixtures = [
 	{
 		"dt": "Custom Field",
 		"filters": [["name", "in", ["Quality Meeting-custom_minutes_guidance"]]],
-	}
+	},
+	{
+		"dt": "Property Setter",
+		"filters": [
+			[
+				"name",
+				"in",
+				[
+					"BOM-inspection_required-description",
+					"Item-inspection_required_before_delivery-description",
+				],
+			]
+		],
+	},
 ]
 
 # Shows ISO Compliance on the desk apps screen, opening straight onto the dashboard.
