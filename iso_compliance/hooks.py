@@ -106,11 +106,11 @@ add_to_apps_screen = [
 # Jinja
 # ----------
 
-# add methods and filters to jinja environment
-# jinja = {
-# 	"methods": "iso_compliance.utils.jinja_methods",
-# 	"filters": "iso_compliance.utils.jinja_filters"
-# }
+# The Certificate of Conformity resolves every inspection behind a delivered
+# row (despatch, PDI, in-process) through the batch's own trace.
+jinja = {
+	"methods": ["iso_compliance.utils.coc_row_inspections"],
+}
 
 # Installation
 # ------------
