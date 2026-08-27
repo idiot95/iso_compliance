@@ -102,3 +102,69 @@ def coc_row_inspections(row) -> dict:
 			):
 				out["in_process"].append(frappe.get_doc("Quality Inspection", name))
 	return out
+
+
+def coc_row_aggregate(row) -> dict:
+	"""The certificate view: every parameter ever measured for this delivered
+	row, one line each, with the observed range across all inspections and all
+	sample readings. The n column is the sampling story -- how many measured
+	values stand behind the range."""
+	chain = coc_row_inspections(row)
+	parameters: dict[str, dict] = {}
+
+	def absorb(qi, stage):
+		for r in qi.readings:
+			p = parameters.setdefault(
+				r.specification,
+				{
+					"specification": r.specification,
+					"spec": r.value
+					or (r.acceptance_formula if r.formula_based_criteria else "")
+					or "",
+					"min_spec": r.min_value,
+					"max_spec": r.max_value,
+					"numeric": r.numeric,
+					"n": 0,
+					"obs_min": None,
+					"obs_max": None,
+					"values": [],
+					"ok": True,
+					"stages": [],
+				},
+			)
+			if stage not in p["stages"]:
+				p["stages"].append(stage)
+			if r.status and r.status != "Accepted":
+				p["ok"] = False
+			if r.numeric:
+				for i in range(1, 11):
+					raw = r.get(f"reading_{i}")
+					if raw in (None, ""):
+						continue
+					try:
+						value = float(raw)
+					except (TypeError, ValueError):
+						continue
+					p["n"] += 1
+					p["obs_min"] = value if p["obs_min"] is None else min(p["obs_min"], value)
+					p["obs_max"] = value if p["obs_max"] is None else max(p["obs_max"], value)
+			elif r.reading_value:
+				p["n"] += 1
+				if r.reading_value not in p["values"]:
+					p["values"].append(r.reading_value)
+
+	for qi in chain["in_process"]:
+		absorb(qi, "In-Process")
+	for qi in chain["pdi"]:
+		absorb(qi, "Final PDI")
+	if chain["outgoing"]:
+		absorb(chain["outgoing"], "Despatch")
+
+	return {
+		"parameters": list(parameters.values()),
+		"work_orders": chain["work_orders"],
+		"outgoing": chain["outgoing"].name if chain["outgoing"] else None,
+		"pdi": [qi.name for qi in chain["pdi"]],
+		"in_process_count": len(chain["in_process"]),
+		"all_accepted": all(p["ok"] for p in parameters.values()) if parameters else False,
+	}
