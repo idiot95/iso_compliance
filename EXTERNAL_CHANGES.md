@@ -15,7 +15,7 @@ Rules for this file:
 4. Core ERPNext behaviour is not modified. Additive Custom Fields only — no changes to
    existing field definitions, no monkeypatching, no overridden core methods.
 
-## Status: five applied changes — four display/naming, one behaviour hook (Work Order BOM from Sales Order)
+## Status: six applied changes — four display/naming, two behaviour (Work Order BOM from Sales Order: insert hook + dialog override)
 
 One display-only HTML Custom Field (Quality Meeting minutes guidance) and one
 Document Naming Rule (Quality Meeting numbers as FRM-024). Both additive, both
@@ -141,6 +141,7 @@ page. Worth revisiting when frappe ships the missing asset.
 
 | Date | Target DocType | Field / Change | Type | Reason | Fixture |
 | ---- | -------------- | -------------- | ---- | ------ | ------- |
+| 2026-09-02 | Sales Order | `get_work_order_items` override | override_whitelisted_methods (wrapper) | The make-Work-Order and raw-material-request dialogs display and submit the row's chosen BOM instead of the item default. Calls the core function first; only BOM values are corrected. Requested by the developer. | code (hooks.py) |
 | 2026-09-02 | Work Order | `before_insert` hook | doc_events (behaviour) | A Sales Order row's chosen `bom_no` replaces the automatic default on the Work Order created from that row; a manually chosen (non-default) BOM on the Work Order is never overridden. Fixes ERPNext ignoring the row's BOM in get_work_order_items. Requested by the developer. | code (hooks.py) |
 | 2026-08-26 | BOM | `inspection_required` description | Property Setter (tooltip only) | Explains that checking it gates Work Order completion behind a Quality Inspection of the output (the PDI). Requested by the developer. | yes |
 | 2026-08-26 | Item | `inspection_required_before_delivery` description | Property Setter (tooltip only) | Explains that checking it blocks Delivery Note submission without an accepted Outgoing inspection (the dispatch gate). Requested by the developer. | yes |
