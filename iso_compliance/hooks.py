@@ -171,15 +171,14 @@ after_migrate = "iso_compliance.setup.install.after_migrate"
 
 # Document Events
 # ---------------
-# Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+# A Sales Order row's chosen BOM survives into the Work Order made from it;
+# ERPNext's own flow would silently substitute the item's default.
+doc_events = {
+	"Work Order": {
+		"before_insert": "iso_compliance.overrides.work_order.apply_sales_order_bom",
+	},
+}
 
 # Scheduled Tasks
 # ---------------
