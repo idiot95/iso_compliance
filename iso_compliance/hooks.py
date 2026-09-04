@@ -31,6 +31,9 @@ fixtures = [
 					"Quality Meeting-custom_minutes_guidance",
 					"Issue-custom_sales_order",
 					"Issue-custom_root_cause",
+					"Quality Feedback-custom_mode",
+					"Quality Feedback-custom_feedback_type",
+					"Quality Feedback-custom_action_required",
 				],
 			]
 		],

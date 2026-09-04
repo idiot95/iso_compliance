@@ -31,5 +31,40 @@
   "label": "Investigation / Root Cause",
   "insert_after": "resolution_details",
   "module": "ISO Compliance"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Quality Feedback-custom_mode",
+  "dt": "Quality Feedback",
+  "fieldname": "custom_mode",
+  "fieldtype": "Select",
+  "label": "Mode of Feedback",
+  "options": "\nEmail\nPhone\nSurvey\nVerbal",
+  "insert_after": "document_name",
+  "in_standard_filter": 1,
+  "module": "ISO Compliance"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Quality Feedback-custom_feedback_type",
+  "dt": "Quality Feedback",
+  "fieldname": "custom_feedback_type",
+  "fieldtype": "Select",
+  "label": "Feedback Type",
+  "options": "\nPositive\nSuggestion\nComplaint",
+  "insert_after": "custom_mode",
+  "in_standard_filter": 1,
+  "module": "ISO Compliance"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Quality Feedback-custom_action_required",
+  "dt": "Quality Feedback",
+  "fieldname": "custom_action_required",
+  "fieldtype": "Select",
+  "label": "Action Required",
+  "options": "\nYes\nNo",
+  "insert_after": "custom_feedback_type",
+  "module": "ISO Compliance"
  }
 ]

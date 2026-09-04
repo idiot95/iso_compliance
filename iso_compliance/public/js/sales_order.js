@@ -23,6 +23,21 @@ frappe.ui.form.on("Sales Order", {
 			);
 		}
 
+		// Feedback, like complaints, usually concerns a delivered order.
+		if (frappe.model.can_create("Quality Feedback")) {
+			frm.add_custom_button(
+				__("Customer Feedback"),
+				() => {
+					frappe.route_options = {
+						document_type: "Customer",
+						document_name: frm.doc.customer,
+					};
+					frappe.new_doc("Quality Feedback");
+				},
+				__("Create")
+			);
+		}
+
 		if (frm.doc.docstatus !== 0) return;
 		if (!frappe.model.can_create("Techno Commercial Review")) return;
 

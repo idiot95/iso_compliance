@@ -99,10 +99,7 @@ makes the corresponding blank column fill in; nothing else changes.
 | Quality Meeting | `custom_meeting_date` | Date | REG-019 "Meeting Date" (today: creation date) |
 | Quality Meeting | `custom_review_period` | Data | REG-019 "Review Period" |
 | Quality Meeting | `custom_chairperson` | Data | REG-019 "Chairperson" |
-| Quality Feedback | `custom_mode` | Select (Email / Phone / Survey / Verbal) | REG-025 "Mode of Feedback" |
-| Quality Feedback | `custom_feedback_type` | Select (Positive / Suggestion / Complaint) | REG-025 "Feedback Type" |
 | Quality Feedback | `custom_summary` | Small Text | REG-025 "Feedback Summary" |
-| Quality Feedback | `custom_action_required` | Select (Yes / No) | REG-025 "Action Required" |
 | Quality Feedback | `custom_feedback_status` | Select (Open / Closed) | REG-025 "Status" |
 | Employee | `custom_roles_responsibilities` | Small Text | REG-013 "Roles & Responsibilities" |
 | Employee | `custom_authority` | Small Text | REG-013 "Authority" |
@@ -139,6 +136,8 @@ page. Worth revisiting when frappe ships the missing asset.
 
 | Date | Target DocType | Field / Change | Type | Reason | Fixture |
 | ---- | -------------- | -------------- | ---- | ------ | ------- |
+| 2026-09-04 | Quality Feedback | `custom_mode`, `custom_feedback_type`, `custom_action_required` | Custom Fields, Select (all optional) | Mode (Email/Phone/Survey/Verbal), Type (Positive/Suggestion/Complaint) and Action Required (Yes/No) — fills three REG-025 columns; the doctype also serves internal and production feedback via document_type User. Promoted from the pending proposal. Requested by the developer. | yes |
+| 2026-09-04 | Sales Order | form script: Create → Customer Feedback button | doctype_js (display only) | Opens a new Quality Feedback pre-filled with the customer. Requested by the developer. | code (hooks.py) |
 | 2026-09-04 | Issue | `custom_sales_order` | Custom Field, Link (Sales Order) | A customer complaint traced to the order it concerns; also the target of the Sales Order form's Create → Customer Complaint button. Requested by the developer. | yes |
 | 2026-09-04 | Issue | `custom_root_cause` | Custom Field, Small Text | Fills REG-008's "Investigation / Root Cause" column (promoted from the pending proposal). Requested by the developer. | yes |
 | 2026-09-04 | Sales Order | form script: Create → Customer Complaint button | doctype_js (display only) | Opens a new Issue pre-filled with the order and customer — the QMS's complaint entry point (FRM-028). Shown on drafts and submitted orders. Requested by the developer. | code (hooks.py) |

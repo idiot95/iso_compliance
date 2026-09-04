@@ -537,7 +537,7 @@
      {
       "step_no": "6",
       "step_title": "Customer Communication",
-      "step_content": "<p>Order status, delivery schedule, technical clarifications, changes and product information are communicated to the customer and recorded against the relevant order or enquiry. A complaint is recorded as a Customer Complaint (FRM-028) in ERPNext, linked to its Sales Order, and registers automatically in REG-008.</p>"
+      "step_content": "<p>Order status, delivery schedule, technical clarifications, changes and product information are communicated to the customer and recorded against the relevant order or enquiry. A complaint is recorded as a Customer Complaint (FRM-028) linked to its Sales Order, registering in REG-008. Customer feedback is recorded on the Quality Feedback Form (FRM-037), registering in REG-025; the same form serves internal and production feedback.</p>"
      },
      {
       "step_no": "7",
@@ -561,6 +561,14 @@
      {
       "number": "REG022",
       "title": "PO Amendment Record Register"
+     },
+     {
+      "number": "FRM037",
+      "title": "Quality Feedback Form"
+     },
+     {
+      "number": "REG025",
+      "title": "Customer Feedback Register"
      }
     ]
    }
@@ -3630,6 +3638,25 @@
    "print_columns": null
   },
   {
+   "name": "HCCPL/QMS/FRM-037",
+   "legacy_document_number": "FRM037",
+   "title": "Quality Feedback Form",
+   "document_type": "FRM",
+   "clause_reference": "8.2.1, 9.1.2",
+   "department_label": "Sales",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-09-04",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "workflow_state": "Active",
+   "mapped_doctype": "Quality Feedback",
+   "mapped_filters": null,
+   "mapped_report": null,
+   "print_columns": null
+  },
+  {
    "name": "HCCPL/QMS/REG-001",
    "legacy_document_number": "REG001",
    "title": "Master Document Register",
@@ -5152,13 +5179,13 @@
      "width": "12%"
     },
     {
-     "fieldname": null,
-     "label": "Mode of Feedback (Email / Phone / Survey / Verbal)",
+     "fieldname": "custom_mode",
+     "label": "Mode of Feedback",
      "width": "9%"
     },
     {
-     "fieldname": null,
-     "label": "Feedback Type (Positive / Suggestion / Complaint)",
+     "fieldname": "custom_feedback_type",
+     "label": "Feedback Type",
      "width": "9%"
     },
     {
@@ -5166,8 +5193,8 @@
      "label": "Feedback Summary"
     },
     {
-     "fieldname": null,
-     "label": "Action Required (Yes / No)",
+     "fieldname": "custom_action_required",
+     "label": "Action Required",
      "width": "7%"
     },
     {
