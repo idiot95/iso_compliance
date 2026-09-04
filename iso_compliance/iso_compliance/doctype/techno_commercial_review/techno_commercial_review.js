@@ -163,6 +163,33 @@ const tcr_handlers = {
 		}
 	},
 
+	before_workflow_action(frm) {
+		// Send Back demands a reason; it lands on both the review's and the
+		// Sales Order's comment timeline before the state moves.
+		if (frm.selected_workflow_action !== "Send Back") return;
+		return new Promise((resolve, reject) => {
+			frappe.prompt(
+				{
+					fieldname: "reason",
+					fieldtype: "Small Text",
+					label: __("Why is this review being sent back?"),
+					reqd: 1,
+				},
+				(values) => {
+					frappe
+						.call({
+							method: "iso_compliance.iso_compliance.doctype.techno_commercial_review.techno_commercial_review.record_send_back",
+							args: { review: frm.doc.name, reason: values.reason },
+						})
+						.then(() => resolve())
+						.catch(reject);
+				},
+				__("Send Back"),
+				__("Send Back")
+			);
+		});
+	},
+
 	sales_order(frm) {
 		tcr_fetch_order(frm);
 	},

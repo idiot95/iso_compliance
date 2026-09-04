@@ -52,6 +52,7 @@
   "deviations_exclusions",
   "customer_clarifications",
   "section_outcome",
+  "computed_recommendation",
   "outcome",
   "column_break_outcome",
   "outcome_remarks",
@@ -358,7 +359,15 @@
    "collapsible": 1
   },
   {
-   "description": "Final recommendation. An order whose latest review concludes Reject cannot be submitted.",
+   "bold": 1,
+   "description": "Computed from the parameter responses. A plain Accept is only possible when no parameter is Not OK.",
+   "fieldname": "computed_recommendation",
+   "fieldtype": "Data",
+   "label": "Computed Recommendation",
+   "read_only": 1
+  },
+  {
+   "description": "Final recommendation, decided by the commercial reviewer. Accept requires every parameter OK or NA; Accept with Conditions requires the conditions recorded. An order whose latest review concludes Reject cannot be submitted.",
    "fieldname": "outcome",
    "fieldtype": "Select",
    "in_list_view": 1,

@@ -23,7 +23,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Response",
-   "options": "\nYes\nNo\nNA"
+   "options": "\nOK\nNot OK\nNA"
   },
   {
    "columns": 3,
