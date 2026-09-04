@@ -22,12 +22,106 @@ def after_install():
 	ensure_workflow_states()
 	ensure_desk_registration()
 	ensure_naming_rules()
+	ensure_review_chain()
 
 
 def after_migrate():
 	ensure_workflow_states()
 	ensure_desk_registration()
 	ensure_naming_rules()
+	ensure_review_chain()
+
+
+#: The sequential review chain on FRM-036 (SOP-004): who may clear each stage.
+REVIEW_CHAIN_ROLES = ("Technical Reviewer", "Costing Reviewer", "Commercial Reviewer")
+
+REVIEW_CHAIN_STATES = (
+	("Technical Review", "Warning"),
+	("Costing Review", "Warning"),
+	("Commercial Review", "Primary"),
+)
+
+
+def ensure_review_chain():
+	"""The Techno-Commercial Review workflow: roles, states, transitions.
+
+	Draft -> Technical Review -> Costing Review -> Commercial Review ->
+	Approved (submitted). Each forward step belongs to one reviewer role, so
+	the workflow history is the signature block of the paper form; Quality
+	Manager can drive any step, because a small organisation cannot stall an
+	order on an unfilled seat. Send Back returns to Draft from any stage.
+	"""
+	for role in REVIEW_CHAIN_ROLES:
+		if not frappe.db.exists("Role", role):
+			frappe.get_doc({"doctype": "Role", "role_name": role, "desk_access": 1}).insert(
+				ignore_permissions=True
+			)
+
+	for state, style in REVIEW_CHAIN_STATES:
+		if not frappe.db.exists("Workflow State", state):
+			frappe.get_doc(
+				{"doctype": "Workflow State", "workflow_state_name": state, "style": style}
+			).insert(ignore_permissions=True)
+
+	for action in (
+		"Send for Technical Review",
+		"Clear Technical Review",
+		"Clear Costing Review",
+		"Complete Review",
+		"Send Back",
+	):
+		if not frappe.db.exists("Workflow Action Master", action):
+			frappe.get_doc(
+				{"doctype": "Workflow Action Master", "workflow_action_name": action}
+			).insert(ignore_permissions=True)
+
+	if frappe.db.exists("Workflow", "Techno-Commercial Review"):
+		frappe.db.commit()
+		return
+
+	forward = (
+		("Draft", "Send for Technical Review", "Technical Review", "Sales User"),
+		("Technical Review", "Clear Technical Review", "Costing Review", "Technical Reviewer"),
+		("Costing Review", "Clear Costing Review", "Commercial Review", "Costing Reviewer"),
+		("Commercial Review", "Complete Review", "Approved", "Commercial Reviewer"),
+	)
+	send_back = (
+		("Technical Review", "Technical Reviewer"),
+		("Costing Review", "Costing Reviewer"),
+		("Commercial Review", "Commercial Reviewer"),
+	)
+	transitions = []
+	for state, action, next_state, role in forward:
+		for allowed in (role, "Quality Manager"):
+			transitions.append(
+				{"state": state, "action": action, "next_state": next_state, "allowed": allowed}
+			)
+	for state, role in send_back:
+		for allowed in (role, "Quality Manager"):
+			transitions.append(
+				{"state": state, "action": "Send Back", "next_state": "Draft", "allowed": allowed}
+			)
+
+	frappe.get_doc(
+		{
+			"doctype": "Workflow",
+			"workflow_name": "Techno-Commercial Review",
+			"document_type": "Techno Commercial Review",
+			"workflow_state_field": "workflow_state",
+			"is_active": 1,
+			"send_email_alert": 0,
+			"states": [
+				{"state": "Draft", "doc_status": "0", "allow_edit": "Sales User"},
+				{"state": "Technical Review", "doc_status": "0", "allow_edit": "Technical Reviewer"},
+				{"state": "Costing Review", "doc_status": "0", "allow_edit": "Costing Reviewer"},
+				{"state": "Commercial Review", "doc_status": "0", "allow_edit": "Commercial Reviewer"},
+				{"state": "Approved", "doc_status": "1", "allow_edit": "Quality Manager"},
+			],
+			"transitions": transitions,
+		}
+	).insert(ignore_permissions=True)
+	frappe.db.commit()
+	print("iso_compliance: created Techno-Commercial Review workflow (sequential review chain)")
 
 
 def ensure_naming_rules():

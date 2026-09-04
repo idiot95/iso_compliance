@@ -74,6 +74,11 @@ add_to_apps_screen = [
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
+
+# Convenience only (the gate itself is server-side): a create button that
+# opens FRM-036 pre-filled from the order, and a banner when SOP-004's slabs
+# demand a review. Logged in EXTERNAL_CHANGES.md.
+doctype_js = {"Sales Order": "public/js/sales_order.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -173,10 +178,15 @@ after_migrate = "iso_compliance.setup.install.after_migrate"
 # ---------------
 
 # A Sales Order row's chosen BOM survives into the Work Order made from it;
-# ERPNext's own flow would silently substitute the item's default.
+# ERPNext's own flow would silently substitute the item's default. And an
+# order in SOP-004's review slabs cannot be submitted without its approved
+# Techno-Commercial Review (FRM-036). Both logged in EXTERNAL_CHANGES.md.
 doc_events = {
 	"Work Order": {
 		"before_insert": "iso_compliance.overrides.work_order.apply_sales_order_bom",
+	},
+	"Sales Order": {
+		"before_submit": "iso_compliance.overrides.sales_order.enforce_techno_commercial_review",
 	},
 }
 
