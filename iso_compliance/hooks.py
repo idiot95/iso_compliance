@@ -23,7 +23,17 @@ required_apps = ["erpnext"]
 fixtures = [
 	{
 		"dt": "Custom Field",
-		"filters": [["name", "in", ["Quality Meeting-custom_minutes_guidance"]]],
+		"filters": [
+			[
+				"name",
+				"in",
+				[
+					"Quality Meeting-custom_minutes_guidance",
+					"Issue-custom_sales_order",
+					"Issue-custom_root_cause",
+				],
+			]
+		],
 	},
 	{
 		"dt": "Property Setter",

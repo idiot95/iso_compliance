@@ -4,7 +4,26 @@
 
 frappe.ui.form.on("Sales Order", {
 	refresh(frm) {
-		if (frm.doc.docstatus !== 0 || frm.doc.__islocal) return;
+		if (frm.doc.__islocal) return;
+
+		// A complaint is usually about a delivered order, so this shows on
+		// submitted orders too. "Customer Complaint" is the QMS name for an
+		// Issue raised against an order (FRM-028 / REG-008).
+		if (frappe.model.can_create("Issue")) {
+			frm.add_custom_button(
+				__("Customer Complaint"),
+				() => {
+					frappe.route_options = {
+						custom_sales_order: frm.doc.name,
+						customer: frm.doc.customer,
+					};
+					frappe.new_doc("Issue");
+				},
+				__("Create")
+			);
+		}
+
+		if (frm.doc.docstatus !== 0) return;
 		if (!frappe.model.can_create("Techno Commercial Review")) return;
 
 		frm.add_custom_button(

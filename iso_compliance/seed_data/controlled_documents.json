@@ -512,17 +512,17 @@
      {
       "step_no": "1",
       "step_title": "Receipt of Enquiry",
-      "step_content": "<p>Customer enquiries may be received through email, telephone, customer visit, online portal or tender documents. The Sales Department shall record every enquiry through the Customer Enquiry Form (FRM-002), capturing the customer, product or service required, specifications, drawings or technical documents received, quantity, required delivery, and any customer-specific requirements.</p>"
+      "step_content": "<p>Customer enquiries may be received through email, telephone, customer visit, online portal or tender documents. Enquiries taken up are recorded in ERPNext — as an Opportunity, or directly as a Quotation for known requirements — capturing the customer, product or service required, specifications, drawings or technical documents received, quantity, required delivery, and any customer-specific requirements.</p>"
      },
      {
       "step_no": "2",
       "step_title": "Enquiry Review",
-      "step_content": "<p>Before a quotation is prepared, the recorded enquiry shall be reviewed to decide whether to proceed. The review shall confirm technical feasibility (product, specifications, drawings, standards) and commercial viability (quantity, delivery expectation, indicative pricing). The outcome — proceed to quotation, or decline with the reason — shall be recorded against the enquiry. This review is the documented evidence that the enquiry was evaluated before quoting.</p>"
+      "step_content": "<p>The head of Sales &amp; Marketing, or Management, decides which enquiries to attend to and which to decline, considering technical feasibility and commercial viability. Enquiries taken up proceed to quotation.</p>"
      },
      {
       "step_no": "3",
       "step_title": "Quotation",
-      "step_content": "<p>For enquiries cleared by the Enquiry Review, the Sales Department shall prepare the quotation (FRM-035) based on approved technical and commercial inputs, including product specification, price, delivery, and validity, together with applicable taxes and terms.</p>"
+      "step_content": "<p>For enquiries taken up, the Sales Department shall prepare the quotation in ERPNext based on approved technical and commercial inputs, including product specification, price, delivery, and validity, together with applicable taxes and terms.</p>"
      },
      {
       "step_no": "4",
@@ -551,20 +551,8 @@
       "title": "Customer Complaint Register"
      },
      {
-      "number": "FRM035",
-      "title": "Quotation"
-     },
-     {
       "number": "FRM036",
       "title": "Techno-Commercial Review Form"
-     },
-     {
-      "number": "",
-      "title": "Order Acknowledgements"
-     },
-     {
-      "number": "FRM002",
-      "title": "Customer Enquiry Form"
      },
      {
       "number": "FRM003",
@@ -2687,41 +2675,6 @@
    ]
   },
   {
-   "name": "HCCPL/QMS/FRM-002",
-   "legacy_document_number": "FRM002",
-   "title": "Customer Enquiry Form",
-   "document_type": "FRM",
-   "clause_reference": "8.2",
-   "department_label": "Sales",
-   "approval_authority": "QA Manager",
-   "issue_number": "01",
-   "issue_date": "2026-04-01",
-   "revision_number": "00",
-   "body_mode": "Mapped Data",
-   "has_source_file": true,
-   "mapped_doctype": "Opportunity",
-   "mapped_filters": null,
-   "mapped_report": null,
-   "print_columns": [
-    [
-     "transaction_date",
-     "Date"
-    ],
-    [
-     "party_name",
-     "Enquiry From"
-    ],
-    [
-     "opportunity_type",
-     "Type"
-    ],
-    [
-     "status",
-     "Status"
-    ]
-   ]
-  },
-  {
    "name": "HCCPL/QMS/FRM-003",
    "legacy_document_number": "FRM003",
    "title": "Contract Review Form",
@@ -3696,25 +3649,6 @@
    "has_source_file": false,
    "workflow_state": "Active",
    "mapped_doctype": "Employee Onboarding",
-   "mapped_filters": null,
-   "mapped_report": null,
-   "print_columns": null
-  },
-  {
-   "name": "HCCPL/QMS/FRM-035",
-   "legacy_document_number": "FRM035",
-   "title": "Quotation",
-   "document_type": "FRM",
-   "clause_reference": "8.2",
-   "department_label": "Sales",
-   "approval_authority": "QA Manager",
-   "issue_number": "01",
-   "issue_date": "2026-09-04",
-   "revision_number": "00",
-   "body_mode": "Mapped Data",
-   "has_source_file": false,
-   "workflow_state": "Active",
-   "mapped_doctype": "Quotation",
    "mapped_filters": null,
    "mapped_report": null,
    "print_columns": null
