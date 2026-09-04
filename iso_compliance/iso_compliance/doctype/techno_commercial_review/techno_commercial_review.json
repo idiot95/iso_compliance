@@ -169,7 +169,8 @@
    "description": "Completed by the technical reviewer.",
    "fieldname": "section_technical",
    "fieldtype": "Section Break",
-   "label": "Technical Review"
+   "label": "Technical Review",
+   "collapsible": 1
   },
   {
    "fieldname": "technical_parameters",
@@ -188,7 +189,8 @@
    "description": "Completed by the costing reviewer.",
    "fieldname": "section_costing",
    "fieldtype": "Section Break",
-   "label": "Costing Review"
+   "label": "Costing Review",
+   "collapsible": 1
   },
   {
    "fieldname": "costing_parameters",
@@ -268,7 +270,8 @@
    "description": "Completed by the commercial reviewer.",
    "fieldname": "section_commercial",
    "fieldtype": "Section Break",
-   "label": "Commercial Review"
+   "label": "Commercial Review",
+   "collapsible": 1
   },
   {
    "fieldname": "commercial_parameters",
@@ -310,7 +313,8 @@
    "description": "Concluding assessment, recorded by the commercial reviewer before the review is completed.",
    "fieldname": "section_overall",
    "fieldtype": "Section Break",
-   "label": "Overall Assessment"
+   "label": "Overall Assessment",
+   "collapsible": 1
   },
   {
    "fieldname": "overall_parameters",
@@ -350,7 +354,8 @@
   {
    "fieldname": "section_outcome",
    "fieldtype": "Section Break",
-   "label": "Outcome"
+   "label": "Outcome",
+   "collapsible": 1
   },
   {
    "description": "Final recommendation. An order whose latest review concludes Reject cannot be submitted.",

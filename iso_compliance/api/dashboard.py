@@ -328,4 +328,48 @@ def get_gap_rows() -> list[dict]:
 			}
 		)
 
+	unstaffed = review_chain_roles_unstaffed()
+	if unstaffed:
+		rows.append(
+			{
+				"area": _("Contract review"),
+				"clause": "8.2.3",
+				"finding": _("Review-chain roles held by no active user: {0}").format(
+					", ".join(unstaffed)
+				),
+				"count": len(unstaffed),
+				"action": _(
+					"Assign the role to the employee whose designation owns that stage "
+					"(Settings → Users → open the user → Roles)."
+				),
+				"doctype": "Techno Commercial Review",
+			}
+		)
+
 	return [r for r in rows if r["count"]]
+
+
+def review_chain_roles_unstaffed() -> list[str]:
+	"""Reviewer roles no enabled user holds -- a stalled chain waiting to happen.
+
+	The review chain routes by role because roles outlive people; the cost is
+	that when the person holding one leaves and their user is disabled, the
+	role sits empty and every review stalls at that stage. This is the
+	reminder to hand the responsibility to someone else."""
+	from iso_compliance.setup.install import REVIEW_CHAIN_ROLES
+
+	unstaffed = []
+	for role in REVIEW_CHAIN_ROLES:
+		holders = [
+			h.parent
+			for h in frappe.get_all(
+				"Has Role", filters={"role": role, "parenttype": "User"}, fields=["parent"]
+			)
+			if h.parent not in ("Administrator", "Guest")
+		]
+		active = holders and frappe.get_all(
+			"User", filters={"name": ("in", holders), "enabled": 1}, limit=1
+		)
+		if not active:
+			unstaffed.append(role)
+	return unstaffed

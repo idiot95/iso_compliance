@@ -50,8 +50,11 @@ def ensure_review_chain():
 	Draft -> Technical Review -> Costing Review -> Commercial Review ->
 	Approved (submitted). Each forward step belongs to one reviewer role, so
 	the workflow history is the signature block of the paper form; Quality
-	Manager can drive any step, because a small organisation cannot stall an
-	order on an unfilled seat. Send Back returns to Draft from any stage.
+	Manager and System Manager can drive any step, because a small
+	organisation cannot stall an order on an unfilled seat. Send Back
+	returns to Draft from any stage. Idempotent and reconciling: transition
+	rows added here later (e.g. System Manager) are appended to an existing
+	workflow rather than requiring its recreation.
 	"""
 	for role in REVIEW_CHAIN_ROLES:
 		if not frappe.db.exists("Role", role):
@@ -77,13 +80,6 @@ def ensure_review_chain():
 				{"doctype": "Workflow Action Master", "workflow_action_name": action}
 			).insert(ignore_permissions=True)
 
-	if frappe.db.exists("Workflow", "Techno-Commercial Review"):
-		# Keep the alert on for sites that created the workflow before it
-		# defaulted on: each transition mails whoever holds the next stage.
-		frappe.db.set_value("Workflow", "Techno-Commercial Review", "send_email_alert", 1)
-		frappe.db.commit()
-		return
-
 	forward = (
 		("Draft", "Send for Technical Review", "Technical Review", "Sales User"),
 		("Technical Review", "Clear Technical Review", "Costing Review", "Technical Reviewer"),
@@ -97,15 +93,27 @@ def ensure_review_chain():
 	)
 	transitions = []
 	for state, action, next_state, role in forward:
-		for allowed in (role, "Quality Manager"):
+		for allowed in (role, "Quality Manager", "System Manager"):
 			transitions.append(
 				{"state": state, "action": action, "next_state": next_state, "allowed": allowed}
 			)
 	for state, role in send_back:
-		for allowed in (role, "Quality Manager"):
+		for allowed in (role, "Quality Manager", "System Manager"):
 			transitions.append(
 				{"state": state, "action": "Send Back", "next_state": "Draft", "allowed": allowed}
 			)
+
+	if frappe.db.exists("Workflow", "Techno-Commercial Review"):
+		workflow = frappe.get_doc("Workflow", "Techno-Commercial Review")
+		workflow.send_email_alert = 1
+		existing = {(t.state, t.action, t.next_state, t.allowed) for t in workflow.transitions}
+		for row in transitions:
+			if (row["state"], row["action"], row["next_state"], row["allowed"]) not in existing:
+				workflow.append("transitions", row)
+		workflow.flags.ignore_version = True
+		workflow.save(ignore_permissions=True)
+		frappe.db.commit()
+		return
 
 	frappe.get_doc(
 		{

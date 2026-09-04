@@ -110,6 +110,23 @@ const tcr_handlers = {
 		];
 		sections.forEach((s) => frm.toggle_display(s.fields, stage >= s.from));
 
+		// Collapse everything but the stage being worked on; on a completed
+		// review leave all sections open for reading.
+		if (frm.doc.docstatus === 0) {
+			const owning_stage = {
+				section_technical: 1,
+				section_costing: 2,
+				section_costing_eval: 2,
+				section_commercial: 3,
+				section_overall: 3,
+				section_outcome: 3,
+			};
+			Object.entries(owning_stage).forEach(([fieldname, at]) => {
+				const field = frm.get_field(fieldname);
+				if (field && field.collapse && stage >= at) field.collapse(at !== stage);
+			});
+		}
+
 		// On a brand-new form the server has not run yet: pull the order's
 		// company-currency value now so the header is right before saving.
 		if (frm.is_new() && frm.doc.sales_order && !frm.doc.order_value) {
