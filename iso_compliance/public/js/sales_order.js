@@ -16,9 +16,11 @@ frappe.ui.form.on("Sales Order", {
 			__("Create")
 		);
 
+		// Slabs are rupee values: compare the company-currency total, not the
+		// foreign-currency figure on an export order.
 		const STANDARD_FROM = 500000;
 		const DETAILED_FROM = 1000000;
-		const value = frm.doc.grand_total || 0;
+		const value = frm.doc.base_grand_total || 0;
 		if (value < STANDARD_FROM) return;
 		const tier = value >= DETAILED_FROM ? __("Detailed") : __("Standard");
 

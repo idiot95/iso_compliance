@@ -151,16 +151,18 @@ class TechnoCommercialReview(Document):
 		so = frappe.db.get_value(
 			"Sales Order",
 			self.sales_order,
-			("customer", "customer_name", "grand_total", "po_no"),
+			("customer", "customer_name", "base_grand_total", "po_no"),
 			as_dict=True,
 		)
 		if not so:
 			return
 		self.customer = self.customer or so.customer
 		self.customer_name = so.customer_name
-		# Tracks the order while the review is open, so a repriced order
-		# recomputes its tier; frozen once submitted.
-		self.order_value = so.grand_total
+		# The company-currency total, because the slabs are rupee values and
+		# export orders are priced in EUR/USD. Tracks the order while the
+		# review is open, so a repriced order recomputes its tier; frozen
+		# once submitted.
+		self.order_value = so.base_grand_total
 		if not self.enquiry_reference and so.po_no:
 			self.enquiry_reference = so.po_no
 

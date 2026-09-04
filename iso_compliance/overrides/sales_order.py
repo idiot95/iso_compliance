@@ -40,8 +40,12 @@ def enforce_techno_commercial_review(doc, method=None):
 	case the opened review must finish. At or above the slabs, an approved
 	FRM-036 of at least the required tier, concluding Accept, must exist.
 	A review concluding Reject always blocks, whatever the enforcement mode.
+
+	The slabs are rupee values, so the comparison uses base_grand_total (the
+	company-currency total) -- an export order priced in EUR or USD is judged
+	by what it is worth in INR, not by the foreign-currency figure.
 	"""
-	required = required_tier(doc.grand_total)
+	required = required_tier(doc.base_grand_total)
 	names = [doc.name]
 	if doc.get("amended_from"):
 		# An amendment inherits its predecessor's review; if the amended value
@@ -82,11 +86,12 @@ def enforce_techno_commercial_review(doc, method=None):
 					pending[0].workflow_state or _("Draft"),
 				)
 			else:
+				company_currency = frappe.get_cached_value("Company", doc.company, "default_currency")
 				message = _(
 					"This order is {0}, so SOP-004 requires a <b>{1}</b> "
 					"Techno-Commercial Review (FRM-036) before acceptance. "
 					"Use <b>Create → Techno-Commercial Review</b> on this order."
-				).format(fmt_money(flt(doc.grand_total), currency=doc.currency), _(required))
+				).format(fmt_money(flt(doc.base_grand_total), currency=company_currency), _(required))
 			_fail(message)
 	elif pending:
 		_fail(

@@ -114,7 +114,7 @@
    "read_only": 1
   },
   {
-   "description": "Taken from the Sales Order's grand total while the review is in progress; for an enquiry-stage review, enter the expected order value.",
+   "description": "The order's value in company currency (₹), taken from the Sales Order while the review is in progress; for an enquiry-stage review, enter the expected value in ₹.",
    "fieldname": "order_value",
    "fieldtype": "Currency",
    "in_list_view": 1,
