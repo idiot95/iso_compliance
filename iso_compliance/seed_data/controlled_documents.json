@@ -462,9 +462,6 @@
       "reference": "ISO 9001:2015 Clause 8.2"
      },
      {
-      "reference": "Customer Purchase Order"
-     },
-     {
       "reference": "Technical Drawings & Specifications"
      },
      {
@@ -556,10 +553,6 @@
      {
       "number": "FRM035",
       "title": "Quotation"
-     },
-     {
-      "number": "",
-      "title": "Purchase Orders(Customer Documents)"
      },
      {
       "number": "FRM036",
@@ -887,9 +880,6 @@
      },
      {
       "reference": "QM001 – Quality Manual"
-     },
-     {
-      "reference": "Customer Purchase Orders"
      },
      {
       "reference": "Approved Drawings & Specifications"
