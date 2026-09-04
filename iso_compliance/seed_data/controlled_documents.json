@@ -515,32 +515,37 @@
      {
       "step_no": "1",
       "step_title": "Receipt of Enquiry",
-      "step_content": "<p>Customer enquiries may be received through:</p><ul><li>Email</li><li>Telephone</li><li>Customer visit</li><li>Online portal</li><li>Tender documents</li></ul><p>The Sales Department shall record the enquiry and collect all applicable technical and commercial requirements.</p>"
+      "step_content": "<p>Customer enquiries may be received through email, telephone, customer visit, online portal or tender documents. The Sales Department shall record every enquiry through the Customer Enquiry Form (FRM-002), capturing the customer, product or service required, specifications, drawings or technical documents received, quantity, required delivery, and any customer-specific requirements.</p>"
      },
      {
       "step_no": "2",
-      "step_title": "Review of Requirements",
-      "step_content": "<p>Customer requirements shall be reviewed to confirm:</p><ul><li>Product specifications</li><li>Drawings or samples</li><li>Material grade</li><li>Quantity</li><li>Delivery schedule</li><li>Inspection requirements</li><li>Testing requirements</li><li>Packaging requirements</li><li>Statutory or regulatory requirements (if applicable)</li></ul><p>Any ambiguity shall be clarified with the customer before submission of the quotation.</p>"
+      "step_title": "Enquiry Review",
+      "step_content": "<p>Before a quotation is prepared, the recorded enquiry shall be reviewed to decide whether to proceed. The review shall confirm technical feasibility (product, specifications, drawings, standards) and commercial viability (quantity, delivery expectation, indicative pricing). The outcome — proceed to quotation, or decline with the reason — shall be recorded against the enquiry. This review is the documented evidence that the enquiry was evaluated before quoting.</p>"
      },
      {
       "step_no": "3",
       "step_title": "Quotation",
-      "step_content": "<p>The Sales Department shall prepare the quotation based on approved technical and commercial inputs.</p><p>The quotation shall include, where applicable:</p><ul><li>Product description</li><li>Quantity</li><li>Price</li><li>Delivery period</li><li>Payment terms</li><li>Validity</li><li>Applicable taxes</li><li>Special conditions</li></ul>"
+      "step_content": "<p>For enquiries cleared by the Enquiry Review, the Sales Department shall prepare the quotation (FRM-035) based on approved technical and commercial inputs, including product specification, price, delivery, and validity, together with applicable taxes and terms.</p>"
      },
      {
       "step_no": "4",
-      "step_title": "Order Acceptance",
-      "step_content": "<ul><li>Upon receipt of the Purchase Order, the Sales Department shall verify that it matches the quoted technical and commercial requirements.</li><li>Any deviations shall be resolved with the customer before acceptance.</li><li>Order acknowledgement shall be issued where applicable.</li></ul><p>Accepted orders shall be communicated to the concerned departments for planning and execution.</p>"
+      "step_title": "Techno-Commercial Review",
+      "step_content": "<p>A techno-commercial review shall be carried out for every order before acceptance, at a depth set by the criticality of the order:</p><ul><li><b>Detailed review — mandatory</b> for orders of value &#8377; 2,50,000 and above, or any order involving a new or first-time product, customer drawings or design inputs, special contractual conditions (penalty, liquidated damages, price variation), or special customer or statutory requirements. Recorded on the Techno-Commercial Review Form (FRM-036) covering technical capability, costing, and commercial and contractual risk.</li><li><b>Standard review</b> for orders between &#8377; 50,000 and &#8377; 2,50,000: the order shall be verified against the quotation for specification, price, quantity, and delivery, and the confirmation recorded on the order (FRM-003).</li><li><b>Simplified review</b> for orders below &#8377; 50,000 that repeat previously supplied items: verification that the item, price and delivery match established terms. Exemption from the detailed review under this slab is subject to approval by the head of Sales &amp; Marketing.</li></ul><p>Whenever any criticality factor applies, the detailed review shall be carried out regardless of order value.</p>"
      },
      {
       "step_no": "5",
-      "step_title": "Customer Communication",
-      "step_content": "<p>Customer communication shall be maintained regarding:</p><ul><li>Order status.</li><li>Delivery schedule</li><li>Technical clarifications</li><li>Design changes.</li><li>Customer complaints</li><li>Product feedback</li><li>After-sales support</li></ul>"
+      "step_title": "Order Acceptance",
+      "step_content": "<p>Upon receipt of the customer Purchase Order, the Sales Department shall verify that it matches the quoted technical and commercial requirements and the completed techno-commercial review. Any deviation shall be resolved and confirmed with the customer before acceptance. Acceptance is recorded by submitting the Sales Order (FRM-003), which constitutes the documented contract review.</p>"
      },
      {
       "step_no": "6",
+      "step_title": "Customer Communication",
+      "step_content": "<p>Customer communication shall be maintained regarding order status, delivery schedule, technical clarifications, design changes, customer complaints and product information, and recorded against the relevant order or enquiry.</p>"
+     },
+     {
+      "step_no": "7",
       "step_title": "Changes to Orders",
-      "step_content": "<ul><li>Any change requested by the customer after order acceptance shall be reviewed for its impact on quality, cost, delivery, and production.</li><li>Approved changes shall be documented and communicated to all affected departments before implementation to ensure relevant documented information is updated.</li></ul>"
+      "step_content": "<p>Any change requested by the customer after order acceptance shall be reviewed for its impact on quality, cost, delivery and production. Approved changes shall be recorded by amending the Sales Order, with the customer's request reference retained; amendments are registered automatically in the PO Amendment Record Register (REG-022).</p>"
      }
     ],
     "records_generated": [
@@ -555,6 +560,10 @@
      {
       "number": "",
       "title": "Purchase Orders(Customer Documents)"
+     },
+     {
+      "number": "FRM036",
+      "title": "Techno-Commercial Review Form"
      },
      {
       "number": "",
@@ -3716,6 +3725,25 @@
    "has_source_file": false,
    "workflow_state": "Active",
    "mapped_doctype": "Quotation",
+   "mapped_filters": null,
+   "mapped_report": null,
+   "print_columns": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-036",
+   "legacy_document_number": "FRM036",
+   "title": "Techno-Commercial Review Form",
+   "document_type": "FRM",
+   "clause_reference": "8.2.3",
+   "department_label": "Sales",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-09-04",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": true,
+   "workflow_state": "Active",
+   "mapped_doctype": null,
    "mapped_filters": null,
    "mapped_report": null,
    "print_columns": null
