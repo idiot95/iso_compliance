@@ -23,6 +23,7 @@ def after_install():
 	ensure_desk_registration()
 	ensure_naming_rules()
 	ensure_review_chain()
+	ensure_review_notifications()
 
 
 def after_migrate():
@@ -30,6 +31,7 @@ def after_migrate():
 	ensure_desk_registration()
 	ensure_naming_rules()
 	ensure_review_chain()
+	ensure_review_notifications()
 
 
 #: The sequential review chain on FRM-036 (SOP-004): who may clear each stage.
@@ -176,6 +178,82 @@ def ensure_desk_registration():
 		if os.path.exists(path):
 			import_file_by_path(path, force=True, ignore_version=True)
 	frappe.db.commit()
+
+
+def ensure_review_notifications():
+	"""In-app (bell) notifications for the review chain.
+
+	The workflow's own alert is email; these Notification records post to the
+	desk bell as the review changes hands, so a pending stage is visible the
+	moment a reviewer logs in. Recipients follow the stage's role, and the
+	send-back and approval pings go to whoever raised the review. Records,
+	not schema -- deleting them reverts the site untouched.
+	"""
+	message = (
+		"Order {{ doc.sales_order }} for {{ doc.customer_name }} — "
+		"{{ doc.review_tier }} review. Complete your section, then pass it on via Actions."
+	)
+	notifications = (
+		(
+			"Techno-Commercial Review: Technical stage",
+			'doc.workflow_state == "Technical Review"',
+			{"receiver_by_role": "Technical Reviewer"},
+			"Review {{ doc.name }} awaits Technical Review",
+			message,
+		),
+		(
+			"Techno-Commercial Review: Costing stage",
+			'doc.workflow_state == "Costing Review"',
+			{"receiver_by_role": "Costing Reviewer"},
+			"Review {{ doc.name }} awaits Costing Review",
+			message,
+		),
+		(
+			"Techno-Commercial Review: Commercial stage",
+			'doc.workflow_state == "Commercial Review"',
+			{"receiver_by_role": "Commercial Reviewer"},
+			"Review {{ doc.name }} awaits Commercial Review and Outcome",
+			message,
+		),
+		(
+			"Techno-Commercial Review: sent back",
+			'doc.workflow_state == "Draft"',
+			{"receiver_by_document_field": "owner"},
+			"Review {{ doc.name }} was sent back",
+			"A reviewer returned {{ doc.name }} (order {{ doc.sales_order }}). "
+			"See the comments, adjust the order or the review, and resend it.",
+		),
+		(
+			"Techno-Commercial Review: approved",
+			'doc.workflow_state == "Approved"',
+			{"receiver_by_document_field": "owner"},
+			"Review {{ doc.name }} approved — outcome {{ doc.outcome }}",
+			"The review chain for order {{ doc.sales_order }} is complete. "
+			"If the outcome is Accept, the Sales Order can now be submitted.",
+		),
+	)
+	created = []
+	for name, condition, recipient, subject, body in notifications:
+		if frappe.db.exists("Notification", name):
+			continue
+		frappe.get_doc(
+			{
+				"doctype": "Notification",
+				"enabled": 1,
+				"channel": "System Notification",
+				"document_type": "Techno Commercial Review",
+				"event": "Value Change",
+				"value_changed": "workflow_state",
+				"condition": condition,
+				"subject": subject,
+				"message": body,
+				"recipients": [recipient],
+			}
+		).insert(ignore_permissions=True, set_name=name)
+		created.append(name)
+	if created:
+		frappe.db.commit()
+		print(f"iso_compliance: created review-chain notifications ({len(created)})")
 
 
 def ensure_workflow_states():
