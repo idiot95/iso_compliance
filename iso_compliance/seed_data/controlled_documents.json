@@ -924,7 +924,7 @@
      {
       "step_no": "1",
       "step_title": "Production Planning",
-      "step_content": "<p>Production planning shall be carried out based on:</p><ul><li>Customer Purchase Orders</li><li>Delivery schedules</li><li>Product specifications</li><li>Material availability</li><li>Machine capacity</li><li>Manpower availability</li><li>Customer priority (where applicable)</li></ul>"
+      "step_content": "<p>Production planning shall be carried out based on:</p><ul><li>Confirmed Sales Orders</li><li>Delivery schedules</li><li>Product specifications</li><li>Material availability</li><li>Machine capacity</li><li>Manpower availability</li><li>Customer priority (where applicable)</li></ul>"
      },
      {
       "step_no": "2",
