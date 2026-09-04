@@ -2,9 +2,64 @@
 // constant; each review section appears only once the review reaches its
 // stage, and completed stages stay visible (permission levels keep them
 // read-only for everyone but their own reviewer). The chain itself is
-// enforced server-side by the workflow -- this file only declutters.
+// enforced server-side by the workflow -- this file declutters the form and
+// mirrors the server's tier/costing arithmetic so the figures are visible
+// before the first save (the server recomputes them authoritatively).
 
-frappe.ui.form.on("Techno Commercial Review", {
+const TCR_DETAILED_FROM = 1000000;
+
+const TCR_CRITICALITY = [
+	"new_or_first_time_product",
+	"customer_drawings_design_inputs",
+	"special_contract_conditions",
+	"special_statutory_requirements",
+];
+
+const TCR_COSTS = [
+	"estimated_material_cost",
+	"estimated_labour_cost",
+	"estimated_overhead_cost",
+	"logistics_cost",
+	"other_direct_cost",
+];
+
+function tcr_compute_tier(frm) {
+	const critical = TCR_CRITICALITY.some((f) => frm.doc[f]);
+	const tier =
+		critical || (frm.doc.order_value || 0) >= TCR_DETAILED_FROM ? "Detailed" : "Standard";
+	if (frm.doc.review_tier !== tier) frm.set_value("review_tier", tier);
+}
+
+function tcr_fetch_order(frm) {
+	if (!frm.doc.sales_order) return;
+	frappe.db
+		.get_value("Sales Order", frm.doc.sales_order, [
+			"customer",
+			"customer_name",
+			"base_grand_total",
+			"po_no",
+		])
+		.then((r) => {
+			const so = r && r.message;
+			if (!so) return;
+			if (!frm.doc.customer) frm.set_value("customer", so.customer);
+			frm.set_value("order_value", so.base_grand_total);
+			if (!frm.doc.enquiry_reference && so.po_no) {
+				frm.set_value("enquiry_reference", so.po_no);
+			}
+			tcr_compute_tier(frm);
+		});
+}
+
+function tcr_compute_costing(frm) {
+	const total = TCR_COSTS.reduce((sum, f) => sum + (frm.doc[f] || 0), 0);
+	frm.set_value("total_estimated_cost", total);
+	const selling = frm.doc.proposed_selling_price || 0;
+	frm.set_value("expected_gross_margin", selling ? selling - total : 0);
+	frm.set_value("expected_margin_pct", selling ? ((selling - total) / selling) * 100 : 0);
+}
+
+const tcr_handlers = {
 	refresh(frm) {
 		const chain = ["Draft", "Technical Review", "Costing Review", "Commercial Review", "Approved"];
 		let stage = chain.indexOf(frm.doc.workflow_state || "Draft");
@@ -55,8 +110,21 @@ frappe.ui.form.on("Techno Commercial Review", {
 		];
 		sections.forEach((s) => frm.toggle_display(s.fields, stage >= s.from));
 
+		// On a brand-new form the server has not run yet: pull the order's
+		// company-currency value now so the header is right before saving.
+		if (frm.is_new() && frm.doc.sales_order && !frm.doc.order_value) {
+			tcr_fetch_order(frm);
+		}
+
 		if (frm.doc.docstatus !== 0) return;
-		if (stage === 0) {
+		// Clear before setting: stacked intros around a save show twice.
+		frm.set_intro("");
+		if (frm.is_new()) {
+			frm.set_intro(
+				__("Order details load from the Sales Order. Save to load the parameter checklist for the computed tier."),
+				"blue"
+			);
+		} else if (stage === 0) {
 			frm.set_intro(
 				__(
 					"Check the order details and criticality factors, then Actions → Send for Technical Review."
@@ -77,4 +145,21 @@ frappe.ui.form.on("Techno Commercial Review", {
 			}
 		}
 	},
-});
+
+	sales_order(frm) {
+		tcr_fetch_order(frm);
+	},
+
+	order_value(frm) {
+		tcr_compute_tier(frm);
+	},
+
+	proposed_selling_price(frm) {
+		tcr_compute_costing(frm);
+	},
+};
+
+TCR_CRITICALITY.forEach((f) => (tcr_handlers[f] = tcr_compute_tier));
+TCR_COSTS.forEach((f) => (tcr_handlers[f] = tcr_compute_costing));
+
+frappe.ui.form.on("Techno Commercial Review", tcr_handlers);

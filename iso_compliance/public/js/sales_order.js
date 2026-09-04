@@ -32,6 +32,9 @@ frappe.ui.form.on("Sales Order", {
 			})
 			.then((rows) => {
 				if (rows && rows.length) return;
+				// Clear before setting: refresh fires more than once around a
+				// save, and stacked intros show the banner twice.
+				frm.set_intro("");
 				frm.set_intro(
 					__(
 						"This order requires a {0} Techno-Commercial Review (FRM-036) before it can be submitted. Use Create → Techno-Commercial Review.",
