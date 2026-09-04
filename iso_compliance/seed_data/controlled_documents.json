@@ -549,8 +549,8 @@
       "title": "Customer Complaint Register"
      },
      {
-      "number": "",
-      "title": "FRMXX – Quotations"
+      "number": "FRM035",
+      "title": "Quotation"
      },
      {
       "number": "",
@@ -559,10 +559,6 @@
      {
       "number": "",
       "title": "Order Acknowledgements"
-     },
-     {
-      "number": "",
-      "title": "FRMXX – Contract Review Checklist"
      },
      {
       "number": "FRM002",
@@ -3701,6 +3697,25 @@
    "has_source_file": false,
    "workflow_state": "Active",
    "mapped_doctype": "Employee Onboarding",
+   "mapped_filters": null,
+   "mapped_report": null,
+   "print_columns": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-035",
+   "legacy_document_number": "FRM035",
+   "title": "Quotation",
+   "document_type": "FRM",
+   "clause_reference": "8.2",
+   "department_label": "Sales",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-09-04",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "workflow_state": "Active",
+   "mapped_doctype": "Quotation",
    "mapped_filters": null,
    "mapped_report": null,
    "print_columns": null
