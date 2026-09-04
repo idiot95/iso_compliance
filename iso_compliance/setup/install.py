@@ -76,6 +76,9 @@ def ensure_review_chain():
 			).insert(ignore_permissions=True)
 
 	if frappe.db.exists("Workflow", "Techno-Commercial Review"):
+		# Keep the alert on for sites that created the workflow before it
+		# defaulted on: each transition mails whoever holds the next stage.
+		frappe.db.set_value("Workflow", "Techno-Commercial Review", "send_email_alert", 1)
 		frappe.db.commit()
 		return
 
@@ -109,7 +112,7 @@ def ensure_review_chain():
 			"document_type": "Techno Commercial Review",
 			"workflow_state_field": "workflow_state",
 			"is_active": 1,
-			"send_email_alert": 0,
+			"send_email_alert": 1,
 			"states": [
 				{"state": "Draft", "doc_status": "0", "allow_edit": "Sales User"},
 				{"state": "Technical Review", "doc_status": "0", "allow_edit": "Technical Reviewer"},
