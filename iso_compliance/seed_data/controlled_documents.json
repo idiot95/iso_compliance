@@ -512,7 +512,7 @@
      {
       "step_no": "1",
       "step_title": "Receipt of Enquiry",
-      "step_content": "<p>Customer enquiries may be received through email, telephone, customer visit, online portal or tender documents. Enquiries taken up are recorded in ERPNext — as an Opportunity, or directly as a Quotation for known requirements — capturing the customer, product or service required, specifications, drawings or technical documents received, quantity, required delivery, and any customer-specific requirements.</p>"
+      "step_content": "<p>Enquiries arrive by email, telephone, visit, portal or tender. Those taken up are recorded in ERPNext — an Opportunity, or directly a Quotation for known requirements — with product, specification, quantity, delivery and any customer-specific requirements.</p>"
      },
      {
       "step_no": "2",
@@ -522,30 +522,34 @@
      {
       "step_no": "3",
       "step_title": "Quotation",
-      "step_content": "<p>For enquiries taken up, the Sales Department shall prepare the quotation in ERPNext based on approved technical and commercial inputs, including product specification, price, delivery, and validity, together with applicable taxes and terms.</p>"
+      "step_content": "<p>Sales prepares the quotation in ERPNext, covering specification, price, delivery, validity, taxes and terms.</p>"
      },
      {
       "step_no": "4",
       "step_title": "Techno-Commercial Review",
-      "step_content": "<p>A techno-commercial review shall be carried out for every order before acceptance, at a depth set by the criticality of the order. ERPNext blocks submission of any Sales Order of value &#8377; 5,00,000 or above until its review on the Techno-Commercial Review Form (FRM-036) is approved.</p><ul><li><b>Detailed review — mandatory</b> for orders of value &#8377; 10,00,000 and above, or any order involving a new or first-time product, customer drawings or design inputs, special contractual conditions (penalty, liquidated damages, price variation), or special customer or statutory requirements. Recorded on FRM-036 covering technical capability, costing, and commercial and contractual risk, and cleared through the sequential review chain in ERPNext — technical review, costing review, then commercial review and approval.</li><li><b>Standard review</b> for orders between &#8377; 5,00,000 and &#8377; 10,00,000: recorded on FRM-036 at standard depth — the order verified against the quotation for specification, price, taxes, payment terms and delivery — and cleared through the same review chain.</li><li><b>Simplified review</b> for orders between &#8377; 1,00,000 and &#8377; 5,00,000: the submission of the Sales Order in ERPNext itself constitutes the contract review — the person accepting the order verifies item, price and delivery against the quotation before submitting. Exemption from a deeper review under this slab is subject to approval by the head of Sales &amp; Marketing.</li><li><b>Routine orders</b> below &#8377; 1,00,000 repeating previously supplied items are exempt from formal techno-commercial review; verification of the order against the quotation at acceptance suffices.</li></ul><p>Whenever any criticality factor applies, the detailed review shall be carried out regardless of order value, recorded by marking the factor on FRM-036. Each stage of the review chain is signed by its reviewer's approval in ERPNext; the workflow history of the form is the record of who reviewed what and when.</p>"
+      "step_content": "<p>Every order is reviewed before acceptance, at a depth set by its value and criticality. ERPNext blocks submission of a Sales Order of &#8377; 5,00,000 or above until its review on the Techno-Commercial Review Form (FRM-036) is approved.</p><ul><li><b>Detailed</b> — mandatory at &#8377; 10,00,000 and above, or for any order with a criticality factor (new or first-time product; customer drawings or design inputs; penalty, LD or price-variation clauses; special customer or statutory requirements). Full FRM-036 checklist through the review chain — technical, costing, commercial.</li><li><b>Standard</b> — &#8377; 5,00,000 to &#8377; 10,00,000: the order verified against the quotation on FRM-036 at standard depth, through the same chain.</li><li><b>Simplified</b> — &#8377; 1,00,000 to &#8377; 5,00,000: submitting the Sales Order is the contract review; the acceptor first verifies item, price and delivery against the quotation. Exemption from a deeper review needs the head of Sales &amp; Marketing's approval.</li><li><b>Routine</b> — below &#8377; 1,00,000, repeating supplied items: exempt; the order-vs-quotation check at acceptance suffices.</li></ul><p>A criticality factor forces a Detailed review at any value. The FRM-036 workflow history records who reviewed each stage and when.</p>"
      },
      {
       "step_no": "5",
       "step_title": "Order Acceptance",
-      "step_content": "<p>Upon receipt of the customer Purchase Order, the Sales Department shall verify that it matches the quoted technical and commercial requirements and the completed techno-commercial review. Any deviation shall be resolved and confirmed with the customer before acceptance. Acceptance is recorded by submitting the Sales Order (FRM-003), which constitutes the documented contract review.</p>"
+      "step_content": "<p>On receipt of the customer's purchase order, Sales verifies it against the quotation and the completed review, resolves any deviation with the customer, and accepts by submitting the Sales Order — the documented contract review.</p>"
      },
      {
       "step_no": "6",
       "step_title": "Customer Communication",
-      "step_content": "<p>Customer communication shall be maintained regarding order status, delivery schedule, technical clarifications, design changes, customer complaints and product information, and recorded against the relevant order or enquiry.</p>"
+      "step_content": "<p>Order status, delivery schedule, technical clarifications, changes and product information are communicated to the customer and recorded against the relevant order or enquiry. A complaint is recorded as a Customer Complaint (FRM-028) in ERPNext, linked to its Sales Order, and registers automatically in REG-008.</p>"
      },
      {
       "step_no": "7",
       "step_title": "Changes to Orders",
-      "step_content": "<p>Any change requested by the customer after order acceptance shall be reviewed for its impact on quality, cost, delivery and production. Approved changes shall be recorded by amending the Sales Order, with the customer's request reference retained; amendments are registered automatically in the PO Amendment Record Register (REG-022).</p>"
+      "step_content": "<p>A change requested after acceptance is reviewed for its impact on quality, cost, delivery and production, then recorded by amending the Sales Order with the customer's request reference retained. Amendments register automatically in REG-022.</p>"
      }
     ],
     "records_generated": [
+     {
+      "number": "FRM028",
+      "title": "Customer Complaint Report"
+     },
      {
       "number": "REG008",
       "title": "Customer Complaint Register"
@@ -553,10 +557,6 @@
      {
       "number": "FRM036",
       "title": "Techno-Commercial Review Form"
-     },
-     {
-      "number": "FRM003",
-      "title": "Contract Review Form"
      },
      {
       "number": "REG022",
@@ -2675,49 +2675,6 @@
    ]
   },
   {
-   "name": "HCCPL/QMS/FRM-003",
-   "legacy_document_number": "FRM003",
-   "title": "Contract Review Form",
-   "document_type": "FRM",
-   "clause_reference": "8.2",
-   "department_label": "Sales",
-   "approval_authority": "QA Manager",
-   "issue_number": "01",
-   "issue_date": "2026-04-01",
-   "revision_number": "00",
-   "body_mode": "Mapped Data",
-   "has_source_file": false,
-   "mapped_doctype": "Sales Order",
-   "mapped_filters": null,
-   "mapped_report": null,
-   "print_columns": [
-    [
-     "transaction_date",
-     "Order Date"
-    ],
-    [
-     "customer_name",
-     "Customer"
-    ],
-    [
-     "po_no",
-     "Customer PO"
-    ],
-    [
-     "po_date",
-     "PO Date"
-    ],
-    [
-     "delivery_date",
-     "Delivery Date"
-    ],
-    [
-     "status",
-     "Status"
-    ]
-   ]
-  },
-  {
    "name": "HCCPL/QMS/FRM-004",
    "legacy_document_number": "FRM004",
    "title": "Purchase Requisition",
@@ -4138,8 +4095,8 @@
      "width": "11%"
     },
     {
-     "fieldname": null,
-     "label": "Product",
+     "fieldname": "custom_sales_order",
+     "label": "Sales Order",
      "width": "8%"
     },
     {
@@ -4147,7 +4104,7 @@
      "label": "Complaint Description"
     },
     {
-     "fieldname": null,
+     "fieldname": "custom_root_cause",
      "label": "Investigation / Root Cause",
      "width": "12%"
     },

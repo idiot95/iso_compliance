@@ -78,7 +78,6 @@ makes the corresponding blank column fill in; nothing else changes.
 
 | Target DocType | Fieldname | Type | Register column it fills |
 | --- | --- | --- | --- |
-| Issue | `custom_product` | Data | REG-008 "Product" |
 | Non Conformance | `custom_supplier` | Link (Supplier) | REG-009 "Supplier" |
 | Non Conformance | `custom_product` | Data | REG-009 "Product / Part No." |
 | Non Conformance | `custom_batch_wo` | Data | REG-009 "Batch / WO No." |
