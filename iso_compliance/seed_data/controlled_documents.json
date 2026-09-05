@@ -604,9 +604,6 @@
      },
      {
       "reference": "REG007 – Approved Suppliers Register"
-     },
-     {
-      "reference": "Purchase Orders"
      }
     ],
     "definitions": [
@@ -689,10 +686,6 @@
      {
       "number": "",
       "title": "FRMxxx – Supplier Evaluation Form"
-     },
-     {
-      "number": "",
-      "title": "Purchase Orders"
      },
      {
       "number": "",
