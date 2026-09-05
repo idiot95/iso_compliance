@@ -11,6 +11,7 @@
   "evaluation_type",
   "column_break_supplier",
   "evaluation_date",
+  "category",
   "product_service",
   "section_metrics",
   "on_time_delivery_pct",
@@ -22,7 +23,6 @@
   "overall_score",
   "section_decision",
   "approval_status",
-  "category",
   "column_break_decision",
   "next_review_date",
   "summary",
@@ -81,7 +81,9 @@
    "description": "Computed from Purchase Receipts of the last 12 months; the matching criteria rows are pre-rated from these figures and can be overridden.",
    "fieldname": "section_metrics",
    "fieldtype": "Section Break",
-   "label": "Performance Data (Computed)"
+   "label": "Performance Data (Computed)",
+   "collapsible": 1,
+   "depends_on": "eval:doc.supplier"
   },
   {
    "fieldname": "on_time_delivery_pct",
@@ -108,7 +110,8 @@
   {
    "fieldname": "section_criteria",
    "fieldtype": "Section Break",
-   "label": "Evaluation Criteria"
+   "label": "Evaluation Criteria",
+   "depends_on": "eval:doc.supplier"
   },
   {
    "fieldname": "criteria",
@@ -128,7 +131,8 @@
   {
    "fieldname": "section_decision",
    "fieldtype": "Section Break",
-   "label": "Evaluation Decision"
+   "label": "Evaluation Decision",
+   "depends_on": "eval:doc.supplier"
   },
   {
    "description": "Written onto the Supplier record when this evaluation is submitted.",
@@ -143,7 +147,10 @@
    "fieldname": "category",
    "fieldtype": "Select",
    "label": "Supplier Category",
-   "options": "\nCritical\nNon-Critical"
+   "options": "\nCritical\nNon-Critical",
+   "default": "Non-Critical",
+   "description": "Chooses the criteria template: Critical scores the full nine weighted criteria, Non-Critical a condensed five.",
+   "in_standard_filter": 1
   },
   {
    "fieldname": "column_break_decision",

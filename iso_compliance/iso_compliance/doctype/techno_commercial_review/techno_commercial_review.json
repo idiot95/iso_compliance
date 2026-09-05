@@ -136,7 +136,8 @@
    "description": "Any factor ticked forces a Detailed review regardless of order value (SOP-004).",
    "fieldname": "section_criticality",
    "fieldtype": "Section Break",
-   "label": "Criticality Factors"
+   "label": "Criticality Factors",
+   "collapsible": 1
   },
   {
    "default": "0",

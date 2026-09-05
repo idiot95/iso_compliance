@@ -211,7 +211,8 @@
   "label": "Quality Inspection",
   "insert_after": "custom_source",
   "module": "ISO Compliance",
-  "options": "Quality Inspection"
+  "options": "Quality Inspection",
+  "depends_on": "eval:doc.custom_source"
  },
  {
   "doctype": "Custom Field",
@@ -222,7 +223,8 @@
   "label": "Item",
   "insert_after": "custom_quality_inspection",
   "module": "ISO Compliance",
-  "options": "Item"
+  "options": "Item",
+  "depends_on": "eval:doc.custom_source"
  },
  {
   "doctype": "Custom Field",
@@ -232,7 +234,8 @@
   "fieldtype": "Data",
   "label": "Batch / Heat No.",
   "insert_after": "custom_item",
-  "module": "ISO Compliance"
+  "module": "ISO Compliance",
+  "depends_on": "eval:doc.custom_source"
  },
  {
   "doctype": "Custom Field",
@@ -242,7 +245,8 @@
   "fieldtype": "Float",
   "label": "Quantity",
   "insert_after": "custom_batch_wo",
-  "module": "ISO Compliance"
+  "module": "ISO Compliance",
+  "depends_on": "eval:doc.custom_source"
  },
  {
   "doctype": "Custom Field",
@@ -252,7 +256,8 @@
   "fieldtype": "Column Break",
   "label": "",
   "insert_after": "custom_qty",
-  "module": "ISO Compliance"
+  "module": "ISO Compliance",
+  "depends_on": "eval:doc.custom_source"
  },
  {
   "doctype": "Custom Field",
@@ -301,7 +306,8 @@
   "module": "ISO Compliance",
   "options": "Supplier",
   "fetch_from": "custom_purchase_receipt.supplier",
-  "fetch_if_empty": 1
+  "fetch_if_empty": 1,
+  "depends_on": "eval:doc.custom_source"
  },
  {
   "doctype": "Custom Field",
@@ -311,7 +317,8 @@
   "fieldtype": "Section Break",
   "label": "Disposition & Closure",
   "insert_after": "custom_supplier",
-  "module": "ISO Compliance"
+  "module": "ISO Compliance",
+  "depends_on": "eval:doc.custom_source"
  },
  {
   "doctype": "Custom Field",
@@ -503,9 +510,8 @@
   "label": "Effectiveness Verified",
   "insert_after": "custom_followup_col",
   "module": "ISO Compliance",
-  "options": "Pending\nYes\nNo",
-  "default": "Pending",
-  "description": "A corrective action cannot be Completed while this is Pending (SOP-014)."
+  "options": "\nPending\nYes\nNo",
+  "description": "Optional record of whether the action was checked for effectiveness."
  },
  {
   "doctype": "Custom Field",

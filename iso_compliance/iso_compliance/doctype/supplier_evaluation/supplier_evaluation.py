@@ -16,9 +16,11 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import add_days, add_months, cint, flt, today
 
-#: Criteria and weights, verbatim from the Supplier Evaluation Form (F-PUR-01).
-#: The first two are pre-rated from receipt data.
-CRITERIA = (
+#: Criteria templates by supplier category. Critical suppliers get the full
+#: nine weighted criteria of the Supplier Evaluation Form (F-PUR-01);
+#: Non-Critical a condensed five. The first two of each are pre-rated from
+#: receipt data.
+CRITICAL_CRITERIA = (
 	("Quality of supplied product / service", 25),
 	("On-time delivery / service", 20),
 	("Technical capability", 15),
@@ -30,8 +32,16 @@ CRITERIA = (
 	("Corrective action effectiveness", 5),
 )
 
-QUALITY_CRITERION = CRITERIA[0][0]
-DELIVERY_CRITERION = CRITERIA[1][0]
+NON_CRITICAL_CRITERIA = (
+	("Quality of supplied product / service", 30),
+	("On-time delivery / service", 25),
+	("Price / commercial competitiveness", 20),
+	("Communication & responsiveness", 15),
+	("Statutory / regulatory compliance", 10),
+)
+
+QUALITY_CRITERION = CRITICAL_CRITERIA[0][0]
+DELIVERY_CRITERION = CRITICAL_CRITERIA[1][0]
 
 #: Percentage-to-rating bands for the computed criteria.
 RATING_BANDS = ((95, "5"), (90, "4"), (80, "3"), (60, "2"), (0, "1"))
@@ -69,10 +79,28 @@ class SupplierEvaluation(Document):
 	def on_submit(self):
 		self.write_to_supplier()
 
+	def _criteria_template(self):
+		return CRITICAL_CRITERIA if self.category == "Critical" else NON_CRITICAL_CRITERIA
+
 	def seed_criteria(self):
-		if self.criteria:
+		"""Fill (or refill) the criteria for the chosen category. On a draft,
+		switching category swaps templates -- recorded ratings for the old
+		template do not carry over, and the auto-rated rows recompute."""
+		template = self._criteria_template()
+		current = [(row.criterion, flt(row.weight)) for row in self.criteria]
+		expected = [(criterion, flt(weight)) for criterion, weight in template]
+		if current == expected:
 			return
-		for criterion, weight in CRITERIA:
+		if self.docstatus != 0:
+			return
+		if current and any(row.rating for row in self.criteria):
+			frappe.msgprint(
+				_("Criteria reloaded for the {0} template; re-check the ratings.").format(
+					_(self.category or "Non-Critical")
+				)
+			)
+		self.set("criteria", [])
+		for criterion, weight in template:
 			self.append("criteria", {"criterion": criterion, "weight": weight})
 
 	def compute_metrics(self):

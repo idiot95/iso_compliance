@@ -650,7 +650,7 @@
      {
       "step_no": "1",
       "step_title": "Supplier Selection",
-      "step_content": "<p>New suppliers are selected on quality, technical capability, delivery performance, commercial terms and certifications, and undergo an initial evaluation on the Supplier Evaluation Form (FRM-005) before the first order.</p>"
+      "step_content": "<p>New suppliers are selected on quality, technical capability, delivery performance, commercial terms and certifications, and undergo an initial evaluation on the Supplier Evaluation Form (FRM-005) before the first order. The criteria follow the supplier's category: Critical suppliers are scored on the full nine weighted criteria, Non-Critical on a condensed five.</p>"
      },
      {
       "step_no": "2",
@@ -1886,12 +1886,12 @@
      {
       "step_no": "5",
       "step_title": "Effectiveness Verification",
-      "step_content": "<p>The Quality Department shall verify that:</p><ul><li>The corrective action has been completed.</li><li>The nonconformity has not recurred.</li><li>The action has effectively addressed the root cause.</li></ul><p>Where necessary, additional actions shall be initiated.</p>"
+      "step_content": "<p>The Quality Department verifies completed corrective actions and confirms the nonconformity has not recurred; where it has, a fresh corrective action is raised.</p>"
      },
      {
       "step_no": "6",
       "step_title": "Records",
-      "step_content": "<p>Corrective actions shall be closed only after satisfactory verification of effectiveness.</p><p>Records shall be retained as documented information.</p>"
+      "step_content": "<p>Corrective actions are recorded and closed in ERPNext (FRM-021), registering automatically in REG-018, and retained as documented information.</p>"
      }
     ],
     "records_generated": [

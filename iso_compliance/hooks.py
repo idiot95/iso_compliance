@@ -195,13 +195,9 @@ doc_events = {
 		"before_submit": "iso_compliance.overrides.sales_order.enforce_techno_commercial_review",
 	},
 	# SOP-005: warn when ordering from a supplier who is not Approved;
-	# a Suspended supplier blocks. SOP-014: a corrective action cannot be
-	# Completed while effectiveness verification is Pending.
+	# a Suspended supplier blocks.
 	"Purchase Order": {
 		"before_submit": "iso_compliance.overrides.purchase_order.check_supplier_approval",
-	},
-	"Quality Action": {
-		"validate": "iso_compliance.overrides.quality_action.enforce_effectiveness_before_closure",
 	},
 }
 

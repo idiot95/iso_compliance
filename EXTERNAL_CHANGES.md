@@ -20,7 +20,8 @@ Rules for this file:
 Everything applied is in the table at the end of this file, newest first: the
 SOP-004 build (Sales Order review gate, Issue and Quality Feedback fields) and
 the SOP-005 build (Supplier approval block, Non Conformance and Quality Action
-clusters, Purchase Order warn gate, Quality Action closure rule), alongside the
+clusters, Purchase Order warn gate; the Quality Action closure rule was built
+and then reverted at the developer's direction), alongside the
 earlier Work Order BOM behaviour pair and display/naming records. Every custom
 field ships as a fixture under module "ISO Compliance" and is reversible by
 deletion. Remaining proposals: Asset identification, Quality Meeting, Quality
@@ -119,7 +120,7 @@ page. Worth revisiting when frappe ships the missing asset.
 | 2026-09-05 | Non Conformance | 13 `custom_*` fields (source, QI link, item, batch, qty, conditional PR/WO/DN links, supplier, disposition per SOP-013, re-inspection, approved by, closure date) | Custom Fields | Makes FRM-020 a product NCR and fills REG-009's columns; reference links appear conditionally on the source. Requested by the developer. | yes |
 | 2026-09-05 | Non Conformance | `procedure` no longer mandatory | Property Setter (requirement relaxed) | Stock ERPNext assumes NCs come from audits of a Quality Procedure; most here come from inspections. Deleting the setter restores the requirement. Requested by the developer. | yes |
 | 2026-09-05 | Quality Action | 11 `custom_*` fields (source per SOP-014, NC link, supplier, related ref, RCA method, root cause, target/completion dates, effectiveness verified/by/date) | Custom Fields | Makes FRM-021 the CAR and fills REG-018's columns. Requested by the developer. | yes |
-| 2026-09-05 | Quality Action | `validate` hook | doc_events (behaviour) | SOP-014's closure rule: status cannot be Completed while effectiveness verification is Pending; completion/verification dates auto-stamp. Requested by the developer. | code (hooks.py) |
+| 2026-09-05 | Quality Action | ~~`validate` hook~~ REVERTED same day | doc_events (behaviour) | The SOP-014 closure rule (no Completed while effectiveness Pending) was built, then removed at the developer's direction: Quality Actions complete normally, and the effectiveness fields are optional record-keeping. | — |
 | 2026-09-05 | Purchase Order | `before_submit` hook | doc_events (behaviour, warn-first) | SOP-005's approval check: non-Approved suppliers warn, Suspended suppliers block. `SUPPLIER_GATE` in overrides/purchase_order.py flips to "block". Requested by the developer. | code (hooks.py) |
 | 2026-09-05 | Supplier / Purchase Order / Quality Inspection | form scripts | doctype_js (display only) | Approval banner + Create → Supplier Evaluation on Supplier; standing banner on Purchase Order; Create → Non Conformance (pre-filled, incl. failed readings) on rejected Quality Inspections. Requested by the developer. | code (hooks.py) |
 | 2026-09-05 | Terms and Conditions | "Purchase Quality Requirements" record | record, not schema | The nine supplier quality requirements (F-PUR-02 Section C), selectable on any Purchase Order. Created by the ensure hook. | via hook |
