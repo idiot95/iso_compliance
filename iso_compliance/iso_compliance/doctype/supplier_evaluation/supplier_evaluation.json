@@ -1,0 +1,248 @@
+{
+ "actions": [],
+ "autoname": "format:HCCPL/QMS/FRM-005-{####}",
+ "creation": "2026-09-05 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_supplier",
+  "supplier",
+  "supplier_name",
+  "evaluation_type",
+  "column_break_supplier",
+  "evaluation_date",
+  "product_service",
+  "section_metrics",
+  "on_time_delivery_pct",
+  "acceptance_pct",
+  "column_break_metrics",
+  "metrics_basis",
+  "section_criteria",
+  "criteria",
+  "overall_score",
+  "section_decision",
+  "approval_status",
+  "category",
+  "column_break_decision",
+  "next_review_date",
+  "summary",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_supplier",
+   "fieldtype": "Section Break",
+   "label": "Supplier Identification"
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Supplier",
+   "options": "Supplier",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "supplier.supplier_name",
+   "fieldname": "supplier_name",
+   "fieldtype": "Data",
+   "label": "Supplier Name",
+   "read_only": 1
+  },
+  {
+   "default": "Periodic",
+   "fieldname": "evaluation_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Evaluation Type",
+   "options": "Initial\nPeriodic\nRe-evaluation",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_supplier",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "evaluation_date",
+   "fieldtype": "Date",
+   "label": "Evaluation Date",
+   "reqd": 1
+  },
+  {
+   "description": "What this supplier provides.",
+   "fieldname": "product_service",
+   "fieldtype": "Data",
+   "label": "Product / Service"
+  },
+  {
+   "description": "Computed from Purchase Receipts of the last 12 months; the matching criteria rows are pre-rated from these figures and can be overridden.",
+   "fieldname": "section_metrics",
+   "fieldtype": "Section Break",
+   "label": "Performance Data (Computed)"
+  },
+  {
+   "fieldname": "on_time_delivery_pct",
+   "fieldtype": "Percent",
+   "label": "On-Time Delivery %",
+   "read_only": 1
+  },
+  {
+   "fieldname": "acceptance_pct",
+   "fieldtype": "Percent",
+   "label": "Acceptance %",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_metrics",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "metrics_basis",
+   "fieldtype": "Data",
+   "label": "Basis",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_criteria",
+   "fieldtype": "Section Break",
+   "label": "Evaluation Criteria"
+  },
+  {
+   "fieldname": "criteria",
+   "fieldtype": "Table",
+   "label": "Criteria",
+   "options": "Supplier Evaluation Criterion"
+  },
+  {
+   "bold": 1,
+   "description": "Computed: sum of weighted scores. 100% means every criterion rated 5.",
+   "fieldname": "overall_score",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "Overall Score (%)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_decision",
+   "fieldtype": "Section Break",
+   "label": "Evaluation Decision"
+  },
+  {
+   "description": "Written onto the Supplier record when this evaluation is submitted.",
+   "fieldname": "approval_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Approval Status",
+   "options": "\nApproved\nProvisional\nNot Approved\nSuspended"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "label": "Supplier Category",
+   "options": "\nCritical\nNon-Critical"
+  },
+  {
+   "fieldname": "column_break_decision",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "When the next evaluation falls due. Defaults to one year for Critical suppliers, two for Non-Critical. ERPNext drafts the re-evaluation automatically when it arrives.",
+   "fieldname": "next_review_date",
+   "fieldtype": "Date",
+   "label": "Next Review Date"
+  },
+  {
+   "fieldname": "summary",
+   "fieldtype": "Small Text",
+   "label": "Evaluation Summary / Weaknesses / Required Improvements"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Supplier Evaluation",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-09-05 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "ISO Compliance",
+ "name": "Supplier Evaluation",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Quality Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Purchase Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Purchase User",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Employee"
+  }
+ ],
+ "search_fields": "supplier_name,evaluation_type,approval_status",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "supplier_name",
+ "track_changes": 1
+}

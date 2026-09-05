@@ -20,24 +20,11 @@ required_apps = ["erpnext"]
 # The only records this app writes into another app's DocTypes, each one
 # approved and logged in EXTERNAL_CHANGES.md first. Named explicitly so an
 # export can never sweep up another app's custom fields.
+# Everything this app writes into another app's DocTypes carries
+# module = "ISO Compliance", so the module filter exports exactly the fields
+# and setters this app owns and can never sweep up a user's own customisation.
 fixtures = [
-	{
-		"dt": "Custom Field",
-		"filters": [
-			[
-				"name",
-				"in",
-				[
-					"Quality Meeting-custom_minutes_guidance",
-					"Issue-custom_sales_order",
-					"Issue-custom_root_cause",
-					"Quality Feedback-custom_mode",
-					"Quality Feedback-custom_feedback_type",
-					"Quality Feedback-custom_action_required",
-				],
-			]
-		],
-	},
+	{"dt": "Custom Field", "filters": [["module", "=", "ISO Compliance"]]},
 	{
 		"dt": "Property Setter",
 		"filters": [
@@ -47,6 +34,8 @@ fixtures = [
 				[
 					"BOM-inspection_required-description",
 					"Item-inspection_required_before_delivery-description",
+					"Supplier-main-search_fields",
+					"Non Conformance-procedure-reqd",
 				],
 			]
 		],
@@ -88,10 +77,14 @@ add_to_apps_screen = [
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 
-# Convenience only (the gate itself is server-side): a create button that
-# opens FRM-036 pre-filled from the order, and a banner when SOP-004's slabs
-# demand a review. Logged in EXTERNAL_CHANGES.md.
-doctype_js = {"Sales Order": "public/js/sales_order.js"}
+# Convenience only (gates are server-side): create buttons, pre-fills and
+# status banners on the transactional forms. All logged in EXTERNAL_CHANGES.md.
+doctype_js = {
+	"Sales Order": "public/js/sales_order.js",
+	"Supplier": "public/js/supplier.js",
+	"Purchase Order": "public/js/purchase_order.js",
+	"Quality Inspection": "public/js/quality_inspection.js",
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -201,10 +194,25 @@ doc_events = {
 	"Sales Order": {
 		"before_submit": "iso_compliance.overrides.sales_order.enforce_techno_commercial_review",
 	},
+	# SOP-005: warn when ordering from a supplier who is not Approved;
+	# a Suspended supplier blocks. SOP-014: a corrective action cannot be
+	# Completed while effectiveness verification is Pending.
+	"Purchase Order": {
+		"before_submit": "iso_compliance.overrides.purchase_order.check_supplier_approval",
+	},
+	"Quality Action": {
+		"validate": "iso_compliance.overrides.quality_action.enforce_effectiveness_before_closure",
+	},
 }
 
 # Scheduled Tasks
 # ---------------
+
+# A supplier whose re-approval date arrives gets a drafted FRM-005
+# evaluation waiting in the worklist, and Purchase is notified.
+scheduler_events = {
+	"daily": ["iso_compliance.tasks.create_due_supplier_evaluations"],
+}
 
 # scheduler_events = {
 # 	"all": [

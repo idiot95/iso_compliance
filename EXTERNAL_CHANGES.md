@@ -15,12 +15,16 @@ Rules for this file:
 4. Core ERPNext behaviour is not modified. Additive Custom Fields only — no changes to
    existing field definitions, no monkeypatching, no overridden core methods.
 
-## Status: six applied changes — four display/naming, two behaviour (Work Order BOM from Sales Order: insert hook + dialog override)
+## Status
 
-One display-only HTML Custom Field (Quality Meeting minutes guidance) and one
-Document Naming Rule (Quality Meeting numbers as FRM-024). Both additive, both
-reversible, both in the Approved and applied table at the end of this file. No
-data-bearing Custom Field exists on any external DocType; those remain proposals.
+Everything applied is in the table at the end of this file, newest first: the
+SOP-004 build (Sales Order review gate, Issue and Quality Feedback fields) and
+the SOP-005 build (Supplier approval block, Non Conformance and Quality Action
+clusters, Purchase Order warn gate, Quality Action closure rule), alongside the
+earlier Work Order BOM behaviour pair and display/naming records. Every custom
+field ships as a fixture under module "ISO Compliance" and is reversible by
+deletion. Remaining proposals: Asset identification, Quality Meeting, Quality
+Feedback summary/status, and Employee rows in the table below.
 
 ## Proposed — awaiting approval
 
@@ -49,23 +53,11 @@ not have.
 What remains is a data task, not a development one: 31 of 33 Assets have no
 maintenance plan, and none are submitted into service.
 
-### 1. Supplier — approval status (REG-007, SOP-005, ISO 9001 clause 8.4)
+### ~~1. Supplier — approval status~~ — APPLIED 2026-09-05
 
-REG-007 is the Approved Suppliers Register, but there is currently no way to express
-approval: of 945 Suppliers, 943 have no supplier group, none are on hold, none are
-disabled, and only 3 have a scorecard. A register built on `Supplier` today would
-list all 945, which is not a controlled list of approved suppliers.
-
-Supplier Group was considered instead and rejected: it already carries a different
-meaning, and overloading it would make approval status invisible to anyone reading
-the group.
-
-| Fieldname | Type | Label | Purpose |
-| --- | --- | --- | --- |
-| `custom_approval_status` | Select | Approval Status | `Approved` / `Provisional` / `Not Approved` / `Suspended` |
-| `custom_approved_on` | Date | Approved On | When approval was granted |
-| `custom_approved_by` | Link (User) | Approved By | Who granted it |
-| `custom_reapproval_due` | Date | Re-approval Due | Drives periodic re-evaluation required by 8.4 |
+Applied as part of the SOP-005 build, extended with `custom_rating` (stars),
+`custom_score` (%), `custom_category` and `custom_qualification_method` from
+the register-column list below. See the Approved and applied table.
 
 ### 2. Register columns awaiting fields (2026-08-07 register-format alignment)
 
@@ -78,24 +70,12 @@ makes the corresponding blank column fill in; nothing else changes.
 
 | Target DocType | Fieldname | Type | Register column it fills |
 | --- | --- | --- | --- |
-| Non Conformance | `custom_supplier` | Link (Supplier) | REG-009 "Supplier" |
-| Non Conformance | `custom_product` | Data | REG-009 "Product / Part No." |
-| Non Conformance | `custom_batch_wo` | Data | REG-009 "Batch / WO No." |
-| Non Conformance | `custom_qty` | Float | REG-009 "Qty." |
-| Non Conformance | `custom_disposition` | Select (Rework / Repair / Reject / Use As Is / Return) | REG-009 "Disposition" |
-| Non Conformance | `custom_approved_by` | Link (User) | REG-009 "Approved By" |
-| Non Conformance | `custom_closure_date` | Date | REG-009 "Closure Date" |
 | Asset | `custom_make` | Data | REG-011 "Make" / REG-020 "Make / Manufacturer" |
 | Asset | `custom_model` | Data | REG-020 "Model" |
 | Asset | `custom_serial_no` | Data | REG-011 / REG-020 "Serial No." |
 | Asset | `custom_range` | Data | REG-011 "Range" |
 | Asset | `custom_least_count` | Data | REG-011 "Least Count (mm)" |
 | Asset | `custom_critical_equipment` | Check | REG-020 "Critical Equipment (Y/N)" |
-| Quality Action | `custom_related_reference` | Data | REG-018 "Related NCR / Audit / Complaint" |
-| Quality Action | `custom_root_cause` | Small Text | REG-018 "Root Cause" |
-| Quality Action | `custom_target_date` | Date | REG-018 "Target Date" |
-| Quality Action | `custom_completion_date` | Date | REG-018 "Completion Date" |
-| Quality Action | `custom_effectiveness_verified` | Select (Pending / Yes / No) | REG-018 "Effectiveness Verified (Y/N)" |
 | Quality Meeting | `custom_meeting_date` | Date | REG-019 "Meeting Date" (today: creation date) |
 | Quality Meeting | `custom_review_period` | Data | REG-019 "Review Period" |
 | Quality Meeting | `custom_chairperson` | Data | REG-019 "Chairperson" |
@@ -103,8 +83,6 @@ makes the corresponding blank column fill in; nothing else changes.
 | Quality Feedback | `custom_feedback_status` | Select (Open / Closed) | REG-025 "Status" |
 | Employee | `custom_roles_responsibilities` | Small Text | REG-013 "Roles & Responsibilities" |
 | Employee | `custom_authority` | Small Text | REG-013 "Authority" |
-| Supplier | `custom_category_critical` | Select (Critical / Non-Critical) | REG-007 "Category" (joins proposal 1's approval fields) |
-| Supplier | `custom_qualification_method` | Data | REG-007 "Qualification Method" |
 
 ## Observations about the site (no change made)
 
@@ -136,6 +114,16 @@ page. Worth revisiting when frappe ships the missing asset.
 
 | Date | Target DocType | Field / Change | Type | Reason | Fixture |
 | ---- | -------------- | -------------- | ---- | ------ | ------- |
+| 2026-09-05 | Supplier | `custom_approval_status`, `custom_category`, `custom_rating`, `custom_score`, `custom_approved_on`, `custom_approved_by`, `custom_reapproval_due`, `custom_qualification_method` (+ section/column breaks) | Custom Fields | The QMS approval block written by submitted FRM-005 Supplier Evaluations; REG-007 reads these. Requested by the developer. | yes |
+| 2026-09-05 | Supplier | `search_fields` = approval status, category | Property Setter (display) | Every supplier dropdown shows approval standing under the name. Requested by the developer. | yes |
+| 2026-09-05 | Non Conformance | 13 `custom_*` fields (source, QI link, item, batch, qty, conditional PR/WO/DN links, supplier, disposition per SOP-013, re-inspection, approved by, closure date) | Custom Fields | Makes FRM-020 a product NCR and fills REG-009's columns; reference links appear conditionally on the source. Requested by the developer. | yes |
+| 2026-09-05 | Non Conformance | `procedure` no longer mandatory | Property Setter (requirement relaxed) | Stock ERPNext assumes NCs come from audits of a Quality Procedure; most here come from inspections. Deleting the setter restores the requirement. Requested by the developer. | yes |
+| 2026-09-05 | Quality Action | 11 `custom_*` fields (source per SOP-014, NC link, supplier, related ref, RCA method, root cause, target/completion dates, effectiveness verified/by/date) | Custom Fields | Makes FRM-021 the CAR and fills REG-018's columns. Requested by the developer. | yes |
+| 2026-09-05 | Quality Action | `validate` hook | doc_events (behaviour) | SOP-014's closure rule: status cannot be Completed while effectiveness verification is Pending; completion/verification dates auto-stamp. Requested by the developer. | code (hooks.py) |
+| 2026-09-05 | Purchase Order | `before_submit` hook | doc_events (behaviour, warn-first) | SOP-005's approval check: non-Approved suppliers warn, Suspended suppliers block. `SUPPLIER_GATE` in overrides/purchase_order.py flips to "block". Requested by the developer. | code (hooks.py) |
+| 2026-09-05 | Supplier / Purchase Order / Quality Inspection | form scripts | doctype_js (display only) | Approval banner + Create → Supplier Evaluation on Supplier; standing banner on Purchase Order; Create → Non Conformance (pre-filled, incl. failed readings) on rejected Quality Inspections. Requested by the developer. | code (hooks.py) |
+| 2026-09-05 | Terms and Conditions | "Purchase Quality Requirements" record | record, not schema | The nine supplier quality requirements (F-PUR-02 Section C), selectable on any Purchase Order. Created by the ensure hook. | via hook |
+| 2026-09-05 | Notification | "Supplier Evaluation Due" record | record, not schema | Bell notification to Purchase Manager and Quality Manager when an FRM-005 evaluation is drafted (the daily scheduler drafts one when a supplier's re-approval date arrives). | via hook |
 | 2026-09-04 | Quality Feedback | `custom_mode`, `custom_feedback_type`, `custom_action_required` | Custom Fields, Select (all optional) | Mode (Email/Phone/Survey/Verbal), Type (Positive/Suggestion/Complaint) and Action Required (Yes/No) — fills three REG-025 columns; the doctype also serves internal and production feedback via document_type User. Promoted from the pending proposal. Requested by the developer. | yes |
 | 2026-09-04 | Sales Order | form script: Create → Customer Feedback button | doctype_js (display only) | Opens a new Quality Feedback pre-filled with the customer. Requested by the developer. | code (hooks.py) |
 | 2026-09-04 | Issue | `custom_sales_order` | Custom Field, Link (Sales Order) | A customer complaint traced to the order it concerns; also the target of the Sales Order form's Create → Customer Complaint button. Requested by the developer. | yes |

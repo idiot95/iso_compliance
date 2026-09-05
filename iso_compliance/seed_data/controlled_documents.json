@@ -650,32 +650,32 @@
      {
       "step_no": "1",
       "step_title": "Supplier Selection",
-      "step_content": "<p>Suppliers shall be selected based on:</p><ul><li>Product quality</li><li>Technical capability</li><li>Delivery performance</li><li>Commercial terms</li><li>Previous performance</li><li>Certifications (where applicable)</li></ul>"
+      "step_content": "<p>New suppliers are selected on quality, technical capability, delivery performance, commercial terms and certifications, and undergo an initial evaluation on the Supplier Evaluation Form (FRM-005) before the first order.</p>"
      },
      {
       "step_no": "2",
       "step_title": "Supplier Approval",
-      "step_content": "<p>New suppliers shall be evaluated before approval.</p><p>Evaluation may consider:</p><ul><li>Product samples</li><li>Manufacturing capability</li><li>Past performance</li><li>Customer references</li><li>Quality certifications</li></ul><p>Approved suppliers shall be listed in the REG007 - Approved Supplier List.</p>"
+      "step_content": "<p>Submitting an FRM-005 evaluation writes the supplier's approval status (Approved / Provisional / Not Approved / Suspended), category and rating onto the supplier record; the Approved Suppliers Register (REG-007) is the live list of these. ERPNext warns when ordering from a supplier who is not Approved and blocks orders to a Suspended supplier.</p>"
      },
      {
       "step_no": "3",
       "step_title": "Purchase Order",
-      "step_content": "<p>Purchase Orders shall clearly specify:</p><ul><li>Product description</li><li>Material grade</li><li>Quantity</li><li>Applicable drawings/specifications</li><li>Delivery schedule</li><li>Inspection requirements</li><li>Packaging requirements</li><li>Commercial terms</li></ul><p>Only authorized personnel shall issue Purchase Orders.</p>"
+      "step_content": "<p>Purchase Orders are issued in ERPNext by authorised personnel, specifying product, material grade, quantity, applicable drawings, delivery schedule, and inspection and packaging requirements. The standard Purchase Quality Requirements terms communicate quality conditions to the supplier on the order itself.</p>"
      },
      {
       "step_no": "4",
       "step_title": "Monitoring Supplier Performance",
-      "step_content": "<p>Supplier performance shall be periodically reviewed based on:</p><ul><li>Quality of supplied materials</li><li>On-time delivery</li><li>Responsiveness</li><li>Complaint history</li><li>Corrective action implementation</li><li>Rejection Rate</li></ul><p>Unsatisfactory suppliers may be re-evaluated or removed from the Approved Supplier List.</p>"
+      "step_content": "<p>Each approved evaluation sets the supplier's next review date; when it falls due, ERPNext drafts the re-evaluation and notifies Purchase and Quality. Delivery and quality ratings are computed from the last twelve months of receipts and inspections. Supplier issues raise a Corrective Action Request (FRM-021) per SOP-014, and rejected supplies register in the Nonconforming Product Register (REG-009) per SOP-013.</p>"
      },
      {
       "step_no": "5",
       "step_title": "Outsourced Processes",
-      "step_content": "<p>Where any process is outsourced, Hatim Carbon shall ensure that applicable quality requirements are communicated, monitored, and verified before acceptance.</p>"
+      "step_content": "<p>An outsourced process is controlled like any purchase: an approved supplier, a Purchase Order carrying the quality requirements, and verification before acceptance.</p>"
      },
      {
       "step_no": "6",
       "step_title": "Purchase Order Amendments",
-      "step_content": "<ul><li>Any change to an issued Purchase Order shall be reviewed and approved by authorized personnel before being communicated to the supplier.</li><li>The revised requirements shall clearly identify the changes made.</li><li>Where applicable, affected departments shall be informed of the revised purchase requirements.</li></ul>"
+      "step_content": "<p>A change to an issued Purchase Order is reviewed and approved by authorised personnel before being communicated to the supplier; the amended order identifies what changed, and affected departments are informed.</p>"
      }
     ],
     "records_generated": [
@@ -684,24 +684,16 @@
       "title": "Approved Suppliers Register"
      },
      {
-      "number": "",
-      "title": "FRMxxx – Supplier Evaluation Form"
-     },
-     {
-      "number": "",
-      "title": "FRMxxx – Supplier Performance Evaluation"
-     },
-     {
-      "number": "",
-      "title": "FRMxxx – Supplier Corrective Action Request (SCAR)"
-     },
-     {
       "number": "FRM004",
       "title": "Purchase Requisition"
      },
      {
       "number": "FRM005",
       "title": "Supplier Evaluation Form"
+     },
+     {
+      "number": "FRM021",
+      "title": "Corrective Action Request (CAR)"
      }
     ]
    }
@@ -2727,23 +2719,10 @@
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": false,
-   "mapped_doctype": "Supplier Scorecard",
+   "mapped_doctype": "Supplier Evaluation",
    "mapped_filters": null,
    "mapped_report": null,
-   "print_columns": [
-    [
-     "supplier",
-     "Supplier"
-    ],
-    [
-     "period",
-     "Period"
-    ],
-    [
-     "status",
-     "Standing"
-    ]
-   ]
+   "print_columns": null
   },
   {
    "name": "HCCPL/QMS/FRM-006",
@@ -4061,28 +4040,28 @@
      "width": "10%"
     },
     {
-     "fieldname": null,
-     "label": "Category (Critical / Non-Critical)",
+     "fieldname": "custom_category",
+     "label": "Category",
      "width": "8%"
     },
     {
-     "fieldname": null,
+     "fieldname": "custom_qualification_method",
      "label": "Qualification Method",
      "width": "9%"
     },
     {
-     "fieldname": null,
+     "fieldname": "custom_approved_on",
      "label": "Approved On",
      "width": "7%"
     },
     {
-     "fieldname": null,
-     "label": "Performance Rating",
+     "fieldname": "custom_score",
+     "label": "Evaluation Score (%)",
      "width": "8%"
     },
     {
-     "fieldname": null,
-     "label": "Remarks (Approved / Conditional / Rejected)",
+     "fieldname": "custom_approval_status",
+     "label": "Approval Status",
      "width": "10%"
     }
    ]
@@ -4173,17 +4152,17 @@
      "width": "7%"
     },
     {
-     "fieldname": null,
+     "fieldname": "custom_supplier",
      "label": "Supplier",
      "width": "9%"
     },
     {
-     "fieldname": null,
+     "fieldname": "custom_item",
      "label": "Product / Part No.",
      "width": "8%"
     },
     {
-     "fieldname": null,
+     "fieldname": "custom_batch_wo",
      "label": "Batch / WO No.",
      "width": "8%"
     },
@@ -4192,22 +4171,22 @@
      "label": "Nonconformity Description"
     },
     {
-     "fieldname": null,
+     "fieldname": "custom_qty",
      "label": "Qty.",
      "width": "4%"
     },
     {
-     "fieldname": null,
-     "label": "Disposition (Rework / Repair / Reject / Use As Is)",
+     "fieldname": "custom_disposition",
+     "label": "Disposition",
      "width": "9%"
     },
     {
-     "fieldname": null,
+     "fieldname": "custom_approved_by",
      "label": "Approved By",
      "width": "7%"
     },
     {
-     "fieldname": null,
+     "fieldname": "custom_closure_date",
      "label": "Closure Date",
      "width": "7%"
     },
@@ -4760,12 +4739,12 @@
      "width": "7%"
     },
     {
-     "fieldname": null,
+     "fieldname": "custom_source",
      "label": "Source of Nonconformity",
      "width": "9%"
     },
     {
-     "fieldname": null,
+     "fieldname": "custom_related_reference",
      "label": "Related NCR / Audit / Complaint",
      "width": "9%"
     },
@@ -4774,7 +4753,7 @@
      "label": "Problem Description"
     },
     {
-     "fieldname": null,
+     "fieldname": "custom_root_cause",
      "label": "Root Cause",
      "width": "10%"
     },
@@ -4784,17 +4763,17 @@
      "width": "11%"
     },
     {
-     "fieldname": null,
+     "fieldname": "custom_target_date",
      "label": "Target Date",
      "width": "6%"
     },
     {
-     "fieldname": null,
+     "fieldname": "custom_completion_date",
      "label": "Completion Date",
      "width": "6%"
     },
     {
-     "fieldname": null,
+     "fieldname": "custom_effectiveness_verified",
      "label": "Effectiveness Verified (Y/N)",
      "width": "6%"
     },

@@ -328,6 +328,35 @@ def get_gap_rows() -> list[dict]:
 			}
 		)
 
+	trading_unclassified = suppliers_trading_unclassified()
+	if trading_unclassified:
+		rows.append(
+			{
+				"area": _("Supplier control"),
+				"clause": "8.4",
+				"finding": _("Suppliers with orders in the last 12 months but no approval status"),
+				"count": trading_unclassified,
+				"action": _(
+					"Record a Supplier Evaluation (FRM-005) for each, or set a provisional "
+					"status, so REG-007 is a controlled list."
+				),
+				"doctype": "Supplier Evaluation",
+			}
+		)
+
+	overdue_suppliers = suppliers_past_reapproval()
+	if overdue_suppliers:
+		rows.append(
+			{
+				"area": _("Supplier control"),
+				"clause": "8.4",
+				"finding": _("Suppliers past their re-approval due date"),
+				"count": overdue_suppliers,
+				"action": _("Complete the drafted FRM-005 re-evaluations."),
+				"doctype": "Supplier Evaluation",
+			}
+		)
+
 	unstaffed = review_chain_roles_unstaffed()
 	if unstaffed:
 		rows.append(
@@ -347,6 +376,29 @@ def get_gap_rows() -> list[dict]:
 		)
 
 	return [r for r in rows if r["count"]]
+
+
+def suppliers_trading_unclassified() -> int:
+	"""Suppliers this company actually buys from who carry no approval status --
+	the gap that makes REG-007 a list of names rather than a controlled register."""
+	return frappe.db.sql(
+		"""
+		select count(distinct po.supplier)
+		from `tabPurchase Order` po
+		join `tabSupplier` s on s.name = po.supplier
+		where po.docstatus = 1
+			and po.transaction_date >= date_sub(curdate(), interval 12 month)
+			and s.disabled = 0
+			and ifnull(s.custom_approval_status, '') = ''
+		"""
+	)[0][0]
+
+
+def suppliers_past_reapproval() -> int:
+	return frappe.db.count(
+		"Supplier",
+		{"disabled": 0, "custom_reapproval_due": ("<", frappe.utils.today())},
+	)
 
 
 def review_chain_roles_unstaffed() -> list[str]:

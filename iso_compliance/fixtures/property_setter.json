@@ -20,5 +20,26 @@
   "property_type": "Small Text",
   "value": "When checked: a Delivery Note containing this item cannot be submitted until an accepted Outgoing Quality Inspection exists for it. This is the dispatch gate — nothing ships uninspected.",
   "module": "ISO Compliance"
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "Supplier-main-search_fields",
+  "doc_type": "Supplier",
+  "doctype_or_field": "DocType",
+  "property": "search_fields",
+  "property_type": "Data",
+  "value": "custom_approval_status,custom_category",
+  "module": "ISO Compliance"
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "Non Conformance-procedure-reqd",
+  "doc_type": "Non Conformance",
+  "doctype_or_field": "DocField",
+  "field_name": "procedure",
+  "property": "reqd",
+  "property_type": "Check",
+  "value": "0",
+  "module": "ISO Compliance"
  }
 ]

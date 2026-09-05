@@ -24,6 +24,7 @@ def after_install():
 	ensure_naming_rules()
 	ensure_review_chain()
 	ensure_review_notifications()
+	ensure_purchase_terms()
 
 
 def after_migrate():
@@ -32,6 +33,40 @@ def after_migrate():
 	ensure_naming_rules()
 	ensure_review_chain()
 	ensure_review_notifications()
+	ensure_purchase_terms()
+
+
+def ensure_purchase_terms():
+	"""The standard quality requirements communicated to suppliers (8.4.3).
+
+	One Terms and Conditions record, selectable on any Purchase Order, carrying
+	the nine requirement lines of the Purchase Order source form (F-PUR-02
+	Section C). A record, not schema -- deleting it reverts the site untouched.
+	"""
+	title = "Purchase Quality Requirements"
+	if frappe.db.exists("Terms and Conditions", title):
+		return
+	terms = (
+		"<p>The supplier shall comply with the following, as applicable to this order:</p>"
+		"<ol>"
+		"<li>Supply strictly to the quality specification and acceptance criteria stated against each item.</li>"
+		"<li>Manufacture to the applicable drawing / technical specification revision referenced in this order.</li>"
+		"<li>Carry out the inspection and testing required before despatch.</li>"
+		"<li>Provide a certificate of conformity / test certificate with each consignment.</li>"
+		"<li>Pack and preserve the goods to prevent damage or deterioration in transit and storage.</li>"
+		"<li>Identify every package and item for traceability (batch / heat / lot numbers).</li>"
+		"<li>Comply with all statutory and regulatory requirements applicable to the goods.</li>"
+		"<li>Use qualified personnel and controlled processes for any special process.</li>"
+		"<li>Honour the warranty / service requirements stated in this order.</li>"
+		"</ol>"
+		"<p>Goods are subject to inspection at receipt; nonconforming supply may be returned at the "
+		"supplier's cost and affects approval status on the Approved Suppliers Register (REG-007).</p>"
+	)
+	frappe.get_doc(
+		{"doctype": "Terms and Conditions", "title": title, "terms": terms, "buying": 1, "selling": 0}
+	).insert(ignore_permissions=True)
+	frappe.db.commit()
+	print("iso_compliance: created Terms and Conditions 'Purchase Quality Requirements'")
 
 
 #: The sequential review chain on FRM-036 (SOP-004): who may clear each stage.
@@ -259,9 +294,35 @@ def ensure_review_notifications():
 			}
 		).insert(ignore_permissions=True, set_name=name)
 		created.append(name)
+
+	# SOP-005: when the scheduler (or anyone) drafts a supplier evaluation,
+	# Purchase and Quality see it in the bell.
+	due_name = "Supplier Evaluation Due"
+	if not frappe.db.exists("Notification", due_name):
+		frappe.get_doc(
+			{
+				"doctype": "Notification",
+				"enabled": 1,
+				"channel": "System Notification",
+				"document_type": "Supplier Evaluation",
+				"event": "New",
+				"subject": "Supplier evaluation due: {{ doc.supplier_name or doc.supplier }}",
+				"message": (
+					"A {{ doc.evaluation_type }} evaluation (FRM-005) has been drafted for "
+					"{{ doc.supplier_name or doc.supplier }}. Complete it to keep the "
+					"Approved Suppliers Register (REG-007) current."
+				),
+				"recipients": [
+					{"receiver_by_role": "Purchase Manager"},
+					{"receiver_by_role": "Quality Manager"},
+				],
+			}
+		).insert(ignore_permissions=True, set_name=due_name)
+		created.append(due_name)
+
 	if created:
 		frappe.db.commit()
-		print(f"iso_compliance: created review-chain notifications ({len(created)})")
+		print(f"iso_compliance: created notifications ({len(created)})")
 
 
 def ensure_workflow_states():
