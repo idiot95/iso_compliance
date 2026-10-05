@@ -328,6 +328,38 @@ def get_gap_rows() -> list[dict]:
 			}
 		)
 
+	undecided = purchase_items_without_inspection_decision()
+	if undecided:
+		rows.append(
+			{
+				"area": _("Incoming inspection"),
+				"clause": "8.4.2",
+				"finding": _("Purchase items received in the last 12 months with no inspection decision"),
+				"count": undecided,
+				"action": _(
+					"Decide per item group whether receipt inspection applies, and set "
+					"Inspection Required before Purchase accordingly (SOP-006)."
+				),
+				"doctype": "Item",
+			}
+		)
+
+	untemplated = inspection_items_without_template()
+	if untemplated:
+		rows.append(
+			{
+				"area": _("Incoming inspection"),
+				"clause": "8.4.2",
+				"finding": _("Items requiring inspection with no inspection template"),
+				"count": untemplated,
+				"action": _(
+					"Name a Quality Inspection Template on the item or its item group, so the "
+					"inspection records readings instead of a bare result."
+				),
+				"doctype": "Quality Inspection Template",
+			}
+		)
+
 	trading_unclassified = suppliers_trading_unclassified()
 	if trading_unclassified:
 		rows.append(
@@ -425,3 +457,44 @@ def review_chain_roles_unstaffed() -> list[str]:
 		if not active:
 			unstaffed.append(role)
 	return unstaffed
+
+
+@frappe.whitelist()
+def purchase_items_without_inspection_decision() -> int:
+	"""Items actually received lately on which nobody has ruled about inspection.
+
+	Counted against receipt activity rather than the whole item master: an item
+	nobody buys any more is not a live gap, and a count of every dormant code
+	would bury the ones that matter. `inspection_required_before_purchase` unset
+	is not a decision that inspection is unnecessary -- it is the absence of one,
+	and SOP-006 asks for the ruling to be made per item group.
+	"""
+	return frappe.db.sql("""
+		select count(distinct it.name)
+		from tabItem it
+		join `tabPurchase Receipt Item` pri on pri.item_code = it.name
+		join `tabPurchase Receipt` pr on pr.name = pri.parent
+		where pr.docstatus = 1
+		  and pr.posting_date >= date_sub(curdate(), interval 12 month)
+		  and it.disabled = 0
+		  and ifnull(it.inspection_required_before_purchase, 0) = 0
+	""")[0][0] or 0
+
+
+@frappe.whitelist()
+def inspection_items_without_template() -> int:
+	"""Items gated on inspection whose inspection has no parameters to record.
+
+	Without a template the readings table opens empty, so the inspection records
+	a verdict and no evidence -- which is the part an auditor asks to see.
+	Item group defaults count: an item inherits one, so it is not a gap.
+	"""
+	return frappe.db.sql("""
+		select count(*)
+		from tabItem it
+		left join `tabItem Group` ig on ig.name = it.item_group
+		where it.disabled = 0
+		  and it.inspection_required_before_purchase = 1
+		  and ifnull(it.quality_inspection_template, '') = ''
+		  and ifnull(ig.custom_default_qi_template, '') = ''
+	""")[0][0] or 0

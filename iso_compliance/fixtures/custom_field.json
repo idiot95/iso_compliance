@@ -533,5 +533,75 @@
   "label": "Verification Date",
   "insert_after": "custom_verified_by",
   "module": "ISO Compliance"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Item Group-custom_qms_section",
+  "dt": "Item Group",
+  "fieldname": "custom_qms_section",
+  "fieldtype": "Section Break",
+  "label": "Incoming Inspection (SOP-006)",
+  "insert_after": "item_group_defaults",
+  "module": "ISO Compliance"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Item Group-custom_mtc_required",
+  "dt": "Item Group",
+  "fieldname": "custom_mtc_required",
+  "fieldtype": "Check",
+  "label": "Material Test Certificate Required",
+  "insert_after": "custom_qms_section",
+  "module": "ISO Compliance",
+  "description": "Consignments of items in this group are expected to arrive with a Material Test Certificate. Receipts without one warn on submit; they are never blocked. Inherited by child groups."
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Item Group-custom_default_qi_template",
+  "dt": "Item Group",
+  "fieldname": "custom_default_qi_template",
+  "fieldtype": "Link",
+  "label": "Default Inspection Template",
+  "options": "Quality Inspection Template",
+  "insert_after": "custom_mtc_required",
+  "module": "ISO Compliance",
+  "description": "Used for items in this group that name no template of their own, so an incoming inspection opens with the parameters that apply instead of an empty table."
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Purchase Receipt-custom_material_test_certificate",
+  "dt": "Purchase Receipt",
+  "fieldname": "custom_material_test_certificate",
+  "fieldtype": "Attach",
+  "label": "Material Test Certificate",
+  "insert_after": "supplier_delivery_note",
+  "module": "ISO Compliance",
+  "description": "The supplier's certificate for this consignment (SOP-006 step 1). Expected where the item group requires it."
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Batch-custom_heat_no",
+  "dt": "Batch",
+  "fieldname": "custom_heat_no",
+  "fieldtype": "Data",
+  "label": "Heat / Lot No.",
+  "insert_after": "batch_id",
+  "module": "ISO Compliance",
+  "in_standard_filter": 1,
+  "description": "The heat, lot or cast number the supplier assigned, where it differs from the batch ID (SOP-006 step 3). This is what the Material Test Certificate refers to."
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Purchase Receipt-custom_recevied_by",
+  "dt": "Purchase Receipt",
+  "fieldname": "custom_recevied_by",
+  "fieldtype": "Link",
+  "label": "Received By",
+  "options": "User",
+  "default": "user",
+  "reqd": 1,
+  "insert_after": "set_posting_time",
+  "module": "ISO Compliance",
+  "description": "Who took delivery of the consignment (SOP-006 step 1). Created on this site by hand before the app existed and adopted into it; the fieldname's typo is kept deliberately, because renaming it would orphan the 415 receipts that carry it."
  }
 ]

@@ -15,6 +15,7 @@ hook would mean a routine upgrade silently writing 93 documents into production.
 
 import frappe
 
+from iso_compliance.overrides.purchase_receipt import REJECTED_WAREHOUSE_NAME
 from iso_compliance.seed.controlled_documents import WORKFLOW_STATES
 
 
@@ -25,6 +26,8 @@ def after_install():
 	ensure_review_chain()
 	ensure_review_notifications()
 	ensure_purchase_terms()
+	ensure_rejected_warehouse()
+	ensure_incoming_rejection_notification()
 
 
 def after_migrate():
@@ -34,6 +37,8 @@ def after_migrate():
 	ensure_review_chain()
 	ensure_review_notifications()
 	ensure_purchase_terms()
+	ensure_rejected_warehouse()
+	ensure_incoming_rejection_notification()
 
 
 def ensure_purchase_terms():
@@ -346,3 +351,78 @@ def ensure_workflow_states():
 		print(f"iso_compliance: created workflow states {', '.join(created)}")
 
 	return created
+
+
+def ensure_rejected_warehouse():
+	"""One warehouse that holds rejected material, incoming and from production (SOP-006 step 5).
+
+	Segregation is the step auditors test: rejected material must be kept where it
+	cannot be issued by mistake. ERPNext models it with `rejected_warehouse` on the
+	receipt, but with no such warehouse on the site the field stayed empty, and the
+	eleven rejections on record went to Goods In Transit -- and twice straight back
+	into Stores, beside the accepted stock.
+
+	Created per company, under the company's warehouse root so it inherits the tree.
+	A record, not schema: deleting it reverts the site untouched, and the receipt
+	hook simply stops defaulting.
+	"""
+	created = []
+	for company in frappe.get_all("Company", fields=["name", "abbr"]):
+		name = f"{REJECTED_WAREHOUSE_NAME} - {company.abbr}"
+		if frappe.db.exists("Warehouse", name):
+			continue
+		# Nest under the company's group root where there is one, so the warehouse
+		# appears in the tree rather than beside it.
+		root = frappe.db.get_value(
+			"Warehouse", {"company": company.name, "is_group": 1, "parent_warehouse": ("in", (None, ""))}, "name"
+		)
+		doc = frappe.get_doc(
+			{
+				"doctype": "Warehouse",
+				"warehouse_name": REJECTED_WAREHOUSE_NAME,
+				"company": company.name,
+				"is_group": 0,
+				"parent_warehouse": root,
+				"warehouse_type": None,
+			}
+		)
+		doc.insert(ignore_permissions=True)
+		created.append(doc.name)
+	if created:
+		frappe.db.commit()
+		print(f"iso_compliance: created warehouse(s) {', '.join(created)}")
+
+
+def ensure_incoming_rejection_notification():
+	"""SOP-006 step 5: a rejection at receipt is reported to Purchase.
+
+	The SOP makes Purchase responsible for taking a rejection up with the supplier,
+	which until now depended on somebody walking over to say so. Fires on a
+	submitted incoming inspection whose status is Rejected. A record, not schema.
+	"""
+	name = "Incoming Material Rejected"
+	if frappe.db.exists("Notification", name):
+		return
+	frappe.get_doc(
+		{
+			"doctype": "Notification",
+			"enabled": 1,
+			"channel": "System Notification",
+			"document_type": "Quality Inspection",
+			"event": "Submit",
+			"condition": 'doc.inspection_type == "Incoming" and doc.status == "Rejected"',
+			"subject": "Incoming material rejected: {{ doc.item_code }}",
+			"message": (
+				"Inspection {{ doc.name }} rejected {{ doc.item_code }} received against "
+				"{{ doc.reference_name }}. The rejected quantity is segregated in the Rejected "
+				"warehouse. Raise a Non Conformance (FRM-020) from the inspection, and take the "
+				"matter up with the supplier -- it affects their standing on REG-007."
+			),
+			"recipients": [
+				{"receiver_by_role": "Purchase Manager"},
+				{"receiver_by_role": "Quality Manager"},
+			],
+		}
+	).insert(ignore_permissions=True, set_name=name)
+	frappe.db.commit()
+	print(f"iso_compliance: created Notification '{name}'")

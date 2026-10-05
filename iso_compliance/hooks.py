@@ -199,6 +199,17 @@ doc_events = {
 	"Purchase Order": {
 		"before_submit": "iso_compliance.overrides.purchase_order.check_supplier_approval",
 	},
+	# SOP-006: segregate rejected quantities, and warn when a consignment that
+	# should carry a Material Test Certificate arrives without one.
+	"Purchase Receipt": {
+		"validate": "iso_compliance.overrides.purchase_receipt.validate",
+		"before_submit": "iso_compliance.overrides.purchase_receipt.before_submit",
+	},
+	# SOP-006 step 3: a batch born from a goods receipt records its supplier,
+	# so identity can be traced back from the shop floor.
+	"Batch": {
+		"before_insert": "iso_compliance.overrides.batch.before_insert",
+	},
 }
 
 # Scheduled Tasks

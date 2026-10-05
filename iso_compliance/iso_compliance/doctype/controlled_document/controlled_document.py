@@ -648,11 +648,17 @@ class ControlledDocument(Document):
 
 		# Reports return column dicts; normalise to the same shape the DocType path
 		# produces so the print macro does not care which kind of register this is.
-		norm_columns = [
+		available = [
 			{"fieldname": c.get("fieldname"), "label": c.get("label")}
 			for c in columns
 			if isinstance(c, dict) and c.get("fieldname")
-		][:14]
+		]
+		# Fall back to the report's own leading columns, trimmed to what fits a
+		# landscape page. The trim applies here and not to `available`: a declared
+		# column may name any field the report produces, including one past the
+		# fourteenth, and silently dropping it printed a register with a heading
+		# missing rather than a page too wide.
+		norm_columns = available[:14]
 
 		# The document's declared columns override the report's own: same
 		# fieldnames, but the register's headings, widths, header groups and
@@ -663,7 +669,7 @@ class ControlledDocument(Document):
 			except ValueError:
 				spec = None
 			if spec:
-				known = {c["fieldname"] for c in norm_columns}
+				known = {c["fieldname"] for c in available}
 				declared = []
 				for item in spec:
 					if isinstance(item, (list, tuple)) and item:
@@ -676,7 +682,9 @@ class ControlledDocument(Document):
 					declared.append({"fieldname": fieldname or None, "label": _(item.get("label") or fieldname),
 						**{k: item[k] for k in ("width", "group") if item.get(k)}})
 				if declared:
-					norm_columns = declared
+					# Same ceiling as the structured-register path, so a long
+					# declaration cannot push the page past what it can print.
+					norm_columns = declared[:18]
 
 		return {
 			"columns": norm_columns,

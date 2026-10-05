@@ -731,7 +731,7 @@
       "reference": "Purchase Order"
      },
      {
-      "reference": "Approved Supplier List"
+      "reference": "REG007 - Approved Suppliers Register"
      },
      {
       "reference": "QM001 - Quality Manual"
@@ -773,17 +773,17 @@
      {
       "step_no": "1",
       "step_title": "Receipt of Material",
-      "step_content": "<p>On receipt, the Stores Department shall verify:</p><ul><li>Delivery Challan</li><li>Purchase Order</li><li>Invoice</li><li>Quantity Received</li><li>Material Identification</li><li>Material Test Certificate (where applicable)</li></ul>"
+      "step_content": "<p>Stores receives the material against the Purchase Order and raises the goods receipt, which records who received it and the supplier's challan number. Before presenting the material for inspection, Stores verifies:</p><ul><li>Delivery Challan against the Purchase Order</li><li>Quantity received</li><li>Material identification on the packages</li><li>Material Test Certificate, where the item group requires one — attached to the goods receipt, not filed separately</li></ul>"
      },
      {
       "step_no": "2",
       "step_title": "Incoming Inspection",
-      "step_content": "<p>The Quality Department shall inspect the material as applicable by:</p><ul><li>Visual inspection</li><li>Dimensional verification</li><li>Material grade verification</li><li>Quantity verification</li><li>Review of Material Test Certificate</li><li>Any additional tests specified in the Purchase Order or inspection plan.</li></ul>"
+      "step_content": "<p>Quality inspects the material and records the result as an Incoming Inspection Report (FRM-006) against the goods receipt. What is inspected is not left to the day: each item carries an inspection template, defaulted from its item group, and the template's parameters are the readings taken — visual, dimensional, material grade, quantity, and any additional test the Purchase Order specifies.</p><p>Where the item group requires a Material Test Certificate, the certificate is reviewed against the specified requirements as part of the inspection.</p><p>Items whose group requires inspection cannot be received without one: the goods receipt will not post until the inspection is submitted.</p>"
      },
      {
       "step_no": "3",
       "step_title": "Material Identification",
-      "step_content": "<p>Accepted materials shall be identified using appropriate labels, batch numbers, heat numbers, lot numbers or supplier identification, as applicable, to maintain identification and traceability throughout storage and production.</p>"
+      "step_content": "<p>Accepted material is identified by its batch, which carries the supplier, the receipt it came from and the supplier's own heat or lot number where one is given. That batch is what production selects when the material is issued, so identification and traceability hold from receipt through to the finished product.</p>"
      },
      {
       "step_no": "4",
@@ -793,7 +793,7 @@
      {
       "step_no": "5",
       "step_title": "Rejection",
-      "step_content": "<p>Materials failing to meet specified requirements shall:</p><ul><li>Be clearly identified.</li><li>Be segregated from accepted material.</li><li>Be recorded.</li><li>Be reported to the Purchase Department for appropriate disposition.</li></ul><p>Nonconforming materials shall be handled in accordance with SOP013 – Control of Nonconforming Outputs Procedure.</p>"
+      "step_content": "<p>Material failing the specified requirements is rejected on the inspection and the rejected quantity is received into the <b>Rejected</b> warehouse, which keeps it out of stores and out of production. Purchase is notified automatically to take the matter up with the supplier, and the rejection affects the supplier's standing on REG-007.</p><p>A Nonconforming Product Report (FRM-020) is raised from the rejected inspection and the material is then handled under SOP-013 – Control of Nonconforming Outputs.</p>"
      },
      {
       "step_no": "6",
@@ -802,22 +802,6 @@
      }
     ],
     "records_generated": [
-     {
-      "number": "",
-      "title": "FRMxxx – Incoming Inspection Report"
-     },
-     {
-      "number": "",
-      "title": "FRMxxx – Goods Receipt Note (GRN)"
-     },
-     {
-      "number": "",
-      "title": "Material Test Certificates (Supplier Documents)"
-     },
-     {
-      "number": "",
-      "title": "FRMxxx – Material Rejection Report"
-     },
      {
       "number": "FRM006",
       "title": "Incoming Inspection Report"
@@ -4555,47 +4539,62 @@
     },
     {
      "fieldname": "name",
-     "label": "GRN / Challan No.",
-     "width": "10%"
+     "label": "GRN No.",
+     "width": "9%"
+    },
+    {
+     "fieldname": "supplier_delivery_note",
+     "label": "Challan No.",
+     "width": "7%"
     },
     {
      "fieldname": "supplier_name",
      "label": "Supplier",
-     "width": "12%"
+     "width": "11%"
     },
     {
      "fieldname": "purchase_order",
      "label": "PO No.",
-     "width": "10%"
+     "width": "9%"
     },
     {
      "fieldname": "item_name",
      "label": "Material Description"
     },
     {
-     "fieldname": "qty_ordered",
-     "label": "Quantity Ordered",
-     "width": "6%"
+     "fieldname": "received_qty",
+     "label": "Qty. Recd.",
+     "width": "5%"
     },
     {
-     "fieldname": "received_qty",
-     "label": "Quantity Received",
-     "width": "6%"
+     "fieldname": "rejected_qty",
+     "label": "Qty. Rej.",
+     "width": "5%"
+    },
+    {
+     "fieldname": "batch_heat",
+     "label": "Batch / Heat No.",
+     "width": "9%"
+    },
+    {
+     "fieldname": "mtc",
+     "label": "Test Cert.",
+     "width": "5%"
     },
     {
      "fieldname": "quality_inspection",
-     "label": "Inspection Report Ref.",
+     "label": "Inspection Ref.",
      "width": "9%"
     },
     {
      "fieldname": "inspection_status",
-     "label": "Inspection Status",
-     "width": "7%"
+     "label": "Status",
+     "width": "6%"
     },
     {
-     "fieldname": null,
-     "label": "Remarks",
-     "width": "7%"
+     "fieldname": "non_conformance",
+     "label": "NCR Ref.",
+     "width": "8%"
     }
    ]
   },
