@@ -84,6 +84,10 @@ doctype_js = {
 	"Supplier": "public/js/supplier.js",
 	"Purchase Order": "public/js/purchase_order.js",
 	"Quality Inspection": "public/js/quality_inspection.js",
+	# SOP-006 material identification labels. material_labels.js holds the sheet
+	# dialog both sides share; the per-doctype file only names the button.
+	"Purchase Receipt": ["public/js/material_labels.js", "public/js/purchase_receipt.js"],
+	"Delivery Note": ["public/js/material_labels.js", "public/js/delivery_note.js"],
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
