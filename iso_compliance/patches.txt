@@ -6,3 +6,4 @@
 # Patches added in this section will be executed after doctypes are migrated
 iso_compliance.patches.normalize_tcr_responses
 iso_compliance.patches.sop_006_incoming_inspection
+iso_compliance.patches.retire_nc_inspection_template
