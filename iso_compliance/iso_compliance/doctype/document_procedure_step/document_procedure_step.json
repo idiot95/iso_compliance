@@ -7,7 +7,9 @@
  "field_order": [
   "step_no",
   "step_title",
-  "step_content"
+  "responsible",
+  "step_content",
+  "erp_record"
  ],
  "fields": [
   {
@@ -22,21 +24,36 @@
    "fieldtype": "Data",
    "label": "Step",
    "in_list_view": 1,
-   "columns": 3,
+   "columns": 2,
    "reqd": 1
+  },
+  {
+   "fieldname": "responsible",
+   "fieldtype": "Data",
+   "label": "Who",
+   "in_list_view": 1,
+   "columns": 2
   },
   {
    "fieldname": "step_content",
    "fieldtype": "Text Editor",
    "label": "Detail",
    "in_list_view": 1,
-   "columns": 7
+   "columns": 3
+  },
+  {
+   "fieldname": "erp_record",
+   "fieldtype": "Data",
+   "label": "In ERPNext",
+   "in_list_view": 1,
+   "columns": 2,
+   "description": "The ERPNext record or screen where this step happens."
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-08-04 00:00:00.000000",
+ "modified": "2026-10-09 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Document Procedure Step",

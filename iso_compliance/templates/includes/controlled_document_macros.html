@@ -172,39 +172,27 @@
 
 
 {%- macro sop_body(doc) -%}
-	{%- if doc.purpose -%}
-	<div class="cd-section"><h2 class="cd-h2">1. Purpose</h2><div class="cd-rich">{{ doc.purpose }}</div></div>
+	{#- Numbered as it prints, so a section left empty does not leave a gap.
+	    Reading order: what and why, the chain at a glance, who, how, what it
+	    leaves behind; references and definitions last, for whoever needs them. -#}
+	{%- set n = namespace(i=0) -%}
+
+	{%- if doc.purpose -%}{%- set n.i = n.i + 1 -%}
+	<div class="cd-section"><h2 class="cd-h2">{{ n.i }}. Purpose</h2><div class="cd-rich">{{ doc.purpose }}</div></div>
 	{%- endif -%}
 
-	{%- if doc.scope -%}
-	<div class="cd-section"><h2 class="cd-h2">2. Scope</h2><div class="cd-rich">{{ doc.scope }}</div></div>
+	{%- if doc.scope -%}{%- set n.i = n.i + 1 -%}
+	<div class="cd-section"><h2 class="cd-h2">{{ n.i }}. Scope</h2><div class="cd-rich">{{ doc.scope }}</div></div>
 	{%- endif -%}
 
-	{%- if doc.references -%}
-	<div class="cd-section"><h2 class="cd-h2">3. References</h2>
-		<ul class="cd-list">
-		{%- for r in doc.references -%}
-			<li>{{ r.reference }}{% if r.clause %} &mdash; cl. {{ r.clause }}{% endif %}{% if r.linked_document %} <span class="cd-refnum">&rarr; {{ r.linked_document }}</span>{% endif %}</li>
-		{%- endfor -%}
-		</ul>
+	{%- if doc.workflow -%}{%- set n.i = n.i + 1 -%}
+	<div class="cd-section"><h2 class="cd-h2">{{ n.i }}. Workflow</h2>
+		<div class="cd-flow">{{ doc.workflow | e }}</div>
 	</div>
 	{%- endif -%}
 
-	{%- if doc.definitions -%}
-	<div class="cd-section"><h2 class="cd-h2">4. Definitions</h2>
-		<table class="cd-table">
-			<thead><tr><th style="width:22%">Term</th><th>Definition</th></tr></thead>
-			<tbody>
-			{%- for d in doc.definitions -%}
-				<tr><td class="cd-strong">{{ d.term }}</td><td>{{ d.definition or "" }}</td></tr>
-			{%- endfor -%}
-			</tbody>
-		</table>
-	</div>
-	{%- endif -%}
-
-	{%- if doc.responsibilities -%}
-	<div class="cd-section"><h2 class="cd-h2">5. Responsibilities</h2>
+	{%- if doc.responsibilities -%}{%- set n.i = n.i + 1 -%}
+	<div class="cd-section"><h2 class="cd-h2">{{ n.i }}. Who Does What</h2>
 		<table class="cd-table">
 			<thead><tr><th style="width:28%">Role</th><th>Responsibility</th></tr></thead>
 			<tbody>
@@ -216,16 +204,23 @@
 	</div>
 	{%- endif -%}
 
-	{%- if doc.procedure_steps -%}
-	<div class="cd-section"><h2 class="cd-h2">6. Procedure</h2>
+	{%- if doc.procedure_steps -%}{%- set n.i = n.i + 1 -%}
+	{%- set detailed = doc.procedure_steps | selectattr("responsible") | list or doc.procedure_steps | selectattr("erp_record") | list -%}
+	<div class="cd-section"><h2 class="cd-h2">{{ n.i }}. Procedure</h2>
 		<table class="cd-table cd-proc">
+			{%- if detailed -%}
+			<thead><tr><th style="width:5%">Step</th><th style="width:16%">Activity</th><th style="width:15%">Who</th><th>What happens</th><th style="width:19%">In ERPNext</th></tr></thead>
+			{%- else -%}
 			<thead><tr><th style="width:7%">Step</th><th style="width:24%">Activity</th><th>Details</th></tr></thead>
+			{%- endif -%}
 			<tbody>
 			{%- for s in doc.procedure_steps -%}
 			<tr>
 				<td class="cd-strong" style="text-align:center">{{ s.step_no or loop.index }}</td>
 				<td class="cd-strong">{{ s.step_title }}</td>
+				{%- if detailed -%}<td>{{ s.responsible or "" }}</td>{%- endif -%}
 				<td class="cd-rich">{{ s.step_content or "" }}</td>
+				{%- if detailed -%}<td class="cd-erp">{{ s.erp_record or "" }}</td>{%- endif -%}
 			</tr>
 			{%- endfor -%}
 			</tbody>
@@ -233,13 +228,36 @@
 	</div>
 	{%- endif -%}
 
-	{%- if doc.records_generated -%}
-	<div class="cd-section"><h2 class="cd-h2">7. Records Generated</h2>
+	{%- if doc.records_generated -%}{%- set n.i = n.i + 1 -%}
+	<div class="cd-section"><h2 class="cd-h2">{{ n.i }}. Records</h2>
 		<table class="cd-table">
 			<thead><tr><th style="width:24%">Document No.</th><th>Title</th></tr></thead>
 			<tbody>
 			{%- for r in doc.records_generated -%}
 				<tr><td class="cd-strong">{{ r.document_number or r.document or "" }}</td><td>{{ r.document_title or "" }}</td></tr>
+			{%- endfor -%}
+			</tbody>
+		</table>
+	</div>
+	{%- endif -%}
+
+	{%- if doc.references -%}{%- set n.i = n.i + 1 -%}
+	<div class="cd-section"><h2 class="cd-h2">{{ n.i }}. References</h2>
+		<ul class="cd-list">
+		{%- for r in doc.references -%}
+			<li>{{ r.reference }}{% if r.clause %} &mdash; cl. {{ r.clause }}{% endif %}{% if r.linked_document %} <span class="cd-refnum">&rarr; {{ r.linked_document }}</span>{% endif %}</li>
+		{%- endfor -%}
+		</ul>
+	</div>
+	{%- endif -%}
+
+	{%- if doc.definitions -%}{%- set n.i = n.i + 1 -%}
+	<div class="cd-section"><h2 class="cd-h2">{{ n.i }}. Definitions</h2>
+		<table class="cd-table">
+			<thead><tr><th style="width:22%">Term</th><th>Definition</th></tr></thead>
+			<tbody>
+			{%- for d in doc.definitions -%}
+				<tr><td class="cd-strong">{{ d.term }}</td><td>{{ d.definition or "" }}</td></tr>
 			{%- endfor -%}
 			</tbody>
 		</table>
@@ -348,7 +366,13 @@
 		<div class="cd-lbl" style="margin-top:4pt">{{ t.label }}</div>
 		<table class="cd-table cd-formtable">
 			<thead><tr>{% for c in t.columns %}<th>{{ c }}</th>{% endfor %}</tr></thead>
-			<tbody>{% for _ in range(4) %}<tr>{% for c in t.columns %}<td>&nbsp;</td>{% endfor %}</tr>{% endfor %}</tbody>
+			<tbody>
+			{%- if t.rows -%}
+				{%- for r in t.rows -%}<tr><td>{{ r }}</td>{% for c in t.columns[1:] %}<td>&nbsp;</td>{% endfor %}</tr>{%- endfor -%}
+			{%- else -%}
+				{% for _ in range(4) %}<tr>{% for c in t.columns %}<td>&nbsp;</td>{% endfor %}</tr>{% endfor %}
+			{%- endif -%}
+			</tbody>
 		</table>
 		{%- endfor -%}
 	</div>

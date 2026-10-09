@@ -428,6 +428,7 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 	if sop:
 		payload["purpose"] = sop.get("purpose")
 		payload["scope"] = sop.get("scope")
+		payload["workflow"] = sop.get("workflow")
 		pass  # references built below for every entry, SOP or not
 		payload["definitions"] = [
 			{"term": d["term"], "definition": d["definition"]} for d in sop.get("definitions", [])

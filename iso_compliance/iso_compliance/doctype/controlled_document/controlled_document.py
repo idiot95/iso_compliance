@@ -469,6 +469,7 @@ class ControlledDocument(Document):
 			"Barcode", "Signature", "Heading", "Icon", "Color", "Geolocation", "JSON", "Code"}
 		sections: list[dict] = []
 		section = {"label": None, "columns": [[]], "tables": []}
+		preprinted = _blank_form_rows(self.mapped_doctype)
 
 		def push():
 			if section["tables"] or any(section["columns"]):
@@ -495,19 +496,23 @@ class ControlledDocument(Document):
 				continue
 			if f.fieldtype in ("Table", "Table MultiSelect"):
 				child = frappe.get_meta(f.options)
+				# A tick-box column means nothing on paper ("Numeric", "Manual").
 				cols = [c.label for c in child.fields
-					if c.in_list_view and not c.hidden and c.label] or [
-					c.label for c in child.fields if c.label][:4]
-				section["tables"].append({"label": f.label, "columns": cols[:8]})
+					if c.in_list_view and not c.hidden and c.label and c.fieldtype != "Check"] or [
+					c.label for c in child.fields if c.label and c.fieldtype != "Check"][:4]
+				section["tables"].append(
+					{"label": f.label, "columns": cols[:8], "rows": preprinted.get(f.fieldname) or []}
+				)
 				continue
-			if f.read_only or f.fieldtype in skip_types:
+			if f.read_only or f.fieldtype in skip_types or f.fieldname in SYSTEM_FIELDS:
 				continue
 			entry = {"kind": "field", "label": f.label}
 			if f.fieldtype == "Check":
 				entry["kind"] = "check"
 			elif f.fieldtype == "Select" and f.options:
 				opts = [o for o in f.options.split("\n") if o.strip()]
-				if opts:
+				# A short choice prints as a hint; a long one is noise on paper.
+				if 0 < len(opts) <= 4:
 					entry["options"] = " / ".join(opts)[:90]
 			elif f.fieldtype in ("Text", "Small Text", "Long Text", "Text Editor"):
 				entry["tall"] = True
@@ -688,7 +693,7 @@ class ControlledDocument(Document):
 
 		return {
 			"columns": norm_columns,
-			"rows": rows[:limit],
+			"rows": _shape(rows[:limit]),
 			"total": len(rows),
 			"shown": min(len(rows), limit),
 			"limit": limit,
@@ -720,20 +725,39 @@ class ControlledDocument(Document):
 
 
 def _shape(rows: list) -> list:
-	"""Make raw values printable: datetimes trimmed to the minute, rich-text
-	fields stripped to their text. A register column carrying microseconds or
-	HTML tags reads like a database dump, not a record."""
+	"""Make raw values printable: dates in the site's format, datetimes to the
+	minute, quantities without a trailing ".0", rich text stripped to its text.
+	A register column carrying microseconds, "10000.0" or HTML tags reads like
+	a database dump, not a record."""
 	import datetime
+	from decimal import Decimal
 
-	from frappe.utils import strip_html
+	from frappe.utils import format_datetime, formatdate, strip_html
 
 	for row in rows:
+		if not isinstance(row, dict):
+			continue
 		for key, value in list(row.items()):
 			if isinstance(value, datetime.datetime):
-				row[key] = str(value)[:16]
+				row[key] = format_datetime(value, "dd-MM-yyyy HH:mm")
+			elif isinstance(value, datetime.date):
+				row[key] = formatdate(value)
+			elif isinstance(value, (float, Decimal)):
+				row[key] = _number(value)
 			elif isinstance(value, str) and "<" in value and ">" in value:
 				row[key] = strip_html(value).strip()
 	return rows
+
+
+def _number(value) -> str:
+	"""10000.0 -> 10,000; 4.970 -> 4.97: Indian grouping, no trailing zeros."""
+	from frappe.utils import fmt_money
+
+	value = float(value)
+	if value.is_integer():
+		return fmt_money(value, precision=0, format="#,##,###.##")
+	text = fmt_money(value, precision=3, format="#,##,###.##")
+	return text.rstrip("0").rstrip(".")
 
 
 def pad_control_number(value, label: str) -> str:
@@ -747,3 +771,24 @@ def pad_control_number(value, label: str) -> str:
 		return value
 
 	return value.zfill(2)
+
+
+#: Fields the system fills, which a person never writes on a paper form.
+SYSTEM_FIELDS = {"naming_series", "company", "amended_from"}
+
+
+def _blank_form_rows(doctype: str) -> dict:
+	"""Rows a doctype wants printed in its blank form's tables, keyed by table
+	fieldname: a checklist prints its questions, not empty lines. A doctype
+	opts in by defining `blank_form_rows()` in its controller module."""
+	module = frappe.get_meta(doctype).module
+	path = "{}.{}.doctype.{}.{}".format(
+		frappe.local.module_app.get(frappe.scrub(module), "erpnext"),
+		frappe.scrub(module),
+		frappe.scrub(doctype),
+		frappe.scrub(doctype),
+	)
+	try:
+		return frappe.get_attr(path + ".blank_form_rows")() or {}
+	except (ImportError, AttributeError):
+		return {}

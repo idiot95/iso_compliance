@@ -90,8 +90,9 @@
    "sop": {
     "declared_number": "SOP001",
     "declared_title": "Control of Documented Information",
-    "purpose": "<p>To establish a systematic process for the creation, review, approval, issue, revision, distribution, storage, retention, and disposal of documented information to ensure that only current and approved documents are available at the point of use.</p>",
-    "scope": "<p>This procedure applies to all documented information forming part of the Quality Management System of Hatim Carbon Co. Pvt. Ltd., including internal and external documents, maintained in electronic or hard copy format.</p>",
+    "purpose": "<p>Keep only current, approved documents in use, and keep the records that prove the QMS works.</p>",
+    "scope": "<p>Every QMS document and record: manual, policies, SOPs, work instructions, forms, registers and external documents.</p>",
+    "workflow": "Change Request → Draft → Review → Approve → Active → Superseded / Obsolete",
     "references": [
      {
       "reference": "ISO 9001:2015 Clause 7.5 – Documented Information"
@@ -106,78 +107,87 @@
     "definitions": [
      {
       "term": "Document",
-      "definition": "Information defining requirements, procedures, or specifications."
+      "definition": "Tells people what to do: a policy, SOP, form template."
      },
      {
       "term": "Record",
-      "definition": "Evidence that an activity has been performed."
-     },
-     {
-      "term": "Controlled Document",
-      "definition": "Approved document subject to revision control."
-     },
-     {
-      "term": "Obsolete Document",
-      "definition": "Superseded document retained only for reference."
-     },
-     {
-      "term": "ERPNext",
-      "definition": "Company's electronic document management system used for maintaining controlled documents and records."
+      "definition": "Proves something was done: a filled form, a register entry."
      }
     ],
     "responsibilities": [
      {
       "role": "Director",
-      "responsibility": "Approve the Quality Manual, Quality Policy, and major QMS documents. Ensure adequate resources for document control."
+      "responsibility": "Approves the Quality Manual, Quality Policy and SOPs."
      },
      {
       "role": "Quality Manager / Management Representative",
-      "responsibility": "Maintain document control. Issue revisions. Maintain the Master Document Register."
+      "responsibility": "Runs document control and keeps the Master Document Register (REG-001) current."
      },
      {
       "role": "Department Heads",
-      "responsibility": "Review documents applicable to their department. Ensure only current documents are used. Identify the need for document revisions."
+      "responsibility": "Review documents for their department and ask for changes when practice changes."
      },
      {
       "role": "All Employees",
-      "responsibility": "Use only approved documents. Prevent unauthorized modification of documents. Report any outdated or incorrect documents to the Quality Department."
+      "responsibility": "Work only from the current document in ERPNext; report anything outdated to Quality."
      }
     ],
     "procedure_steps": [
      {
       "step_no": "1",
-      "step_title": "Preparation of Documents",
-      "step_content": "<p>Documents are prepared by authorized personnel using the approved format and unique document numbering system.</p>"
+      "step_title": "Ask for a change",
+      "responsible": "Anyone",
+      "step_content": "<p>Raise a Document Change Request: which document, what to change and why. A new document starts the same way.</p>",
+      "erp_record": "Document Change Request (FRM-001)"
      },
      {
       "step_no": "2",
-      "step_title": "Review and Approval",
-      "step_content": "<p>All QMS documents shall be reviewed and approved prior to issue by authorized personnel.</p>"
+      "step_title": "Approve the request",
+      "responsible": "Quality Manager",
+      "step_content": "<p>Review the request and its impact on training and other documents, then approve or reject. The person who asked can't approve their own request.</p>",
+      "erp_record": "Document Change Request: Submit = approve"
      },
      {
       "step_no": "3",
-      "step_title": "Document Identification",
-      "step_content": "<p>Each document shall contain:</p><ul><li>Document Number</li><li>Title</li><li>Revision No.</li><li>Issue Date</li><li>Page Number</li></ul>"
+      "step_title": "Write and review",
+      "responsible": "Document owner",
+      "step_content": "<p>Edit the document in ERPNext and move it through Draft and Under Review. An Approved or Active document can't be edited without an approved request.</p>",
+      "erp_record": "Controlled Document"
      },
      {
       "step_no": "4",
-      "step_title": "Distribution",
-      "step_content": "<p>Controlled documents shall be made available through the ERPNext document management system. Uncontrolled copies shall be identified accordingly.</p>"
+      "step_title": "Approve and issue",
+      "responsible": "Director / Quality Manager",
+      "step_content": "<p>Approve the document. ERPNext sets the revision number and date, stamps who prepared, reviewed and approved it, and logs the change in the revision history.</p>",
+      "erp_record": "Controlled Document: Approved → Active"
      },
      {
       "step_no": "5",
-      "step_title": "Revision",
-      "step_content": "<p>Changes shall be reviewed, approved, and recorded. Superseded versions shall be withdrawn from use.</p>"
+      "step_title": "Withdraw the old version",
+      "responsible": "Quality Manager",
+      "step_content": "<p>The previous version becomes Superseded, or Obsolete if withdrawn. Its prints carry an OBSOLETE watermark.</p>",
+      "erp_record": "Controlled Document"
      },
      {
       "step_no": "6",
-      "step_title": "External Documents",
-      "step_content": "<p>Applicable standards, customer drawings, specifications, and supplier documents shall be identified and controlled.</p>"
+      "step_title": "Make it available",
+      "responsible": "Quality Manager",
+      "step_content": "<p>Everyone reads and prints current documents in ERPNext. A printout is uncontrolled once it leaves the system.</p>",
+      "erp_record": "ISO Compliance workspace"
      },
      {
       "step_no": "7",
-      "step_title": "Record Retention",
-      "step_content": "<p>Documents and records shall be stored, protected, retained, and disposed of in accordance with the Record Retention Register.</p>"
+      "step_title": "Control external documents",
+      "responsible": "Quality Manager",
+      "step_content": "<p>Record each customer drawing, specification and standard with its revision, so the current one is known and old ones are marked invalid.</p>",
+      "erp_record": "Drawing Revision Register (REG-026), kept by Quality; not yet in ERPNext"
+     },
+     {
+      "step_no": "8",
+      "step_title": "Keep records",
+      "responsible": "Department Heads",
+      "step_content": "<p>Records stay in ERPNext for their retention period and are not edited after submission.</p>",
+      "erp_record": "The record's own screen"
      }
     ],
     "records_generated": [
@@ -212,8 +222,9 @@
    "sop": {
     "declared_number": "SOP002",
     "declared_title": "Risk & Opportunity Management Procedure",
-    "purpose": "<p>To establish a systematic approach for identifying, evaluating, controlling, and monitoring risks and opportunities that may affect the Quality Management System (QMS), customer satisfaction, product quality, and business performance of Hatim Carbon Co. Pvt. Ltd.</p>",
-    "scope": "<p>This procedure applies to all business processes, including sales, design, procurement, production, inspection, dispatch, customer service, and support functions.</p>",
+    "purpose": "<p>Find the risks and opportunities that affect quality, and act on the ones that matter most.</p>",
+    "scope": "<p>All processes, from enquiry to delivery, and the business context around them.</p>",
+    "workflow": "Identify → Score → Plan action → Review at Management Review → Close",
     "references": [
      {
       "reference": "ISO 9001:2015 Clause 6.1"
@@ -227,56 +238,59 @@
     ],
     "definitions": [
      {
-      "term": "Risk",
-      "definition": "Effect of uncertainty that may negatively impact objectives or processes."
-     },
-     {
-      "term": "Opportunity",
-      "definition": "Circumstances that may improve performance, efficiency, or customer satisfaction."
-     },
-     {
-      "term": "Risk Register",
-      "definition": "Document used to record identified risks, opportunities, actions, and status."
+      "term": "Risk score",
+      "definition": "Severity (or benefit, for an opportunity) × probability, each rated 1 to 5. The higher the score, the sooner the action."
      }
     ],
     "responsibilities": [
      {
       "role": "Top Management",
-      "responsibility": "Review significant business risks and approve mitigation plans."
+      "responsibility": "Reviews the register at Management Review and provides resources for actions."
      },
      {
       "role": "Quality Manager / MR",
-      "responsibility": "Maintain the Risk & Opportunity Register. Monitor implementation of actions. Present risk status during Management Review Meetings."
+      "responsibility": "Keeps the register, follows up actions, brings it to Management Review."
      },
      {
       "role": "Department Heads",
-      "responsibility": "Identify process-specific risks and opportunities. Implement and monitor agreed actions."
-     },
-     {
-      "role": "All Employees",
-      "responsibility": "Report potential risks or improvement opportunities to their department head."
+      "responsibility": "Raise risks and opportunities from their area and own the actions assigned to them."
      }
     ],
     "procedure_steps": [
      {
       "step_no": "1",
-      "step_title": "Identification",
-      "step_content": "<p>Risks and opportunities shall be identified through:</p><ul><li>Management Review Meetings</li><li>Customer feedback and complaints</li><li>Internal and external audits</li><li>Process performance monitoring.</li><li>Supplier evaluations</li><li>Production and quality issues</li><li>Market and statutory changes</li></ul>"
+      "step_title": "Identify",
+      "responsible": "Department Heads",
+      "step_content": "<p>Record a risk or opportunity when one shows up: at a review meeting, from a complaint, an audit, a supplier problem, a process failure or a change in law or market.</p>",
+      "erp_record": "Risk and Opportunity (FRM-032)"
      },
      {
       "step_no": "2",
-      "step_title": "Evaluation",
-      "step_content": "<p>Each identified risk shall be evaluated based on:</p><ul><li>Likelihood of occurrence</li><li>Potential impact</li><li>Existing controls(if any)</li></ul><p>Risks shall be prioritized for appropriate action.</p>"
+      "step_title": "Score",
+      "responsible": "Department Head",
+      "step_content": "<p>Rate severity (or benefit) and probability from 1 to 5. ERPNext calculates the score and the priority.</p>",
+      "erp_record": "Risk and Opportunity"
      },
      {
       "step_no": "3",
-      "step_title": "Action Planning",
-      "step_content": "<p>Appropriate actions may include:</p><ul><li>Eliminating the risk</li><li>Reducing the likelihood or impact</li><li>Establishing additional controls</li><li>Assigning responsibilities</li><li>Setting completion timelines</li></ul><p>Opportunities for improvement shall also be documented and implemented where feasible.</p>"
+      "step_title": "Plan the action",
+      "responsible": "Department Head",
+      "step_content": "<p>Write the action, the responsible position and a target date. A risk that needs a formal fix gets a Corrective Action.</p>",
+      "erp_record": "Risk and Opportunity; Quality Action (REG-018)"
      },
      {
       "step_no": "4",
-      "step_title": "Monitoring",
-      "step_content": "<p>The Quality Manager shall periodically review the Risk &amp; Opportunity Register to verify:</p><ul><li>Completion of planned actions</li><li>Effectiveness of implemented controls.</li><li>Need for additional actions.</li></ul><p>The register shall be reviewed during Management Review Meetings or whenever significant changes to the organization, or its processes occur.</p>"
+      "step_title": "Review",
+      "responsible": "Quality Manager",
+      "step_content": "<p>Bring open items to every Management Review. Update status and the last-reviewed date; record decisions in the minutes.</p>",
+      "erp_record": "Quality Meeting (FRM-024 / REG-019)"
+     },
+     {
+      "step_no": "5",
+      "step_title": "Close",
+      "responsible": "Quality Manager",
+      "step_content": "<p>Close an item when its action is done and has worked. Closed items stay on the register.</p>",
+      "erp_record": "Risk and Opportunity Register (REG-004)"
      }
     ],
     "records_generated": [
@@ -323,8 +337,9 @@
    "sop": {
     "declared_number": "SOP003",
     "declared_title": "Human Resource, Competency & Training Procedure",
-    "purpose": "<p>To ensure that personnel performing work affecting product quality are competent based on appropriate education, training, skills, and experience, and are aware of the Quality Management System and their responsibilities.</p>",
-    "scope": "<p>This procedure applies to all permanent, contractual, trainee, apprentice, and temporary employees working at Hatim Carbon Co. Pvt. Ltd.</p>",
+    "purpose": "<p>Make sure everyone is competent for their job, and keep the evidence.</p>",
+    "scope": "<p>All employees, from joining onwards, including temporary and contract staff.</p>",
+    "workflow": "Join → Induction → Competency check → Training → Effectiveness check → Matrix updated",
     "references": [
      {
       "reference": "ISO 9001:2015 Clause 7.1.2"
@@ -342,65 +357,65 @@
     "definitions": [
      {
       "term": "Competency",
-      "definition": "Ability to perform assigned duties based on education, training, skills, and experience."
-     },
-     {
-      "term": "Training",
-      "definition": "Planned activity to improve employee knowledge and skills."
-     },
-     {
-      "term": "Induction Training",
-      "definition": "Orientation provided to newly joined employees regarding company policies, safety, and the QMS."
+      "definition": "Being able to do the job to the required standard: education, skill and experience together."
      }
     ],
     "responsibilities": [
      {
       "role": "Top Management",
-      "responsibility": "Provide adequate resources for recruitment and training. Review competency requirements."
+      "responsibility": "Approves the annual training plan and its resources."
      },
      {
       "role": "HR Department",
-      "responsibility": "Maintain employee records. Coordinate induction and training programs. Maintain training records."
+      "responsibility": "Runs induction, schedules training and keeps training records."
      },
      {
       "role": "Department Heads",
-      "responsibility": "Identify competency requirements. Recommend training needs. Evaluate employee performance and effectiveness of training."
-     },
-     {
-      "role": "All Employees",
-      "responsibility": "Attend assigned training programs. Apply acquired knowledge in their work. Follow company procedures and work instructions."
+      "responsibility": "Assess their team's competency, ask for training and check that it worked."
      }
     ],
     "procedure_steps": [
      {
       "step_no": "1",
-      "step_title": "Recruitment",
-      "step_content": "<ul><li>Personnel shall be recruited based on the qualification, experience, and competency requirements of the respective position.</li></ul>"
+      "step_title": "Recruit",
+      "responsible": "HR / Department Head",
+      "step_content": "<p>Hire against the position's requirements for qualification, experience and skill.</p>",
+      "erp_record": "Employee"
      },
      {
       "step_no": "2",
-      "step_title": "Induction",
-      "step_content": "<p>All new employees shall undergo induction training covering:</p><ul><li>Company profile</li><li>Quality Policy and Quality Objectives</li><li>QMS awareness</li><li>Safety requirements</li><li>Departmental responsibilities</li><li>Applicable procedures and work instructions</li></ul>"
+      "step_title": "Induct",
+      "responsible": "HR",
+      "step_content": "<p>Every new joiner completes induction: company, Quality Policy and objectives, safety, their department's procedures.</p>",
+      "erp_record": "Employee Onboarding (FRM-034)"
      },
      {
       "step_no": "3",
-      "step_title": "Competency Evaluation",
-      "step_content": "<p>Department Heads shall periodically assess employee competency based on:</p><ul><li>Education and qualifications</li><li>Experience</li><li>Job performance</li><li>Skill level</li><li>Training effectiveness</li></ul>"
+      "step_title": "Assess competency",
+      "responsible": "Department Head",
+      "step_content": "<p>Rate each employee's skills for their job. Gaps become training needs.</p>",
+      "erp_record": "Employee Skill Map (FRM-033); Competency Matrix (REG-006)"
      },
      {
       "step_no": "4",
-      "step_title": "Training",
-      "step_content": "<p>Training may include:</p><ul><li>Technical training</li><li>Quality awareness</li><li>Process-specific training.</li><li>Safety training</li><li>Customer-specific requirements</li><li>Equipment or machine operation</li></ul><p>Training may be conducted internally or externally.</p>"
+      "step_title": "Plan and train",
+      "responsible": "HR",
+      "step_content": "<p>Schedule training for the gaps and for new processes, machines or customer requirements. Attendance is recorded on the event.</p>",
+      "erp_record": "Training Event (REG-023 / REG-012); Attendance Register (REG-027)"
      },
      {
       "step_no": "5",
-      "step_title": "Effectiveness of Training",
-      "step_content": "<p>The effectiveness of training shall be evaluated through one or more of the following:</p><ul><li>Observation of job performance</li><li>Practical demonstration</li><li>Supervisor feedback</li><li>Skill assessment</li><li>Reduction in errors or nonconformities</li></ul><p>Additional training shall be provided where necessary.</p>"
+      "step_title": "Check it worked",
+      "responsible": "Department Head",
+      "step_content": "<p>Assess each trainee after training, by observation, test or results. Repeat training where it didn't work.</p>",
+      "erp_record": "Training Result (FRM-031)"
      },
      {
       "step_no": "6",
-      "step_title": "Awareness",
-      "step_content": "<p>Employees shall be made aware of:</p><ul><li>The Quality Policy</li><li>Quality Objectives</li><li>Their contribution to product quality</li><li>Customer requirements</li><li>Consequences of nonconforming work</li></ul>"
+      "step_title": "Keep people aware",
+      "responsible": "Department Heads",
+      "step_content": "<p>Make sure everyone knows the Quality Policy, their objectives and what poor work costs the customer. Cover it in induction and team meetings.</p>",
+      "erp_record": "Employee Onboarding; Training Event"
      }
     ],
     "records_generated": [
@@ -455,8 +470,9 @@
    "sop": {
     "declared_number": "SOP004",
     "declared_title": "Customer Communication, Sales & Contract Review Procedure",
-    "purpose": "<p>To establish a systematic process for receiving customer enquiries, reviewing customer requirements, preparing quotations, accepting orders, and maintaining effective communication to ensure customer requirements are clearly understood and fulfilled.</p>",
-    "scope": "<p>This procedure applies to all enquiries, quotations, purchase orders, contracts, amendments, and customer communications related to products and services provided by Hatim Carbon Co. Pvt. Ltd.</p>",
+    "purpose": "<p>Understand exactly what the customer wants before we commit, and keep them informed after.</p>",
+    "scope": "<p>Enquiries, quotations, order acceptance, order changes, complaints and feedback, for every product we sell.</p>",
+    "workflow": "Enquiry → Quotation → Sales Order (draft) → Techno-Commercial Review (₹5 lakh and above) → Sales Order submitted → Customer communication",
     "references": [
      {
       "reference": "ISO 9001:2015 Clause 8.2"
@@ -470,79 +486,99 @@
     ],
     "definitions": [
      {
-      "term": "Customer Enquiry",
-      "definition": "A request for quotation, technical information, or product details received from a customer."
+      "term": "Contract review",
+      "definition": "Checking that we can meet the order's requirements before accepting it."
      },
      {
-      "term": "Contract Review",
-      "definition": "Verification of customer requirements before accepting an order."
-     },
-     {
-      "term": "Purchase Order (PO)",
-      "definition": "Official order issued by the customer for the supply of products or services."
-     },
-     {
-      "term": "Quotation",
-      "definition": "Commercial offer issued by the organization based on reviewed customer requirements."
+      "term": "LD",
+      "definition": "Liquidated damages: a penalty for late delivery written into the order."
      }
     ],
     "responsibilities": [
      {
       "role": "Top Management",
-      "responsibility": "Approve special commercial or contractual conditions when required."
+      "responsibility": "Approves special commercial or contractual conditions."
      },
      {
       "role": "Sales & Marketing Department",
-      "responsibility": "Receive customer enquiries. Prepare quotations. Coordinate with customers. Obtain order confirmation."
+      "responsibility": "Handles enquiries and quotations, opens the review, picks the reviewers, records the decision and accepts the order."
      },
      {
-      "role": "Design / Engineering Department (where applicable)",
-      "responsibility": "Review drawings, samples, and technical specifications. Confirm technical feasibility."
+      "role": "Design / Engineering Department",
+      "responsibility": "Completes the Technical section when assigned: drawings, specification, feasibility."
      },
      {
       "role": "Production Department",
-      "responsibility": "Confirm manufacturing capability and delivery schedule."
+      "responsibility": "Confirms capability and delivery when assigned."
      },
      {
       "role": "Quality Department",
-      "responsibility": "Review quality, inspection, testing, and statutory requirements where applicable."
+      "responsibility": "Confirms inspection, testing and statutory requirements when assigned."
      }
     ],
     "procedure_steps": [
      {
       "step_no": "1",
-      "step_title": "Receipt of Enquiry",
-      "step_content": "<p>Enquiries arrive by email, telephone, visit, portal or tender. Those taken up are recorded in ERPNext — an Opportunity, or directly a Quotation for known requirements — with product, specification, quantity, delivery and any customer-specific requirements.</p>"
+      "step_title": "Record the enquiry",
+      "responsible": "Sales Executive",
+      "step_content": "<p>Record enquiries we will quote for. The Sales Head decides which ones to decline.</p>",
+      "erp_record": "Opportunity, or Quotation directly"
      },
      {
       "step_no": "2",
-      "step_title": "Enquiry Review",
-      "step_content": "<p>The head of Sales &amp; Marketing, or Management, decides which enquiries to attend to and which to decline, considering technical feasibility and commercial viability. Enquiries taken up proceed to quotation.</p>"
+      "step_title": "Quote",
+      "responsible": "Sales Executive",
+      "step_content": "<p>Send the quotation: specification, price, delivery, validity, taxes and terms.</p>",
+      "erp_record": "Quotation"
      },
      {
       "step_no": "3",
-      "step_title": "Quotation",
-      "step_content": "<p>Sales prepares the quotation in ERPNext, covering specification, price, delivery, validity, taxes and terms.</p>"
+      "step_title": "Open the review",
+      "responsible": "Sales Executive",
+      "step_content": "<p>On the draft Sales Order, open the Techno-Commercial Review. ERPNext sets the depth: Detailed at ₹10 lakh and above or for any critical order (new product, customer drawings, penalty/LD clauses, special requirements); Standard at ₹5–10 lakh.</p>",
+      "erp_record": "Sales Order → Create → Techno-Commercial Review (FRM-036)"
      },
      {
       "step_no": "4",
-      "step_title": "Techno-Commercial Review",
-      "step_content": "<p>Every order is reviewed before acceptance, at a depth set by its value and criticality. ERPNext blocks submission of a Sales Order of &#8377; 5,00,000 or above until its review on the Techno-Commercial Review Form (FRM-036) is approved.</p><ul><li><b>Detailed</b> — mandatory at &#8377; 10,00,000 and above, or for any order with a criticality factor (new or first-time product; customer drawings or design inputs; penalty, LD or price-variation clauses; special customer or statutory requirements). Full FRM-036 checklist through the review chain — technical, costing, commercial.</li><li><b>Standard</b> — &#8377; 5,00,000 to &#8377; 10,00,000: the order verified against the quotation on FRM-036 at standard depth, through the same chain.</li><li><b>Simplified</b> — &#8377; 1,00,000 to &#8377; 5,00,000: submitting the Sales Order is the contract review; the acceptor first verifies item, price and delivery against the quotation. Exemption from a deeper review needs the head of Sales &amp; Marketing's approval.</li><li><b>Routine</b> — below &#8377; 1,00,000, repeating supplied items: exempt; the order-vs-quotation check at acceptance suffices.</li></ul><p>A criticality factor forces a Detailed review at any value. The FRM-036 workflow history records who reviewed each stage and when.</p>"
+      "step_title": "Assign reviewers",
+      "responsible": "Sales Executive",
+      "step_content": "<p>Pick who completes Technical, Costing and Commercial, and save. Each is notified and can edit the form. Discuss open points in the form's comments.</p>",
+      "erp_record": "FRM-036: Reviewers"
      },
      {
       "step_no": "5",
-      "step_title": "Order Acceptance",
-      "step_content": "<p>On receipt of the customer's purchase order, Sales verifies it against the quotation and the completed review, resolves any deviation with the customer, and accepts by submitting the Sales Order — the documented contract review.</p>"
+      "step_title": "Complete the checks",
+      "responsible": "Assigned reviewers",
+      "step_content": "<p>Answer every check OK, Not OK or NA. For a Detailed review, Costing also enters material cost and selling price; ERPNext works out the margin. The progress bar shows what is left.</p>",
+      "erp_record": "FRM-036"
      },
      {
       "step_no": "6",
-      "step_title": "Customer Communication",
-      "step_content": "<p>Order status, delivery schedule, technical clarifications, changes and product information are communicated to the customer and recorded against the relevant order or enquiry. A complaint is recorded as a Customer Complaint (FRM-028) linked to its Sales Order, registering in REG-008. Customer feedback is recorded on the Quality Feedback Form (FRM-037), registering in REG-025; the same form serves internal and production feedback.</p>"
+      "step_title": "Decide",
+      "responsible": "Sales Executive",
+      "step_content": "<p>Record the decision: Accept, Accept with Conditions (write the conditions), Clarification Required or Reject, and submit. A plain Accept isn't possible while any check is Not OK.</p>",
+      "erp_record": "FRM-036: Submit"
      },
      {
       "step_no": "7",
-      "step_title": "Changes to Orders",
-      "step_content": "<p>A change requested after acceptance is reviewed for its impact on quality, cost, delivery and production, then recorded by amending the Sales Order with the customer's request reference retained. Amendments register automatically in REG-022.</p>"
+      "step_title": "Accept the order",
+      "responsible": "Sales Executive",
+      "step_content": "<p>Check the customer's PO against the quotation and the review, resolve differences with the customer, and submit the order. At ₹5 lakh and above ERPNext blocks this until the review is submitted with a passing decision. Below ₹5 lakh, submitting the order is the review.</p>",
+      "erp_record": "Sales Order: Submit"
+     },
+     {
+      "step_no": "8",
+      "step_title": "Handle changes",
+      "responsible": "Sales Executive",
+      "step_content": "<p>Check a customer's change for its effect on cost, delivery and production, then amend the order. Amendments list themselves in REG-022.</p>",
+      "erp_record": "Sales Order: Amend"
+     },
+     {
+      "step_no": "9",
+      "step_title": "Complaints and feedback",
+      "responsible": "Sales Executive",
+      "step_content": "<p>Record a complaint against its Sales Order, and customer feedback on the feedback form.</p>",
+      "erp_record": "Issue (FRM-028 / REG-008); Quality Feedback (FRM-037 / REG-025)"
      }
     ],
     "records_generated": [
@@ -593,8 +629,9 @@
    "sop": {
     "declared_number": "SOP005",
     "declared_title": "Purchase & Supplier Management Procedure",
-    "purpose": "<p>To ensure that all externally provided products, materials, and services conform to specified purchase requirements through systematic supplier selection, evaluation, purchasing, and performance monitoring.</p>",
-    "scope": "<p>This procedure applies to the procurement of raw materials, bought-out components, consumables, subcontracted processes, equipment, services, and other externally provided products required by Hatim Carbon Co. Pvt. Ltd.</p>",
+    "purpose": "<p>Buy only from suppliers who can meet our requirements, and keep checking that they do.</p>",
+    "scope": "<p>Every supplier of material, components, consumables and outsourced processes.</p>",
+    "workflow": "Requisition → Supplier evaluated and approved → Purchase Order → Receipt (SOP-006) → Periodic re-evaluation",
     "references": [
      {
       "reference": "ISO 9001:2015 Clause 8.4"
@@ -608,74 +645,84 @@
     ],
     "definitions": [
      {
-      "term": "Supplier",
-      "definition": "External provider of products or services."
-     },
-     {
-      "term": "Approved Supplier",
-      "definition": "Supplier evaluated and approved by Hatim Carbon."
-     },
-     {
-      "term": "Purchase Order (PO)",
-      "definition": "Official document issued to procure materials or services."
-     },
-     {
-      "term": "Outsourced Process",
-      "definition": "A process performed by an external provider under the control of Hatim Carbon."
+      "term": "Critical supplier",
+      "definition": "One whose material goes into the product or directly affects its quality. Evaluated on 9 criteria and re-evaluated every 12 months; others on 5 criteria every 24 months."
      }
     ],
     "responsibilities": [
      {
       "role": "Top Management",
-      "responsibility": "Approve critical suppliers when required."
+      "responsibility": "Approves critical suppliers when required."
      },
      {
       "role": "Purchase Department",
-      "responsibility": "Identify and evaluate suppliers. Issue Purchase Orders. Monitor supplier performance."
+      "responsibility": "Evaluates suppliers, raises Purchase Orders, follows up supplier problems."
      },
      {
       "role": "Quality Department",
-      "responsibility": "Define quality requirements. Verify supplier quality documents. Review supplier performance."
-     },
-     {
-      "role": "Stores Department",
-      "responsibility": "Verify received quantity and documents. Coordinate incoming inspection."
+      "responsibility": "Sets the quality requirements and takes part in supplier evaluation."
      },
      {
       "role": "Production Department",
-      "responsibility": "Provide technical specifications or material requirements where applicable."
+      "responsibility": "Gives the specification for what is needed."
      }
     ],
     "procedure_steps": [
      {
       "step_no": "1",
-      "step_title": "Supplier Selection",
-      "step_content": "<p>New suppliers are selected on quality, technical capability, delivery performance, commercial terms and certifications, and undergo an initial evaluation on the Supplier Evaluation Form (FRM-005) before the first order. The criteria follow the supplier's category: Critical suppliers are scored on the full nine weighted criteria, Non-Critical on a condensed five.</p>"
+      "step_title": "Ask for material",
+      "responsible": "Department Head",
+      "step_content": "<p>Raise a requisition with item, quantity and the date needed.</p>",
+      "erp_record": "Material Request (FRM-004)"
      },
      {
       "step_no": "2",
-      "step_title": "Supplier Approval",
-      "step_content": "<p>Submitting an FRM-005 evaluation writes the supplier's approval status (Approved / Provisional / Not Approved / Suspended), category and rating onto the supplier record; the Approved Suppliers Register (REG-007) is the live list of these. ERPNext warns when ordering from a supplier who is not Approved and blocks orders to a Suspended supplier.</p>"
+      "step_title": "Evaluate the supplier",
+      "responsible": "Purchase Executive",
+      "step_content": "<p>Before the first order, evaluate the supplier. Critical suppliers are scored on 9 weighted criteria, others on 5. Quality and delivery ratings come from the last 12 months of receipts.</p>",
+      "erp_record": "Supplier Evaluation (FRM-005)"
      },
      {
       "step_no": "3",
-      "step_title": "Purchase Order",
-      "step_content": "<p>Purchase Orders are issued in ERPNext by authorised personnel, specifying product, material grade, quantity, applicable drawings, delivery schedule, and inspection and packaging requirements. The standard Purchase Quality Requirements terms communicate quality conditions to the supplier on the order itself.</p>"
+      "step_title": "Approve",
+      "responsible": "Purchase Executive / Quality Manager",
+      "step_content": "<p>Submitting the evaluation sets the supplier's status (Approved, Provisional, Not Approved or Suspended), category and rating. That list is the Approved Suppliers Register.</p>",
+      "erp_record": "Supplier; REG-007"
      },
      {
       "step_no": "4",
-      "step_title": "Monitoring Supplier Performance",
-      "step_content": "<p>Each approved evaluation sets the supplier's next review date; when it falls due, ERPNext drafts the re-evaluation and notifies Purchase and Quality. Delivery and quality ratings are computed from the last twelve months of receipts and inspections. Supplier issues raise a Corrective Action Request (FRM-021) per SOP-014, and rejected supplies register in the Nonconforming Product Register (REG-009) per SOP-013.</p>"
+      "step_title": "Order",
+      "responsible": "Purchase Executive",
+      "step_content": "<p>Raise the Purchase Order with item, grade, quantity, drawings, delivery date and inspection needs. Add the Purchase Quality Requirements terms. ERPNext warns on a supplier who isn't Approved and blocks a Suspended one.</p>",
+      "erp_record": "Purchase Order"
      },
      {
       "step_no": "5",
-      "step_title": "Outsourced Processes",
-      "step_content": "<p>An outsourced process is controlled like any purchase: an approved supplier, a Purchase Order carrying the quality requirements, and verification before acceptance.</p>"
+      "step_title": "Change an order",
+      "responsible": "Purchase Executive",
+      "step_content": "<p>Get the change approved before telling the supplier; amend the order so the change is recorded.</p>",
+      "erp_record": "Purchase Order: Amend"
      },
      {
       "step_no": "6",
-      "step_title": "Purchase Order Amendments",
-      "step_content": "<p>A change to an issued Purchase Order is reviewed and approved by authorised personnel before being communicated to the supplier; the amended order identifies what changed, and affected departments are informed.</p>"
+      "step_title": "Re-evaluate",
+      "responsible": "Purchase Executive",
+      "step_content": "<p>When a supplier's review date is 7 days away, ERPNext drafts the re-evaluation and notifies Purchase and Quality. Complete it.</p>",
+      "erp_record": "Supplier Evaluation (Periodic)"
+     },
+     {
+      "step_no": "7",
+      "step_title": "Act on problems",
+      "responsible": "Purchase Executive / Quality Manager",
+      "step_content": "<p>Rejected material is recorded as a nonconformance (SOP-013); a repeated or serious problem gets a Corrective Action Request to the supplier (SOP-014).</p>",
+      "erp_record": "Non Conformance (REG-009); Quality Action (FRM-021)"
+     },
+     {
+      "step_no": "8",
+      "step_title": "Outsourced processes",
+      "responsible": "Purchase Executive",
+      "step_content": "<p>Control them like any purchase: approved supplier, Purchase Order with requirements, inspection on return.</p>",
+      "erp_record": "Purchase Order; Quality Inspection"
      }
     ],
     "records_generated": [
@@ -718,8 +765,9 @@
    "sop": {
     "declared_number": "SOP006",
     "declared_title": "Incoming Material Inspection & Material Identification",
-    "purpose": "<p>To ensure that all incoming materials are verified against specified purchase requirements before acceptance for production and are properly identified to maintain traceability.</p>",
-    "scope": "<p>This procedure applies to all incoming raw materials, bought-out components, consumables, packing materials, and outsourced products received by Hatim Carbon Co. Pvt. Ltd.</p>",
+    "purpose": "<p>Accept only material that meets the order, and keep it identified from receipt to production.</p>",
+    "scope": "<p>All purchased raw material, components, consumables, packing material and outsourced work.</p>",
+    "workflow": "Receipt (draft) → Inspection → Receipt posted: accepted to stores, rejected to Rejected warehouse + NCR → Label → Issue by batch",
     "references": [
      {
       "reference": "ISO 9001:2015 Clause 8.4 – Control of Externally Provided Processes, Products and Services"
@@ -739,66 +787,66 @@
     ],
     "definitions": [
      {
-      "term": "Incoming Inspection",
-      "definition": "Verification of received materials against specified requirements before acceptance."
-     },
-     {
-      "term": "Accepted Material",
-      "definition": "Material approved for production after inspection."
-     },
-     {
-      "term": "Rejected Material",
-      "definition": "Material not meeting specified requirements and segregated to prevent unintended use."
-     },
-     {
-      "term": "Material Test Certificate (MTC)",
-      "definition": "Supplier-issued document confirming the material conforms to specified chemical, mechanical, or other technical requirements."
+      "term": "MTC",
+      "definition": "Material Test Certificate: the supplier's proof that the material meets its specification."
      }
     ],
     "responsibilities": [
      {
-      "role": "Purchase Department",
-      "responsibility": "Coordinate with suppliers regarding rejected materials. Arrange replacement or corrective action where required."
+      "role": "Stores Department",
+      "responsibility": "Receives material, checks quantity and documents, posts the receipt, labels and stores it."
      },
      {
       "role": "Quality Department",
-      "responsibility": "Carry out incoming inspection. Verify specifications and quality requirements. Approve or reject received materials."
+      "responsibility": "Inspects, accepts or rejects."
      },
      {
-      "role": "Stores Department",
-      "responsibility": "Receive incoming materials. Verify quantity and accompanying documents. Present materials for inspection."
+      "role": "Purchase Department",
+      "responsibility": "Takes up rejections with the supplier."
      }
     ],
     "procedure_steps": [
      {
       "step_no": "1",
-      "step_title": "Receipt of Material",
-      "step_content": "<p>Stores receives the material against the Purchase Order and raises the goods receipt, which records who received it and the supplier's challan number. Before presenting the material for inspection, Stores verifies:</p><ul><li>Delivery Challan against the Purchase Order</li><li>Quantity received</li><li>Material identification on the packages</li><li>Material Test Certificate, where the item group requires one — attached to the goods receipt, not filed separately</li></ul>"
+      "step_title": "Receive",
+      "responsible": "Storekeeper",
+      "step_content": "<p>Receive against the Purchase Order and keep the material in the inspection area. Check the challan, the quantity and the package markings. Record who received it and the challan number. Attach the MTC where the item group needs one; ERPNext warns if it's missing.</p>",
+      "erp_record": "Purchase Receipt (draft)"
      },
      {
       "step_no": "2",
-      "step_title": "Incoming Inspection",
-      "step_content": "<p>Quality inspects the material and records the result as an Incoming Inspection Report (FRM-006) against the goods receipt. What is inspected is not left to the day: each item carries an inspection template, defaulted from its item group, and the template's parameters are the readings taken — visual, dimensional, material grade, quantity, and any additional test the Purchase Order specifies.</p><p>Where the item group requires a Material Test Certificate, the certificate is reviewed against the specified requirements as part of the inspection.</p><p>Items whose group requires inspection cannot be received without one: the goods receipt will not post until the inspection is submitted.</p>"
+      "step_title": "Inspect",
+      "responsible": "Quality Inspector",
+      "step_content": "<p>Inspect against the item's inspection template and review the MTC. Record the readings and the result. The receipt can't be posted until the inspection is submitted.</p>",
+      "erp_record": "Quality Inspection (FRM-006)"
      },
      {
       "step_no": "3",
-      "step_title": "Material Identification",
-      "step_content": "<p>Accepted material is identified by its batch, which carries the supplier, the receipt it came from and the supplier's own heat or lot number where one is given. That batch is what production selects when the material is issued, so identification and traceability hold from receipt through to the finished product.</p>"
+      "step_title": "Post the receipt",
+      "responsible": "Storekeeper",
+      "step_content": "<p>Enter accepted and rejected quantities and post the receipt. Accepted material gets a batch that records the supplier and heat number; rejected quantity goes into the Rejected warehouse, out of reach of production.</p>",
+      "erp_record": "Purchase Receipt: Submit; Batch"
      },
      {
       "step_no": "4",
-      "step_title": "Acceptance",
-      "step_content": "<p>Materials meeting the specified purchase and inspection requirements shall be accepted, identified with an acceptance status (where applicable), and released to Stores for production use.</p>"
+      "step_title": "Label",
+      "responsible": "Storekeeper",
+      "step_content": "<p>Print material labels from the posted receipt and stick one on each package: item, batch barcode, supplier, date. Put the QC OK or QC Not OK sticker beside it.</p>",
+      "erp_record": "Purchase Receipt → Material Labels"
      },
      {
       "step_no": "5",
-      "step_title": "Rejection",
-      "step_content": "<p>Material failing the specified requirements is rejected on the inspection and the rejected quantity is received into the <b>Rejected</b> warehouse, which keeps it out of stores and out of production. Purchase is notified automatically to take the matter up with the supplier, and the rejection affects the supplier's standing on REG-007.</p><p>A Nonconforming Product Report (FRM-020) is raised from the rejected inspection and the material is then handled under SOP-013 – Control of Nonconforming Outputs.</p>"
+      "step_title": "Act on rejections",
+      "responsible": "Quality Inspector",
+      "step_content": "<p>Raise the NCR from the rejected inspection and follow SOP-013. Purchase is notified automatically and takes it up with the supplier.</p>",
+      "erp_record": "Non Conformance (FRM-020)"
      },
      {
       "step_no": "6",
-      "step_title": "Storage",
-      "step_content": "<p>Accepted materials shall be stored in designated locations to prevent damage, deterioration, contamination, or mix-up before issue to production.</p>"
+      "step_title": "Store and issue",
+      "responsible": "Storekeeper",
+      "step_content": "<p>Store accepted material in its place, protected from damage and mix-up. Production draws it by batch (scan the label), so it can be traced back to the receipt.</p>",
+      "erp_record": "Stock Entry (by batch); Incoming Material Register (REG-015)"
      }
     ],
     "records_generated": [

@@ -26,6 +26,7 @@
   "sop_body_section",
   "purpose",
   "scope",
+  "workflow",
   "definitions_section",
   "definitions",
   "responsibilities_section",
@@ -222,6 +223,12 @@
    "fieldname": "scope",
    "fieldtype": "Text Editor",
    "label": "Scope"
+  },
+  {
+   "fieldname": "workflow",
+   "fieldtype": "Small Text",
+   "label": "Workflow",
+   "description": "The process in one line, steps joined by arrows: Enquiry → Quotation → Sales Order."
   },
   {
    "depends_on": "eval:doc.body_mode=='Structured SOP'",
@@ -533,7 +540,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-08-15 11:00:00.000000",
+ "modified": "2026-10-09 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Controlled Document",
