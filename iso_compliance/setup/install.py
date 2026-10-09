@@ -25,6 +25,7 @@ def after_install():
 	ensure_naming_rules()
 	ensure_review_notifications()
 	ensure_purchase_terms()
+	ensure_supplier_evaluation_templates()
 	ensure_rejected_warehouse()
 	ensure_incoming_rejection_notification()
 
@@ -35,8 +36,64 @@ def after_migrate():
 	ensure_naming_rules()
 	ensure_review_notifications()
 	ensure_purchase_terms()
+	ensure_supplier_evaluation_templates()
 	ensure_rejected_warehouse()
 	ensure_incoming_rejection_notification()
+
+
+#: The two FRM-005 templates a new site starts with: the nine weighted criteria
+#: of the Supplier Evaluation Form (F-PUR-01) for Critical suppliers, a
+#: condensed five for Non-Critical. Seeded once; Quality edits them afterwards.
+SUPPLIER_EVALUATION_TEMPLATES = {
+	"Critical": (
+		12,
+		(
+			("Quality of supplied product / service", 25, "Acceptance % from receipts"),
+			("On-time delivery / service", 20, "On-time % from receipts"),
+			("Technical capability", 15, None),
+			("Price / commercial competitiveness", 10, None),
+			("Capacity / resource availability", 10, None),
+			("Statutory / regulatory compliance", 5, None),
+			("Management system / certifications", 5, None),
+			("Communication & responsiveness", 5, None),
+			("Corrective action effectiveness", 5, None),
+		),
+	),
+	"Non-Critical": (
+		24,
+		(
+			("Quality of supplied product / service", 30, "Acceptance % from receipts"),
+			("On-time delivery / service", 25, "On-time % from receipts"),
+			("Price / commercial competitiveness", 20, None),
+			("Communication & responsiveness", 15, None),
+			("Statutory / regulatory compliance", 10, None),
+		),
+	),
+}
+
+
+def ensure_supplier_evaluation_templates():
+	"""Create the Critical and Non-Critical templates if missing. An existing
+	template is never touched: once created it belongs to Quality."""
+	created = []
+	for category, (months, criteria) in SUPPLIER_EVALUATION_TEMPLATES.items():
+		if frappe.db.exists("Supplier Evaluation Template", category):
+			continue
+		frappe.get_doc(
+			{
+				"doctype": "Supplier Evaluation Template",
+				"category": category,
+				"review_months": months,
+				"criteria": [
+					{"criterion": criterion, "weight": weight, "auto_rate": auto}
+					for criterion, weight, auto in criteria
+				],
+			}
+		).insert(ignore_permissions=True)
+		created.append(category)
+	if created:
+		frappe.db.commit()
+		print(f"iso_compliance: created supplier evaluation templates ({', '.join(created)})")
 
 
 def ensure_purchase_terms():

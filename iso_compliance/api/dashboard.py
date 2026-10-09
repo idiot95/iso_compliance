@@ -389,6 +389,26 @@ def get_gap_rows() -> list[dict]:
 			}
 		)
 
+	overridden = frappe.db.count(
+		"Purchase Order",
+		{
+			"docstatus": 1,
+			"custom_supplier_override": 1,
+			"transaction_date": (">=", frappe.utils.add_days(frappe.utils.today(), -90)),
+		},
+	)
+	if overridden:
+		rows.append(
+			{
+				"area": _("Supplier control"),
+				"clause": "8.4",
+				"finding": _("Purchase Orders placed with the supplier approval overridden (last 90 days)"),
+				"count": overridden,
+				"action": _("Evaluate those suppliers (FRM-005) so the next order needs no override."),
+				"doctype": "Purchase Order",
+			}
+		)
+
 	unassigned = reviews_waiting_unassigned()
 	if unassigned:
 		rows.append(

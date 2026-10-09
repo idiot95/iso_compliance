@@ -603,5 +603,45 @@
   "insert_after": "set_posting_time",
   "module": "ISO Compliance",
   "description": "Who took delivery of the consignment (SOP-006 step 1). Created on this site by hand before the app existed and adopted into it; the fieldname's typo is kept deliberately, because renaming it would orphan the 415 receipts that carry it."
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Purchase Order-custom_supplier_override",
+  "dt": "Purchase Order",
+  "fieldname": "custom_supplier_override",
+  "fieldtype": "Check",
+  "label": "Override supplier approval",
+  "insert_after": "supplier",
+  "no_copy": 1,
+  "default": "0",
+  "description": "For an urgent order to a supplier who isn't Approved. Only a Purchase Manager or Quality Manager can submit it, and the reason is kept on the order.",
+  "module": "ISO Compliance"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Purchase Order-custom_supplier_override_reason",
+  "dt": "Purchase Order",
+  "fieldname": "custom_supplier_override_reason",
+  "fieldtype": "Small Text",
+  "label": "Override reason",
+  "insert_after": "custom_supplier_override",
+  "no_copy": 1,
+  "depends_on": "eval:doc.custom_supplier_override",
+  "mandatory_depends_on": "eval:doc.custom_supplier_override",
+  "module": "ISO Compliance"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Purchase Order-custom_supplier_override_by",
+  "dt": "Purchase Order",
+  "fieldname": "custom_supplier_override_by",
+  "fieldtype": "Link",
+  "options": "User",
+  "label": "Override approved by",
+  "insert_after": "custom_supplier_override_reason",
+  "no_copy": 1,
+  "read_only": 1,
+  "depends_on": "eval:doc.custom_supplier_override_by",
+  "module": "ISO Compliance"
  }
 ]

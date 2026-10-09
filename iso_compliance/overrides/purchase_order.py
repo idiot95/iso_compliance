@@ -1,40 +1,63 @@
 # Copyright (c) 2026, Hatim Carbon Co. Pvt. Ltd. and contributors
 # For license information, please see license.txt
 
-"""SOP-005's supplier-approval check, run when a Purchase Order is submitted.
+"""SOP-005's supplier-approval lock, run when a Purchase Order is submitted.
 
-Warn-first by design: 943 of the site's suppliers have no approval status
-yet, and hard-blocking every order on day one would stop purchasing dead.
-A Suspended supplier always blocks -- suspension is a deliberate decision,
-not a data gap. Flip SUPPLIER_GATE to "block" once the supplier base is
-classified, and Not Approved suppliers block too.
+Only an Approved supplier can be ordered from. An urgent order to anyone
+else needs an override: the order is ticked, a reason is written, and a
+Purchase Manager or Quality Manager submits it -- their name is stamped on
+the order and the reason goes on its timeline, so every exception is
+evidence rather than a quiet workaround. A Suspended supplier is never
+overridden: suspension is a deliberate decision, reversed only by a new
+evaluation (FRM-005).
 """
 
 import frappe
 from frappe import _
 
-SUPPLIER_GATE = "warn"  # "block": Not Approved / unclassified suppliers also block
+#: Who may submit an order to a supplier that is not Approved.
+OVERRIDE_ROLES = ("Purchase Manager", "Quality Manager", "System Manager")
 
 
 def check_supplier_approval(doc, method=None):
 	status = frappe.db.get_value("Supplier", doc.supplier, "custom_approval_status")
+	supplier = frappe.bold(doc.supplier_name or doc.supplier)
 	if status == "Approved":
 		return
+
 	if status == "Suspended":
 		frappe.throw(
 			_(
 				"Supplier {0} is <b>Suspended</b> on the Approved Suppliers Register "
-				"(REG-007). Orders cannot be placed until a new evaluation (FRM-005) "
-				"restores approval."
-			).format(frappe.bold(doc.supplier_name or doc.supplier)),
+				"(REG-007). No order can be placed, override or not, until a new "
+				"evaluation (FRM-005) restores approval."
+			).format(supplier),
 			title=_("Supplier Suspended"),
 		)
-	label = _(status) if status else _("not yet classified")
-	message = _(
-		"Supplier {0} is <b>{1}</b> on the Approved Suppliers Register (REG-007). "
-		"SOP-005 expects purchases from Approved suppliers; record a Supplier "
-		"Evaluation (FRM-005) to classify them."
-	).format(frappe.bold(doc.supplier_name or doc.supplier), label)
-	if SUPPLIER_GATE == "block":
-		frappe.throw(message, title=_("Supplier Not Approved"))
-	frappe.msgprint(message, title=_("Supplier Approval"), indicator="orange")
+
+	label = _(status) if status else _("not yet evaluated")
+	if not doc.get("custom_supplier_override"):
+		frappe.throw(
+			_(
+				"Supplier {0} is <b>{1}</b>, not Approved, on the Approved Suppliers "
+				"Register (REG-007). Record a Supplier Evaluation (FRM-005) to approve them. "
+				"For an urgent order, tick <b>Override supplier approval</b>, write the "
+				"reason, and have a Purchase Manager or Quality Manager submit it."
+			).format(supplier, label),
+			title=_("Supplier Not Approved"),
+		)
+
+	if not set(OVERRIDE_ROLES) & set(frappe.get_roles()):
+		frappe.throw(
+			_("Only a Purchase Manager or Quality Manager can submit an order with the supplier approval overridden."),
+			title=_("Override Not Permitted"),
+		)
+	reason = (doc.get("custom_supplier_override_reason") or "").strip()
+	if not reason:
+		frappe.throw(_("Write the reason for the override."), title=_("Override Reason Missing"))
+
+	doc.custom_supplier_override_by = frappe.session.user
+	doc.add_comment(
+		"Comment",
+		_("Supplier approval overridden ({0} supplier): {1}").format(label, reason),
+	)

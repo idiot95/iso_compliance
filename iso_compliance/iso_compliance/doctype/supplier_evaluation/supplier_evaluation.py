@@ -3,12 +3,14 @@
 
 """FRM-005: the supplier evaluation behind every approval on REG-007 (SOP-005).
 
-The nine weighted criteria come from the Supplier Evaluation Form source file.
-The two criteria the system can measure -- quality of supply and on-time
-delivery -- are pre-rated from the last twelve months of Purchase Receipts, so
-the evaluator judges only what genuinely needs judgment. Submitting the
-evaluation writes the decision onto the Supplier record: the evaluation is the
-evidence, the master carries the state, and REG-007 reads the master.
+The criteria come from the Supplier Evaluation Template of the supplier's
+category -- Critical or Non-Critical -- which Quality maintains. Criteria the
+system can measure (acceptance and on-time delivery) are pre-rated from the
+last twelve months of Purchase Receipts, so the evaluator judges only what
+genuinely needs judgment. The template also sets the re-evaluation interval,
+so the next review date fills itself. Submitting writes the decision onto the
+Supplier record: the evaluation is the evidence, the master carries the
+state, and REG-007 reads the master.
 """
 
 import frappe
@@ -16,35 +18,19 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import add_days, add_months, cint, flt, today
 
-#: Criteria templates by supplier category. Critical suppliers get the full
-#: nine weighted criteria of the Supplier Evaluation Form (F-PUR-01);
-#: Non-Critical a condensed five. The first two of each are pre-rated from
-#: receipt data.
-CRITICAL_CRITERIA = (
-	("Quality of supplied product / service", 25),
-	("On-time delivery / service", 20),
-	("Technical capability", 15),
-	("Price / commercial competitiveness", 10),
-	("Capacity / resource availability", 10),
-	("Statutory / regulatory compliance", 5),
-	("Management system / certifications", 5),
-	("Communication & responsiveness", 5),
-	("Corrective action effectiveness", 5),
-)
+ACCEPTANCE = "Acceptance % from receipts"
+ON_TIME = "On-time % from receipts"
 
-NON_CRITICAL_CRITERIA = (
-	("Quality of supplied product / service", 30),
-	("On-time delivery / service", 25),
-	("Price / commercial competitiveness", 20),
-	("Communication & responsiveness", 15),
-	("Statutory / regulatory compliance", 10),
-)
-
-QUALITY_CRITERION = CRITICAL_CRITERIA[0][0]
-DELIVERY_CRITERION = CRITICAL_CRITERIA[1][0]
+#: Before templates were records, the two data-backed criteria were known by
+#: name; evaluations from then still carry these rows without auto_rate.
+LEGACY_AUTO = {
+	"Quality of supplied product / service": ACCEPTANCE,
+	"On-time delivery / service": ON_TIME,
+}
 
 #: Percentage-to-rating bands for the computed criteria.
 RATING_BANDS = ((95, "5"), (90, "4"), (80, "3"), (60, "2"), (0, "1"))
+
 
 def _pct_to_rating(pct):
 	for floor, rating in RATING_BANDS:
@@ -55,6 +41,7 @@ def _pct_to_rating(pct):
 
 class SupplierEvaluation(Document):
 	def validate(self):
+		self.default_category()
 		self.seed_criteria()
 		self.compute_metrics()
 		self.suggest_ratings()
@@ -79,29 +66,44 @@ class SupplierEvaluation(Document):
 	def on_submit(self):
 		self.write_to_supplier()
 
-	def _criteria_template(self):
-		return CRITICAL_CRITERIA if self.category == "Critical" else NON_CRITICAL_CRITERIA
+	def default_category(self):
+		if not self.category and self.supplier:
+			self.category = frappe.db.get_value("Supplier", self.supplier, "custom_category")
+		if not self.category:
+			frappe.throw(_("Choose the supplier category (Critical or Non-Critical)."), title=_("Category Missing"))
+
+	def _template(self):
+		if not frappe.db.exists("Supplier Evaluation Template", self.category):
+			frappe.throw(
+				_("No Supplier Evaluation Template exists for {0} suppliers. Quality must create one first.").format(
+					frappe.bold(_(self.category))
+				),
+				title=_("Template Missing"),
+			)
+		return frappe.get_cached_doc("Supplier Evaluation Template", self.category)
 
 	def seed_criteria(self):
-		"""Fill (or refill) the criteria for the chosen category. On a draft,
-		switching category swaps templates -- recorded ratings for the old
-		template do not carry over, and the auto-rated rows recompute."""
-		template = self._criteria_template()
-		current = [(row.criterion, flt(row.weight)) for row in self.criteria]
-		expected = [(criterion, flt(weight)) for criterion, weight in template]
-		if current == expected:
-			return
+		"""Load the criteria of the category's template. On a draft, a change
+		of category swaps templates; recorded ratings for the old template do
+		not carry over, and the pre-rated rows recompute. A submitted
+		evaluation keeps the criteria it was scored on."""
 		if self.docstatus != 0:
+			return
+		template = self._template()
+		self.template = template.name
+		current = [(row.criterion, flt(row.weight)) for row in self.criteria]
+		expected = [(row.criterion, flt(row.weight)) for row in template.criteria]
+		if current == expected:
 			return
 		if current and any(row.rating for row in self.criteria):
 			frappe.msgprint(
-				_("Criteria reloaded for the {0} template; re-check the ratings.").format(
-					_(self.category or "Non-Critical")
-				)
+				_("Criteria reloaded from the {0} template; check the ratings again.").format(_(self.category))
 			)
 		self.set("criteria", [])
-		for criterion, weight in template:
-			self.append("criteria", {"criterion": criterion, "weight": weight})
+		for row in template.criteria:
+			self.append(
+				"criteria", {"criterion": row.criterion, "weight": row.weight, "auto_rate": row.auto_rate}
+			)
 
 	def compute_metrics(self):
 		"""Acceptance and on-time percentages from the last 12 months of
@@ -143,13 +145,14 @@ class SupplierEvaluation(Document):
 		for row in self.criteria:
 			if row.rating:
 				continue
-			if row.criterion == QUALITY_CRITERION and self.acceptance_pct is not None:
+			source = row.auto_rate or LEGACY_AUTO.get(row.criterion)
+			if source == ACCEPTANCE and self.acceptance_pct is not None:
 				row.rating = _pct_to_rating(self.acceptance_pct)
 				if not row.remarks:
 					row.remarks = _("auto: {0}% accepted, last 12 months").format(
 						round(flt(self.acceptance_pct), 1)
 					)
-			elif row.criterion == DELIVERY_CRITERION and self.on_time_delivery_pct is not None:
+			elif source == ON_TIME and self.on_time_delivery_pct is not None:
 				row.rating = _pct_to_rating(self.on_time_delivery_pct)
 				if not row.remarks:
 					row.remarks = _("auto: {0}% on time, last 12 months").format(
@@ -164,9 +167,11 @@ class SupplierEvaluation(Document):
 		self.overall_score = total
 
 	def default_next_review(self):
-		if self.next_review_date:
+		"""Always the evaluation date plus the template's interval, so the date
+		on the form is the one the supplier will carry."""
+		if self.docstatus != 0:
 			return
-		months = 12 if self.category == "Critical" else 24
+		months = cint(frappe.db.get_value("Supplier Evaluation Template", self.category, "review_months")) or 12
 		self.next_review_date = add_months(self.evaluation_date or today(), months)
 
 	def write_to_supplier(self):

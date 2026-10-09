@@ -8,11 +8,12 @@
   "section_supplier",
   "supplier",
   "supplier_name",
+  "category",
   "evaluation_type",
   "column_break_supplier",
   "evaluation_date",
-  "category",
   "product_service",
+  "template",
   "section_metrics",
   "on_time_delivery_pct",
   "acceptance_pct",
@@ -51,6 +52,16 @@
    "read_only": 1
   },
   {
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "label": "Supplier Category",
+   "options": "\nCritical\nNon-Critical",
+   "description": "Taken from the supplier. Critical: material that goes into the product or decides its quality. Choosing it loads that category's criteria.",
+   "in_standard_filter": 1,
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
    "default": "Periodic",
    "fieldname": "evaluation_type",
    "fieldtype": "Select",
@@ -76,6 +87,13 @@
    "fieldname": "product_service",
    "fieldtype": "Data",
    "label": "Product / Service"
+  },
+  {
+   "fieldname": "template",
+   "fieldtype": "Link",
+   "label": "Template",
+   "options": "Supplier Evaluation Template",
+   "read_only": 1
   },
   {
    "description": "Computed from Purchase Receipts of the last 12 months; the matching criteria rows are pre-rated from these figures and can be overridden.",
@@ -144,23 +162,15 @@
    "options": "\nApproved\nProvisional\nNot Approved\nSuspended"
   },
   {
-   "fieldname": "category",
-   "fieldtype": "Select",
-   "label": "Supplier Category",
-   "options": "\nCritical\nNon-Critical",
-   "default": "Non-Critical",
-   "description": "Chooses the criteria template: Critical scores the full nine weighted criteria, Non-Critical a condensed five.",
-   "in_standard_filter": 1
-  },
-  {
    "fieldname": "column_break_decision",
    "fieldtype": "Column Break"
   },
   {
-   "description": "When the next evaluation falls due. Defaults to one year for Critical suppliers, two for Non-Critical. ERPNext drafts the re-evaluation automatically when it arrives.",
+   "description": "Evaluation date plus the template's re-evaluation interval. Written to the supplier on submit; the re-evaluation is drafted automatically a week before.",
    "fieldname": "next_review_date",
    "fieldtype": "Date",
-   "label": "Next Review Date"
+   "label": "Next Review Date",
+   "read_only": 1
   },
   {
    "fieldname": "summary",
@@ -181,7 +191,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-09-05 10:00:00.000000",
+ "modified": "2026-10-09 13:10:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Supplier Evaluation",

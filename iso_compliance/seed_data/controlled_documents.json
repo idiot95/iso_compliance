@@ -631,7 +631,7 @@
     "declared_title": "Purchase & Supplier Management Procedure",
     "purpose": "<p>Buy only from suppliers who can meet our requirements, and keep checking that they do.</p>",
     "scope": "<p>Every supplier of material, components, consumables and outsourced processes.</p>",
-    "workflow": "Requisition → Supplier evaluated and approved → Purchase Order → Receipt (SOP-006) → Periodic re-evaluation",
+    "workflow": "Requisition → Evaluate (Critical / Non-Critical template) → Approved → Purchase Order → Receipt (SOP-006) → Re-evaluation drafted automatically",
     "references": [
      {
       "reference": "ISO 9001:2015 Clause 8.4"
@@ -679,21 +679,21 @@
       "step_no": "2",
       "step_title": "Evaluate the supplier",
       "responsible": "Purchase Executive",
-      "step_content": "<p>Before the first order, evaluate the supplier. Critical suppliers are scored on 9 weighted criteria, others on 5. Quality and delivery ratings come from the last 12 months of receipts.</p>",
-      "erp_record": "Supplier Evaluation (FRM-005)"
+      "step_content": "<p>Before the first order, evaluate the supplier on the template for its category: Critical (9 weighted criteria) or Non-Critical (5). Quality and delivery are pre-rated from the last 12 months of receipts; rate the rest. Quality keeps the templates.</p>",
+      "erp_record": "Supplier Evaluation (FRM-005); Supplier Evaluation Template"
      },
      {
       "step_no": "3",
       "step_title": "Approve",
       "responsible": "Purchase Executive / Quality Manager",
-      "step_content": "<p>Submitting the evaluation sets the supplier's status (Approved, Provisional, Not Approved or Suspended), category and rating. That list is the Approved Suppliers Register.</p>",
+      "step_content": "<p>Submitting the evaluation sets the supplier's status (Approved, Provisional, Not Approved or Suspended), category, rating and next review date: 12 months for Critical, 24 for Non-Critical. That list is the Approved Suppliers Register.</p>",
       "erp_record": "Supplier; REG-007"
      },
      {
       "step_no": "4",
       "step_title": "Order",
       "responsible": "Purchase Executive",
-      "step_content": "<p>Raise the Purchase Order with item, grade, quantity, drawings, delivery date and inspection needs. Add the Purchase Quality Requirements terms. ERPNext warns on a supplier who isn't Approved and blocks a Suspended one.</p>",
+      "step_content": "<p>Raise the Purchase Order with item, grade, quantity, drawings, delivery date and inspection needs, and add the Purchase Quality Requirements terms. Only an Approved supplier's order can be submitted. An urgent order to anyone else needs Override supplier approval with a written reason, submitted by a Purchase Manager or Quality Manager. A Suspended supplier can't be ordered from at all.</p>",
       "erp_record": "Purchase Order"
      },
      {
@@ -707,7 +707,7 @@
       "step_no": "6",
       "step_title": "Re-evaluate",
       "responsible": "Purchase Executive",
-      "step_content": "<p>When a supplier's review date is 7 days away, ERPNext drafts the re-evaluation and notifies Purchase and Quality. Complete it.</p>",
+      "step_content": "<p>A week before a supplier's next review date, ERPNext drafts the re-evaluation with the same category and product, and notifies Purchase and Quality. Complete it.</p>",
       "erp_record": "Supplier Evaluation (Periodic)"
      },
      {
