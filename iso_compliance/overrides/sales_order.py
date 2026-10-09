@@ -55,7 +55,7 @@ def enforce_techno_commercial_review(doc, method=None):
 	reviews = frappe.get_all(
 		"Techno Commercial Review",
 		filters={"sales_order": ("in", names), "docstatus": ("<", 2)},
-		fields=["name", "docstatus", "review_tier", "outcome", "workflow_state"],
+		fields=["name", "docstatus", "review_tier", "outcome"],
 		order_by="modified desc",
 	)
 	approved = [r for r in reviews if r.docstatus == 1]
@@ -78,12 +78,11 @@ def enforce_techno_commercial_review(doc, method=None):
 		if not satisfied:
 			if pending:
 				message = _(
-					"Techno-Commercial Review {0} for this order is still at "
-					"<b>{1}</b>. It must complete the review chain and be approved "
-					"before the order can be submitted."
+					"Techno-Commercial Review {0} for this order is still open "
+					"(<b>{1}</b>). It must be completed before the order can be submitted."
 				).format(
 					frappe.utils.get_link_to_form("Techno Commercial Review", pending[0].name),
-					pending[0].workflow_state or _("Draft"),
+					_progress_text(pending[0].name),
 				)
 			else:
 				company_currency = frappe.get_cached_value("Company", doc.company, "default_currency")
@@ -96,13 +95,18 @@ def enforce_techno_commercial_review(doc, method=None):
 	elif pending:
 		_fail(
 			_(
-				"Techno-Commercial Review {0} was opened for this order and is still at "
-				"<b>{1}</b>. Complete or cancel it before submitting the order."
+				"Techno-Commercial Review {0} was opened for this order and is still open "
+				"(<b>{1}</b>). Complete or cancel it before submitting the order."
 			).format(
 				frappe.utils.get_link_to_form("Techno Commercial Review", pending[0].name),
-				pending[0].workflow_state or _("Draft"),
+				_progress_text(pending[0].name),
 			)
 		)
+
+
+def _progress_text(review):
+	progress = frappe.get_doc("Techno Commercial Review", review).progress()
+	return _("{0} of {1} done").format(progress["done"], progress["total"])
 
 
 def _fail(message):

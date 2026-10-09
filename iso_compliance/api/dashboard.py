@@ -389,20 +389,15 @@ def get_gap_rows() -> list[dict]:
 			}
 		)
 
-	unstaffed = review_chain_roles_unstaffed()
-	if unstaffed:
+	unassigned = reviews_waiting_unassigned()
+	if unassigned:
 		rows.append(
 			{
 				"area": _("Contract review"),
 				"clause": "8.2.3",
-				"finding": _("Review-chain roles held by no active user: {0}").format(
-					", ".join(unstaffed)
-				),
-				"count": len(unstaffed),
-				"action": _(
-					"Assign the role to the employee whose designation owns that stage "
-					"(Settings → Users → open the user → Roles)."
-				),
+				"finding": _("Open reviews with an unanswered section nobody is assigned to"),
+				"count": unassigned,
+				"action": _("Open the review and pick a reviewer for each section."),
 				"doctype": "Techno Commercial Review",
 			}
 		)
@@ -433,30 +428,23 @@ def suppliers_past_reapproval() -> int:
 	)
 
 
-def review_chain_roles_unstaffed() -> list[str]:
-	"""Reviewer roles no enabled user holds -- a stalled chain waiting to happen.
+def reviews_waiting_unassigned() -> int:
+	"""Draft FRM-036 reviews where some section still has unanswered checks and
+	no one named to answer them -- a review that will sit until someone looks."""
+	from iso_compliance.iso_compliance.doctype.techno_commercial_review.techno_commercial_review import (
+		SECTIONS,
+	)
 
-	The review chain routes by role because roles outlive people; the cost is
-	that when the person holding one leaves and their user is disabled, the
-	role sits empty and every review stalls at that stage. This is the
-	reminder to hand the responsibility to someone else."""
-	from iso_compliance.setup.install import REVIEW_CHAIN_ROLES
-
-	unstaffed = []
-	for role in REVIEW_CHAIN_ROLES:
-		holders = [
-			h.parent
-			for h in frappe.get_all(
-				"Has Role", filters={"role": role, "parenttype": "User"}, fields=["parent"]
-			)
-			if h.parent not in ("Administrator", "Guest")
-		]
-		active = holders and frappe.get_all(
-			"User", filters={"name": ("in", holders), "enabled": 1}, limit=1
-		)
-		if not active:
-			unstaffed.append(role)
-	return unstaffed
+	count = 0
+	for name in frappe.get_all("Techno Commercial Review", filters={"docstatus": 0}, pluck="name"):
+		doc = frappe.get_doc("Techno Commercial Review", name)
+		progress = {s["key"]: s for s in doc.progress()["sections"]}
+		if any(
+			not doc.get(field) and progress[key]["done"] < progress[key]["total"]
+			for key, field, _t, _l in SECTIONS
+		):
+			count += 1
+	return count
 
 
 @frappe.whitelist()

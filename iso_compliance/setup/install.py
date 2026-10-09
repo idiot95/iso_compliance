@@ -23,7 +23,6 @@ def after_install():
 	ensure_workflow_states()
 	ensure_desk_registration()
 	ensure_naming_rules()
-	ensure_review_chain()
 	ensure_review_notifications()
 	ensure_purchase_terms()
 	ensure_rejected_warehouse()
@@ -34,7 +33,6 @@ def after_migrate():
 	ensure_workflow_states()
 	ensure_desk_registration()
 	ensure_naming_rules()
-	ensure_review_chain()
 	ensure_review_notifications()
 	ensure_purchase_terms()
 	ensure_rejected_warehouse()
@@ -72,109 +70,6 @@ def ensure_purchase_terms():
 	).insert(ignore_permissions=True)
 	frappe.db.commit()
 	print("iso_compliance: created Terms and Conditions 'Purchase Quality Requirements'")
-
-
-#: The sequential review chain on FRM-036 (SOP-004): who may clear each stage.
-REVIEW_CHAIN_ROLES = ("Technical Reviewer", "Costing Reviewer", "Commercial Reviewer")
-
-REVIEW_CHAIN_STATES = (
-	("Technical Review", "Warning"),
-	("Costing Review", "Warning"),
-	("Commercial Review", "Primary"),
-)
-
-
-def ensure_review_chain():
-	"""The Techno-Commercial Review workflow: roles, states, transitions.
-
-	Draft -> Technical Review -> Costing Review -> Commercial Review ->
-	Approved (submitted). Each forward step belongs to one reviewer role, so
-	the workflow history is the signature block of the paper form; Quality
-	Manager and System Manager can drive any step, because a small
-	organisation cannot stall an order on an unfilled seat. Send Back
-	returns to Draft from any stage. Idempotent and reconciling: transition
-	rows added here later (e.g. System Manager) are appended to an existing
-	workflow rather than requiring its recreation.
-	"""
-	for role in REVIEW_CHAIN_ROLES:
-		if not frappe.db.exists("Role", role):
-			frappe.get_doc({"doctype": "Role", "role_name": role, "desk_access": 1}).insert(
-				ignore_permissions=True
-			)
-
-	for state, style in REVIEW_CHAIN_STATES:
-		if not frappe.db.exists("Workflow State", state):
-			frappe.get_doc(
-				{"doctype": "Workflow State", "workflow_state_name": state, "style": style}
-			).insert(ignore_permissions=True)
-
-	for action in (
-		"Send for Technical Review",
-		"Clear Technical Review",
-		"Clear Costing Review",
-		"Complete Review",
-		"Send Back",
-	):
-		if not frappe.db.exists("Workflow Action Master", action):
-			frappe.get_doc(
-				{"doctype": "Workflow Action Master", "workflow_action_name": action}
-			).insert(ignore_permissions=True)
-
-	forward = (
-		("Draft", "Send for Technical Review", "Technical Review", "Sales User"),
-		("Technical Review", "Clear Technical Review", "Costing Review", "Technical Reviewer"),
-		("Costing Review", "Clear Costing Review", "Commercial Review", "Costing Reviewer"),
-		("Commercial Review", "Complete Review", "Approved", "Commercial Reviewer"),
-	)
-	send_back = (
-		("Technical Review", "Technical Reviewer"),
-		("Costing Review", "Costing Reviewer"),
-		("Commercial Review", "Commercial Reviewer"),
-	)
-	transitions = []
-	for state, action, next_state, role in forward:
-		for allowed in (role, "Quality Manager", "System Manager"):
-			transitions.append(
-				{"state": state, "action": action, "next_state": next_state, "allowed": allowed}
-			)
-	for state, role in send_back:
-		for allowed in (role, "Quality Manager", "System Manager"):
-			transitions.append(
-				{"state": state, "action": "Send Back", "next_state": "Draft", "allowed": allowed}
-			)
-
-	if frappe.db.exists("Workflow", "Techno-Commercial Review"):
-		workflow = frappe.get_doc("Workflow", "Techno-Commercial Review")
-		workflow.send_email_alert = 1
-		existing = {(t.state, t.action, t.next_state, t.allowed) for t in workflow.transitions}
-		for row in transitions:
-			if (row["state"], row["action"], row["next_state"], row["allowed"]) not in existing:
-				workflow.append("transitions", row)
-		workflow.flags.ignore_version = True
-		workflow.save(ignore_permissions=True)
-		frappe.db.commit()
-		return
-
-	frappe.get_doc(
-		{
-			"doctype": "Workflow",
-			"workflow_name": "Techno-Commercial Review",
-			"document_type": "Techno Commercial Review",
-			"workflow_state_field": "workflow_state",
-			"is_active": 1,
-			"send_email_alert": 1,
-			"states": [
-				{"state": "Draft", "doc_status": "0", "allow_edit": "Sales User"},
-				{"state": "Technical Review", "doc_status": "0", "allow_edit": "Technical Reviewer"},
-				{"state": "Costing Review", "doc_status": "0", "allow_edit": "Costing Reviewer"},
-				{"state": "Commercial Review", "doc_status": "0", "allow_edit": "Commercial Reviewer"},
-				{"state": "Approved", "doc_status": "1", "allow_edit": "Quality Manager"},
-			],
-			"transitions": transitions,
-		}
-	).insert(ignore_permissions=True)
-	frappe.db.commit()
-	print("iso_compliance: created Techno-Commercial Review workflow (sequential review chain)")
 
 
 def ensure_naming_rules():
@@ -229,76 +124,12 @@ def ensure_desk_registration():
 
 
 def ensure_review_notifications():
-	"""In-app (bell) notifications for the review chain.
+	"""In-app (bell) notifications this app's records need.
 
-	The workflow's own alert is email; these Notification records post to the
-	desk bell as the review changes hands, so a pending stage is visible the
-	moment a reviewer logs in. Recipients follow the stage's role, and the
-	send-back and approval pings go to whoever raised the review. Records,
-	not schema -- deleting them reverts the site untouched.
+	FRM-036 needs none of its own: its reviewers are notified by ERPNext's
+	assignment. Records, not schema -- deleting them reverts the site.
 	"""
-	message = (
-		"Order {{ doc.sales_order }} for {{ doc.customer_name }} — "
-		"{{ doc.review_tier }} review. Complete your section, then pass it on via Actions."
-	)
-	notifications = (
-		(
-			"Techno-Commercial Review: Technical stage",
-			'doc.workflow_state == "Technical Review"',
-			{"receiver_by_role": "Technical Reviewer"},
-			"Review {{ doc.name }} awaits Technical Review",
-			message,
-		),
-		(
-			"Techno-Commercial Review: Costing stage",
-			'doc.workflow_state == "Costing Review"',
-			{"receiver_by_role": "Costing Reviewer"},
-			"Review {{ doc.name }} awaits Costing Review",
-			message,
-		),
-		(
-			"Techno-Commercial Review: Commercial stage",
-			'doc.workflow_state == "Commercial Review"',
-			{"receiver_by_role": "Commercial Reviewer"},
-			"Review {{ doc.name }} awaits Commercial Review and Outcome",
-			message,
-		),
-		(
-			"Techno-Commercial Review: sent back",
-			'doc.workflow_state == "Draft"',
-			{"receiver_by_document_field": "owner"},
-			"Review {{ doc.name }} was sent back",
-			"A reviewer returned {{ doc.name }} (order {{ doc.sales_order }}). "
-			"See the comments, adjust the order or the review, and resend it.",
-		),
-		(
-			"Techno-Commercial Review: approved",
-			'doc.workflow_state == "Approved"',
-			{"receiver_by_document_field": "owner"},
-			"Review {{ doc.name }} approved — outcome {{ doc.outcome }}",
-			"The review chain for order {{ doc.sales_order }} is complete. "
-			"If the outcome is Accept, the Sales Order can now be submitted.",
-		),
-	)
 	created = []
-	for name, condition, recipient, subject, body in notifications:
-		if frappe.db.exists("Notification", name):
-			continue
-		frappe.get_doc(
-			{
-				"doctype": "Notification",
-				"enabled": 1,
-				"channel": "System Notification",
-				"document_type": "Techno Commercial Review",
-				"event": "Value Change",
-				"value_changed": "workflow_state",
-				"condition": condition,
-				"subject": subject,
-				"message": body,
-				"recipients": [recipient],
-			}
-		).insert(ignore_permissions=True, set_name=name)
-		created.append(name)
 
 	# SOP-005: when the scheduler (or anyone) drafts a supplier evaluation,
 	# Purchase and Quality see it in the bell.
