@@ -20,12 +20,14 @@
   "column_break_metrics",
   "metrics_basis",
   "section_criteria",
+  "rating_panel",
   "criteria",
   "overall_score",
   "section_decision",
+  "recommended_status",
   "approval_status",
-  "column_break_decision",
   "next_review_date",
+  "column_break_decision",
   "summary",
   "amended_from"
  ],
@@ -33,7 +35,7 @@
   {
    "fieldname": "section_supplier",
    "fieldtype": "Section Break",
-   "label": "Supplier Identification"
+   "label": "Supplier"
   },
   {
    "fieldname": "supplier",
@@ -49,25 +51,24 @@
    "fieldname": "supplier_name",
    "fieldtype": "Data",
    "label": "Supplier Name",
-   "read_only": 1
+   "read_only": 1,
+   "hidden": 1
   },
   {
    "fieldname": "category",
    "fieldtype": "Select",
-   "label": "Supplier Category",
+   "label": "Category",
    "options": "\nCritical\nNon-Critical",
-   "description": "Taken from the supplier. Critical: material that goes into the product or decides its quality. Choosing it loads that category's criteria.",
    "in_standard_filter": 1,
    "reqd": 1,
    "in_list_view": 1
   },
   {
-   "default": "Periodic",
    "fieldname": "evaluation_type",
    "fieldtype": "Select",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Evaluation Type",
+   "label": "Type",
    "options": "Initial\nPeriodic\nRe-evaluation",
    "reqd": 1
   },
@@ -79,103 +80,119 @@
    "default": "Today",
    "fieldname": "evaluation_date",
    "fieldtype": "Date",
-   "label": "Evaluation Date",
+   "label": "Date",
    "reqd": 1
   },
   {
-   "description": "What this supplier provides.",
    "fieldname": "product_service",
    "fieldtype": "Data",
-   "label": "Product / Service"
+   "label": "Supplies"
   },
   {
    "fieldname": "template",
    "fieldtype": "Link",
    "label": "Template",
    "options": "Supplier Evaluation Template",
-   "read_only": 1
+   "read_only": 1,
+   "hidden": 1
   },
   {
-   "description": "Computed from Purchase Receipts of the last 12 months; the matching criteria rows are pre-rated from these figures and can be overridden.",
    "fieldname": "section_metrics",
    "fieldtype": "Section Break",
    "label": "Performance Data (Computed)",
    "collapsible": 1,
-   "depends_on": "eval:doc.supplier"
+   "depends_on": "eval:doc.supplier",
+   "hidden": 1
   },
   {
    "fieldname": "on_time_delivery_pct",
    "fieldtype": "Percent",
    "label": "On-Time Delivery %",
-   "read_only": 1
+   "read_only": 1,
+   "hidden": 1
   },
   {
    "fieldname": "acceptance_pct",
    "fieldtype": "Percent",
    "label": "Acceptance %",
-   "read_only": 1
+   "read_only": 1,
+   "hidden": 1
   },
   {
    "fieldname": "column_break_metrics",
-   "fieldtype": "Column Break"
+   "fieldtype": "Column Break",
+   "hidden": 1
   },
   {
    "fieldname": "metrics_basis",
    "fieldtype": "Data",
    "label": "Basis",
-   "read_only": 1
+   "read_only": 1,
+   "hidden": 1
   },
   {
    "fieldname": "section_criteria",
    "fieldtype": "Section Break",
-   "label": "Evaluation Criteria",
+   "label": "Rating",
    "depends_on": "eval:doc.supplier"
+  },
+  {
+   "fieldname": "rating_panel",
+   "fieldtype": "HTML",
+   "label": "Ratings"
   },
   {
    "fieldname": "criteria",
    "fieldtype": "Table",
-   "label": "Criteria",
-   "options": "Supplier Evaluation Criterion"
+   "label": "Criteria (detail)",
+   "options": "Supplier Evaluation Criterion",
+   "hidden": 1
   },
   {
    "bold": 1,
-   "description": "Computed: sum of weighted scores. 100% means every criterion rated 5.",
    "fieldname": "overall_score",
    "fieldtype": "Percent",
    "in_list_view": 1,
    "label": "Overall Score (%)",
-   "read_only": 1
+   "read_only": 1,
+   "hidden": 1
   },
   {
    "fieldname": "section_decision",
    "fieldtype": "Section Break",
-   "label": "Evaluation Decision",
+   "label": "Review",
    "depends_on": "eval:doc.supplier"
   },
   {
-   "description": "Written onto the Supplier record when this evaluation is submitted.",
+   "fieldname": "recommended_status",
+   "fieldtype": "Data",
+   "label": "Suggested decision",
+   "read_only": 1,
+   "hidden": 1
+  },
+  {
    "fieldname": "approval_status",
    "fieldtype": "Select",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Approval Status",
-   "options": "\nApproved\nProvisional\nNot Approved\nSuspended"
+   "label": "Decision",
+   "options": "\nApproved\nProvisional\nNot Approved\nSuspended",
+   "hidden": 1
+  },
+  {
+   "fieldname": "next_review_date",
+   "fieldtype": "Date",
+   "label": "Next review",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_decision",
    "fieldtype": "Column Break"
   },
   {
-   "description": "Evaluation date plus the template's re-evaluation interval. Written to the supplier on submit; the re-evaluation is drafted automatically a week before.",
-   "fieldname": "next_review_date",
-   "fieldtype": "Date",
-   "label": "Next Review Date",
-   "read_only": 1
-  },
-  {
    "fieldname": "summary",
    "fieldtype": "Small Text",
-   "label": "Evaluation Summary / Weaknesses / Required Improvements"
+   "label": "Notes"
   },
   {
    "fieldname": "amended_from",
@@ -191,7 +208,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-10-09 13:10:00.000000",
+ "modified": "2026-10-12 15:00:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Supplier Evaluation",

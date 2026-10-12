@@ -88,7 +88,8 @@
   "module": "ISO Compliance",
   "options": "\nApproved\nProvisional\nNot Approved\nSuspended",
   "in_standard_filter": 1,
-  "in_list_view": 1
+  "in_list_view": 1,
+  "read_only": 1
  },
  {
   "doctype": "Custom Field",
@@ -167,7 +168,7 @@
   "label": "Re-approval Due",
   "insert_after": "custom_approved_by",
   "module": "ISO Compliance",
-  "description": "When this passes, ERPNext drafts the next FRM-005 evaluation and notifies Purchase."
+  "read_only": 1
  },
  {
   "doctype": "Custom Field",

@@ -28,6 +28,9 @@ LEGACY_AUTO = {
 	"On-time delivery / service": ON_TIME,
 }
 
+#: Score-to-decision suggestion shown beside the evaluator's own choice.
+DECISION_BANDS = ((80, "Approved"), (60, "Provisional"), (0, "Not Approved"))
+
 #: Percentage-to-rating bands for the computed criteria.
 RATING_BANDS = ((95, "5"), (90, "4"), (80, "3"), (60, "2"), (0, "1"))
 
@@ -165,6 +168,9 @@ class SupplierEvaluation(Document):
 			row.weighted_score = flt(row.weight) * cint(row.rating) / 5 if row.rating else 0
 			total += row.weighted_score
 		self.overall_score = total
+		self.recommended_status = None
+		if self.criteria and all(row.rating for row in self.criteria):
+			self.recommended_status = next(status for floor, status in DECISION_BANDS if total >= floor)
 
 	def default_next_review(self):
 		"""Always the evaluation date plus the template's interval, so the date
