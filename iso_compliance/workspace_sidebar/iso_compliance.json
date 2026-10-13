@@ -189,6 +189,73 @@
   {
    "child": 0,
    "collapsible": 1,
+   "icon": "clipboard-check",
+   "indent": 1,
+   "keep_closed": 1,
+   "label": "Inspection",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Section Break",
+   "link_to": null
+  },
+  {
+   "child": 1,
+   "collapsible": 1,
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Inspection Templates",
+   "link_to": "Quality Inspection Template",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 1,
+   "collapsible": 1,
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "QI Transition Readiness",
+   "link_to": "QI Transition Readiness",
+   "link_type": "Report",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 1,
+   "collapsible": 1,
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "QI Capability",
+   "link_to": "QI Capability",
+   "link_type": "Report",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 1,
+   "collapsible": 1,
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Test Methods",
+   "link_to": "Test Method",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 1,
+   "collapsible": 1,
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Inspection Settings",
+   "link_to": "Inspection Settings",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
    "icon": "sheet",
    "indent": 1,
    "keep_closed": 1,
@@ -286,7 +353,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-10-12 12:00:00.000000",
+ "modified": "2026-10-13 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "ISO Compliance",
