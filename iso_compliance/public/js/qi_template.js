@@ -303,16 +303,21 @@ class QIBuilder {
 		$wrap.show();
 		try {
 			if (this.drawing_url !== url) {
-				await frappe.require("/assets/iso_compliance/js/qi_pdf.js");
-				if (this.drawing) this.drawing.close();
-				this.drawing = await window.iso_qi_pdf.open(url);
+				// one open per drawing, even when the form refreshes while it loads
 				this.drawing_url = url;
-				this.page = 1;
+				this.opening = (async () => {
+					await frappe.require("/assets/iso_compliance/js/qi_pdf.js");
+					if (this.drawing) this.drawing.close();
+					this.drawing = await window.iso_qi_pdf.open(url);
+					this.page = 1;
+				})();
 			}
+			await this.opening;
 			await this.draw_page();
 			this.ensure_page_images();
 		} catch (e) {
 			console.error(e);
+			this.drawing_url = null; // try again on the next refresh
 			$wrap.html(`<div class="text-danger small" style="padding:12px">${__("Could not show the drawing here")}: ${qi_esc(e.message)}
 				· <a href="${qi_esc(url)}" target="_blank" rel="noopener">${__("open the file")}</a></div>`);
 		}

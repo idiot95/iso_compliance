@@ -22,6 +22,10 @@ window.iso_qi_pdf = (() => {
 
 	const is_pdf = (url) => /\.pdf(\?|$)/i.test(url || "");
 
+	// The render running on each canvas, whichever drawing started it.
+	const canvas_tasks = new WeakMap();
+	const canvas_latest = new WeakMap();
+
 	// Open a drawing: returns {pages, render(pageNo, canvas, width) -> {w,h}, close()}.
 	async function open(url) {
 		if (!is_pdf(url)) {
@@ -46,28 +50,38 @@ window.iso_qi_pdf = (() => {
 		}
 		const pdfjs = await load();
 		const doc = await pdfjs.getDocument({ url, withCredentials: true }).promise;
-		const tasks = new WeakMap();
 		return {
 			pages: doc.numPages,
 			async render(pageNo, canvas, width) {
+				// the newest call on a canvas wins; older ones step aside
+				const token = {};
+				canvas_latest.set(canvas, token);
 				const page = await doc.getPage(pageNo);
 				const base = page.getViewport({ scale: 1 });
 				if (!(width > 0)) width = base.width; // hidden or not laid out yet
 				const dpr = Math.min(window.devicePixelRatio || 1, 2);
 				const vp = page.getViewport({ scale: (width / base.width) * dpr });
+				// pdf.js frees a canvas only once a cancelled render has settled
+				let running;
+				while ((running = canvas_tasks.get(canvas))) {
+					running.cancel();
+					await running.promise.catch(() => {});
+					if (canvas_tasks.get(canvas) === running) canvas_tasks.delete(canvas);
+				}
+				if (canvas_latest.get(canvas) !== token) return null;
 				canvas.width = Math.round(vp.width);
 				canvas.height = Math.round(vp.height);
 				canvas.style.width = Math.round(vp.width / dpr) + "px";
 				canvas.style.height = Math.round(vp.height / dpr) + "px";
-				const previous = tasks.get(canvas);
-				if (previous) previous.cancel();
 				const task = page.render({ canvasContext: canvas.getContext("2d"), viewport: vp });
-				tasks.set(canvas, task);
+				canvas_tasks.set(canvas, task);
 				try {
 					await task.promise;
 				} catch (e) {
 					if (e && e.name === "RenderingCancelledException") return null;
 					throw e;
+				} finally {
+					if (canvas_tasks.get(canvas) === task) canvas_tasks.delete(canvas);
 				}
 				return { w: vp.width / dpr, h: vp.height / dpr };
 			},
