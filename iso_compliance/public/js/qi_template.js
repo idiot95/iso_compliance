@@ -726,6 +726,7 @@ function qi_balloon_dialog(frm, row, defaults = {}, on_cancel) {
 		row_type: r.custom_row_type || defaults.row_type || "Dimension",
 		tt: r.custom_tolerance_type || "",
 		prefix: qi_prefix_of(r.custom_spec_text),
+		dev_signs: qi_dev_signs_of(r.custom_upper_dev, r.custom_lower_dev),
 		instruments: new Set((r.custom_instruments || "").split("\n").map((x) => x.trim()).filter(Boolean)),
 	};
 	if (!st.tt && st.row_type !== "Visual") st.tt = st.row_type === "Dimension" ? QI_TT.SYM : QI_TT.LIM;
@@ -763,11 +764,12 @@ function qi_balloon_dialog(frm, row, defaults = {}, on_cancel) {
 			{ fieldtype: "Section Break", fieldname: "tol_section", label: __("Tolerance, as shown on the drawing") },
 			{ fieldname: "tt_html", fieldtype: "HTML" },
 			{ fieldname: "prefix_html", fieldtype: "HTML" },
+			{ fieldname: "dev_html", fieldtype: "HTML" },
 			{ fieldtype: "Section Break", fieldname: "tol_inputs" },
 			{ fieldname: "nominal", fieldtype: "Data", label: __("Nominal"), default: qi_num(r.custom_nominal) },
 			{ fieldname: "tol", fieldtype: "Data", label: __("± Tolerance"), default: qi_num(r.custom_tol) },
-			{ fieldname: "upper_dev", fieldtype: "Data", label: __("+ Upper deviation"), default: qi_num(r.custom_upper_dev), description: __("As printed, e.g. +0.1") },
-			{ fieldname: "lower_dev", fieldtype: "Data", label: __("− Lower deviation"), default: qi_num(r.custom_lower_dev), description: __("As printed, with its sign, e.g. −0.05") },
+			{ fieldname: "upper_dev", fieldtype: "Data", label: __("Upper deviation"), default: qi_num(qi_abs(r.custom_upper_dev)) },
+			{ fieldname: "lower_dev", fieldtype: "Data", label: __("Lower deviation"), default: qi_num(qi_abs(r.custom_lower_dev)) },
 			{ fieldname: "fit_class", fieldtype: "Data", label: __("Fit class"), default: r.custom_fit_class, description: __("e.g. H7, h9, js7") },
 			{
 				fieldname: "gdt_symbol",
@@ -837,6 +839,7 @@ function qi_balloon_dialog(frm, row, defaults = {}, on_cancel) {
 		qi_render_type(d, st, refresh);
 		qi_render_tt(d, st, refresh);
 		qi_render_prefix(d, st, refresh);
+		qi_render_dev_signs(d, st, refresh);
 		qi_show_fields(d, st);
 		preview();
 	};
@@ -897,6 +900,51 @@ function qi_render_prefix(d, st, refresh) {
 	});
 }
 
+// Unequal tolerance: both deviations above nominal (+/+), either side (+/−) or
+// both below (−/−). The toggle gives the signs; the boxes take the sizes.
+const QI_DEV_SIGNS = [
+	["+-", "+ / −", "12.5 +0.1/−0.05"],
+	["++", "+ / +", "12.5 +0.2/+0.1"],
+	["--", "− / −", "12.5 −0.05/−0.15"],
+];
+function qi_abs(x) {
+	return x == null || x === "" ? x : Math.abs(Number(x));
+}
+function qi_dev_signs_of(upper, lower) {
+	if (Number(upper) < 0) return "--";
+	if (Number(lower) > 0) return "++";
+	return "+-";
+}
+function qi_dev_apply(st, v) {
+	if (st.tt !== QI_TT.DEV) return v;
+	const [su, sl] = { "+-": [1, -1], "++": [1, 1], "--": [-1, -1] }[st.dev_signs] || [1, -1];
+	const sign = (x, k) => (typeof x === "number" ? k * Math.abs(x) : x);
+	let u = sign(v.upper_dev, su);
+	let l = sign(v.lower_dev, sl);
+	if (typeof u === "number" && typeof l === "number" && u < l) [u, l] = [l, u]; // typed the other way round
+	return { ...v, upper_dev: u, lower_dev: l };
+}
+const QI_DEV_LABELS = {
+	"+-": [__("+ Upper deviation"), __("− Lower deviation")],
+	"++": [__("+ Upper deviation (larger)"), __("+ Lower deviation (smaller)")],
+	"--": [__("− Upper deviation (smaller)"), __("− Lower deviation (larger)")],
+};
+function qi_render_dev_signs(d, st, refresh) {
+	const $w = d.fields_dict.dev_html.$wrapper;
+	if (st.row_type === "Visual" || st.tt !== QI_TT.DEV) return $w.empty();
+	const ex = (QI_DEV_SIGNS.find(([k]) => k === st.dev_signs) || [])[2] || "";
+	$w.html(`<div class="qi-prefix"><span class="text-muted small">${__("Deviations")}</span>${QI_DEV_SIGNS.map(
+		([k, label]) => `<button type="button" class="qi-seg-btn sm ${st.dev_signs === k ? "on" : ""}" data-k="${k}">${label}</button>`
+	).join("")}<span class="text-muted small">${__("e.g.")} ${qi_esc(ex)}</span></div>`);
+	$w.find("button").on("click", (e) => {
+		st.dev_signs = String($(e.currentTarget).data("k"));
+		refresh();
+	});
+	const [ul, ll] = QI_DEV_LABELS[st.dev_signs];
+	d.set_df_property("upper_dev", "label", ul);
+	d.set_df_property("lower_dev", "label", ll);
+}
+
 function qi_show_fields(d, st) {
 	const need = new Set(st.row_type === "Visual" ? [] : QI_TT_FIELDS[st.tt] || []);
 	if (st.tt === QI_TT.GEN && d.get_value("unit") === "°") need.add("angle_side");
@@ -949,7 +997,7 @@ function qi_preview(d, st, general) {
 		qi_preview_html(d, `<div class="qi-pv"><span>${__("Judged")}</span><b>OK / NG</b></div>`);
 		return;
 	}
-	const v = qi_numbers(d.get_values(true));
+	const v = qi_dev_apply(st, qi_numbers(d.get_values(true)));
 	const unit = v.unit || "";
 	const bad = qi_bad_numbers(v).filter((f) => !d.fields_dict[f].df.hidden);
 	if (bad.length) {
@@ -1046,7 +1094,7 @@ async function qi_render_instruments(d, st) {
 }
 
 async function qi_save_balloon(frm, row, v, position, dialog, st) {
-	v = qi_numbers(v);
+	v = qi_dev_apply(st, qi_numbers(v));
 	const visual = st.row_type === "Visual";
 	const bad = visual ? [] : qi_bad_numbers(v).filter((f) => !dialog.fields_dict[f].df.hidden);
 	if (bad.length) {
