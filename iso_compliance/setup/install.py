@@ -16,6 +16,7 @@ hook would mean a routine upgrade silently writing 93 documents into production.
 import frappe
 
 from iso_compliance.overrides.purchase_receipt import REJECTED_WAREHOUSE_NAME
+from iso_compliance.qi.setup import ensure_qi_setup
 from iso_compliance.seed.controlled_documents import WORKFLOW_STATES
 
 
@@ -28,6 +29,7 @@ def after_install():
 	ensure_supplier_evaluation_templates()
 	ensure_rejected_warehouse()
 	ensure_incoming_rejection_notification()
+	ensure_qi_setup()
 
 
 def after_migrate():
@@ -39,6 +41,7 @@ def after_migrate():
 	ensure_supplier_evaluation_templates()
 	ensure_rejected_warehouse()
 	ensure_incoming_rejection_notification()
+	ensure_qi_setup()
 
 
 #: The two FRM-005 templates a new site starts with: the nine weighted criteria

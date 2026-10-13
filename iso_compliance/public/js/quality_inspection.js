@@ -17,9 +17,16 @@ frappe.ui.form.on("Quality Inspection", {
 					"Job Card": "In-Process",
 					"Delivery Note": "Final Inspection",
 				};
+				// Drawing inspections can hold the same parameter at several
+				// balloons: name the balloon so the NC says which one failed.
 				const failed = (frm.doc.readings || [])
 					.filter((r) => r.status === "Rejected")
-					.map((r) => `${r.specification}${r.reading_value ? ": " + r.reading_value : ""}`)
+					.map((r) => {
+						const name = r.custom_balloon_no ? `${r.custom_balloon_no} ${r.specification}` : r.specification;
+						if (r.custom_row_type && r.custom_row_type !== "Visual")
+							return `${name}: ${r.custom_out_of_spec || 0} of ${r.custom_n || 0} out (${r.custom_obs_min} – ${r.custom_obs_max})`;
+						return `${name}${r.reading_value ? ": " + r.reading_value : ""}`;
+					})
 					.join("; ");
 				const opts = {
 					subject: __("Rejected inspection {0} — {1}", [frm.doc.name, frm.doc.item_code]),

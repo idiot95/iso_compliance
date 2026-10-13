@@ -1,0 +1,43 @@
+{
+ "actions": [],
+ "creation": "2026-10-12 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "instrument_item",
+  "instrument_name"
+ ],
+ "fields": [
+  {
+   "fieldname": "instrument_item",
+   "fieldtype": "Link",
+   "label": "Instrument",
+   "options": "Item",
+   "reqd": 1,
+   "in_list_view": 1,
+   "columns": 6,
+   "description": "The instrument type (e.g. ST101471 Outside Micrometer). The inspector picks one of the Assets of this item."
+  },
+  {
+   "fieldname": "instrument_name",
+   "fieldtype": "Data",
+   "label": "Name",
+   "fetch_from": "instrument_item.item_name",
+   "read_only": 1,
+   "in_list_view": 1,
+   "columns": 4
+  }
+ ],
+ "links": [],
+ "modified": "2026-10-12 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "ISO Compliance",
+ "name": "Test Method Instrument",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "istable": 1,
+ "editable_grid": 1
+}

@@ -67,9 +67,44 @@ def _manufacture_entries(item_code: str, batches: list[str]) -> list:
 	)
 
 
+def _receipt_inspections(item_code: str, batches: list[str]) -> list:
+	"""Drawing-based incoming inspections of the receipts these batches came
+	from -- for traded items, the receipt inspection is the final one (QI
+	SPEC v2, Phase E). Legacy incoming inspections are left out so existing
+	certificates read exactly as before."""
+	if not batches:
+		return []
+	receipts = set(
+		frappe.get_all("Batch", filters={"name": ("in", batches), "reference_doctype": "Purchase Receipt"},
+		               pluck="reference_name")
+	)
+	bundles = frappe.get_all("Serial and Batch Entry", filters={"batch_no": ("in", batches)}, pluck="parent")
+	if bundles:
+		receipts |= set(
+			frappe.get_all(
+				"Serial and Batch Bundle",
+				filters={"name": ("in", bundles), "voucher_type": "Purchase Receipt", "item_code": item_code,
+				         "docstatus": 1},
+				pluck="voucher_no",
+			)
+		)
+	if not receipts:
+		return []
+	return [
+		frappe.get_doc("Quality Inspection", name)
+		for name in frappe.get_all(
+			"Quality Inspection",
+			filters={"reference_type": "Purchase Receipt", "reference_name": ("in", list(receipts)),
+			         "item_code": item_code, "custom_stage": "Incoming", "docstatus": ("<", 2)},
+			order_by="report_date asc, name asc",
+			pluck="name",
+		)
+	]
+
+
 def coc_row_inspections(row) -> dict:
 	"""Every inspection behind one delivered row, staged for the certificate."""
-	out = {"outgoing": None, "pdi": [], "in_process": [], "work_orders": []}
+	out = {"outgoing": None, "pdi": [], "in_process": [], "work_orders": [], "incoming": []}
 
 	if row.get("quality_inspection"):
 		out["outgoing"] = frappe.get_doc("Quality Inspection", row.quality_inspection)
@@ -88,6 +123,8 @@ def coc_row_inspections(row) -> dict:
 			out["pdi"].append(frappe.get_doc("Quality Inspection", name))
 		if entry.work_order and entry.work_order not in out["work_orders"]:
 			out["work_orders"].append(entry.work_order)
+
+	out["incoming"] = _receipt_inspections(row.item_code, _row_batches(row))
 
 	if out["work_orders"]:
 		job_cards = frappe.get_all(
@@ -108,19 +145,36 @@ def coc_row_aggregate(row) -> dict:
 	"""The certificate view: every parameter ever measured for this delivered
 	row, one line each, with the observed range across all inspections and all
 	sample readings. The n column is the sampling story -- how many measured
-	values stand behind the range."""
+	values stand behind the range.
+
+	Drawing inspections (QI SPEC v2) can carry one parameter at several
+	balloons, so lines are keyed by (parameter, balloon) -- legacy readings have
+	no balloon and group exactly as before -- and their values come from QI
+	Measurement, which holds every sample, not just the first ten."""
+	from iso_compliance.qi.certificates import _limit_text as limit_text
+	from iso_compliance.qi.inspection import measurements
+
 	chain = coc_row_inspections(row)
-	parameters: dict[str, dict] = {}
+	parameters: dict[tuple, dict] = {}
+	concessions: list[str] = []
 
 	def absorb(qi, stage):
+		drawing = any(r.get("custom_row_type") for r in qi.readings)
+		meas = measurements(qi.name) if drawing else {}
+		concession = qi.get("custom_disposition") == "Accept under Concession"
+		if concession:
+			concessions.append(qi.get("custom_concession_no") or qi.name)
 		for r in qi.readings:
+			balloon = r.get("custom_balloon_no") or ""
 			p = parameters.setdefault(
-				r.specification,
+				(r.specification, balloon),
 				{
 					"specification": r.specification,
-					"spec": r.value
-					or (r.acceptance_formula if r.formula_based_criteria else "")
-					or "",
+					"balloon": balloon,
+					"class": r.get("custom_class") or "",
+					"spec": (r.get("custom_spec_text") or "")
+					if r.get("custom_row_type")
+					else (r.value or (r.acceptance_formula if r.formula_based_criteria else "") or ""),
 					"min_spec": r.min_value,
 					"max_spec": r.max_value,
 					"numeric": r.numeric,
@@ -130,12 +184,31 @@ def coc_row_aggregate(row) -> dict:
 					"values": [],
 					"ok": True,
 					"stages": [],
+					"concession": False,
+					# drawing rows print their limits as read ("≤ 35", "OK / NG")
+					"limits": limit_text(r) if r.get("custom_row_type") else None,
 				},
 			)
 			if stage not in p["stages"]:
 				p["stages"].append(stage)
 			if r.status and r.status != "Accepted":
 				p["ok"] = False
+				p["concession"] = p["concession"] or concession
+			if drawing and r.get("custom_row_type"):
+				for m in meas.get(balloon, []):
+					if r.get("custom_row_type") == "Visual":
+						p["n"] += 1
+						if m.value not in p["values"]:
+							p["values"].append(m.value)
+						continue
+					try:
+						value = float(m.value)
+					except (TypeError, ValueError):
+						continue
+					p["n"] += 1
+					p["obs_min"] = value if p["obs_min"] is None else min(p["obs_min"], value)
+					p["obs_max"] = value if p["obs_max"] is None else max(p["obs_max"], value)
+				continue
 			if r.numeric:
 				for i in range(1, 11):
 					raw = r.get(f"reading_{i}")
@@ -153,6 +226,8 @@ def coc_row_aggregate(row) -> dict:
 				if r.reading_value not in p["values"]:
 					p["values"].append(r.reading_value)
 
+	for qi in chain.get("incoming") or []:
+		absorb(qi, "Incoming")
 	for qi in chain["in_process"]:
 		absorb(qi, "In-Process")
 	for qi in chain["pdi"]:
@@ -165,6 +240,9 @@ def coc_row_aggregate(row) -> dict:
 		"work_orders": chain["work_orders"],
 		"outgoing": chain["outgoing"].name if chain["outgoing"] else None,
 		"pdi": [qi.name for qi in chain["pdi"]],
+		"incoming": [qi.name for qi in chain.get("incoming") or []],
 		"in_process_count": len(chain["in_process"]),
 		"all_accepted": all(p["ok"] for p in parameters.values()) if parameters else False,
+		"has_balloons": any(p["balloon"] for p in parameters.values()),
+		"concessions": list(dict.fromkeys(concessions)),
 	}

@@ -41,5 +41,92 @@
   "property_type": "Check",
   "value": "0",
   "module": "ISO Compliance"
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "BOM-quality_inspection_template-allow_on_submit",
+  "doc_type": "BOM",
+  "field_name": "quality_inspection_template",
+  "property": "allow_on_submit",
+  "property_type": "Check",
+  "value": "1",
+  "module": "ISO Compliance",
+  "doctype_or_field": "DocField"
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "Item Quality Inspection Parameter-specification-columns",
+  "doc_type": "Item Quality Inspection Parameter",
+  "field_name": "specification",
+  "property": "columns",
+  "property_type": "Int",
+  "value": "2",
+  "module": "ISO Compliance",
+  "doctype_or_field": "DocField"
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "Item Quality Inspection Parameter-value-columns",
+  "doc_type": "Item Quality Inspection Parameter",
+  "field_name": "value",
+  "property": "columns",
+  "property_type": "Int",
+  "value": "1",
+  "module": "ISO Compliance",
+  "doctype_or_field": "DocField"
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "Item Quality Inspection Parameter-min_value-columns",
+  "doc_type": "Item Quality Inspection Parameter",
+  "field_name": "min_value",
+  "property": "columns",
+  "property_type": "Int",
+  "value": "1",
+  "module": "ISO Compliance",
+  "doctype_or_field": "DocField"
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "Item Quality Inspection Parameter-max_value-columns",
+  "doc_type": "Item Quality Inspection Parameter",
+  "field_name": "max_value",
+  "property": "columns",
+  "property_type": "Int",
+  "value": "1",
+  "module": "ISO Compliance",
+  "doctype_or_field": "DocField"
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "Item Quality Inspection Parameter-numeric-in_list_view",
+  "doc_type": "Item Quality Inspection Parameter",
+  "field_name": "numeric",
+  "property": "in_list_view",
+  "property_type": "Check",
+  "value": "0",
+  "module": "ISO Compliance",
+  "doctype_or_field": "DocField"
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "BOM-quality_inspection_template-depends_on",
+  "doc_type": "BOM",
+  "field_name": "quality_inspection_template",
+  "property": "depends_on",
+  "property_type": "Data",
+  "module": "ISO Compliance",
+  "doctype_or_field": "DocField"
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "Quality Inspection Template-item_quality_inspection_parameter-reqd",
+  "doc_type": "Quality Inspection Template",
+  "field_name": "item_quality_inspection_parameter",
+  "property": "reqd",
+  "property_type": "Check",
+  "value": "0",
+  "module": "ISO Compliance",
+  "doctype_or_field": "DocField"
  }
 ]

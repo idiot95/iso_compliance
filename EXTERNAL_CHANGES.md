@@ -85,6 +85,131 @@ makes the corresponding blank column fill in; nothing else changes.
 | Employee | `custom_roles_responsibilities` | Small Text | REG-013 "Roles & Responsibilities" |
 | Employee | `custom_authority` | Small Text | REG-013 "Authority" |
 
+### 3. Drawing-based inspection templates — Phase A — APPROVED 2026-10-12, applied on the local site
+
+Approved by the developer 2026-10-12. Applied on `frontend`; reaches production with the next deploy. See the Approved and applied table.
+
+Spec: `hcc_erp_edits/docs/qi-build/SPEC.md` v2, §3.2 and §4.2. Turns a Quality
+Inspection Template into one drawing revision with ballooned dimensions, tests
+and visual checks. **Legacy templates are untouched**: everything below only
+acts on a template that has at least one row with `custom_row_type` set, and
+none of the 28 existing templates has one. All fields are additive, ship as
+fixtures under module "ISO Compliance", and deleting them restores ERPNext
+exactly.
+
+**Quality Inspection Template** — custom fields
+
+| Fieldname | Type | Purpose |
+| --- | --- | --- |
+| `custom_drawing_section` | Section Break "Drawing" | groups the fields below |
+| `custom_item` | Link Item | the item whose BOMs/attachments supply the drawing |
+| `custom_used_by` | HTML | lists the BOMs and Items pointing at this template (read from their native fields; nothing stored) |
+| `custom_drawing` | Attach | the drawing, copied as a private File on the template so deleting the BOM's copy doesn't break it |
+| `custom_drawing_hash` | Data, hidden | hash of the drawing; page images are rebuilt only when it changes |
+| `custom_drawing_pages` | Long Text, hidden | URLs of page PNGs used by the printed inspection record |
+| `custom_drawing_source` | Select: Customer / In-house / None | |
+| `custom_customer` | Link Customer | shown when source = Customer |
+| `custom_drawing_no`, `custom_drawing_revision` | Data | |
+| `custom_general_tolerance` | Select: None / ISO 2768-f / -m / -c / -v | title-block general tolerance |
+| `custom_general_geometric` | Select: None / H / K / L | ISO 2768-2 |
+| `custom_product_wi` | Link Controlled Document | product work instruction (WI-004…007) |
+| `custom_locked` | Check, read-only | set when the first inspection on the template is submitted (Phase B) |
+| `custom_superseded_by` | Link Quality Inspection Template, read-only | set by New Revision |
+
+**Item Quality Inspection Parameter** (template rows) — custom fields
+
+| Fieldname | Type | Purpose |
+| --- | --- | --- |
+| `custom_row_type` | Select: Dimension / Test / Visual | marks a drawing row; its presence makes the template a drawing template |
+| `custom_balloon_no` | Data | the row's key (1, 2… / T1… / V1…), unique per template |
+| `custom_spec_text` | Data | the spec exactly as printed on the drawing |
+| `custom_tolerance_type` | Select (11 types, SPEC §4.1) | |
+| `custom_nominal`, `custom_upper_dev`, `custom_lower_dev`, `custom_tol`, `custom_bonus_tol` | Float | tolerance inputs; `min_value`/`max_value` (native) are computed from them |
+| `custom_fit_class` | Data | ISO 286 class, e.g. H11 |
+| `custom_gdt_symbol` | Select (14 symbols) | |
+| `custom_datums` | Data | |
+| `custom_unit` | Link UOM (was Data; changed 2026-10-13, see the Approved table) | |
+| `custom_class` | Select: CTQ / Major / Minor | |
+| `custom_stage_incoming`, `custom_stage_in_process`, `custom_stage_final`, `custom_stage_fai`, `custom_stage_type_test` | Check | stages that load the row |
+| `custom_frequency` | Select: Every lot / First article only / Every N lots / Every N months | |
+| `custom_frequency_n` | Int | |
+| `custom_sampling` | Select: Lot sample / Fixed number | |
+| `custom_fixed_count` | Int | |
+| `custom_test_method` | Link Test Method (new iso doctype) | Test rows |
+| `custom_conditions` | Code (JSON) | per-part overrides of the method's set values |
+| ~~`custom_instrument_item`~~ → `custom_instruments` | Small Text (Asset names) | replaced 2026-10-13: the measuring-instrument Assets the inspector may choose from; see the Approved table |
+| `custom_position` | Data (JSON) | the balloon's box on the drawing |
+
+**Behaviour and records**
+
+| Target | Change | Type |
+| --- | --- | --- |
+| Quality Inspection Template | `validate`: on drawing templates only, compute min/max from the tolerance type, require unique balloons, a stage per row and a Test Method on Test rows; once `custom_locked`, refuse changes to drawing, balloons, limits and stages | doc_events |
+| Quality Inspection Template | template builder: drawing picker, pdf.js canvas, balloon popup, "Tag Items / BOMs", New Revision | doctype_js (display + whitelisted calls) |
+| BOM / Item | `quality_inspection_template` (native field) written by the explicit "Tag Items / BOMs" action only. It never overwrites a different template without the user confirming the listed conflicts, and it leaves a Comment on each record (old → new). Item is tagged only when all its active BOMs share the template or it has no BOM, so group templates from the SOP-006 backfill survive. | data on a core field |
+| BOM | `quality_inspection_template` allow_on_submit = 1 | Property Setter |
+
+### 4. Drawing-based inspection — Phase B, the inspector — APPROVED 2026-10-12, applied on the local site
+
+Approved by the developer 2026-10-12. Applied on `frontend` (fields, role, permissions by patch `qi_inspector_role`, page `inspect`); reaches production with the next deploy.
+
+Spec: `hcc_erp_edits/docs/qi-build/SPEC.md` v2, §3.2–3.4, §4.3–4.5. Inspectors
+record measurements against a drawing template on a phone or tablet. Each value
+saves on its own, and the inspection gets a disposition.
+
+**Existing inspections are untouched.** Every hook below starts with the legacy
+guard. It acts only on a *draft* inspection whose template has drawing rows. The
+~1,300 existing inspections and every inspection on the 28 existing templates
+behave exactly as today, and a regression test proves it before anything is
+called done.
+
+**Quality Inspection** — custom fields
+
+| Fieldname | Type | Purpose |
+| --- | --- | --- |
+| `custom_inspection_section` | Section Break "Drawing inspection" | groups the fields below; collapsed when empty |
+| `custom_stage` | Select: Incoming / In Process / Final / FAI / Type Test | which template rows load; maps to `inspection_type` (Final → Outgoing) |
+| `custom_lot_qty` | Float | the lot the sample is drawn from |
+| `custom_work_order` | Link Work Order, read-only | the lot's work order (final inspection) |
+| `custom_customer` | Link Customer, read-only | from the work order's Sales Order |
+| `custom_drawing_no`, `custom_drawing_revision` | Data, read-only | snapshot of the template at inspection time |
+| `custom_drawing` | Attach, read-only | snapshot of the drawing file |
+| `custom_disposition` | Select: Accepted / Accept under Concession / Rework / Rejected | |
+| `custom_concession_no` | Data | shown for a concession |
+| `custom_non_conformance` | Link Non Conformance | |
+| `custom_conditions` | Table → QI Condition (new iso child doctype) | test conditions: set value vs actual |
+| `custom_work_instructions` | Table → QI Work Instruction (new iso child doctype), read-only | WI number and revision in force when inspected |
+| `custom_measurements_html` | HTML | shows the measured values (stored in the new QI Measurement doctype) |
+| `custom_created_entry` | Data, hidden, no_copy | the draft Manufacture Stock Entry this inspection created, so it can be deleted with it |
+
+**Quality Inspection Reading** — custom fields
+
+`custom_row_type`, `custom_balloon_no`, `custom_class`, `custom_spec_text`,
+`custom_tolerance_type`, `custom_unit`, `custom_test_method` (Link Test Method),
+`custom_sample_count` (Int: how many are required), `custom_instrument` (Link
+Asset), `custom_cal_due` (Date), `custom_cal_cert` (Data), `custom_n` (Int: how many
+measured), `custom_obs_min`, `custom_obs_max`, `custom_mean` (Float),
+`custom_out_of_spec` (Int). All read-only snapshots and summaries. The native
+reading fields keep their meaning; `reading_1..10` hold the first ten values for
+display.
+
+**Behaviour**
+
+| Target | Change | Type |
+| --- | --- | --- |
+| Quality Inspection | `before_validate`: build readings from the template rows due at this stage and lot. Copy the balloon and tolerance fields. Summarise the measurements. Set each drawing row's verdict ourselves (`reading.manual_inspection = 1`, so ERPNext skips it). Map disposition to status: concession → Accepted; Rework/Rejected → Rejected. | doc_events |
+| Quality Inspection | `validate`: undo ERPNext's Job Card quirk, which overwrites limits from the Item's template by parameter name, by restoring them from the inspection's own template, matched by balloon. Refuse "Accepted" while a row is out of spec. Warn on test conditions outside tolerance and on overdue calibration (Warn/Block per Inspection Settings; no calibration record never blocks). | doc_events |
+| Quality Inspection | `before_submit`: CTQ rows need every required sample. A concession shows an orange warning listing the failed rows and **never blocks** (developer's decision). `on_submit`: lock the template; refresh the lot's draft Manufacture entry. `on_trash`/`on_cancel`: delete the draft Manufacture entry this inspection created, if still draft. | doc_events |
+| Quality Inspection | form script: "Open inspector" button, measurements view. Added as a second file beside the existing `quality_inspection.js`; the hooks.py value becomes a list. | doctype_js |
+| Quality Inspection | "Create → Non Conformance" prefill (existing SOP-005/006 script) lists failed readings by balloon, not just by parameter | change to existing iso script |
+| Work Order | "Final inspection" button and dialog: lot qty, sample size; creates a draft Manufacture Stock Entry for the lot and the inspection, then opens the inspector | doctype_js |
+| Purchase Receipt | "Inspect" button per row on a drawing template (legacy templates keep ERPNext's own button) | doctype_js (added to the existing list) |
+| Job Card | "Inspect" button on a drawing template | doctype_js |
+| Stock Entry | draft Manufacture entries created by "Final inspection" (records, not schema) | data |
+| Role | "Quality Inspector" (new role, desk access) | record, via patch |
+| Custom DocPerm | Quality Inspection: Quality Inspector and **Stock User** get read/create/write/submit. Read for both on Quality Inspection Template, Test Method, Inspection Settings, QI Measurement, Asset, Asset Maintenance, Asset Maintenance Task. Applied with `frappe.permissions.add_permission`, which copies the standard rows first, so **Quality Manager keeps every right it has today**; the patch asserts it. | permissions, via patch |
+| Page | `inspect` (new iso page, `/app/inspect/<inspection>`): the mobile/tablet inspector screen. Roles: Quality Inspector, Quality Manager, Stock User, System Manager. | new page (iso) |
+
 ## Observations about the site (no change made)
 
 ### Print Settings still selects wkhtmltopdf
@@ -115,6 +240,25 @@ page. Worth revisiting when frappe ships the missing asset.
 
 | Date | Target DocType | Field / Change | Type | Reason | Fixture |
 | ---- | -------------- | -------------- | ---- | ------ | ------- |
+| 2026-10-13 | UOM | 23 records: mm, µm, °, N, kV, V, mV, A, Ω, mΩ, MΩ, µΩ·m, MPa, g/cm³, MS/m, % IACS, HRB, HRC, Shore A, Shore D, kg, g, % | record, not schema | Units as drawings and certificates print them; template rows and Test Methods now link to UOM, and ERPNext ships only long names (Newton, Micrometer, Percent…). Created by `qi.setup.ensure_uoms` (from `ensure_qi_setup`, after_migrate) only when no UOM of that name exists; matched by name, never renamed or edited afterwards, so a unit already on the site is left as it is. Follows the developer's request of 2026-10-13 that the row unit come from the unit table. | no (after_migrate hook) |
+| 2026-10-13 | Item Quality Inspection Parameter | `custom_unit` Data → **Link UOM**; `custom_instrument_item` (Link Item) **replaced by** `custom_instruments` (Small Text: measuring-instrument Asset names, one per line, from Asset Category "Measuring Instruments") | Custom Fields | The developer, 2026-10-13: unit picked from the unit table; instruments multi-selected from the measuring instruments (a whole instrument type at once), and the inspector chooses the one in hand from that list. Neither field has reached production, so the fixture creates them in their final form. | yes |
+| 2026-10-13 | Item Group | `custom_issue_mtc` (Check, inherited down the tree); set on Carbon Block, Copper Wire, Chemicals, Pipe Fittings, Terminal, Sheet Metal, Tamping Powder, Tubes & Rods, Raw Insulation Sheet, Machinery Tools, Machined FG Parts, Rubberized Insulation Sheet | Custom Field + data (patch `qi_issue_mtc_groups`, once) | QI Phase C2: deliveries of these groups carry an EN 10204 3.1 Material Test Certificate (print format "Material Test Certificate 3.1", Delivery Note), traced batch → receipt → supplier certificate, or through the Manufacture entry to raw-material receipts. Missing certificate or properties warn and never block, at dispatch and at goods-in. Developer, 2026-10-13. | yes |
+| 2026-10-13 | Quality Inspection / Item Quality Inspection Parameter | `custom_check_point` (First-off / Patrol / Last-off), `custom_supplier_cert` (Attach, from the receipt); row `custom_in_process_at` (Every check / First-off only / First-off and last-off); row type "Material" added to `custom_row_type` | Custom Fields | QI Phase E: supplier 3.1 values read at goods-in (Material rows, the PR's MTC linked); in-process first-off / patrol / last-off on Job Cards, several inspections per Job Card. Built on the developer's go-ahead for Phase E, 2026-10-13. | yes |
+| 2026-10-13 | Stock Entry (draft, Manufacture) | `allow_zero_valuation_rate` set on the rows of the lot entry Final inspection drafts | data on a core field | Stock carries no value on this site (accounting in Tally, every valuation rate zero); without it ERPNext refuses the entry and final inspection cannot start. Developer, 2026-10-13. | code |
+| 2026-10-13 | Quality Inspection Template | parameter table not mandatory (`reqd` 0); `qi.template.validate` still requires rows on any template without an Item | Property Setter (requirement moved into app validation) | A drawing template is saved with its drawing before its rows exist (they come from the balloons); without this the BOM button and the cascade could not create one. Old-style templates keep the rule. Found in the developer's test, 2026-10-13. | yes |
+| 2026-10-13 | Quality Inspection Template | `custom_bom` (Link BOM, filtered to the item), `custom_drawing_file` (Select of that BOM's drawings), `custom_rows_section` (Section Break "Characteristics") | Custom Fields | Item → BOM → drawing cascade on the template, and the parameter table in its own full-width section. Requested by the developer 2026-10-13. | yes |
+| 2026-10-13 | Item Quality Inspection Parameter | grid columns: Balloon, Parameter, As printed, Tolerance type, Min, Max, Value, Class (`numeric` off the grid; column widths) | Property Setters + custom field list-view flags | The template's rows table shows tolerances at a glance. Requested by the developer 2026-10-13. | yes |
+| 2026-10-13 | BOM | "Inspection Plan" tab (`custom_inspection_plan_tab`, `custom_inspection_plan_html`); `inspection_required` and `quality_inspection_template` moved into it (field_order); `quality_inspection_template` no longer hidden behind `inspection_required` (depends_on cleared) | Custom Fields + Property Setters | One place on the BOM for its inspection: the requirement, the tagged template, and a summary of the template's rows with tolerances. Requested by the developer 2026-10-13. | yes |
+| 2026-10-13 | Item | `custom_inspection_plan_html` in the existing Quality tab | Custom Field (HTML) | The same template summary on the Item. Requested by the developer 2026-10-13. | yes |
+| 2026-10-12 | BOM / Item / Quality Inspection Template (list) | Create › Inspection template button on BOM and Item; "New from drawing" button on the template list | doctype_js / doctype_list_js (display + whitelisted calls) | Entry points to the drawing template builder (§5 of the QI build): opens the drawing template already in use, or creates one for the item with the chosen BOM drawing attached. Shown to Quality Manager / System Manager only. Approved by the developer 2026-10-12. | code (hooks.py) |
+| 2026-10-12 | Quality Inspection / Quality Inspection Reading | 20 + 16 `custom_*` fields (stage, lot, work order, customer, drawing snapshot, disposition, concession, NC link, conditions, WIs, measurements; reading balloon/class/tolerance/test/instrument/summary) | Custom Fields | Drawing-based inspection (QI SPEC v2 §3.2). Requested by the developer. | yes |
+| 2026-10-12 | Quality Inspection | `before_validate`, `validate`, `before_submit`, `on_submit`, `on_cancel`, `on_trash` hooks | doc_events | Readings from the drawing template by stage/frequency, own verdict per row, disposition → status, Job Card limit quirk undone by balloon, CTQ completeness, concession warning (never blocks), template lock, the lot's draft Manufacture entry kept with its inspection. Act only on drafts on drawing templates: verified identical with and without the hooks on existing drafts. Requested by the developer. | code (hooks.py) |
+| 2026-10-12 | Quality Inspection / Work Order / Job Card / Purchase Receipt | form scripts: Open inspector, Final inspection, Inspect buttons; NC prefill names the balloon | doctype_js | Entry points to the inspector screen, shown only where a drawing template applies. Requested by the developer. | code (hooks.py) |
+| 2026-10-12 | Role / Custom DocPerm | "Quality Inspector" role; Quality Inspector and Stock User: create/write/submit on Quality Inspection, read on templates, Test Method, settings, measurements, Asset, Asset Maintenance | permissions | Inspectors and stores record inspections (developer's decision: Stock User may submit). Applied with add_permission; Quality Manager's rights verified unchanged. | via patch |
+| 2026-10-12 | Quality Inspection Template / Item Quality Inspection Parameter | 16 + 31 `custom_*` fields (drawing, tolerance, class, stages, frequency, sampling, test method, position) | Custom Fields | Drawing-based inspection templates (QI SPEC v2 §3.2): one template = one drawing revision, rows keyed by balloon, limits computed from the tolerance as printed. Act only on templates with drawing rows; the 28 existing templates are untouched. Requested by the developer. | yes |
+| 2026-10-12 | Quality Inspection Template | `validate` hook + form script (template builder) | doc_events + doctype_js | Limits from tolerances, unique balloons, stage/test-method checks, lock after first submitted inspection; drawing picker, pdf.js canvas, balloon popup, Tag Items / BOMs, New Revision. Legacy templates pass through unchanged (verified). Requested by the developer. | code (hooks.py) |
+| 2026-10-12 | BOM / Item | `quality_inspection_template` written by the explicit Tag action only; asks before replacing another template; Comment on each record; Item tagged only when all its active BOMs share the template | data on a core field | So inspections started from a BOM load its drawing template without silently replacing item-group templates from the SOP-006 backfill. Requested by the developer. | no (action) |
+| 2026-10-12 | BOM | `quality_inspection_template` allow_on_submit | Property Setter | Re-tag a submitted BOM by hand. Requested by the developer. | yes |
 | 2026-10-06 | Purchase Receipt / Delivery Note | form scripts | doctype_js (display only) | SOP-006 step 3 material identification labels, eight to an A4 sheet: Print > Material Labels on a submitted receipt (item, batch as Code128, supplier, date of goods in) and Print > Dispatch Labels on a submitted delivery note (item, batch as Code128, customer, their PO, the sales order). The label count is typed per batch, never derived from the received quantity. Reads only; writes nothing. Requested by the developer. | code (hooks.py) |
 | 2026-10-09 | Purchase Order | `custom_supplier_override`, `custom_supplier_override_reason`, `custom_supplier_override_by` | Custom Fields (Check, Small Text, Link User; no_copy) | The urgent-order override for SOP-005's lock: ticked with a reason, submitted only by a Purchase Manager or Quality Manager, who is stamped on the order. Shown only when the supplier isn't Approved. Requested by the developer. | yes |
 | 2026-10-09 | Purchase Order | `before_submit` hook now **blocks** | doc_events (behaviour) | Was warn-first. Now only an Approved supplier's order submits; others need the override above; Suspended always blocks. Requested by the developer. | code (hooks.py) |

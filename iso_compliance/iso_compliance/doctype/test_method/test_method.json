@@ -1,0 +1,153 @@
+{
+ "actions": [],
+ "creation": "2026-10-12 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "method_name",
+  "standard",
+  "procedure",
+  "column_break_1",
+  "result_unit",
+  "readings_per_sample",
+  "result_rule",
+  "material_property",
+  "section_instruments",
+  "instruments",
+  "section_conditions",
+  "conditions",
+  "section_description",
+  "description"
+ ],
+ "fields": [
+  {
+   "fieldname": "method_name",
+   "fieldtype": "Data",
+   "label": "Method",
+   "reqd": 1,
+   "unique": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "standard",
+   "fieldtype": "Data",
+   "label": "Standard",
+   "in_list_view": 1,
+   "description": "e.g. IEC 60136, IS 3600, customer spec"
+  },
+  {
+   "fieldname": "procedure",
+   "fieldtype": "Link",
+   "label": "Procedure (WI)",
+   "options": "Controlled Document"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "result_unit",
+   "fieldtype": "Link",
+   "options": "UOM",
+   "label": "Result unit",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "readings_per_sample",
+   "fieldtype": "Int",
+   "label": "Readings per sample",
+   "default": "1",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "result_rule",
+   "fieldtype": "Select",
+   "label": "Result rule",
+   "options": "Each reading must pass\nMean must pass",
+   "default": "Each reading must pass"
+  },
+  {
+   "fieldname": "material_property",
+   "fieldtype": "Check",
+   "label": "Material property",
+   "description": "Results print on the 3.1 Material Test Certificate."
+  },
+  {
+   "fieldname": "section_instruments",
+   "fieldtype": "Section Break",
+   "label": "Instruments"
+  },
+  {
+   "fieldname": "instruments",
+   "fieldtype": "Table",
+   "label": "Allowed instruments",
+   "options": "Test Method Instrument"
+  },
+  {
+   "fieldname": "section_conditions",
+   "fieldtype": "Section Break",
+   "label": "Test conditions",
+   "description": "Set values here are the defaults; a template row can override them per part."
+  },
+  {
+   "fieldname": "conditions",
+   "fieldtype": "Table",
+   "label": "Conditions",
+   "options": "Test Method Condition"
+  },
+  {
+   "fieldname": "section_description",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  }
+ ],
+ "links": [],
+ "modified": "2026-10-13 16:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "ISO Compliance",
+ "name": "Test Method",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "Quality Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1,
+   "create": 1,
+   "write": 1,
+   "delete": 1
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1,
+   "create": 1,
+   "write": 1,
+   "delete": 1
+  },
+  {
+   "role": "Stock User",
+   "read": 1,
+   "report": 1,
+   "print": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "autoname": "field:method_name",
+ "title_field": "method_name",
+ "search_fields": "standard,result_unit",
+ "track_changes": 1
+}

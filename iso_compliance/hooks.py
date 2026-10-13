@@ -36,6 +36,19 @@ fixtures = [
 					"Item-inspection_required_before_delivery-description",
 					"Supplier-main-search_fields",
 					"Non Conformance-procedure-reqd",
+					# drawing-based inspection: re-tag a template on a submitted BOM
+					"BOM-quality_inspection_template-allow_on_submit",
+					# drawing-based inspection layout (2026-10-13): template rows grid,
+					# BOM "Inspection Plan" tab
+					"Item Quality Inspection Parameter-specification-columns",
+					"Item Quality Inspection Parameter-value-columns",
+					"Item Quality Inspection Parameter-min_value-columns",
+					"Item Quality Inspection Parameter-max_value-columns",
+					"Item Quality Inspection Parameter-numeric-in_list_view",
+					"BOM-quality_inspection_template-depends_on",
+					"Quality Inspection Template-item_quality_inspection_parameter-reqd",
+					# NOT "BOM-main-field_order": that is the site's own Customize Form
+					# order. qi.setup.ensure_qi_setup (after_migrate) moves two fields within it.
 				],
 			]
 		],
@@ -83,10 +96,18 @@ doctype_js = {
 	"Sales Order": "public/js/sales_order.js",
 	"Supplier": "public/js/supplier.js",
 	"Purchase Order": "public/js/purchase_order.js",
-	"Quality Inspection": "public/js/quality_inspection.js",
+	# quality_inspection.js: SOP-005/006 one-click NCR. qi_inspection.js: drawing inspection.
+	"Quality Inspection": ["public/js/quality_inspection.js", "public/js/qi_inspection.js"],
+	"Work Order": "public/js/qi_work_order.js",
+	"Job Card": "public/js/qi_job_card.js",
+	# Drawing-based inspection: Create › Inspection template (EXTERNAL_CHANGES §5).
+	"BOM": "public/js/qi_start_template.js",
+	"Item": "public/js/qi_start_template.js",
+	# Drawing-based inspection template builder (pdf.js loaded on demand).
+	"Quality Inspection Template": "public/js/qi_template.js",
 	# SOP-006 material identification labels. material_labels.js holds the sheet
 	# dialog both sides share; the per-doctype file only names the button.
-	"Purchase Receipt": ["public/js/material_labels.js", "public/js/purchase_receipt.js"],
+	"Purchase Receipt": ["public/js/material_labels.js", "public/js/purchase_receipt.js", "public/js/qi_purchase_receipt.js"],
 	"Delivery Note": ["public/js/material_labels.js", "public/js/delivery_note.js"],
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
@@ -123,8 +144,18 @@ doctype_js = {
 
 # The Certificate of Conformity resolves every inspection behind a delivered
 # row (despatch, PDI, in-process) through the batch's own trace.
+# Drawing-based inspection: "New from drawing" on the template list.
+doctype_list_js = {"Quality Inspection Template": "public/js/qi_template_list.js"}
+
 jinja = {
-	"methods": ["iso_compliance.utils.coc_row_inspections", "iso_compliance.utils.coc_row_aggregate"],
+	"methods": [
+		"iso_compliance.utils.coc_row_inspections",
+		"iso_compliance.utils.coc_row_aggregate",
+		# Sampling & Inspection Record (drawing inspections)
+		"iso_compliance.qi.certificates.qi_record",
+		"iso_compliance.qi.certificates.dn_records",
+		"iso_compliance.qi.certificates.mtc_row",
+	],
 }
 
 # Installation
@@ -192,6 +223,23 @@ after_migrate = "iso_compliance.setup.install.after_migrate"
 # order in SOP-004's review slabs cannot be submitted without its approved
 # Techno-Commercial Review (FRM-036). Both logged in EXTERNAL_CHANGES.md.
 doc_events = {
+	# Drawing-based inspection: limits from tolerances, balloon checks, lock.
+	# Acts only on templates with drawing rows; legacy templates pass through.
+	"Quality Inspection Template": {
+		"validate": "iso_compliance.qi.template.validate",
+		"on_update": "iso_compliance.qi.template.on_update",
+	},
+	# Drawing inspections: readings from the template, our own verdict per row,
+	# disposition. Every handler returns at once unless the inspection is a draft
+	# on a drawing template, so existing inspections behave as before.
+	"Quality Inspection": {
+		"before_validate": "iso_compliance.qi.inspection.before_validate",
+		"validate": "iso_compliance.qi.inspection.validate",
+		"before_submit": "iso_compliance.qi.inspection.before_submit",
+		"on_submit": "iso_compliance.qi.inspection.on_submit",
+		"on_cancel": "iso_compliance.qi.inspection.on_cancel",
+		"on_trash": "iso_compliance.qi.inspection.on_trash",
+	},
 	"Work Order": {
 		"before_insert": "iso_compliance.overrides.work_order.apply_sales_order_bom",
 	},

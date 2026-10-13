@@ -1,0 +1,82 @@
+{
+ "actions": [],
+ "creation": "2026-10-12 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "default_sample_percent",
+  "calibration_overdue_policy",
+  "section_wi",
+  "stage_wi"
+ ],
+ "fields": [
+  {
+   "fieldname": "default_sample_percent",
+   "fieldtype": "Percent",
+   "label": "Default sample size (% of lot)",
+   "default": "5",
+   "description": "Pre-fills the sample size when an inspection starts; any number may be entered."
+  },
+  {
+   "fieldname": "calibration_overdue_policy",
+   "fieldtype": "Select",
+   "label": "When an instrument's calibration is overdue",
+   "options": "Warn\nBlock",
+   "default": "Warn",
+   "description": "An instrument with no calibration record at all never blocks; it is noted on the inspection."
+  },
+  {
+   "fieldname": "section_wi",
+   "fieldtype": "Section Break",
+   "label": "Work instructions by stage"
+  },
+  {
+   "fieldname": "stage_wi",
+   "fieldtype": "Table",
+   "label": "Stage work instructions",
+   "options": "Inspection Stage WI"
+  }
+ ],
+ "links": [],
+ "modified": "2026-10-12 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "ISO Compliance",
+ "name": "Inspection Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "Quality Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1,
+   "create": 1,
+   "write": 1,
+   "delete": 1
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1,
+   "create": 1,
+   "write": 1,
+   "delete": 1
+  },
+  {
+   "role": "Stock User",
+   "read": 1,
+   "report": 1,
+   "print": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "issingle": 1
+}
