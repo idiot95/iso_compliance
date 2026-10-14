@@ -472,7 +472,7 @@
     "declared_title": "Customer Communication, Sales & Contract Review Procedure",
     "purpose": "<p>Understand exactly what the customer wants before we commit, and keep them informed after.</p>",
     "scope": "<p>Enquiries, quotations, order acceptance, order changes, complaints and feedback, for every product we sell.</p>",
-    "workflow": "Enquiry → Quotation → Sales Order (draft) → Techno-Commercial Review (₹5 lakh and above) → Sales Order submitted → Customer communication",
+    "workflow": "Enquiry → Quotation → Sales Order (draft) → Techno-Commercial Review (₹5 lakh and above, or any critical order) → Decision → Sales Order submitted → Changes, complaints and feedback",
     "references": [
      {
       "reference": "ISO 9001:2015 Clause 8.2"
@@ -496,24 +496,24 @@
     ],
     "responsibilities": [
      {
-      "role": "Top Management",
-      "responsibility": "Approves special commercial or contractual conditions."
+      "role": "Sales Executive",
+      "responsibility": "ERPNext role Sales User. Quotes, opens the review, picks the reviewers, records the decision and submits the order."
      },
      {
-      "role": "Sales & Marketing Department",
-      "responsibility": "Handles enquiries and quotations, opens the review, picks the reviewers, records the decision and accepts the order."
+      "role": "Engineer",
+      "responsibility": "Completes the Technical section when assigned: drawings, specification, standards, feasibility, inspection."
      },
      {
-      "role": "Design / Engineering Department",
-      "responsibility": "Completes the Technical section when assigned: drawings, specification, feasibility."
-     },
-     {
-      "role": "Production Department",
+      "role": "Production Lead",
       "responsibility": "Confirms capability and delivery when assigned."
      },
      {
-      "role": "Quality Department",
-      "responsibility": "Confirms inspection, testing and statutory requirements when assigned."
+      "role": "Quality Manager / Management Representative",
+      "responsibility": "Confirms inspection, testing and statutory requirements when assigned. ERPNext role Quality Manager."
+     },
+     {
+      "role": "Managing Director",
+      "responsibility": "Approves special commercial or contractual conditions."
      }
     ],
     "procedure_steps": [
@@ -521,64 +521,64 @@
       "step_no": "1",
       "step_title": "Record the enquiry",
       "responsible": "Sales Executive",
-      "step_content": "<p>Record enquiries we will quote for. The Sales Head decides which ones to decline.</p>",
+      "step_content": "<p>Record each enquiry we will quote for. The Sales Manager decides which ones to decline.</p>",
       "erp_record": "Opportunity, or Quotation directly"
      },
      {
       "step_no": "2",
       "step_title": "Quote",
       "responsible": "Sales Executive",
-      "step_content": "<p>Send the quotation: specification, price, delivery, validity, taxes and terms.</p>",
-      "erp_record": "Quotation"
+      "step_content": "<p>Send the quotation: specification, price, delivery, validity, taxes and terms. For a large or unusual enquiry, a review can be opened before quoting (Review Stage: Enquiry Review).</p>",
+      "erp_record": "Quotation; Techno-Commercial Review (FRM-036)"
      },
      {
       "step_no": "3",
       "step_title": "Open the review",
       "responsible": "Sales Executive",
-      "step_content": "<p>On the draft Sales Order, open the Techno-Commercial Review. ERPNext sets the depth: Detailed at ₹10 lakh and above or for any critical order (new product, customer drawings, penalty/LD clauses, special requirements); Standard at ₹5–10 lakh.</p>",
+      "step_content": "<p>On the draft Sales Order, press Create → Techno-Commercial Review. The order shows a banner when a review is required. A review is required at ₹5 lakh and above. Below ₹5 lakh, open one anyway if the order is critical: new product, customer drawings, penalty / LD / price-variation clauses, or special customer or statutory requirements. ERPNext sets the depth: Detailed (12 checks plus cost figures) at ₹10 lakh and above or for any critical order; Standard (6 checks) otherwise.</p>",
       "erp_record": "Sales Order → Create → Techno-Commercial Review (FRM-036)"
      },
      {
       "step_no": "4",
       "step_title": "Assign reviewers",
       "responsible": "Sales Executive",
-      "step_content": "<p>Pick who completes Technical, Costing and Commercial, and save. Each is notified and can edit the form. Discuss open points in the form's comments.</p>",
+      "step_content": "<p>Pick who completes Technical, Costing and Commercial, and save. Each reviewer gets the task on My Work, a notification and an email, and can edit the form. Discuss open points in the form's comments.</p>",
       "erp_record": "FRM-036: Reviewers"
      },
      {
       "step_no": "5",
       "step_title": "Complete the checks",
       "responsible": "Assigned reviewers",
-      "step_content": "<p>Answer every check OK, Not OK or NA. For a Detailed review, Costing also enters material cost and selling price; ERPNext works out the margin. The progress bar shows what is left.</p>",
+      "step_content": "<p>Answer every check OK, Not OK or NA. In a Detailed review, Costing also enters the material cost and the selling price; ERPNext works out the margin. The progress bar shows what is left. When every section is done, the reviewers' tasks close and the Sales Executive is notified.</p>",
       "erp_record": "FRM-036"
      },
      {
       "step_no": "6",
       "step_title": "Decide",
       "responsible": "Sales Executive",
-      "step_content": "<p>Record the decision: Accept, Accept with Conditions (write the conditions), Clarification Required or Reject, and submit. A plain Accept isn't possible while any check is Not OK.</p>",
+      "step_content": "<p>Record the decision and submit: Accept; Accept with Conditions (write the conditions); Clarification Required; or Reject. A plain Accept isn't possible while any check is Not OK, and the review can't be submitted with a check unanswered.</p>",
       "erp_record": "FRM-036: Submit"
      },
      {
       "step_no": "7",
       "step_title": "Accept the order",
       "responsible": "Sales Executive",
-      "step_content": "<p>Check the customer's PO against the quotation and the review, resolve differences with the customer, and submit the order. At ₹5 lakh and above ERPNext blocks this until the review is submitted with a passing decision. Below ₹5 lakh, submitting the order is the review.</p>",
+      "step_content": "<p>Check the customer's PO against the quotation and the review, resolve differences with the customer, and submit the order. ERPNext blocks the order until its review is submitted as Accept or Accept with Conditions, at the depth the order's value needs. A review that was opened must be finished, whatever the value. A review decided Reject blocks the order. Below ₹5 lakh with no review opened, submitting the order is the review.</p>",
       "erp_record": "Sales Order: Submit"
      },
      {
       "step_no": "8",
       "step_title": "Handle changes",
       "responsible": "Sales Executive",
-      "step_content": "<p>Check a customer's change for its effect on cost, delivery and production, then amend the order. Amendments list themselves in REG-022.</p>",
-      "erp_record": "Sales Order: Amend"
+      "step_content": "<p>Check a customer's change for its effect on cost, delivery and production, then amend the order. The amended order keeps its review, unless the new value needs a deeper one; then open a new review. Amendments list themselves in REG-022.</p>",
+      "erp_record": "Sales Order: Amend; PO Amendment Record Register (REG-022)"
      },
      {
       "step_no": "9",
       "step_title": "Complaints and feedback",
       "responsible": "Sales Executive",
-      "step_content": "<p>Record a complaint against its Sales Order, and customer feedback on the feedback form.</p>",
-      "erp_record": "Issue (FRM-028 / REG-008); Quality Feedback (FRM-037 / REG-025)"
+      "step_content": "<p>Record a complaint from its Sales Order; it is assigned to a Sales Executive to respond. Record customer feedback the same way.</p>",
+      "erp_record": "Sales Order → Create → Customer Complaint (Issue, FRM-028 / REG-008); Customer Feedback (Quality Feedback, FRM-037 / REG-025)"
      }
     ],
     "records_generated": [
