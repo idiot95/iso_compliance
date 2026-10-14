@@ -308,7 +308,7 @@ ROLE_CANON = {
 	# accountability folding: a department cannot be audited, its head can
 	"Quality Department": "Quality Manager / Management Representative",
 	"QA Manager": "Quality Manager / Management Representative",
-	"Stores Department": "Purchase Executive",
+	"Stores Department": "Storekeeper",
 	"HR Department": "Business Development Manager",
 	# NOT folded: Quality Manager / Management Representative and Internal
 	# Auditor are real positions awaiting a holder; Department Head is the one
@@ -396,6 +396,7 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 		"issue_number": entry.get("issue_number") or "01",
 		"issue_date": entry.get("issue_date"),
 		"revision_number": entry.get("revision_number") or "00",
+		"revision_date": entry.get("revision_date"),
 		"body_mode": entry.get("body_mode"),
 		"body_content": entry.get("body_content"),
 		"mapped_doctype": entry.get("mapped_doctype"),
@@ -455,7 +456,7 @@ def _create_document(entry: dict, resolve: dict, batch: str):
 			"issue_number": doc.issue_number,
 			"issue_date": doc.issue_date,
 			"revision_number": doc.revision_number,
-			"revision_date": None,
+			"revision_date": doc.revision_date,
 			"clause_section_affected": _("All"),
 			"description_of_change": _baseline_note(entry),
 		},

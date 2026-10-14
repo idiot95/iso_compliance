@@ -755,7 +755,7 @@
    "approval_authority": "Director",
    "issue_number": "01",
    "issue_date": "2026-04-01",
-   "revision_number": "00",
+   "revision_number": "01",
    "body_mode": "Structured SOP",
    "has_source_file": true,
    "mapped_doctype": null,
@@ -765,9 +765,9 @@
    "sop": {
     "declared_number": "SOP006",
     "declared_title": "Incoming Material Inspection & Material Identification",
-    "purpose": "<p>Accept only material that meets the order, and keep it identified from receipt to production.</p>",
-    "scope": "<p>All purchased raw material, components, consumables, packing material and outsourced work.</p>",
-    "workflow": "Receipt (draft) → Inspection → Receipt posted: accepted to stores, rejected to Rejected warehouse + NCR → Label → Issue by batch",
+    "purpose": "<p>Accept only material that meets the order, keep it out of use until it is inspected, and keep it identified from receipt to dispatch.</p>",
+    "scope": "<p>All purchased raw material, components, consumables, packing material and outsourced work, and finished goods of item groups that need inspection.</p>",
+    "workflow": "Receive & check → Post (QC items to Inspection Required, others to Stores) → Inspect → Transfer: accepted to Stores, rejected to Rejected + NCR → Issue by batch → Finish → Final inspection → Transfer to the Work Order's warehouse",
     "references": [
      {
       "reference": "ISO 9001:2015 Clause 8.4 – Control of Externally Provided Processes, Products and Services"
@@ -789,70 +789,89 @@
      {
       "term": "MTC",
       "definition": "Material Test Certificate: the supplier's proof that the material meets its specification."
+     },
+     {
+      "term": "Inspection Required",
+      "definition": "The warehouse where received or finished stock waits until it is inspected. Stock leaves it only through its inspection's transfer."
      }
     ],
     "responsibilities": [
      {
-      "role": "Stores Department",
-      "responsibility": "Receives material, checks quantity and documents, posts the receipt, labels and stores it."
+      "role": "Storekeeper",
+      "responsibility": "ERPNext role Stock User; the stores in-charge holds Stock Manager. Receives and checks material, posts the receipt, labels, racks and posts the transfers."
      },
      {
-      "role": "Quality Department",
-      "responsibility": "Inspects, accepts or rejects."
+      "role": "Engineer",
+      "responsibility": "Inspection. ERPNext role Quality Manager. Picks up inspections from My Work, inspects incoming material and finished goods, records accepted and rejected quantities, puts on the green (OK) or red (not OK) sticker."
      },
      {
-      "role": "Purchase Department",
-      "responsibility": "Takes up rejections with the supplier."
+      "role": "Production Lead",
+      "responsibility": "ERPNext role Manufacturing User; the production head holds Manufacturing Manager. Requests and issues material by batch, finishes the Work Order, returns leftover material."
+     },
+     {
+      "role": "Purchase Executive",
+      "responsibility": "Purchase. ERPNext role Purchase User / Purchase Manager. Takes up rejections with the supplier."
      }
     ],
     "procedure_steps": [
      {
       "step_no": "1",
       "step_title": "Receive",
-      "responsible": "Storekeeper",
-      "step_content": "<p>Receive against the Purchase Order and keep the material in the inspection area. Check the challan, the quantity and the package markings. Record who received it and the challan number. Attach the MTC where the item group needs one; ERPNext warns if it's missing.</p>",
-      "erp_record": "Purchase Receipt (draft)"
+      "responsible": "Stock User",
+      "step_content": "<p>Track the shipment and unload it in the landing area. Make the Purchase Receipt against the Purchase Order. Tick the three receiving checks (right quantity, right material, visual OK) and record who received it; the receipt can't be posted without them. Attach the MTC where the item group needs one. Without it the receipt still posts, with a warning.</p>",
+      "erp_record": "Purchase Receipt"
      },
      {
       "step_no": "2",
-      "step_title": "Inspect",
-      "responsible": "Quality Inspector",
-      "step_content": "<p>Inspect against the item's inspection template and review the MTC. Record the readings and the result. The receipt can't be posted until the inspection is submitted.</p>",
-      "erp_record": "Quality Inspection (FRM-006)"
+      "step_title": "Post and label",
+      "responsible": "Stock User",
+      "step_content": "<p>Post the receipt. Items whose group needs inspection go into the Inspection Required warehouse and the receipt is assigned to an Engineer, on their My Work; the rest go straight to Stores, where the Storekeeper puts on the green (OK) sticker. Press Print Labels, enter how many labels each batch needs (one per package) and stick one on each package. Batch items carry the batch barcode; other items carry their item code as the barcode.</p>",
+      "erp_record": "Purchase Receipt: Submit; Print Labels"
      },
      {
       "step_no": "3",
-      "step_title": "Post the receipt",
-      "responsible": "Storekeeper",
-      "step_content": "<p>Enter accepted and rejected quantities and post the receipt. Accepted material gets a batch that records the supplier and heat number; rejected quantity goes into the Rejected warehouse, out of reach of production.</p>",
-      "erp_record": "Purchase Receipt: Submit; Batch"
+      "step_title": "Inspect",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>Open the receipt from My Work and press Inspect. The inspection opens on the item's inspection plan or template. Inspect, review the MTC and record the readings. Enter the accepted and rejected quantities and submit. Put the green sticker on accepted packages and the red sticker on rejected ones. The assignment closes when nothing on the receipt is still waiting.</p>",
+      "erp_record": "Quality Inspection (FRM-006)"
      },
      {
       "step_no": "4",
-      "step_title": "Label",
-      "responsible": "Storekeeper",
-      "step_content": "<p>Print material labels from the posted receipt and stick one on each package: item, batch barcode, supplier, date. Put the QC OK or QC Not OK sticker beside it.</p>",
-      "erp_record": "Purchase Receipt → Material Labels"
+      "step_title": "Rack and segregate",
+      "responsible": "Stock User",
+      "step_content": "<p>Submitting the inspection drafts the transfer: accepted quantity to Stores, rejected quantity to the Rejected warehouse. Rack the material, scanning the barcodes, and post the transfer. Nothing else can move stock out of Inspection Required. The Inspection Status report lists what is waiting to be inspected and what is waiting to be racked, with the days waiting.</p>",
+      "erp_record": "Stock Entry (Material Transfer); Inspection Status report"
      },
      {
       "step_no": "5",
       "step_title": "Act on rejections",
-      "responsible": "Quality Inspector",
-      "step_content": "<p>Raise the NCR from the rejected inspection and follow SOP-013. Purchase is notified automatically and takes it up with the supplier.</p>",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>Raise the NCR from the rejected inspection and follow SOP-013. Purchase is notified and takes it up with the supplier.</p>",
       "erp_record": "Non Conformance (FRM-020)"
      },
      {
       "step_no": "6",
-      "step_title": "Store and issue",
-      "responsible": "Storekeeper",
-      "step_content": "<p>Store accepted material in its place, protected from damage and mix-up. Production draws it by batch (scan the label), so it can be traced back to the receipt.</p>",
-      "erp_record": "Stock Entry (by batch); Incoming Material Register (REG-015)"
+      "step_title": "Issue",
+      "responsible": "Manufacturing User",
+      "step_content": "<p>Raise the Material Request for the Work Order, then the transfer for manufacture by batch (scan the label), so the material can be traced back to the receipt.</p>",
+      "erp_record": "Material Request; Stock Entry (Material Transfer for Manufacture)"
+     },
+     {
+      "step_no": "7",
+      "step_title": "Finish and final inspection",
+      "responsible": "Manufacturing User; Engineer (Quality Manager)",
+      "step_content": "<p>Production finishes the Work Order. The finished item of a group that needs inspection goes into Inspection Required, and the entry is assigned to an Engineer on My Work; by-products go to Stores. The Engineer presses Inspect on the entry, or Final inspection on the Work Order, and records accepted and rejected quantities; the Storekeeper posts the transfer: accepted to the Work Order's target warehouse, rejected to Rejected. Production returns leftover material from WIP with Return Components.</p>",
+      "erp_record": "Work Order → Finish (Manufacture); Quality Inspection (FRM-010); Stock Entry"
      }
     ],
     "records_generated": [
      {
       "number": "FRM006",
       "title": "Incoming Inspection Report"
+     },
+     {
+      "number": "FRM010",
+      "title": "Final Inspection Report (PDI)"
      },
      {
       "number": "FRM020",
@@ -863,7 +882,8 @@
       "title": "Incoming Material Register"
      }
     ]
-   }
+   },
+   "revision_date": "2026-10-14"
   },
   {
    "name": "HCCPL/QMS/SOP-007",
@@ -1465,7 +1485,15 @@
      },
      {
       "number": "FRM039",
-      "title": "Material Test Certificate (EN 10204 3.1)"
+      "title": "3.1 Detailed Inspection Report (EN 10204)"
+     },
+     {
+      "number": "FRM040",
+      "title": "2.1 Certificate of Conformity (EN 10204)"
+     },
+     {
+      "number": "FRM041",
+      "title": "2.2 Inspection Report (EN 10204)"
      }
     ]
    }
@@ -1490,8 +1518,8 @@
    "sop": {
     "declared_number": "SOP011",
     "declared_title": "Identification & Traceability Procedure",
-    "purpose": "<p>To establish a system for identifying materials, components, semi-finished products, and finished products throughout the manufacturing process to ensure traceability and prevent product mix-up.</p>",
-    "scope": "<p>This procedure applies to all incoming materials, work-in-progress (WIP), finished products, and dispatched products manufactured by Hatim Carbon Co. Pvt. Ltd.</p>",
+    "purpose": "<p>Know what every item is, where it came from and whether it passed inspection, from receipt to dispatch.</p>",
+    "scope": "<p>Purchased material, work in progress, finished goods and dispatched goods.</p>",
     "references": [
      {
       "reference": "ISO 9001:2015 Clause 8.5.2"
@@ -1507,95 +1535,106 @@
      },
      {
       "reference": "SOP010 – Preservation, Storage, Packing & Dispatch"
-     },
-     {
-      "reference": "Production Job Cards"
-     },
-     {
-      "reference": "Inspection & Test Records"
      }
     ],
     "definitions": [
      {
-      "term": "Identification",
-      "definition": "Method of recognizing a product, material, or batch by a unique marking or label."
-     },
-     {
-      "term": "Traceability",
-      "definition": "Ability to trace the history, application, and location of a product through recorded identification."
-     },
-     {
       "term": "Batch",
-      "definition": "A quantity of products manufactured under similar conditions and identified by a unique batch number."
-     },
-     {
-      "term": "Inspection Status",
-      "definition": "The current acceptance status of a product or material, such as Accepted, Rejected, Under Inspection, or Hold."
+      "definition": "A quantity received or made together, with one number that links it to its receipt or Work Order, its inspection and its dispatch."
      }
     ],
     "responsibilities": [
      {
-      "role": "Production Department",
-      "responsibility": "Maintain product identification throughout manufacturing. Ensure batch details are recorded on Job Cards."
+      "role": "Storekeeper",
+      "responsibility": "ERPNext role Stock User; the stores in-charge holds Stock Manager. Labels material, keeps it in the right warehouse and place, issues and dispatches by batch."
      },
      {
-      "role": "Quality Department",
-      "responsibility": "Verify identification and traceability during inspection. Ensure inspection status is properly indicated."
+      "role": "Engineer",
+      "responsibility": "ERPNext role Quality Manager. Records the inspection result that sets the status; puts on the green or red sticker."
      },
      {
-      "role": "Stores Department",
-      "responsibility": "Identify and label incoming materials. Maintain identification and segregation of materials during storage and issue."
+      "role": "Production Lead",
+      "responsibility": "ERPNext role Manufacturing User / Manufacturing Manager. Keeps parts with their Work Order and Job Card in production."
+     },
+     {
+      "role": "Quality Manager / Management Representative",
+      "responsibility": "Traces a batch on request: customer complaint, recall or audit."
      }
     ],
     "procedure_steps": [
      {
       "step_no": "1",
-      "step_title": "Incoming Materials",
-      "step_content": "<p>All incoming materials shall be identified using supplier markings, batch numbers, heat numbers, or internal labels, as applicable. Materials shall retain their identification until issued for production.</p>"
+      "step_title": "Label at receipt",
+      "responsible": "Stock User",
+      "step_content": "<p>Press Print Labels on the posted receipt, enter how many labels each batch needs (one per package) and stick one on each package: item, supplier, date and barcode. Batch items carry the batch barcode; the batch records the supplier and heat number. Other items carry their item code as the barcode.</p>",
+      "erp_record": "Purchase Receipt → Print Labels; Batch"
      },
      {
       "step_no": "2",
-      "step_title": "Work-in-Progress",
-      "step_content": "<p>During manufacturing, products shall be identified by appropriate means such as:</p><ul><li>Job Card Number</li><li>Batch Number</li><li>Product Code</li><li>Customer Name (where applicable)</li></ul><p>Identification shall be maintained throughout all production stages.</p>"
+      "step_title": "Show the inspection status",
+      "responsible": "Stock User; Engineer (Quality Manager)",
+      "step_content": "<p>The warehouse is the status: Inspection Required (waiting), Stores (accepted), Rejected (not OK). On the shelf, a green sticker means OK and a red sticker means not OK. Scanning a label on the Stock Labels page shows where the stock is, where it belongs and its inspection state.</p>",
+      "erp_record": "Warehouse; Stock Labels page; Inspection Status report"
      },
      {
       "step_no": "3",
-      "step_title": "Finished Products",
-      "step_content": "<p>Finished products shall be identified with applicable information such as:</p><ul><li>Product Name / Part Number</li><li>Batch Number</li><li>Quantity</li><li>Inspection Status</li><li>Customer Name (where applicable)</li></ul>"
+      "step_title": "Issue by batch",
+      "responsible": "Manufacturing User",
+      "step_content": "<p>Issue material to the Work Order by scanning the label, so the batch is recorded on the transfer.</p>",
+      "erp_record": "Stock Entry (Material Transfer for Manufacture)"
      },
      {
       "step_no": "4",
-      "step_title": "Inspection Status",
-      "step_content": "<p>Inspection status shall be clearly indicated to prevent unintended use or dispatch of unapproved products.</p><p>Status may include:</p><ul><li>Accepted</li><li>Rejected</li><li>Under Inspection</li><li>Hold (where applicable)</li></ul>"
+      "step_title": "Identify work in progress",
+      "responsible": "Manufacturing User",
+      "step_content": "<p>Parts in production stay with their Work Order and Job Card number.</p>",
+      "erp_record": "Work Order; Job Card"
      },
      {
       "step_no": "5",
-      "step_title": "Traceability",
-      "step_content": "<p>Where traceability is required by the customer, regulatory requirements, or internal quality requirements, records shall enable tracing of:</p><ul><li>Raw materials</li><li>Supplier (where applicable)</li><li>Manufacturing batch</li><li>Inspection records</li><li>Final product</li><li>Dispatch details</li></ul>"
+      "step_title": "Identify finished goods",
+      "responsible": "Stock User",
+      "step_content": "<p>Finishing the Work Order creates the finished batch. Print labels for it from the Stock Labels page after the final inspection.</p>",
+      "erp_record": "Batch; Stock Labels page"
+     },
+     {
+      "step_no": "6",
+      "step_title": "Dispatch by batch",
+      "responsible": "Stock User",
+      "step_content": "<p>The Delivery Note records the batch of each line, and the inspection document sent with it is drawn from those batches.</p>",
+      "erp_record": "Delivery Note; Dispatch Register (REG-024)"
+     },
+     {
+      "step_no": "7",
+      "step_title": "Trace",
+      "responsible": "Quality Manager",
+      "step_content": "<p>From a batch, its stock ledger shows the receipt or Work Order, the inspection and the delivery it went into.</p>",
+      "erp_record": "Batch → Stock Ledger"
      }
     ],
     "records_generated": [
      {
-      "number": "",
-      "title": "FRMxxx – Job Card"
-     },
-     {
-      "number": "",
-      "title": "FRMxxx – Inspection Report"
-     },
-     {
-      "number": "",
-      "title": "FRMxxx – Dispatch Record"
+      "number": "REG015",
+      "title": "Incoming Material Register"
      },
      {
       "number": "REG016",
       "title": "Production Register"
      },
      {
-      "number": "REG015",
-      "title": "Incoming Material Register"
+      "number": "REG024",
+      "title": "Dispatch Register"
+     },
+     {
+      "number": "FRM006",
+      "title": "Incoming Inspection Report"
+     },
+     {
+      "number": "FRM010",
+      "title": "Final Inspection Report (PDI)"
      }
-    ]
+    ],
+    "workflow": "Label at receipt → Status by warehouse and sticker → Issue by batch → Work Order and Job Card → Finished batch labelled → Delivery Note records the batch"
    }
   },
   {
@@ -1618,8 +1657,8 @@
    "sop": {
     "declared_number": "SOP010",
     "declared_title": "Preservation, Storage, Packing & Dispatch Procedure",
-    "purpose": "<p>To establish a systematic process for the monitoring, measurement, inspection and testing of products at the incoming, in-process and final stages, so that conformity to specified requirements is verified and evidenced before release.</p>",
-    "scope": "<p>This procedure applies to all inspection and testing of purchased materials, work-in-progress and finished products at Hatim Carbon Company Private Limited.</p>",
+    "purpose": "<p>Check product at receipt, during production and before dispatch, and release only what passes.</p>",
+    "scope": "<p>Incoming, in-process and final inspection of every item whose item group needs inspection.</p>",
     "references": [
      {
       "reference": "ISO 9001:2015 Clause 9.1.1 – Monitoring, Measurement, Analysis and Evaluation"
@@ -1645,57 +1684,92 @@
     ],
     "definitions": [
      {
-      "term": "Inspection",
-      "definition": "Examination of a product against specified requirements, recorded as a Quality Inspection."
-     },
-     {
-      "term": "Acceptance Criteria",
-      "definition": "The limits or requirements a characteristic must satisfy for the product to be accepted."
+      "term": "Inspection plan",
+      "definition": "The characteristics to check for an item, from its drawing, with tolerances, sample size and instruments for each stage."
      },
      {
       "term": "Release",
-      "definition": "Authorisation for a product to proceed to the next stage or to dispatch after satisfactory inspection."
+      "definition": "Moving inspected stock out of Inspection Required: accepted to stores or finished goods, rejected to Rejected."
      }
     ],
     "responsibilities": [
      {
       "role": "Quality Manager / Management Representative",
-      "responsibility": "Define inspection stages, templates and acceptance criteria. Review inspection results and authorise release. Ensure inspection is performed with calibrated equipment."
+      "responsibility": "ERPNext role Quality Manager. Approves inspection plans and test methods, reviews results, decides concessions."
+     },
+     {
+      "role": "Engineer",
+      "responsibility": "ERPNext role Quality Manager. Builds inspection plans, inspects at every stage, records accepted and rejected quantities."
      },
      {
       "role": "Production Lead",
-      "responsibility": "Ensure in-process and final inspections are carried out and recorded before products move to the next stage."
+      "responsibility": "ERPNext role Manufacturing User / Manufacturing Manager. Calls in-process checks at the Job Card checkpoints; finishes Work Orders."
      },
      {
-      "role": "Purchase Executive",
-      "responsibility": "Ensure incoming material is presented for inspection before acceptance into stock."
+      "role": "Storekeeper",
+      "responsibility": "ERPNext role Stock User; the stores in-charge holds Stock Manager. Posts the release transfers after racking."
+     },
+     {
+      "role": "Sales Executive",
+      "responsibility": "Sends the inspection document the customer asked for with the Delivery Note."
      }
     ],
     "procedure_steps": [
      {
       "step_no": "1",
-      "step_title": "Inspection Stages",
-      "step_content": "<p>Monitoring and measurement shall be carried out at three stages: incoming inspection of purchased material (SOP001-referenced in SOP006), in-process inspection during manufacturing (SOP008), and final inspection before release for dispatch.</p>"
+      "step_title": "Plan",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>Build the item's inspection plan from its drawing: characteristics, tolerances, sample size and instruments for each stage. Start it from the Inspection Plan tab on the Item or BOM.</p>",
+      "erp_record": "Inspection plan (Quality Inspection Template)"
      },
      {
       "step_no": "2",
-      "step_title": "Inspection Records",
-      "step_content": "<p>Each inspection shall be recorded as a Quality Inspection in ERPNext, identifying the item, the batch or work order, the characteristics checked, the person inspecting, and the result.</p>"
+      "step_title": "Inspect incoming material",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>As SOP-006: received stock waits in Inspection Required and the receipt is assigned to an Engineer on My Work.</p>",
+      "erp_record": "Quality Inspection (FRM-006)"
      },
      {
       "step_no": "3",
-      "step_title": "Acceptance Criteria",
-      "step_content": "<p>Inspection shall be performed against approved drawings, specifications and customer requirements. Observations shall be recorded against the defined acceptance criteria of the applicable inspection template.</p>"
+      "step_title": "Inspect in process",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>At each checkpoint (first-off, patrol, last-off), start the inspection from the Job Card's Inspect button.</p>",
+      "erp_record": "Job Card → Inspect; Quality Inspection (FRM-009)"
      },
      {
       "step_no": "4",
-      "step_title": "Inspection Status",
-      "step_content": "<p>The inspection result determines the product status in accordance with SOP011 – Identification & Traceability. Rejected material shall be handled in accordance with SOP013 – Control of Nonconforming Outputs.</p>"
+      "step_title": "Inspect finished goods",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>Finished goods of inspected groups wait in Inspection Required and the entry is assigned on My Work. Press Inspect on the entry, or Final inspection on the Work Order.</p>",
+      "erp_record": "Quality Inspection (FRM-010)"
      },
      {
       "step_no": "5",
-      "step_title": "Release for Dispatch",
-      "step_content": "<p>Only products with satisfactory completion of all specified inspection and testing shall be released. Release evidence shall accompany the dispatch documents where required by the customer.</p>"
+      "step_title": "Record",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>Enter each reading on the drawing; values out of tolerance turn red. Use only calibrated instruments (SOP-017). Enter accepted and rejected quantities and submit.</p>",
+      "erp_record": "Quality Inspection; Sampling & Inspection Record (FRM-038)"
+     },
+     {
+      "step_no": "6",
+      "step_title": "Release",
+      "responsible": "Stock User",
+      "step_content": "<p>Submitting the inspection drafts the transfer: accepted to Stores or the Work Order's warehouse, rejected to Rejected. Rack it and post the transfer. Nothing else can move stock out of Inspection Required.</p>",
+      "erp_record": "Stock Entry; Inspection Status report"
+     },
+     {
+      "step_no": "7",
+      "step_title": "Act on rejections",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>Raise the NCR from the rejected inspection and follow SOP-013.</p>",
+      "erp_record": "Non Conformance (FRM-020)"
+     },
+     {
+      "step_no": "8",
+      "step_title": "Send the evidence",
+      "responsible": "Sales Executive",
+      "step_content": "<p>Attach the inspection document the customer asked for to the Delivery Note email: 2.1 Certificate of Conformity (FRM-040), 2.2 Inspection Report (FRM-041) or 3.1 Detailed Inspection Report (FRM-039). Each is drawn from the inspections of the delivered batches.</p>",
+      "erp_record": "Delivery Note → email"
      }
     ],
     "records_generated": [
@@ -1721,9 +1795,18 @@
      },
      {
       "number": "FRM039",
-      "title": "Material Test Certificate (EN 10204 3.1)"
+      "title": "3.1 Detailed Inspection Report (EN 10204)"
+     },
+     {
+      "number": "FRM040",
+      "title": "2.1 Certificate of Conformity (EN 10204)"
+     },
+     {
+      "number": "FRM041",
+      "title": "2.2 Inspection Report (EN 10204)"
      }
-    ]
+    ],
+    "workflow": "Inspection plan → Incoming (SOP-006) → In-process (Job Card) → Final (after Finish) → Release transfer → Inspection document with dispatch"
    }
   },
   {
@@ -1746,8 +1829,8 @@
    "sop": {
     "declared_number": "SOP013",
     "declared_title": "Control of Nonconforming Outputs Procedure",
-    "purpose": "<p>To establish a systematic process for identifying, segregating, evaluating, and controlling nonconforming materials and products to prevent their unintended use or delivery.</p>",
-    "scope": "<p>This procedure applies to incoming materials, work-in-progress (WIP), finished products, and externally provided products that do not conform to specified requirements.</p>",
+    "purpose": "<p>Keep nonconforming material and product out of use, decide what happens to it, and record the decision.</p>",
+    "scope": "<p>Nonconforming purchased material, work in progress, finished goods and delivered product.</p>",
     "references": [
      {
       "reference": "ISO 9001:2015 Clause 8.7"
@@ -1764,66 +1847,96 @@
     ],
     "definitions": [
      {
-      "term": "Nonconformity",
-      "definition": "Failure to meet a specified requirement."
-     },
-     {
-      "term": "Nonconforming Product",
-      "definition": "Any material or product that does not comply with applicable specifications, drawings, standards, or customer requirements."
-     },
-     {
-      "term": "Disposition",
-      "definition": "The decision taken regarding a nonconforming product, such as rework, repair, acceptance under concession, return, or scrap."
+      "term": "Concession",
+      "definition": "Written permission to use or deliver product that does not meet a requirement."
      }
     ],
     "responsibilities": [
      {
-      "role": "Production Department",
-      "responsibility": "Stop further processing of identified nonconforming products. Carry out approved rework or correction, where applicable."
+      "role": "Engineer",
+      "responsibility": "ERPNext role Quality Manager. Raises the NCR from a rejected inspection and re-inspects reworked product."
      },
      {
-      "role": "Quality Department",
-      "responsibility": "Identify and record nonconforming products. Segregate affected products. Evaluate the nonconformity. Recommend appropriate disposition."
+      "role": "Quality Manager / Management Representative",
+      "responsibility": "ERPNext role Quality Manager. Decides the disposition, approves concessions within the specification's intent, closes the NCR."
      },
      {
-      "role": "Purchase Department",
-      "responsibility": "Coordinate with suppliers regarding nonconforming incoming materials."
+      "role": "Storekeeper",
+      "responsibility": "ERPNext role Stock User; the stores in-charge holds Stock Manager. Keeps nonconforming stock in the Rejected warehouse and carries out its movements."
      },
      {
-      "role": "Top Management",
-      "responsibility": "Approve customer concessions or major disposition decisions, where required."
+      "role": "Production Lead",
+      "responsibility": "ERPNext role Manufacturing User / Manufacturing Manager. Stops the job when product is found nonconforming; carries out rework and repair."
+     },
+     {
+      "role": "Purchase Executive",
+      "responsibility": "ERPNext role Purchase User / Purchase Manager. Returns rejected material to the supplier and follows up the supplier's corrective action."
+     },
+     {
+      "role": "Sales Executive",
+      "responsibility": "Obtains the customer's written approval before a concession on their product."
+     },
+     {
+      "role": "Managing Director",
+      "responsibility": "Approves a concession that changes what a customer receives."
      }
     ],
     "procedure_steps": [
      {
       "step_no": "1",
-      "step_title": "Identification",
-      "step_content": "<p>Nonconformities may be identified during:</p><ul><li>Incoming inspection</li><li>In-process inspection</li><li>Final inspection</li><li>Customer complaints</li><li>Internal audits</li><li>Production activities</li></ul><p>All identified nonconforming products shall be clearly marked to prevent unintended use.</p>"
+      "step_title": "Raise the NCR",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>On a rejected inspection, press Non Conformance. The NCR carries the item, batch, quantity, receipt or Work Order and supplier. Nonconformities found elsewhere (production, customer complaint, internal audit) are raised directly as a Non Conformance with that source.</p>",
+      "erp_record": "Non Conformance (FRM-020); Nonconforming Product Register (REG-009)"
      },
      {
       "step_no": "2",
-      "step_title": "Segregation",
-      "step_content": "<p>Where practical, nonconforming materials or products shall be segregated and kept in a designated Nonconforming Material Area until disposition is decided.</p>"
+      "step_title": "Segregate",
+      "responsible": "Storekeeper",
+      "step_content": "<p>Rejected quantity from an inspection is already in the Rejected warehouse through the inspection's transfer; put the red sticker on it. Move anything found nonconforming later into Rejected by Material Transfer. Stock in Rejected is not issued.</p>",
+      "erp_record": "Stock Entry (Material Transfer to Rejected)"
      },
      {
       "step_no": "3",
-      "step_title": "Evaluation",
-      "step_content": "<p>The Quality Department, in consultation with the relevant department, shall evaluate the nonconformity and determine the appropriate disposition.</p><p>Possible dispositions include:</p><ul><li>Rework</li><li>Repair</li><li>Re-grade for an alternative application</li><li>Return to supplier</li><li>Acceptance under approved concession</li><li>Scrap</li></ul>"
+      "step_title": "Decide",
+      "responsible": "Quality Manager",
+      "step_content": "<p>The NCR is assigned to the Quality Manager. Choose the disposition: Return to Supplier, Rework, Repair, Re-grade, Accept under Concession or Scrap. The approver is recorded on the NCR.</p>",
+      "erp_record": "Non Conformance: Disposition, Disposition Approved By"
      },
      {
       "step_no": "4",
-      "step_title": "Verification After Rework",
-      "step_content": "<p>Products that have been reworked or repaired shall be re-inspected before being released for further processing or dispatch.</p>"
+      "step_title": "Concession",
+      "responsible": "Sales Executive; Managing Director",
+      "step_content": "<p>If the product goes to a customer as it is, Sales obtains the customer's written approval and attaches it to the NCR; the Managing Director approves.</p>",
+      "erp_record": "Non Conformance (attachment)"
      },
      {
       "step_no": "5",
-      "step_title": "Customer Notification",
-      "step_content": "<p>Where a nonconformity affects customer requirements or delivery commitments, the customer shall be informed whenever necessary and approval obtained before release under concession.</p>"
+      "step_title": "Return to supplier",
+      "responsible": "Purchase Executive",
+      "step_content": "<p>Make the purchase return from the Rejected warehouse against the original receipt.</p>",
+      "erp_record": "Purchase Receipt (Return)"
      },
      {
       "step_no": "6",
-      "step_title": "Records",
-      "step_content": "<p>All nonconformities and their dispositions shall be recorded and reviewed to identify recurring issues and opportunities for improvement.</p>"
+      "step_title": "Rework or repair",
+      "responsible": "Production Lead",
+      "step_content": "<p>Stores transfers the stock to production; Production reworks it. The Engineer inspects it again before use and records the result in Re-inspection After Rework.</p>",
+      "erp_record": "Stock Entry; Quality Inspection; Non Conformance: Re-inspection"
+     },
+     {
+      "step_no": "7",
+      "step_title": "Scrap",
+      "responsible": "Storekeeper",
+      "step_content": "<p>Issue the quantity out of the Rejected warehouse as scrap.</p>",
+      "erp_record": "Stock Entry (Material Issue)"
+     },
+     {
+      "step_no": "8",
+      "step_title": "Close",
+      "responsible": "Quality Manager",
+      "step_content": "<p>When the disposition is carried out, set the closure date and mark the NCR Resolved. If the cause could recur, raise a corrective action under SOP-014.</p>",
+      "erp_record": "Non Conformance: Resolved; Quality Action (FRM-021)"
      }
     ],
     "records_generated": [
@@ -1832,22 +1945,19 @@
       "title": "Nonconforming Product Report (NCR)"
      },
      {
-      "number": "FRM021",
-      "title": "Corrective Action Request (CAR) (where applicable)"
-     },
-     {
       "number": "REG009",
       "title": "Nonconforming Product Register"
      },
      {
-      "number": "REG018",
-      "title": "Corrective Action Records"
+      "number": "FRM021",
+      "title": "Corrective Action Request (CAR)"
      },
      {
-      "number": "FRM038",
-      "title": "Sampling & Inspection Record"
+      "number": "REG018",
+      "title": "Corrective Action Records"
      }
-    ]
+    ],
+    "workflow": "Reject → NCR → Segregate in Rejected → Decide (Quality Manager) → Return / Rework / Re-grade / Concession / Scrap → Re-inspect if reworked → Close → Corrective action if needed (SOP-014)"
    }
   },
   {
@@ -2426,7 +2536,113 @@
    "mapped_doctype": null,
    "mapped_filters": null,
    "mapped_report": null,
-   "print_columns": null
+   "print_columns": null,
+   "sop": {
+    "declared_number": "WI001",
+    "declared_title": "Receiving & Identification of Raw Materials",
+    "purpose": "<p>To receive purchased material correctly, identify every package and place it where it belongs.</p>",
+    "scope": "<p>All deliveries against a Purchase Order, at the gate and in the landing area.</p>",
+    "workflow": "Check the Purchase Order → Unload → Count and check → Purchase Receipt → Post → Label → Place",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 8.4.2 – Type and Extent of Control"
+     },
+     {
+      "reference": "ISO 9001:2015 Clause 8.5.2 – Identification & Traceability"
+     },
+     {
+      "reference": "SOP006 – Incoming Material Inspection & Material Identification"
+     },
+     {
+      "reference": "SOP011 – Identification & Traceability"
+     }
+    ],
+    "definitions": [],
+    "responsibilities": [
+     {
+      "role": "Storekeeper",
+      "responsibility": "ERPNext role Stock User; the stores in-charge holds Stock Manager. Carries out every step of this instruction."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Confirm the order",
+      "responsible": "Stock User",
+      "step_content": "<p>Before unloading, find the open Purchase Order for the supplier and item in ERPNext. If there is none, do not unload; inform Purchase.</p>",
+      "erp_record": "Purchase Order"
+     },
+     {
+      "step_no": "2",
+      "step_title": "Unload",
+      "responsible": "Stock User",
+      "step_content": "<p>Unload in the landing area only. Keep each delivery apart from other deliveries and from stocked material.</p>",
+      "erp_record": "On the shop floor"
+     },
+     {
+      "step_no": "3",
+      "step_title": "Count",
+      "responsible": "Stock User",
+      "step_content": "<p>Count or weigh each item and compare with the delivery challan and the Purchase Order.</p>",
+      "erp_record": "On the shop floor"
+     },
+     {
+      "step_no": "4",
+      "step_title": "Check the material",
+      "responsible": "Stock User",
+      "step_content": "<p>Check that the item, grade and size match the Purchase Order, and that the packaging and material are undamaged.</p>",
+      "erp_record": "On the shop floor"
+     },
+     {
+      "step_no": "5",
+      "step_title": "Make the receipt",
+      "responsible": "Stock User",
+      "step_content": "<p>From the Purchase Order, create the Purchase Receipt. Enter the quantity actually received, the challan number and date, and Received By.</p>",
+      "erp_record": "Purchase Receipt"
+     },
+     {
+      "step_no": "6",
+      "step_title": "Attach the MTC",
+      "responsible": "Stock User",
+      "step_content": "<p>Where the item group requires a Material Test Certificate, attach it to the receipt. If the supplier has not sent it, the receipt can still be posted; ERPNext warns, and Purchase must obtain it.</p>",
+      "erp_record": "Purchase Receipt: Material Test Certificate"
+     },
+     {
+      "step_no": "7",
+      "step_title": "Record the checks",
+      "responsible": "Stock User",
+      "step_content": "<p>Tick Right quantity, Right material and Visual check OK. If any check fails, enter only what is acceptable to receive, write the reason in the remarks and inform Purchase.</p>",
+      "erp_record": "Purchase Receipt: Receiving checks"
+     },
+     {
+      "step_no": "8",
+      "step_title": "Post",
+      "responsible": "Stock User",
+      "step_content": "<p>Submit the receipt. Items that need inspection are posted to the Inspection Required warehouse and assigned to Engineering automatically.</p>",
+      "erp_record": "Purchase Receipt: Submit"
+     },
+     {
+      "step_no": "9",
+      "step_title": "Label",
+      "responsible": "Stock User",
+      "step_content": "<p>Press Print Labels, enter one label per package for each batch, print on the A4 label sheet and stick a label on every package.</p>",
+      "erp_record": "Purchase Receipt → Print Labels"
+     },
+     {
+      "step_no": "10",
+      "step_title": "Place",
+      "responsible": "Stock User",
+      "step_content": "<p>Place material that needs inspection in the Inspection Required area. Rack all other material in Stores and put on the green sticker.</p>",
+      "erp_record": "On the shop floor"
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "REG015",
+      "title": "Incoming Material Register"
+     }
+    ]
+   }
   },
   {
    "name": "HCCPL/QMS/WI-002",
@@ -2444,7 +2660,127 @@
    "mapped_doctype": null,
    "mapped_filters": null,
    "mapped_report": null,
-   "print_columns": null
+   "print_columns": null,
+   "sop": {
+    "declared_number": "WI002",
+    "declared_title": "Incoming Material Inspection",
+    "purpose": "<p>To inspect received material against its inspection plan and release it or reject it.</p>",
+    "scope": "<p>All received material of item groups that require inspection.</p>",
+    "workflow": "My Work → Inspect → Sample → Measure → Accept / reject quantities → Submit → Sticker → NCR if rejected",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 8.4.2 – Type and Extent of Control"
+     },
+     {
+      "reference": "ISO 9001:2015 Clause 8.6 – Release of Products and Services"
+     },
+     {
+      "reference": "SOP006 – Incoming Material Inspection & Material Identification"
+     },
+     {
+      "reference": "SOP012 – Monitoring, Measurement, Inspection & Testing"
+     },
+     {
+      "reference": "SOP013 – Control of Nonconforming Outputs"
+     },
+     {
+      "reference": "SOP017 – Control of Monitoring & Measuring Equipment (Calibration)"
+     }
+    ],
+    "definitions": [],
+    "responsibilities": [
+     {
+      "role": "Engineer",
+      "responsibility": "ERPNext role Quality Manager. Carries out every step of this instruction."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Take up the task",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>Open My Work and select the Purchase Receipt assigned for inspection.</p>",
+      "erp_record": "My Work; Inspection Status report"
+     },
+     {
+      "step_no": "2",
+      "step_title": "Start the inspection",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>On the receipt, press Inspect and choose the line. The inspection opens on the item's inspection plan, with the drawing and the sample size.</p>",
+      "erp_record": "Purchase Receipt → Inspect; Quality Inspection"
+     },
+     {
+      "step_no": "3",
+      "step_title": "Check the instruments",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>Use only instruments whose calibration is in date. Do not use an instrument without a valid calibration label.</p>",
+      "erp_record": "Monitoring & Measuring Instruments Register (REG-011)"
+     },
+     {
+      "step_no": "4",
+      "step_title": "Review the MTC",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>Where an MTC is attached, compare its values with the specification on the plan.</p>",
+      "erp_record": "Quality Inspection"
+     },
+     {
+      "step_no": "5",
+      "step_title": "Take the sample",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>Take the number of pieces shown as the sample size, from different packages where there are several.</p>",
+      "erp_record": "On the shop floor"
+     },
+     {
+      "step_no": "6",
+      "step_title": "Measure",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>Measure each characteristic and enter the reading. A value outside tolerance turns red.</p>",
+      "erp_record": "Quality Inspection: readings"
+     },
+     {
+      "step_no": "7",
+      "step_title": "Decide the quantities",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>Enter the accepted and rejected quantities. Together they must equal the received quantity.</p>",
+      "erp_record": "Quality Inspection: Accepted / Rejected quantity"
+     },
+     {
+      "step_no": "8",
+      "step_title": "Submit",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>Submit the inspection. ERPNext drafts the transfer of accepted stock to Stores and rejected stock to Rejected, and assigns it to Stores for racking.</p>",
+      "erp_record": "Quality Inspection (FRM-006)"
+     },
+     {
+      "step_no": "9",
+      "step_title": "Mark the material",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>Put the green sticker on accepted packages and the red sticker on rejected packages.</p>",
+      "erp_record": "On the shop floor"
+     },
+     {
+      "step_no": "10",
+      "step_title": "Report a rejection",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>If any quantity is rejected, press Non Conformance on the inspection and follow SOP-013.</p>",
+      "erp_record": "Non Conformance (FRM-020)"
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "FRM006",
+      "title": "Incoming Inspection Report"
+     },
+     {
+      "number": "FRM038",
+      "title": "Sampling & Inspection Record"
+     },
+     {
+      "number": "FRM020",
+      "title": "Nonconforming Product Report (NCR)"
+     }
+    ]
+   }
   },
   {
    "name": "HCCPL/QMS/WI-003",
@@ -2570,7 +2906,115 @@
    "mapped_doctype": null,
    "mapped_filters": null,
    "mapped_report": null,
-   "print_columns": null
+   "print_columns": null,
+   "sop": {
+    "declared_number": "WI009",
+    "declared_title": "Final Inspection & Product Release",
+    "purpose": "<p>To inspect finished goods before they are stored for dispatch, and release only what passes.</p>",
+    "scope": "<p>Finished goods of item groups that require inspection, from a Work Order's Finish.</p>",
+    "workflow": "Finish → My Work → Final inspection → Accept / reject quantities → Submit → Sticker → Rack to Finished Goods → Label",
+    "references": [
+     {
+      "reference": "ISO 9001:2015 Clause 8.6 – Release of Products and Services"
+     },
+     {
+      "reference": "SOP012 – Monitoring, Measurement, Inspection & Testing"
+     },
+     {
+      "reference": "SOP013 – Control of Nonconforming Outputs"
+     },
+     {
+      "reference": "SOP010 – Preservation, Storage, Packing & Dispatch"
+     }
+    ],
+    "definitions": [],
+    "responsibilities": [
+     {
+      "role": "Engineer",
+      "responsibility": "ERPNext role Quality Manager. Inspects and releases."
+     },
+     {
+      "role": "Storekeeper",
+      "responsibility": "ERPNext role Stock User; the stores in-charge holds Stock Manager. Racks released goods, posts the transfer and labels them."
+     }
+    ],
+    "procedure_steps": [
+     {
+      "step_no": "1",
+      "step_title": "Take up the task",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>When Production finishes a Work Order, its Manufacture entry is assigned to you. Open it from My Work.</p>",
+      "erp_record": "My Work; Inspection Status report"
+     },
+     {
+      "step_no": "2",
+      "step_title": "Start the inspection",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>Press Inspect on the Manufacture entry, or Final inspection on the Work Order. The inspection opens on the product's plan, with the drawing and the sample size.</p>",
+      "erp_record": "Quality Inspection"
+     },
+     {
+      "step_no": "3",
+      "step_title": "Check the instruments",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>Use only instruments whose calibration is in date.</p>",
+      "erp_record": "Monitoring & Measuring Instruments Register (REG-011)"
+     },
+     {
+      "step_no": "4",
+      "step_title": "Take the sample and measure",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>Take the sample shown, measure each characteristic and enter the readings. A value outside tolerance turns red.</p>",
+      "erp_record": "Quality Inspection: readings"
+     },
+     {
+      "step_no": "5",
+      "step_title": "Decide the quantities",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>Enter the accepted and rejected quantities and submit. ERPNext drafts the transfer: accepted to the Work Order's warehouse, rejected to Rejected.</p>",
+      "erp_record": "Quality Inspection (FRM-010)"
+     },
+     {
+      "step_no": "6",
+      "step_title": "Mark the goods",
+      "responsible": "Engineer (Quality Manager)",
+      "step_content": "<p>Put the green sticker on accepted goods and the red sticker on rejected goods. If any quantity is rejected, raise the Non Conformance and follow SOP-013.</p>",
+      "erp_record": "Non Conformance (FRM-020)"
+     },
+     {
+      "step_no": "7",
+      "step_title": "Rack and post",
+      "responsible": "Stock User",
+      "step_content": "<p>Rack the accepted goods in Finished Goods, scanning the labels, and post the transfer. Until it is posted the goods cannot be delivered.</p>",
+      "erp_record": "Stock Entry (Material Transfer)"
+     },
+     {
+      "step_no": "8",
+      "step_title": "Label",
+      "responsible": "Stock User",
+      "step_content": "<p>Print labels for the finished batch from the Stock Labels page and stick one on each package.</p>",
+      "erp_record": "Stock Labels page"
+     }
+    ],
+    "records_generated": [
+     {
+      "number": "FRM010",
+      "title": "Final Inspection Report (PDI)"
+     },
+     {
+      "number": "FRM038",
+      "title": "Sampling & Inspection Record"
+     },
+     {
+      "number": "FRM020",
+      "title": "Nonconforming Product Report (NCR)"
+     },
+     {
+      "number": "REG016",
+      "title": "Production Register"
+     }
+    ]
+   }
   },
   {
    "name": "HCCPL/QMS/WI-010",
@@ -3701,13 +4145,49 @@
   {
    "name": "HCCPL/QMS/FRM-039",
    "legacy_document_number": "FRM039",
-   "title": "Material Test Certificate (EN 10204 3.1)",
+   "title": "3.1 Detailed Inspection Report (EN 10204)",
    "document_type": "FRM",
    "clause_reference": "8.6",
    "department_label": "QA",
    "approval_authority": "QA Manager",
    "issue_number": "01",
    "issue_date": "2026-10-13",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": "Delivery Note",
+   "mapped_filters": null,
+   "mapped_report": null,
+   "print_columns": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-040",
+   "legacy_document_number": "FRM040",
+   "title": "2.1 Certificate of Conformity (EN 10204)",
+   "document_type": "FRM",
+   "clause_reference": "8.6",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-10-14",
+   "revision_number": "00",
+   "body_mode": "Mapped Data",
+   "has_source_file": false,
+   "mapped_doctype": "Delivery Note",
+   "mapped_filters": null,
+   "mapped_report": null,
+   "print_columns": null
+  },
+  {
+   "name": "HCCPL/QMS/FRM-041",
+   "legacy_document_number": "FRM041",
+   "title": "2.2 Inspection Report (EN 10204)",
+   "document_type": "FRM",
+   "clause_reference": "8.6",
+   "department_label": "QA",
+   "approval_authority": "QA Manager",
+   "issue_number": "01",
+   "issue_date": "2026-10-14",
    "revision_number": "00",
    "body_mode": "Mapped Data",
    "has_source_file": false,
