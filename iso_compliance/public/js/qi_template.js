@@ -283,8 +283,7 @@ class QIBuilder {
 					${editable ? `<span class="text-muted small">${__("Add")}</span>
 					<button class="btn btn-xs btn-default qi-add" data-type="Dimension">${__("Dimensional")}</button>
 					<button class="btn btn-xs btn-default qi-add" data-type="Test">${__("Operational")}</button>
-					<button class="btn btn-xs btn-default qi-add" data-type="Visual">${__("Visual")}</button>
-					<button class="btn btn-xs btn-default qi-add" data-type="Material">${__("Material (3.1)")}</button>` : ""}
+					<button class="btn btn-xs btn-default qi-add" data-type="Visual">${__("Visual")}</button>` : ""}
 				</div>
 				<div class="qi-b-table"></div>
 			</div>
@@ -724,12 +723,13 @@ const QI_GDT = {
 	"Profile of a surface": "⌓",
 };
 const QI_PREFIXES = ["", "Ø", "R", "SØ", "SR", "□"];
-// Stored values stay Dimension / Test / Visual / Material; people read these names.
+// Stored values stay Dimension / Test / Visual; people read these names. The
+// Material type (values read off a supplier's 3.1) is no longer offered for new
+// rows (developer, 2026-10-14); the 3.1 certificate belongs to the dispatch.
 const QI_ROW_TYPES = [
 	["Dimension", __("Dimensional")],
 	["Test", __("Operational")],
 	["Visual", __("Visual")],
-	["Material", __("Material (3.1)")],
 ];
 const qi_type_label = (t) => (QI_ROW_TYPES.find(([v]) => v === t) || [t, t])[1];
 

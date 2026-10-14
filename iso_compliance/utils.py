@@ -187,6 +187,7 @@ def coc_row_aggregate(row) -> dict:
 					"concession": False,
 					# drawing rows print their limits as read ("≤ 35", "OK / NG")
 					"limits": limit_text(r) if r.get("custom_row_type") else None,
+					"unit": r.get("custom_unit") or r.get("custom_uom") or "",
 				},
 			)
 			if stage not in p["stages"]:

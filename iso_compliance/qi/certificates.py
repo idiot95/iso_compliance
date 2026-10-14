@@ -27,6 +27,8 @@ from iso_compliance.qi.inspection import calibration, drawing_rows, measurements
 from iso_compliance.qi.template import ROWS, is_drawing_template
 
 RECORD_FORMAT = "Sampling and Inspection Record"
+DECLARATION_FORMAT = "Declaration of Compliance 2.1"
+TEST_REPORT_FORMAT = "Test Report 2.2"
 COC_FORMAT = "Certificate of Conformity"
 MTC_FORMAT = "Material Test Certificate 3.1"
 #: Next free form number after FRM-037 (developer, 2026-10-13); REG-001 entry by iso's document set.
@@ -334,6 +336,166 @@ def mtc_row(row) -> dict | None:
 	}
 
 
+# --------------------------------------------------------------- EN 10204 --
+# One shape for the three inspection documents of EN 10204:2004.
+#   2.1 Declaration of compliance with the order: the statement, no results.
+#   2.2 Test report: the statement with results of non-specific inspection
+#       (the same product and process; not necessarily the lot delivered).
+#   3.1 Inspection certificate: results of specific inspection of the lot
+#       delivered, validated by an inspection representative independent of
+#       manufacturing; material groups add the supplier trace (mtc_row).
+# Form numbers: next free after FRM-039 (to be entered in REG-001).
+
+# Titles as HCC issues them (developer, 2026-10-14); the type number keeps each
+# one tied to its EN 10204 definition.
+EN10204 = {
+	"2.1": {"title": "Certificate of Conformity", "form_no": "HCCPL/QMS/FRM-040"},
+	"2.2": {"title": "Inspection Report", "form_no": "HCCPL/QMS/FRM-041"},
+	"3.1": {"title": "Detailed Inspection Report", "form_no": "HCCPL/QMS/FRM-039"},
+}
+
+
+def _num(x) -> str:
+	return f"{round(flt(x), 4):g}"
+
+
+def _result(p) -> str:
+	if p.get("values"):
+		return ", ".join(str(v) for v in p["values"])
+	if p.get("obs_min") is None:
+		return ""
+	lo, hi = _num(p["obs_min"]), _num(p["obs_max"])
+	return lo if lo == hi else f"{lo} – {hi}"
+
+
+def _requirement(p) -> str:
+	if p.get("limits"):
+		return p["limits"]
+	if p.get("numeric"):
+		return f"{_num(p['min_spec'])} – {_num(p['max_spec'])}"
+	return p.get("spec") or ""
+
+
+def _results(params) -> list[dict]:
+	out = []
+	for p in params:
+		res = _result(p)
+		if not res:
+			continue
+		out.append({"characteristic": p["specification"], "requirement": _requirement(p), "result": res,
+		            "unit": p.get("unit") or "", "ok": p.get("ok", True)})
+	return out
+
+
+def _latest_results(item_code: str):
+	"""Non-specific results for 2.2: the newest accepted inspection of the
+	same product. (qi, results) or (None, [])."""
+	from iso_compliance.qi.inspection import measurements
+
+	name = frappe.db.get_value(
+		"Quality Inspection", {"item_code": item_code, "docstatus": 1, "status": "Accepted"}, "name",
+		order_by="report_date desc, creation desc")
+	if not name:
+		return None, []
+	qi = frappe.get_doc("Quality Inspection", name)
+	meas = measurements(qi.name) if any(r.get("custom_row_type") for r in qi.readings) else {}
+	params = []
+	for r in qi.readings:
+		p = {"specification": r.specification, "limits": _limit_text(r) if r.get("custom_row_type") else None,
+		     "numeric": r.numeric, "min_spec": r.min_value, "max_spec": r.max_value, "spec": r.value,
+		     "unit": r.get("custom_unit") or r.get("custom_uom") or "", "values": [], "obs_min": None, "obs_max": None}
+		raw = [m.value for m in meas.get(r.get("custom_balloon_no") or "", [])] if r.get("custom_row_type") else \
+			[r.get(f"reading_{i}") for i in range(1, 11)] if r.numeric else [r.reading_value]
+		for v in raw:
+			if v in (None, ""):
+				continue
+			if r.get("custom_row_type") == "Visual" or not (r.numeric or r.get("custom_row_type")):
+				if v not in p["values"]:
+					p["values"].append(v)
+				continue
+			try:
+				x = float(v)
+			except (TypeError, ValueError):
+				continue
+			p["obs_min"] = x if p["obs_min"] is None else min(p["obs_min"], x)
+			p["obs_max"] = x if p["obs_max"] is None else max(p["obs_max"], x)
+		params.append(p)
+	return qi, _results(params)
+
+
+def _drawing_ref(item_code: str) -> str:
+	from iso_compliance.qi.inspection import resolve_template
+
+	t = resolve_template(item_code)
+	if not t or not is_drawing_template(t):
+		return ""
+	no, rev = frappe.db.get_value("Quality Inspection Template", t, ["custom_drawing_no", "custom_drawing_revision"])
+	return " Rev ".join(x for x in (no, rev) if x)
+
+
+def _company_address(company: str) -> str:
+	"""One line identifying the manufacturer: its primary company address."""
+	names = frappe.get_all("Dynamic Link", filters={"link_doctype": "Company", "link_name": company, "parenttype": "Address"},
+	                       pluck="parent")
+	rows = frappe.get_all("Address", filters={"name": ("in", names or [""]), "disabled": 0},
+	                      fields=["address_line1", "address_line2", "city", "pincode", "country", "is_primary_address"],
+	                      order_by="is_primary_address desc, creation asc", limit=1)
+	if not rows:
+		return ""
+	a = rows[0]
+	city = " ".join(x for x in (a.city, a.pincode) if x)
+	return ", ".join(x for x in (a.address_line1, a.address_line2, city, a.country) if x)
+
+
+def en10204(delivery_note, doc_type: str) -> dict:
+	"""Everything an EN 10204 2.1 / 2.2 / 3.1 document prints for one Delivery Note."""
+	from iso_compliance.utils import coc_row_aggregate
+
+	dn = delivery_note if not isinstance(delivery_note, str) else frappe.get_doc("Delivery Note", delivery_note)
+	spec = EN10204[doc_type]
+	orders = sorted({r.against_sales_order for r in dn.items if r.get("against_sales_order")})
+	po = [frappe.db.get_value("Sales Order", so, ["po_no", "po_date"], as_dict=True) for so in orders]
+	po = [p for p in po if p and p.po_no] or ([frappe._dict(po_no=dn.po_no, po_date=dn.po_date)] if dn.get("po_no") else [])
+	logo = frappe.db.get_value("Company", dn.company, "company_logo")
+	rows, concessions = [], []
+	for row in dn.items:
+		r = {"item_code": row.item_code, "item_name": row.item_name, "qty": row.qty, "uom": row.uom,
+		     "batches": _batches_of(row.get("serial_and_batch_bundle"), row.get("batch_no")),
+		     "drawing": _drawing_ref(row.item_code), "results": [], "basis": "", "mtc": None}
+		if doc_type in ("2.2", "3.1"):
+			agg = coc_row_aggregate(row)
+			concessions += agg["concessions"]
+			r["results"] = _results(agg["parameters"])
+			if r["results"]:
+				r["basis"] = _("specific inspection of the batches supplied")
+			elif doc_type == "2.2":
+				qi, res = _latest_results(row.item_code)
+				if qi:
+					r["results"], r["basis"] = res, _("non-specific inspection, production of {0}").format(
+						frappe.utils.formatdate(qi.report_date))
+			if doc_type == "3.1":
+				r["mtc"] = mtc_row(row)
+		rows.append(r)
+	return {
+		"type": doc_type,
+		"title": spec["title"],
+		"form_no": spec["form_no"],
+		"number": f"{dn.name}/{doc_type}",
+		"issued": dn.posting_date,
+		"company": dn.company,
+		"address": _company_address(dn.company),
+		"logo": _data_uri(logo) if logo else None,
+		"customer": dn.customer_name or dn.customer,
+		"po": [{"no": p.po_no, "date": p.po_date} for p in po],
+		"delivery_note": dn.name,
+		"delivery_date": dn.posting_date,
+		"rows": rows,
+		"show_drawing": any(r["drawing"] for r in rows),
+		"concessions": list(dict.fromkeys(concessions)),
+		"draft": dn.docstatus != 1,
+	}
+
+
 # ------------------------------------------------------------- readiness --
 
 
@@ -362,8 +524,11 @@ def certificate_readiness(delivery_note: str) -> dict:
 	dn = frappe.get_doc("Delivery Note", delivery_note)
 	dn.check_permission("read")
 
+	from iso_compliance.utils import coc_row_aggregate
+
 	missing, drafts, rejected, concessions, records, no_record = [], [], [], [], 0, []
 	mtc_items, mtc_gaps = [], []
+	no_results, no_specific = [], []
 	for row in dn.items:
 		chain = coc_row_inspections(row)
 		evidence = (list(chain.get("incoming") or []) + list(chain["pdi"])
@@ -385,6 +550,12 @@ def certificate_readiness(delivery_note: str) -> dict:
 		if m:
 			mtc_items.append(row.item_code)
 			mtc_gaps += [f"{row.item_code}: {g}" for g in m["gaps"]]
+		# 3.1 needs results of the delivered batches; 2.2 accepts the product's latest
+		specific = bool(_results(coc_row_aggregate(row)["parameters"])) if evidence else False
+		if not specific and not m:
+			no_specific.append(row.item_code)
+			if not _latest_results(row.item_code)[0]:
+				no_results.append(row.item_code)
 
 	def why(*parts):
 		return "; ".join(p for p in parts if p)
@@ -414,11 +585,42 @@ def certificate_readiness(delivery_note: str) -> dict:
 			),
 			"print_format": RECORD_FORMAT,
 		},
+		# EN 10204 documents; "default" says whether the email ticks it unasked.
+		"d21": {
+			"applicable": True,
+			"ready": coc_ready,
+			"reason": why(
+				dn.docstatus != 1 and _("Delivery Note not submitted"),
+				drafts and _("inspections still in draft"),
+				rejected and _("rejected inspections: {0}").format(", ".join(rejected)),
+				concessions and _("includes concession {0}").format(", ".join(concessions)),
+			),
+			"print_format": DECLARATION_FORMAT,
+			"default": False,
+		},
+		"d22": {
+			"applicable": True,
+			"ready": coc_ready and not no_results,
+			"reason": why(
+				dn.docstatus != 1 and _("Delivery Note not submitted"),
+				drafts and _("inspections still in draft"),
+				no_results and _("no test results for {0}").format(", ".join(no_results)),
+				concessions and _("includes concession {0}").format(", ".join(concessions)),
+			),
+			"print_format": TEST_REPORT_FORMAT,
+			"default": False,
+		},
 		# Gaps warn but never block: the sender decides (developer, 2026-10-13).
+		# Any delivery may carry a 3.1; it is ticked unasked only for item groups that issue one.
 		"mtc": {
-			"applicable": bool(mtc_items),
-			"ready": bool(mtc_items) and not mtc_gaps and dn.docstatus == 1,
-			"reason": _("not issued for these item groups") if not mtc_items else "; ".join(mtc_gaps),
+			"applicable": True,
+			"ready": coc_ready and not no_specific and not mtc_gaps,
+			"reason": why(
+				dn.docstatus != 1 and _("Delivery Note not submitted"),
+				no_specific and _("no inspection of the delivered batches for {0}").format(", ".join(no_specific)),
+				"; ".join(mtc_gaps),
+			),
 			"print_format": MTC_FORMAT,
+			"default": bool(mtc_items),
 		},
 	}

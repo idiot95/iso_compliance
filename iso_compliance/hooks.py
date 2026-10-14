@@ -155,6 +155,7 @@ jinja = {
 		"iso_compliance.qi.certificates.qi_record",
 		"iso_compliance.qi.certificates.dn_records",
 		"iso_compliance.qi.certificates.mtc_row",
+		"iso_compliance.qi.certificates.en10204",
 	],
 }
 
