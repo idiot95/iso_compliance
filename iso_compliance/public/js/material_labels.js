@@ -13,13 +13,11 @@ frappe.provide("hcc.labels");
 
 hcc.labels.WARN_THRESHOLD = 50;
 
+// A button of its own on the posted document (batches exist only once it is
+// posted, and the barcode carries the batch), not tucked under Print.
 hcc.labels.add_button = function (frm, label) {
 	if (frm.doc.docstatus !== 1) return;
-	frm.add_custom_button(
-		label,
-		() => hcc.labels.open_dialog(frm),
-		__("Print")
-	);
+	frm.add_custom_button(label, () => hcc.labels.open_dialog(frm));
 };
 
 hcc.labels.open_dialog = async function (frm) {

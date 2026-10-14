@@ -5,6 +5,6 @@
 
 frappe.ui.form.on("Purchase Receipt", {
 	refresh(frm) {
-		hcc.labels.add_button(frm, __("Material Labels"));
+		hcc.labels.add_button(frm, __("Print Labels"));
 	},
 });
