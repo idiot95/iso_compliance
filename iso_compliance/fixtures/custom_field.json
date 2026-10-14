@@ -651,7 +651,7 @@
   "dt": "Quality Inspection Template",
   "fieldname": "custom_drawing_section",
   "fieldtype": "Section Break",
-  "label": "Drawing",
+  "label": "Item and drawing",
   "insert_after": "quality_inspection_template_name",
   "module": "ISO Compliance"
  },
@@ -691,7 +691,7 @@
   "options": "Item",
   "insert_after": "custom_drawing_section",
   "module": "ISO Compliance",
-  "description": "The drawing is picked from this item's BOMs and attachments."
+  "description": "The plan is for this item; its BOMs' drawings are offered."
  },
  {
   "doctype": "Custom Field",
@@ -699,7 +699,7 @@
   "dt": "Item Quality Inspection Parameter",
   "fieldname": "custom_balloon_no",
   "fieldtype": "Data",
-  "label": "Balloon",
+  "label": "No.",
   "insert_after": "custom_row_type",
   "module": "ISO Compliance",
   "columns": 1,
@@ -739,7 +739,7 @@
   "options": "BOM",
   "insert_after": "custom_item",
   "module": "ISO Compliance",
-  "description": "The drawing is picked from this BOM's attachments."
+  "description": "Optional: offers only this BOM's drawings."
  },
  {
   "doctype": "Custom Field",
@@ -774,7 +774,7 @@
   "dt": "Quality Inspection Template",
   "fieldname": "custom_drawing_file",
   "fieldtype": "Select",
-  "label": "Drawing on the BOM",
+  "label": "Drawing file",
   "insert_after": "custom_bom",
   "module": "ISO Compliance",
   "description": "Choosing one attaches it to the template."
@@ -869,7 +869,7 @@
   "dt": "Quality Inspection Reading",
   "fieldname": "custom_balloon_no",
   "fieldtype": "Data",
-  "label": "Balloon",
+  "label": "No.",
   "insert_after": "custom_row_type",
   "module": "ISO Compliance",
   "columns": 1,
@@ -914,7 +914,7 @@
   "dt": "Quality Inspection Template",
   "fieldname": "custom_drawing_no",
   "fieldtype": "Data",
-  "label": "Drawing no.",
+  "label": "Drawing number",
   "insert_after": "custom_drawing_cb",
   "module": "ISO Compliance"
  },
@@ -992,12 +992,12 @@
   "dt": "Quality Inspection Template",
   "fieldname": "custom_general_tolerance",
   "fieldtype": "Select",
-  "label": "General tolerance (ISO 2768-1)",
+  "label": "General tolerance, linear and angular (ISO 2768-1)",
   "options": "None\nISO 2768-f\nISO 2768-m\nISO 2768-c\nISO 2768-v",
   "insert_after": "custom_drawing_revision",
   "module": "ISO Compliance",
   "default": "None",
-  "description": "From the drawing's title block. Applies to dimensions with no tolerance of their own."
+  "description": "From the title block. Applies to sizes printed without a tolerance of their own."
  },
  {
   "doctype": "Custom Field",
@@ -1028,7 +1028,7 @@
   "dt": "Quality Inspection Template",
   "fieldname": "custom_general_geometric",
   "fieldtype": "Select",
-  "label": "General geometric (ISO 2768-2)",
+  "label": "General tolerance, geometric (ISO 2768-2)",
   "options": "None\nH\nK\nL",
   "insert_after": "custom_general_tolerance",
   "module": "ISO Compliance",
@@ -1706,5 +1706,30 @@
   "label": "Inspection plan",
   "insert_after": "quality_inspection_template",
   "module": "ISO Compliance"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Quality Inspection-custom_print_all_sheets",
+  "dt": "Quality Inspection",
+  "fieldname": "custom_print_all_sheets",
+  "fieldtype": "Check",
+  "label": "Print every drawing sheet",
+  "insert_after": "letter_head",
+  "module": "ISO Compliance",
+  "allow_on_submit": 1,
+  "description": "Off: the inspection record prints only the drawing sheets that carry inspected numbers."
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Item Quality Inspection Parameter-custom_work_instruction",
+  "dt": "Item Quality Inspection Parameter",
+  "fieldname": "custom_work_instruction",
+  "fieldtype": "Link",
+  "options": "Controlled Document",
+  "label": "Work instruction",
+  "insert_after": "custom_test_method",
+  "module": "ISO Compliance",
+  "depends_on": "eval:doc.custom_row_type==\"Test\"",
+  "description": "How an Operational check is done; its Test Method is chosen from this work instruction's."
  }
 ]

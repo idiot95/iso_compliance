@@ -39,7 +39,7 @@ def _tt(*types):
 
 
 TEMPLATE_FIELDS = [
-	dict(fieldname="custom_drawing_section", fieldtype="Section Break", label="Drawing",
+	dict(fieldname="custom_drawing_section", fieldtype="Section Break", label="Item and drawing",
 	     insert_after="quality_inspection_template_name", collapsible=0),
 	dict(fieldname="custom_item", fieldtype="Link", options="Item", label="Item",
 	     insert_after="custom_drawing_section",
@@ -54,13 +54,13 @@ TEMPLATE_FIELDS = [
 	dict(fieldname="custom_customer", fieldtype="Link", options="Customer", label="Customer",
 	     depends_on='eval:doc.custom_drawing_source=="Customer"', insert_after="custom_drawing_source"),
 	dict(fieldname="custom_drawing_cb", fieldtype="Column Break", insert_after="custom_customer"),
-	dict(fieldname="custom_drawing_no", fieldtype="Data", label="Drawing no.", insert_after="custom_drawing_cb"),
+	dict(fieldname="custom_drawing_no", fieldtype="Data", label="Drawing number", insert_after="custom_drawing_cb"),
 	dict(fieldname="custom_drawing_revision", fieldtype="Data", label="Revision", insert_after="custom_drawing_no"),
-	dict(fieldname="custom_general_tolerance", fieldtype="Select", label="General tolerance (ISO 2768-1)",
+	dict(fieldname="custom_general_tolerance", fieldtype="Select", label="General tolerance, linear and angular (ISO 2768-1)",
 	     options="None\nISO 2768-f\nISO 2768-m\nISO 2768-c\nISO 2768-v", default="None",
 	     insert_after="custom_drawing_revision",
 	     description="From the drawing's title block. Applies to dimensions with no tolerance of their own."),
-	dict(fieldname="custom_general_geometric", fieldtype="Select", label="General geometric (ISO 2768-2)",
+	dict(fieldname="custom_general_geometric", fieldtype="Select", label="General tolerance, geometric (ISO 2768-2)",
 	     options="None\nH\nK\nL", default="None", insert_after="custom_general_tolerance"),
 	dict(fieldname="custom_product_wi", fieldtype="Link", options="Controlled Document",
 	     label="Product work instruction", insert_after="custom_general_geometric"),
@@ -76,7 +76,7 @@ ROW_FIELDS = [
 	dict(fieldname="custom_row_type", fieldtype="Select", label="Row type",
 	     options="\nDimension\nTest\nVisual\nMaterial", insert_after="parameter_group", in_list_view=1, columns=1,
 	     description="Leave blank on templates that are not drawing templates."),
-	dict(fieldname="custom_balloon_no", fieldtype="Data", label="Balloon", insert_after="custom_row_type",
+	dict(fieldname="custom_balloon_no", fieldtype="Data", label="No.", insert_after="custom_row_type",
 	     in_list_view=1, columns=1, depends_on="custom_row_type"),
 	dict(fieldname="custom_spec_text", fieldtype="Data", label="As printed", insert_after="custom_balloon_no",
 	     depends_on="custom_row_type"),
@@ -206,7 +206,7 @@ READING_FIELDS = [
 	     insert_after="parameter_group", depends_on="custom_row_type", collapsible=1),
 	dict(fieldname="custom_row_type", fieldtype="Data", label="Row type", read_only=1,
 	     insert_after="custom_drawing_section"),
-	dict(fieldname="custom_balloon_no", fieldtype="Data", label="Balloon", read_only=1,
+	dict(fieldname="custom_balloon_no", fieldtype="Data", label="No.", read_only=1,
 	     insert_after="custom_row_type", in_list_view=1, columns=1),
 	dict(fieldname="custom_class", fieldtype="Data", label="Class", read_only=1, insert_after="custom_balloon_no"),
 	dict(fieldname="custom_spec_text", fieldtype="Data", label="As printed", read_only=1, insert_after="custom_class"),
@@ -250,7 +250,7 @@ def create_phase_b():
 LAYOUT_TEMPLATE_FIELDS = [
 	dict(fieldname="custom_bom", fieldtype="Link", options="BOM", label="BOM", insert_after="custom_item",
 	     description="The drawing is picked from this BOM's attachments."),
-	dict(fieldname="custom_drawing_file", fieldtype="Select", label="Drawing on the BOM", insert_after="custom_bom",
+	dict(fieldname="custom_drawing_file", fieldtype="Select", label="Drawing file", insert_after="custom_bom",
 	     description="Choosing one attaches it to the template."),
 	dict(fieldname="custom_rows_section", fieldtype="Section Break", label="Characteristics", insert_after="custom_used_by"),
 ]

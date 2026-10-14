@@ -109,12 +109,14 @@ class Inspector {
 			${this.readonly && d.docstatus === 0 ? `<div class="qi-banner">${__("You can view this inspection but not change it.")}</div>` : ""}
 			<div class="qi-body">
 				<div class="qi-drawing">
-					<button class="qi-strip">${__("Drawing")} · ${esc(d.drawing_no || "")} <span>${__("Show")} ▾</span></button>
+					<div class="qi-close"></div>
+					<button class="qi-strip">${__("Whole drawing")} · ${esc(d.drawing_no || "")} <span>${__("Show")} ▾</span></button>
 					<div class="qi-canvas-wrap"><div class="qi-stage"><canvas></canvas><div class="qi-overlay"></div></div></div>
-					<div class="qi-zoom"><button data-z="-1" aria-label="${__("Zoom out")}">−</button><button data-z="1" aria-label="${__("Zoom in")}">+</button><span>${__("Tap a balloon")}</span></div>
+					<div class="qi-zoom"><button data-z="-1" aria-label="${__("Zoom out")}">−</button><button data-z="1" aria-label="${__("Zoom in")}">+</button><span>${__("Tap a number")}</span></div>
 				</div>
 				<div class="qi-panel"></div>
 			</div>`);
+		this.__close = null; // its pane was just replaced
 		this.$root.find(".qi-strip").on("click", () => this.$root.find(".qi-drawing").toggleClass("open") && this.draw_page());
 		this.$root.find(".qi-zoom button").on("click", (e) => {
 			this.zoom = Math.min(4, Math.max(1, this.zoom + Number($(e.currentTarget).data("z")) * 0.5));
@@ -124,10 +126,40 @@ class Inspector {
 		this.load_drawing();
 	}
 
+	// The region round the current characteristic, always in view: above the
+	// card on a phone (the whole sheet one tap away), above the sheet on a tablet.
+	async update_closeup() {
+		const $c = this.$root.find(".qi-close");
+		if (!this.drawing || !$c.length) return;
+		const r = this.d.rows[this.row];
+		const pos = r && this.pos(r);
+		const page = (pos && pos.page) || 1;
+		this.__hires = this.__hires || {};
+		if (!this.__hires[page]) {
+			const c = document.createElement("canvas");
+			const dpr = Math.min(window.devicePixelRatio || 1, 2);
+			this.__hires[page] = this.drawing.render(page, c, window.iso_qi_pdf.is_pdf(this.drawing_url) ? 2000 / dpr : 2000).then(() => c);
+		}
+		const hi = await this.__hires[page];
+		if (this.d.rows[this.row] !== r) return;
+		if (!this.__close || this.__close_page !== page) {
+			this.__close = window.iso_qi_pdf.closeup($c, hi, { page: __("Whole sheet") });
+			this.__close_page = page;
+		}
+		const colour = { done: "#16794C", failed: "#CC2929" };
+		const boxes = this.d.rows
+			.map((x) => ({ x, p: this.pos(x) }))
+			.filter(({ p }) => p && (p.page || 1) === page)
+			.map(({ x, p }) => ({ ...p, color: x === r ? "#0289F7" : colour[this.row_state(x)] || "rgba(120,120,120,.6)" }));
+		const focus = pos ? boxes.find((b) => b.x === pos.x && b.y === pos.y && b.w === pos.w) : null;
+		this.__close.show(focus, boxes);
+	}
+
 	render_panel() {
 		if (this.review) this.render_review();
 		else this.render_card();
 		this.render_balloons();
+		this.update_closeup();
 	}
 
 	render_card() {
@@ -191,7 +223,7 @@ class Inspector {
 			<div class="qi-card">
 				<div class="qi-card-head">
 					<div><span class="qi-num">${esc(r.balloon)}</span><span class="qi-name">${esc(r.specification)}</span>
-					${r.row_type !== "Dimension" ? `<span class="qi-type">${esc(__(r.row_type === "Material" ? "From 3.1" : r.row_type))}</span>` : ""}</div>
+					${r.row_type !== "Dimension" ? `<span class="qi-type">${esc({ Material: __("From 3.1"), Test: __("Operational"), Visual: __("Visual") }[r.row_type] || r.row_type)}</span>` : ""}</div>
 					${r.class ? `<span class="qi-class ${esc(r.class.toLowerCase())}">${esc(r.class)}</span>` : ""}
 				</div>
 				<div class="qi-spec"><span>${__("As on drawing")}</span><strong>${esc(r.spec_text || "")}${r.spec_text ? " → " : ""}${esc(this.limit_text(r))}</strong></div>
@@ -457,6 +489,7 @@ class Inspector {
 				this.drawing_url = url;
 			}
 			await this.draw_page();
+			this.update_closeup();
 		} catch (e) {
 			console.error(e);
 			$wrap.html(`<div class="qi-muted" style="padding:12px">${__("Could not show the drawing here")}: ${esc(e.message)}
@@ -498,7 +531,7 @@ class Inspector {
 			const p = this.pos(r);
 			if (!p || (p.page || 1) !== this.page_no) return;
 			const state = i === this.row && !this.review ? "current" : this.row_state(r);
-			$(`<button class="qi-bx ${state}" aria-label="${__("Balloon")} ${esc(r.balloon)}"><span>${esc(r.balloon)}</span></button>`)
+			$(`<button class="qi-bx ${state}" aria-label="${__("No.")} ${esc(r.balloon)}"><span>${esc(r.balloon)}</span></button>`)
 				.css({ left: p.x + "%", top: p.y + "%", width: p.w + "%", height: p.h + "%" })
 				.on("click", () => {
 					this.go_row(i);
@@ -520,6 +553,7 @@ class Inspector {
 
 	layout() {
 		if (this.d) this.draw_page();
+		if (this.d) this.update_closeup();
 	}
 }
 
@@ -540,6 +574,21 @@ frappe.dom.set_style(`
 .qi-drawing{flex:1.25;min-width:0;position:sticky;top:60px}
 .qi-drawing.none{display:none}
 .qi-strip{display:none!important}
+.qi-close{margin-bottom:8px}
+.qi-close ~ .qi-canvas-wrap{max-height:calc(64vh - 230px);min-height:200px}
+.qi-close .qi-dp canvas{display:block;width:100%;height:36vh;max-height:300px;border:1px solid var(--border-color);border-radius:12px;touch-action:none;background:#e9e9e9}
+.qi-close .qi-dp{position:relative}
+.qi-close .qi-dp-tools{position:absolute;top:8px;right:8px;display:flex;gap:6px}
+.qi-insp .qi-close .qi-dp-tools button{min-height:40px;min-width:44px;background:#fff;color:#1f272e;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+@media (pointer:coarse){
+	.qi-insp button{min-height:52px;font-size:16px}
+	.qi-insp input.qi-value{height:76px;font-size:34px}
+	.qi-field select,.qi-field input{min-height:52px;font-size:17px}
+	.qi-insp .qi-chip{min-height:46px;font-size:15px}
+	.qi-nav button{height:60px;font-size:16px}
+	.qi-stepper button{width:64px;height:64px}
+	.qi-okng button{height:88px;font-size:26px}
+}
 .qi-canvas-wrap{border:1px solid var(--border-color);border-radius:12px;background:#fff;overflow:auto;max-height:calc(100vh - 190px);touch-action:pan-x pan-y}
 .qi-stage{position:relative;margin:0 auto}.qi-stage canvas{display:block}
 .qi-overlay{position:absolute;inset:0}
@@ -602,6 +651,8 @@ frappe.dom.set_style(`
 	.qi-strip{display:flex!important;width:100%;justify-content:space-between;align-items:center}
 	.qi-strip span{color:var(--cur)}
 	.qi-drawing .qi-canvas-wrap,.qi-drawing .qi-zoom{display:none}
+	.qi-close{display:block;margin-bottom:8px}
+	.qi-drawing.open .qi-close{display:none}
 	.qi-drawing.open .qi-canvas-wrap{display:block;margin-top:8px;max-height:55vh}
 	.qi-drawing.open .qi-zoom{display:flex}
 	.qi-panel{width:100%}

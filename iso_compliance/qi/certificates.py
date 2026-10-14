@@ -47,11 +47,17 @@ def _data_uri(file_url: str) -> str | None:
 
 
 def _pages(template: str) -> list[str]:
-	raw = frappe.db.get_value("Quality Inspection Template", template, "custom_drawing_pages")
+	from iso_compliance.qi.template import page_images
+
 	try:
-		return (frappe.parse_json(raw) or {}).get("pages") or []
+		return page_images(frappe.get_doc("Quality Inspection Template", template))
 	except Exception:
-		return []
+		frappe.log_error(title=f"Drawing page images: {template}")
+		raw = frappe.db.get_value("Quality Inspection Template", template, "custom_drawing_pages")
+		try:
+			return (frappe.parse_json(raw) or {}).get("pages") or []
+		except Exception:
+			return []
 
 
 def _limit_text(r) -> str:
@@ -109,6 +115,8 @@ def qi_record(name: str) -> dict | None:
 			"min": r.custom_obs_min if r.custom_row_type != "Visual" else None,
 			"max": r.custom_obs_max if r.custom_row_type != "Visual" else None,
 			"status": r.status,
+			# from the values themselves: the row's status is refreshed only when the inspection is saved
+			"bad": r.status == "Rejected" or any(v["bad"] for v in values),
 		})
 		src = tpl_rows.get(r.custom_balloon_no)
 		if src and src.custom_position:
@@ -117,15 +125,15 @@ def qi_record(name: str) -> dict | None:
 			except Exception:
 				pos = None
 			if pos:
-				boxes.setdefault(cint(pos.get("page") or 1), []).append({
-					**pos, "balloon": r.custom_balloon_no,
-					"state": "bad" if r.status == "Rejected" else "ok",
-				})
+				# red: out of spec; green: every planned sample measured and in spec; grey: not finished
+				state = "bad" if rows[-1]["bad"] else ("ok" if values and len(values) >= cint(r.custom_sample_count) else "todo")
+				boxes.setdefault(cint(pos.get("page") or 1), []).append({**pos, "balloon": r.custom_balloon_no, "state": state})
 
-	pages = [
-		{"image": _data_uri(url), "boxes": boxes.get(i, [])}
-		for i, url in enumerate(_pages(qi.quality_inspection_template), 1)
-	]
+	# the sheets that carry numbers, or every sheet when the inspection asks for it
+	urls = _pages(qi.quality_inspection_template)
+	every = cint(qi.get("custom_print_all_sheets"))
+	keep = [i for i in range(1, len(urls) + 1) if every or i in boxes] or ([1] if urls else [])
+	pages = [{"no": i, "image": _data_uri(urls[i - 1]), "boxes": boxes.get(i, [])} for i in keep]
 	conditions = [c for c in qi.get("custom_conditions") or []]
 	return {
 		"name": qi.name,
@@ -161,7 +169,13 @@ def qi_record(name: str) -> dict | None:
 		],
 		"rows": rows,
 		"pages": [p for p in pages if p["image"]],
-		"failed": [r for r in rows if r["status"] == "Rejected"],
+		"failed": [r for r in rows if r["bad"]],
+		"sheets": len(urls),
+		"counts": {
+			"conform": sum(1 for r in rows if not r["bad"] and r["n"] and r["n"] >= r["required"]),
+			"failed": sum(1 for r in rows if r["bad"]),
+			"open": sum(1 for r in rows if not r["bad"] and (not r["n"] or r["n"] < r["required"])),
+		},
 	}
 
 

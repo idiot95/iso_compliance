@@ -15,11 +15,17 @@
 	.sir-h { font-size: 8.8pt; font-weight: 700; margin: 8pt 0 3pt; color: #1f3d2b; }
 	.sir-drawing { position: relative; width: 100%; border: 0.5pt solid #999; margin-bottom: 6pt; page-break-inside: avoid; }
 	.sir-drawing img { width: 100%; display: block; }
-	.sir-box { position: absolute; border: 1.4pt solid #1d6fd1; }
-	.sir-box.bad { border-color: #c0262d; }
+	.sir-box { position: absolute; border: 1.4pt solid #8a8a8a; }
+	.sir-box.ok { border-color: #1f7a4a; }
+	.sir-box.bad { border: 2.2pt solid #c0262d; background: rgba(192, 38, 45, 0.12); }
 	.sir-bal { position: absolute; top: -8pt; left: -8pt; width: 15pt; height: 15pt; line-height: 15pt; border-radius: 8pt;
-		background: #1d6fd1; color: #fff; font-size: 7pt; font-weight: 700; text-align: center; }
-	.sir-box.bad .sir-bal { background: #c0262d; }
+		background: #8a8a8a; color: #fff; font-size: 7pt; font-weight: 700; text-align: center; }
+	.sir-box.ok .sir-bal { background: #1f7a4a; }
+	.sir-box.bad .sir-bal { background: #c0262d; width: 18pt; height: 18pt; line-height: 18pt; border-radius: 9pt; top: -10pt; left: -10pt; }
+	.sir-key { font-size: 6.6pt; color: #444; margin: -3pt 0 6pt; }
+	.sir-key b { display: inline-block; width: 8pt; height: 8pt; border-radius: 4pt; vertical-align: -1pt; margin: 0 2pt 0 8pt; }
+	.sir-sum td { font-size: 8pt; padding: 3pt 6pt; border: 0.6pt solid #000; text-align: center; }
+	.sir-sum strong { font-size: 11pt; display: block; }
 	table.sir-rows { width: 100%; border-collapse: collapse; margin: 2pt 0 8pt; }
 	.sir-rows th, .sir-rows td { border: 0.5pt solid #666; padding: 2.5pt 4pt; font-size: 7.4pt; text-align: left; vertical-align: top; }
 	.sir-rows th { background: #f2f2f2; font-size: 6.4pt; text-transform: uppercase; letter-spacing: 0.3pt; }
@@ -60,8 +66,16 @@
 	<td colspan="2"><span class="sir-lbl">Work instructions</span>{% for w in rec.work_instructions %}{{ w.doc.split("/")[-1] }}{% if w.revision %} Rev {{ w.revision }}{% endif %}{% if not loop.last %} &middot; {% endif %}{% else %}&mdash;{% endfor %}</td>
 </tr></table>
 
+<table class="sir-sum" style="width:100%;border-collapse:collapse;margin-bottom:6pt"><tr>
+	<td><strong class="sir-ok">{{ rec.counts.conform }}</strong>conform</td>
+	<td><strong class="{{ 'sir-nok' if rec.counts.failed }}">{{ rec.counts.failed }}</strong>out of specification</td>
+	<td><strong>{{ rec.counts.open }}</strong>not fully measured</td>
+	<td><strong>{{ "Draft" if rec.docstatus == 0 else rec.disposition }}</strong>{{ "not submitted" if rec.docstatus == 0 else "disposition" }}</td>
+</tr></table>
+
 {%- for page in rec.pages %}
-<div class="sir-h">Drawing{% if rec.pages | length > 1 %} &middot; page {{ loop.index }}{% endif %} &mdash; balloons as inspected{% if rec.failed %} (red: out of specification){% endif %}</div>
+<div class="sir-h">Drawing{% if rec.sheets > 1 %} &middot; sheet {{ page.no }} of {{ rec.sheets }}{% endif %} &mdash; numbers as inspected</div>
+<div class="sir-key"><b style="background:#1f7a4a"></b>conforms<b style="background:#c0262d"></b>out of specification<b style="background:#8a8a8a"></b>not fully measured</div>
 <div class="sir-drawing">
 	<img src="{{ page.image }}">
 	{%- for b in page.boxes %}
@@ -86,7 +100,7 @@
 		<td>{%- for v in r["values"] %}<span class="sir-v {{ 'bad' if v.bad }}"><i>{{ v.n }}</i>{{ v.value }}</span>{% endfor -%}</td>
 		<td>{{ r.n }}{% if r.required and r.n < r.required %}/{{ r.required }}{% endif %}</td>
 		<td>{% if r.min is not none and r.n %}{{ r.min }}{% if r.max != r.min %} &ndash; {{ r.max }}{% endif %}{% else %}&mdash;{% endif %}</td>
-		<td>{% if r.status == "Rejected" %}<span class="sir-nok">Out of spec</span>{% else %}<span class="sir-ok">Conforms</span>{% endif %}</td>
+		<td>{% if r.bad %}<span class="sir-nok">Out of spec</span>{% elif r.required and r.n < r.required %}Not fully measured{% else %}<span class="sir-ok">Conforms</span>{% endif %}</td>
 	</tr>
 	{%- endfor %}
 	</tbody>

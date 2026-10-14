@@ -29,8 +29,7 @@ frappe.ui.form.on("Quality Inspection Template", {
 	},
 
 	refresh(frm) {
-		// drawing templates are edited through the table under the drawing, not the raw grid
-		frm.set_df_property(QI_ROWS, "hidden", frm.doc.custom_item || qi_is_drawing(frm) ? 1 : 0);
+		qi_form_layout(frm);
 		const builder = qi_builder(frm);
 		builder.render();
 		qi_drawing_options(frm);
@@ -94,6 +93,31 @@ frappe.ui.form.on("Quality Inspection Template", {
 	custom_drawing_revision: (frm) => qi_rename_hint(frm),
 });
 
+// Only the new format shows. The builder under the drawing holds the rows, the
+// lock, the supersession and "Used by", so the raw fields behind it stay out of
+// sight. A template from before drawings (no item, no drawing rows) is
+// archived: read only, still used by its items until a new-format one replaces it.
+const QIT_BEHIND_BUILDER = [QI_ROWS, "custom_rows_section", "custom_drawing", "custom_locked", "custom_superseded_by", "custom_used_by"];
+
+function qi_is_legacy(frm) {
+	return !frm.is_new() && !frm.doc.custom_item && (frm.doc[QI_ROWS] || []).length > 0 && !qi_is_drawing(frm);
+}
+
+function qi_form_layout(frm) {
+	QIT_BEHIND_BUILDER.forEach((f) => frm.set_df_property(f, "hidden", 1));
+	// sub-headings inside the "Item and drawing" section
+	[["custom_item", __("Item")], ["custom_drawing_no", __("Drawing")], ["custom_general_tolerance", __("General tolerances (title block)")]].forEach(([f, label]) => {
+		const $f = frm.fields_dict[f] && $(frm.fields_dict[f].wrapper);
+		if ($f && !$f.prev(".qi-col-head").length) $f.before(`<div class="qi-col-head">${label}</div>`);
+	});
+	const legacy = qi_is_legacy(frm);
+	frm.set_df_property("custom_drawing_section", "hidden", legacy ? 1 : 0);
+	if (legacy) {
+		frm.set_read_only();
+		frm.disable_save();
+	}
+}
+
 function qi_guess_drawing(file) {
 	// "40.054.GA.R03.pdf" → drawing 40.054.GA, revision 03
 	const base = (file || "").replace(/\.(pdf|png|jpe?g)$/i, "");
@@ -120,9 +144,10 @@ async function qi_drawing_options(frm, autopick) {
 	if (cur && !mine.some((f) => f.name === cur)) options.push({ label: cur, value: cur }); // uploaded to the template
 	frm.set_df_property("custom_drawing_file", "options", options);
 	frm.set_df_property("custom_drawing_file", "description", mine.length
-		? __("Choosing one attaches it to the template.")
+		? `<a class="qi-browse">${__("Look at the drawings before choosing")}</a>`
 		: bom ? __("{0} has no PDF or image attached. Upload one in the drawing panel below.", [bom]) : "");
 	frm.refresh_field("custom_drawing_file");
+	$(frm.fields_dict.custom_drawing_file.wrapper).find(".qi-browse").off("click").on("click", () => qi_pick_drawing(frm));
 	if (autopick && mine.length === 1 && !frm.doc.custom_drawing_file) frm.set_value("custom_drawing_file", mine[0].name);
 }
 
@@ -221,50 +246,49 @@ class QIBuilder {
 		const $p = this.mount();
 		if (!$p) return;
 		const d = this.doc;
-		if (this.frm.is_new()) {
-			$p.html(`<div class="text-muted small" style="padding:12px 15px">${__(
-				"Choose the Item, then its BOM, then the drawing on that BOM: the drawing opens here."
-			)}</div>`);
-			return;
-		}
-		if (!d.custom_item && !qi_is_drawing(this.frm)) {
-			$p.html(`<div class="text-muted small" style="padding:12px 15px">${__(
-				"To make this a drawing template, set the Item above. Templates without drawing rows behave exactly as before."
-			)}</div>`);
-			this.render_used_by();
+		if (qi_is_legacy(this.frm)) {
+			this.render_legacy();
 			return;
 		}
 		const locked = !!d.custom_locked;
 		const editable = qi_can_edit() && !locked;
+		const pick_label = d.custom_drawing ? __("Change drawing") : d.custom_item ? __("Choose drawing") : __("Upload drawing");
 		$p.html(`
-			<div class="qi-b-head">
-				<div class="qi-b-title">${__("Drawing and characteristics")}</div>
-				<div class="qi-b-status ${locked ? "locked" : ""}">${
-					locked ? __("Locked · inspections submitted; change through New Revision") : __("Editable · not used yet")
-				}</div>
-			</div>
 			<div class="qi-b-banner"></div>
-			<div class="qi-b-toolbar">
-				${editable ? `<button class="btn btn-xs btn-default qi-pick">${__("Other drawing / upload")}</button>` : ""}
-				${editable && d.custom_drawing ? `<button class="btn btn-xs qi-mode ${this.mode === "draw" ? "btn-primary" : "btn-default"}" data-mode="draw">▭ ${__("Draw balloon")}</button>` : ""}
-				<span class="qi-b-hint text-muted small">${
-					d.custom_drawing ? (editable ? __("Select a row or draw a box: the balloon goes where you draw.") : "") : __("No drawing yet.")
-				}</span>
-				<span class="qi-b-spacer"></span>
-				<span class="qi-b-pages small"></span>
-				<button class="btn btn-xs btn-default qi-zoom" data-z="-1">−</button>
-				<span class="small qi-zoom-val">${Math.round(this.zoom * 100)}%</span>
-				<button class="btn btn-xs btn-default qi-zoom" data-z="1">+</button>
+			<div class="qi-b-block">
+				<div class="qi-b-head">
+					<div class="qi-b-title">${__("Drawing")}</div>
+					<span class="qi-b-status ${locked ? "locked" : ""}">${
+						locked ? __("Locked · inspections submitted; change through New Revision") : __("Editable")
+					}</span>
+					<span class="qi-b-spacer"></span>
+					${editable ? `<button class="btn btn-xs btn-default qi-pick-btn">${pick_label}</button>` : ""}
+					${editable && d.custom_drawing ? `<button class="btn btn-xs qi-mode ${this.mode === "draw" ? "btn-primary" : "btn-default"}" data-mode="draw">${__("Mark on drawing")}</button>` : ""}
+				</div>
+				${d.custom_drawing ? `<div class="qi-b-toolbar">
+					<span class="qi-b-hint text-muted small">${editable ? __("Mark on drawing, then drag a box round what is checked: its number goes there.") : ""}</span>
+					<span class="qi-b-spacer"></span>
+					<span class="qi-b-pages small"></span>
+					<button class="btn btn-xs btn-default qi-zoom" data-z="-1">−</button>
+					<span class="small qi-zoom-val">${Math.round(this.zoom * 100)}%</span>
+					<button class="btn btn-xs btn-default qi-zoom" data-z="1">+</button>
+				</div>` : `<div class="qi-b-nodrawing text-muted small">${__("No drawing. Characteristics can be added without one; a drawing can be added at any time.")}</div>`}
+				<div class="qi-b-canvas-wrap"><div class="qi-b-stage"><canvas></canvas><div class="qi-b-overlay"></div></div></div>
 			</div>
-			<div class="qi-b-canvas-wrap"><div class="qi-b-stage"><canvas></canvas><div class="qi-b-overlay"></div></div></div>
-			<div class="qi-b-add">
-				${editable ? `<button class="btn btn-xs btn-default qi-add" data-type="Dimension">+ ${__("Dimension")}</button>
-				<button class="btn btn-xs btn-default qi-add" data-type="Test">+ ${__("Test (from Test Method)")}</button>
-				<button class="btn btn-xs btn-default qi-add" data-type="Visual">+ ${__("Visual check")}</button>
-				<button class="btn btn-xs btn-default qi-add" data-type="Material">+ ${__("Material (supplier 3.1)")}</button>` : ""}
+			<div class="qi-b-block">
+				<div class="qi-b-head">
+					<div class="qi-b-title">${__("Characteristics")}</div>
+					<span class="qi-b-count text-muted small"></span>
+					<span class="qi-b-spacer"></span>
+					${editable ? `<span class="text-muted small">${__("Add")}</span>
+					<button class="btn btn-xs btn-default qi-add" data-type="Dimension">${__("Dimensional")}</button>
+					<button class="btn btn-xs btn-default qi-add" data-type="Test">${__("Operational")}</button>
+					<button class="btn btn-xs btn-default qi-add" data-type="Visual">${__("Visual")}</button>
+					<button class="btn btn-xs btn-default qi-add" data-type="Material">${__("Material (3.1)")}</button>` : ""}
+				</div>
+				<div class="qi-b-table"></div>
 			</div>
-			<div class="qi-b-table"></div>
-			<div class="qi-b-used"></div>
+			<div class="qi-b-block qi-b-used"></div>
 		`);
 		this.bind();
 		this.render_table();
@@ -275,7 +299,7 @@ class QIBuilder {
 
 	bind() {
 		const $p = this.$panel;
-		$p.find(".qi-pick").on("click", () => qi_pick_drawing(this.frm));
+		$p.find(".qi-pick-btn").on("click", () => qi_pick_drawing(this.frm));
 		$p.find(".qi-mode").on("click", () => {
 			this.mode = this.mode === "draw" ? "select" : "draw";
 			$p.find(".qi-mode").toggleClass("btn-primary", this.mode === "draw").toggleClass("btn-default", this.mode !== "draw");
@@ -343,6 +367,24 @@ class QIBuilder {
 			});
 		}
 		this.render_boxes();
+	}
+
+	// A sharp copy of a page for the popup's close-up, kept until the drawing changes.
+	hires(page) {
+		const key = `${this.drawing_url}#${page}`;
+		if (!this.__hires || this.__hires.url !== this.drawing_url) this.__hires = { url: this.drawing_url };
+		if (!this.__hires[key]) {
+			this.__hires[key] = (async () => {
+				await this.opening;
+				const c = document.createElement("canvas");
+				const dpr = Math.min(window.devicePixelRatio || 1, 2);
+				const pdf = window.iso_qi_pdf.is_pdf(this.drawing_url);
+				if (!(await this.drawing.render(page, c, pdf ? 2400 / dpr : 2400))) throw new Error("render cancelled");
+				return c;
+			})();
+			this.__hires[key].catch(() => delete this.__hires[key]);
+		}
+		return this.__hires[key];
 	}
 
 	render_boxes() {
@@ -468,7 +510,8 @@ class QIBuilder {
 		const rows = (this.doc[QI_ROWS] || []).filter((r) => r.custom_row_type);
 		const $t = this.$panel.find(".qi-b-table");
 		if (!rows.length) {
-			$t.html(`<div class="qi-empty">${__("No characteristics yet. Draw a box round a dimension on the drawing, or use the buttons above.")}</div>`);
+			this.$panel.find(".qi-b-count").text("");
+			$t.html(`<div class="qi-empty">${__("No characteristics yet. Mark one on the drawing, or use Add above.")}</div>`);
 			return;
 		}
 		const stages = (r) =>
@@ -486,17 +529,17 @@ class QIBuilder {
 			const n = (r.custom_instruments || "").split("\n").filter(Boolean).length;
 			return n ? __("{0} chosen", [n]) : r.custom_row_type === "Visual" ? "" : `<span class="text-muted">${__("any")}</span>`;
 		};
-		$t.html(`<div class="qi-b-subtitle">${__("Characteristics")} <span class="text-muted small">${__("click a row to change it")}</span></div>
-			<table class="table table-sm qi-rows">
-			<thead><tr><th>${__("Balloon")}</th><th>${__("What is checked")}</th><th>${__("On the drawing")}</th>
-			<th>${__("Accept")}</th><th>${__("Importance")}</th><th>${__("Stages")}</th><th>${__("Pieces")}</th><th>${__("Instruments")}</th></tr></thead>
+		this.$panel.find(".qi-b-count").text(__("{0} · click a row to change it", [rows.length]));
+		$t.html(`<table class="table table-sm qi-rows">
+			<thead><tr><th>${__("No.")}</th><th>${__("Parameter")}</th><th>${__("As specified")}</th>
+			<th>${__("Acceptance range")}</th><th>${__("Classification")}</th><th>${__("Stages")}</th><th>${__("Sample")}</th><th>${__("Instruments")}</th></tr></thead>
 			<tbody>${rows
 				.map(
 					(r) => `<tr data-row="${r.name}" class="${this.selected === r.name ? "selected" : ""}">
 				<td><span class="qi-balloon static">${qi_esc(r.custom_balloon_no || "")}</span>${
 						r.custom_row_type === "Dimension" && !qi_pos(r) ? ` <span class="text-warning" title="${__("No box on the drawing")}">◌</span>` : ""
 					}</td>
-				<td>${qi_esc(r.specification)}<div class="text-muted small">${qi_esc(__(r.custom_row_type))}${r.custom_test_method ? " · " + qi_esc(r.custom_test_method) : ""}</div></td>
+				<td>${qi_esc(r.specification)}<div class="text-muted small">${qi_esc(qi_type_label(r.custom_row_type))}${r.custom_test_method ? " · " + qi_esc(r.custom_test_method) : ""}</div></td>
 				<td class="qi-mono">${qi_esc(r.custom_spec_text || "")}${
 					r.custom_spec_text && r.custom_unit && r.custom_unit !== "°" && r.custom_tolerance_type !== "Geometric (GD&T)" ? " " + qi_esc(r.custom_unit) : ""
 				}</td>
@@ -512,6 +555,43 @@ class QIBuilder {
 			const name = $(e.currentTarget).data("row");
 			this.select(name);
 			if (qi_can_edit() && !this.doc.custom_locked) qi_balloon_dialog(this.frm, locals["Item Quality Inspection Parameter"][name]);
+		});
+	}
+
+	// An archived template: its checks, read only, and the way to the new format.
+	render_legacy() {
+		const rows = this.doc[QI_ROWS] || [];
+		const accept = (r) =>
+			r.formula_based_criteria ? r.acceptance_formula : r.numeric ? `${qi_num(r.min_value)} … ${qi_num(r.max_value)}` : r.value || "";
+		this.$panel.html(`
+			<div class="qi-b-head">
+				<div class="qi-b-title">${__("Old-format template")}</div>
+				<div class="qi-b-status">${__("Archived · read only")}</div>
+			</div>
+			<div class="alert alert-warning small">${__(
+				"Made before drawing-based inspection. Inspections of the items below still use it as it is. To change what is inspected, make the new-format template from the item's drawing; tagging it on the item replaces this one."
+			)} ${qi_can_edit() ? `<button class="btn btn-xs btn-primary qi-start-new" style="margin-left:6px">${__("New-format template")}</button>` : ""}</div>
+			<div class="qi-b-subtitle">${__("Checks in this template")}</div>
+			<table class="table table-sm qi-legacy"><thead><tr><th>${__("Parameter")}</th><th>${__("Group")}</th><th>${__("Accept")}</th></tr></thead>
+			<tbody>${rows
+				.map((r) => `<tr><td>${qi_esc(r.specification)}</td><td class="text-muted">${qi_esc(r.parameter_group || "")}</td><td>${qi_esc(accept(r))}</td></tr>`)
+				.join("")}</tbody></table>
+			<div class="qi-b-used"></div>`);
+		this.render_used_by();
+		this.$panel.find(".qi-start-new").on("click", async () => {
+			const { message: m } = await frappe.call({ method: `${QI}.used_by`, args: { template: this.doc.name } });
+			const d = new frappe.ui.Dialog({
+				title: __("New-format template"),
+				fields: [{ fieldname: "item", fieldtype: "Link", options: "Item", label: __("Item"), reqd: 1, default: (m.items[0] || {}).name,
+					description: __("Its BOMs' drawings are offered next.") }],
+				primary_action_label: __("Next"),
+				primary_action: async (v) => {
+					d.hide();
+					await frappe.require("/assets/iso_compliance/js/qi_start_template.js");
+					iso_qi.start_template(v.item);
+				},
+			});
+			d.show();
 		});
 	}
 
@@ -533,7 +613,7 @@ class QIBuilder {
 			$u.html(`<div class="qi-b-subtitle">${__("Used by")}</div>${
 				html.length ? html.join("") : `<div class="text-muted small">${__("Nothing points at this template yet. Use Tag Items / BOMs.")}</div>`
 			}<div class="text-muted small" style="margin-top:6px">${__(
-				"Once an inspection is submitted against this template, drawing, balloons and limits lock; changes go through New Revision."
+				"Once an inspection is submitted against this plan, its drawing, numbers and limits lock; changes go through New Revision."
 			)}</div>`);
 			$u.find(".qi-untag").on("click", (e) => {
 				const { dt, name } = $(e.currentTarget).data();
@@ -547,6 +627,7 @@ class QIBuilder {
 	render_banner() {
 		const $b = this.$panel.find(".qi-b-banner").empty();
 		const d = this.doc;
+		if (this.frm.is_new()) return;
 		if (d.custom_superseded_by) {
 			$b.html(`<div class="alert alert-warning small">${__("Superseded by {0}", [
 				`<a href="/app/quality-inspection-template/${encodeURIComponent(d.custom_superseded_by)}">${qi_esc(d.custom_superseded_by)}</a>`,
@@ -643,13 +724,14 @@ const QI_GDT = {
 	"Profile of a surface": "⌓",
 };
 const QI_PREFIXES = ["", "Ø", "R", "SØ", "SR", "□"];
+// Stored values stay Dimension / Test / Visual / Material; people read these names.
 const QI_ROW_TYPES = [
-	["Dimension", "⌀", __("Dimension")],
-	["Test", "⚗", __("Test")],
-	["Visual", "👁", __("Visual")],
-	["Material", "▤", __("Material (3.1)")],
+	["Dimension", __("Dimensional")],
+	["Test", __("Operational")],
+	["Visual", __("Visual")],
+	["Material", __("Material (3.1)")],
 ];
-const QI_DIALOG_STAGES = QI_STAGES.filter(([f]) => !["custom_stage_fai", "custom_stage_type_test"].includes(f)); // Phase F later
+const qi_type_label = (t) => (QI_ROW_TYPES.find(([v]) => v === t) || [t, t])[1];
 
 function qi_num(x) {
 	if (x == null || x === "") return "";
@@ -719,58 +801,101 @@ function qi_instruments() {
 	return window.__qi_instruments;
 }
 
+// Stage check fields on the row and the stage names an inspection carries.
+const QI_STAGE_NAMES = {
+	custom_stage_incoming: "Incoming",
+	custom_stage_in_process: "In Process",
+	custom_stage_final: "Final",
+};
+
+// custom_instruments: one Asset per line; "Incoming: ASSET" narrows it to a stage.
+function qi_parse_instruments(text) {
+	const out = { "": new Set() };
+	Object.values(QI_STAGE_NAMES).forEach((s) => (out[s] = null)); // null: same as every stage
+	(text || "").split("\n").forEach((line) => {
+		line = line.trim();
+		if (!line) return;
+		const i = line.indexOf(":");
+		const stage = i > 0 ? line.slice(0, i).trim() : "";
+		if (stage && stage in out) (out[stage] = out[stage] || new Set()).add(line.slice(i + 1).trim());
+		else out[""].add(line);
+	});
+	return out;
+}
+function qi_join_instruments(inst, stages) {
+	const lines = [...inst[""]];
+	Object.entries(QI_STAGE_NAMES).forEach(([f, s]) => {
+		if (stages[f] && inst[s]) inst[s].forEach((n) => lines.push(`${s}: ${n}`));
+	});
+	return lines.join("\n");
+}
+
 function qi_balloon_dialog(frm, row, defaults = {}, on_cancel) {
 	const r = row || {};
-	const general = frm.doc.custom_general_tolerance;
+	const type = r.custom_row_type || defaults.row_type || "Dimension";
 	const st = {
-		row_type: r.custom_row_type || defaults.row_type || "Dimension",
+		row_type: type,
+		cls: r.custom_class || "Major",
 		tt: r.custom_tolerance_type || "",
 		prefix: qi_prefix_of(r.custom_spec_text),
 		dev_signs: qi_dev_signs_of(r.custom_upper_dev, r.custom_lower_dev),
-		instruments: new Set((r.custom_instruments || "").split("\n").map((x) => x.trim()).filter(Boolean)),
+		inst: qi_parse_instruments(r.custom_instruments),
+		inst_tab: "",
+		inst_filter: "",
+		when: {
+			stages: Object.fromEntries(
+				Object.keys(QI_STAGE_NAMES).map((f) => [f, row ? (r[f] ? 1 : 0) : (type === "Material" ? f === "custom_stage_incoming" : f === "custom_stage_final") ? 1 : 0])
+			),
+			in_process_at: r.custom_in_process_at || "Every check",
+			frequency: r.custom_frequency || "Every lot",
+			frequency_n: r.custom_frequency_n || null,
+			sampling: r.custom_sampling || "Lot sample",
+			fixed_count: r.custom_fixed_count || null,
+		},
 	};
 	if (!st.tt && st.row_type !== "Visual") st.tt = st.row_type === "Dimension" ? QI_TT.SYM : QI_TT.LIM;
-	const new_stage = (f) => (st.row_type === "Material" ? f === "custom_stage_incoming" : f === "custom_stage_final") ? 1 : 0;
 
 	const d = new frappe.ui.Dialog({
-		title: row ? __("Balloon {0}", [r.custom_balloon_no]) : __("New characteristic"),
-		size: "extra-large",
+		title: row ? __("Characteristic {0}", [r.custom_balloon_no]) : __("New characteristic"),
+		size: "large",
 		fields: [
+			{ fieldtype: "Section Break", fieldname: "char_section", label: __("Characteristic") },
 			{ fieldname: "type_html", fieldtype: "HTML" },
+			{ fieldtype: "Section Break", fieldname: "what_section" },
 			{
 				fieldname: "specification",
 				fieldtype: "Link",
 				options: "Quality Inspection Parameter",
-				label: __("What is checked"),
+				label: __("Parameter"),
 				reqd: 1,
 				default: r.specification,
 				description: __("e.g. Width, Length, Hardness, Shunt length"),
 			},
+			{
+				fieldname: "work_instruction",
+				fieldtype: "Link",
+				options: "Controlled Document",
+				label: __("Work instruction"),
+				default: r.custom_work_instruction,
+				hidden: 1,
+				get_query: () => ({ filters: { name: ["like", "%WI-%"] } }),
+				description: __("How the check is done. Its test methods are offered next."),
+			},
 			{ fieldname: "test_method", fieldtype: "Link", options: "Test Method", label: __("Test method"), default: r.custom_test_method, hidden: 1 },
 			{ fieldtype: "Column Break" },
-			{ fieldname: "balloon_no", fieldtype: "Data", label: __("Balloon no."), default: r.custom_balloon_no, description: __("Leave blank for the next number") },
-			{
-				fieldname: "class",
-				fieldtype: "Select",
-				label: __("Importance"),
-				options: [
-					{ value: "CTQ", label: __("CTQ · critical to quality") },
-					{ value: "Major", label: __("Major") },
-					{ value: "Minor", label: __("Minor") },
-				],
-				default: r.custom_class || "Major",
-			},
+			{ fieldname: "balloon_no", fieldtype: "Data", label: __("Reference no."), default: r.custom_balloon_no, description: __("Blank: the next number") },
+			{ fieldtype: "Column Break" },
+			{ fieldname: "class_html", fieldtype: "HTML" },
 
-			{ fieldtype: "Section Break", fieldname: "tol_section", label: __("Tolerance, as shown on the drawing") },
+			{ fieldtype: "Section Break", fieldname: "tol_section", label: __("Tolerance as specified on the drawing") },
+			{ fieldname: "general_html", fieldtype: "HTML" },
 			{ fieldname: "tt_html", fieldtype: "HTML" },
 			{ fieldname: "prefix_html", fieldtype: "HTML" },
 			{ fieldname: "dev_html", fieldtype: "HTML" },
 			{ fieldtype: "Section Break", fieldname: "tol_inputs" },
-			{ fieldname: "nominal", fieldtype: "Data", label: __("Nominal"), default: qi_num(r.custom_nominal) },
-			{ fieldname: "tol", fieldtype: "Data", label: __("± Tolerance"), default: qi_num(r.custom_tol) },
-			{ fieldname: "upper_dev", fieldtype: "Data", label: __("Upper deviation"), default: qi_num(qi_abs(r.custom_upper_dev)) },
-			{ fieldname: "lower_dev", fieldtype: "Data", label: __("Lower deviation"), default: qi_num(qi_abs(r.custom_lower_dev)) },
-			{ fieldname: "fit_class", fieldtype: "Data", label: __("Fit class"), default: r.custom_fit_class, description: __("e.g. H7, h9, js7") },
+			// three columns, so each kind's boxes sit side by side
+			{ fieldname: "nominal", fieldtype: "Data", label: __("Nominal value"), default: qi_num(r.custom_nominal) },
+			{ fieldname: "lower", fieldtype: "Data", label: __("Lower limit"), default: qi_num(qi_shown_limit(r.min_value)) },
 			{
 				fieldname: "gdt_symbol",
 				fieldtype: "Select",
@@ -778,9 +903,14 @@ function qi_balloon_dialog(frm, row, defaults = {}, on_cancel) {
 				options: Object.entries(QI_GDT).map(([value, sym]) => ({ value, label: `${sym}  ${__(value)}` })),
 				default: r.custom_gdt_symbol || "Position",
 			},
-			{ fieldname: "datums", fieldtype: "Data", label: __("Datums"), default: r.custom_datums, description: __("e.g. A B") },
-			{ fieldname: "lower", fieldtype: "Data", label: __("Min (≥)"), default: qi_num(qi_shown_limit(r.min_value)) },
-			{ fieldname: "upper", fieldtype: "Data", label: __("Max (≤)"), default: qi_num(qi_shown_limit(r.max_value)) },
+			{ fieldtype: "Column Break" },
+			{ fieldname: "tol", fieldtype: "Data", label: __("Tolerance (±)"), default: qi_num(r.custom_tol) },
+			{ fieldname: "upper_dev", fieldtype: "Data", label: __("Upper deviation"), default: qi_num(qi_abs(r.custom_upper_dev)) },
+			{ fieldname: "upper", fieldtype: "Data", label: __("Upper limit"), default: qi_num(qi_shown_limit(r.max_value)) },
+			{ fieldname: "fit_class", fieldtype: "Data", label: __("Fit (ISO 286)"), default: r.custom_fit_class, description: __("e.g. H7, h9, js7") },
+			{ fieldtype: "Column Break" },
+			{ fieldname: "lower_dev", fieldtype: "Data", label: __("Lower deviation"), default: qi_num(qi_abs(r.custom_lower_dev)) },
+			{ fieldname: "datums", fieldtype: "Data", label: __("Datum references"), default: r.custom_datums, description: __("e.g. A B") },
 			{
 				fieldname: "angle_side",
 				fieldtype: "Data",
@@ -788,36 +918,20 @@ function qi_balloon_dialog(frm, row, defaults = {}, on_cancel) {
 				hidden: 1,
 				description: __("ISO 2768 angular tolerance depends on it."),
 			},
-			{ fieldtype: "Column Break" },
 			{
 				fieldname: "unit",
 				fieldtype: "Link",
 				options: "UOM",
-				label: __("Unit"),
+				label: __("Unit of measure"),
 				default: r.custom_unit || (st.row_type === "Dimension" ? "mm" : ""),
 			},
+			{ fieldtype: "Section Break", fieldname: "preview_section" },
 			{ fieldname: "limits_preview", fieldtype: "HTML" },
 
-			{ fieldtype: "Section Break", label: __("When and how many") },
-			...QI_DIALOG_STAGES.map(([f, label]) => ({ fieldname: f, fieldtype: "Check", label, default: row ? r[f] : new_stage(f) })),
-			{
-				fieldname: "in_process_at",
-				fieldtype: "Select",
-				label: __("In process, check at"),
-				options: "Every check\nFirst-off only\nFirst-off and last-off",
-				default: r.custom_in_process_at || "Every check",
-				depends_on: "custom_stage_in_process",
-			},
-			{ fieldtype: "Column Break" },
-			{ fieldname: "frequency", fieldtype: "Select", label: __("How often"), options: "Every lot\nFirst article only\nEvery N lots\nEvery N months", default: r.custom_frequency || "Every lot" },
-			{ fieldname: "frequency_n", fieldtype: "Int", label: "N", default: r.custom_frequency_n, depends_on: 'eval:["Every N lots","Every N months"].includes(doc.frequency)' },
-			{ fieldname: "sampling", fieldtype: "Select", label: __("Pieces to check"), options: [
-				{ value: "Lot sample", label: __("Sample size of the lot") },
-				{ value: "Fixed number", label: __("A fixed number") },
-			], default: r.custom_sampling || "Lot sample" },
-			{ fieldname: "fixed_count", fieldtype: "Int", label: __("How many pieces"), default: r.custom_fixed_count, depends_on: 'eval:doc.sampling=="Fixed number"' },
+			{ fieldtype: "Section Break", fieldname: "when_section", label: __("Inspection stages, frequency and sample size"), collapsible: 1 },
+			{ fieldname: "when_html", fieldtype: "HTML" },
 
-			{ fieldtype: "Section Break", fieldname: "inst_section", label: __("Instruments the inspector can use") },
+			{ fieldtype: "Section Break", fieldname: "inst_section", label: __("Measuring instruments"), collapsible: 1 },
 			{ fieldname: "inst_html", fieldtype: "HTML" },
 		],
 		primary_action_label: row ? __("Save") : __("Add"),
@@ -825,7 +939,7 @@ function qi_balloon_dialog(frm, row, defaults = {}, on_cancel) {
 		secondary_action_label: row ? __("Delete") : null,
 		secondary_action: row
 			? () =>
-					frappe.confirm(__("Delete balloon {0}?", [r.custom_balloon_no]), () => {
+					frappe.confirm(__("Delete characteristic {0}?", [r.custom_balloon_no]), () => {
 						frm.get_field(QI_ROWS).grid.grid_rows_by_docname[row.name].remove();
 						d.hide();
 						frm.save();
@@ -834,27 +948,412 @@ function qi_balloon_dialog(frm, row, defaults = {}, on_cancel) {
 	});
 	d.$wrapper.addClass("qi-dialog");
 
-	const preview = frappe.utils.debounce(() => qi_preview(d, st, general), 200);
+	const preview = frappe.utils.debounce(() => qi_preview(d, st, frm), 200);
 	const refresh = () => {
 		qi_render_type(d, st, refresh);
+		qi_render_class(d, st);
+		qi_render_general(d, st, frm, refresh);
 		qi_render_tt(d, st, refresh);
 		qi_render_prefix(d, st, refresh);
 		qi_render_dev_signs(d, st, refresh);
 		qi_show_fields(d, st);
+		qi_render_when(d, st);
+		qi_render_instruments(d, st);
 		preview();
 	};
 	[...QI_TOL_FIELDS, "unit"].forEach((f) => (d.fields_dict[f].df.onchange = f === "unit" ? refresh : preview));
+	d.fields_dict.work_instruction.df.onchange = () => qi_from_work_instruction(d);
 	d.fields_dict.test_method.df.onchange = () => qi_from_test_method(d, st);
-	qi_render_instruments(d, st);
 	d.onhide = () => on_cancel && !d.__saved && on_cancel();
 	d.show();
 	refresh();
+	qi_from_work_instruction(d, true);
+	// the drawing sits between the title and the scrolling body, so it stays in view
+	const $host = $(`<div class="qi-dp-host"></div>`).insertAfter(d.$wrapper.find(".modal-header"));
+	qi_drawing_pane(frm, d, $host, defaults.position || qi_pos(r));
+}
+
+const QI_CLASSES = [
+	["CTQ", __("CTQ"), __("Critical to quality: every planned sample must be measured before the inspection can be submitted.")],
+	["Major", __("Major"), __("Affects fit or function.")],
+	["Minor", __("Minor"), __("Little effect on fit or function.")],
+];
+function qi_render_class(d, st) {
+	const $w = d.fields_dict.class_html.$wrapper;
+	$w.html(`<div class="form-group"><label class="control-label">${__("Classification")}</label>
+		<div class="qi-pills">${QI_CLASSES.map(
+			([v, label, hint]) => `<button type="button" class="qi-pill ${v.toLowerCase()} ${st.cls === v ? "on" : ""}" data-v="${v}" title="${qi_esc(hint)}">${qi_esc(label)}</button>`
+		).join("")}</div></div>`);
+	$w.find(".qi-pill").on("click", (e) => {
+		st.cls = String($(e.currentTarget).data("v"));
+		qi_render_class(d, st);
+	});
+}
+
+// ---- inspection stages, frequency and sample size ----
+// Four rows of choices, each with what it means on hover.
+
+const QI_WHEN = {
+	in_process_at: [
+		["Every check", __("Every check"), __("At every in-process check of the Work Order: first-off, patrol and last-off.")],
+		["First-off only", __("First-off only"), __("Only on the first pieces off a new set-up.")],
+		["First-off and last-off", __("First-off and last-off"), __("On the first pieces off the set-up and on the last pieces of the run.")],
+	],
+	frequency: [
+		["Every lot", __("Every lot"), __("Checked on every lot that reaches this stage.")],
+		["First article only", __("First article only"), __("Checked once, on the first lot of this drawing revision.")],
+		["Every N lots", __("Every N lots"), __("Checked on one lot in every N; the lots in between skip it.")],
+		["Every N months", __("Every N months"), __("Checked when N months have passed since it was last checked.")],
+	],
+	sampling: [
+		["Lot sample", __("Sampling plan"), __("As many pieces as the inspection's sample size, taken from the lot by the sampling plan.")],
+		["Fixed number", __("Fixed quantity"), __("Always this many pieces, whatever the lot size.")],
+	],
+};
+const qi_tip = (text) => `<span class="qi-tip" title="${qi_esc(text)}">i</span>`;
+
+function qi_render_when(d, st) {
+	const w = st.when;
+	const $w = d.fields_dict.when_html.$wrapper;
+	const pills = (key, opts) =>
+		opts.map(([v, label, tip]) => `<button type="button" class="qi-pill ${w[key] === v ? "on" : ""}" data-k="${key}" data-v="${qi_esc(v)}" title="${qi_esc(tip)}">${qi_esc(label)}</button>`).join("");
+	const n_freq = ["Every N lots", "Every N months"].includes(w.frequency);
+	$w.html(`<div class="qi-when">
+		<div class="qi-when-row"><div class="qi-when-label">${__("Inspection stages")} ${qi_tip(__("Where this characteristic is checked. Tick every stage that applies."))}</div>
+			<div class="qi-pills">${Object.entries(QI_STAGE_NAMES)
+				.map(([f]) => {
+					const label = QI_STAGES.find(([x]) => x === f)[1];
+					return `<button type="button" class="qi-pill check ${w.stages[f] ? "on" : ""}" data-stage="${f}">${w.stages[f] ? "✓ " : ""}${qi_esc(label)}</button>`;
+				})
+				.join("")}</div></div>
+		${w.stages.custom_stage_in_process ? `<div class="qi-when-row"><div class="qi-when-label">${__("In-process checkpoint")} ${qi_tip(__("Which in-process checks of a Work Order include this characteristic."))}</div>
+			<div class="qi-pills">${pills("in_process_at", QI_WHEN.in_process_at)}</div></div>` : ""}
+		<div class="qi-when-row"><div class="qi-when-label">${__("Frequency")} ${qi_tip(__("How often a lot is checked for this characteristic."))}</div>
+			<div class="qi-pills">${pills("frequency", QI_WHEN.frequency)}
+			${n_freq ? `<label class="qi-when-n">N <input type="number" min="1" class="form-control input-xs" data-n="frequency_n" value="${qi_esc(w.frequency_n || "")}"></label>` : ""}</div></div>
+		<div class="qi-when-row"><div class="qi-when-label">${__("Sample size")} ${qi_tip(__("How many pieces of a checked lot are measured."))}</div>
+			<div class="qi-pills">${pills("sampling", QI_WHEN.sampling)}
+			${w.sampling === "Fixed number" ? `<label class="qi-when-n">${__("Pieces")} <input type="number" min="1" class="form-control input-xs" data-n="fixed_count" value="${qi_esc(w.fixed_count || "")}"></label>` : ""}</div></div>
+	</div>`);
+	$w.find("[data-stage]").on("click", (e) => {
+		const f = $(e.currentTarget).data("stage");
+		w.stages[f] = w.stages[f] ? 0 : 1;
+		qi_render_when(d, st);
+		qi_render_instruments(d, st);
+		qi_when_title(d, st);
+	});
+	$w.find("[data-k]").on("click", (e) => {
+		w[$(e.currentTarget).data("k")] = String($(e.currentTarget).data("v"));
+		qi_render_when(d, st);
+		qi_when_title(d, st);
+	});
+	$w.find("[data-n]").on("change", (e) => {
+		w[$(e.currentTarget).data("n")] = parseInt(e.currentTarget.value, 10) || null;
+		qi_when_title(d, st);
+	});
+	qi_when_title(d, st);
+}
+
+// The section opens closed; its title says what is set.
+function qi_when_title(d, st) {
+	const w = st.when;
+	const stages = Object.keys(QI_STAGE_NAMES).filter((f) => w.stages[f]).map((f) => QI_STAGES.find(([x]) => x === f)[1]);
+	const freq = w.frequency.replace(" N ", ` ${w.frequency_n || "N"} `);
+	const pieces = w.sampling === "Fixed number" ? __("{0} pcs", [w.fixed_count || "?"]) : __("sampling plan");
+	d.fields_dict.when_section.wrapper
+		.find(".section-head")
+		.first()
+		.contents()
+		.filter((_, n) => n.nodeType === 3 && n.textContent.trim())
+		.first()
+		.replaceWith(`${__("Inspection stages, frequency and sample size")} · ${stages.join(", ") || __("no stage")} · ${__(freq)} · ${pieces}`);
+}
+
+function qi_show_fields(d, st) {
+	const need = new Set(st.row_type === "Visual" ? [] : QI_TT_FIELDS[st.tt] || []);
+	if (st.tt === QI_TT.GEN && d.get_value("unit") === "°") need.add("angle_side");
+	QI_TOL_FIELDS.forEach((f) => d.set_df_property(f, "hidden", need.has(f) ? 0 : 1));
+	d.set_df_property("tol", "label", st.tt === QI_TT.GEO ? __("Tolerance zone") : st.tt === QI_TT.ANG ? __("Tolerance (±°)") : __("Tolerance (±)"));
+	d.set_df_property("nominal", "label", st.tt === QI_TT.ANG ? __("Nominal angle (°)") : __("Nominal value"));
+	const visual = st.row_type === "Visual";
+	const test = st.row_type === "Test";
+	d.set_df_property("tol_section", "hidden", visual ? 1 : 0);
+	d.set_df_property("tol_inputs", "hidden", visual ? 1 : 0);
+	d.set_df_property("unit", "hidden", visual ? 1 : 0);
+	d.set_df_property("inst_section", "hidden", visual ? 1 : 0);
+	d.set_df_property("tol_section", "label", test || st.row_type === "Material" ? __("Acceptance limits") : __("Tolerance as specified on the drawing"));
+	d.set_df_property("work_instruction", "hidden", test ? 0 : 1);
+	d.set_df_property("work_instruction", "reqd", test ? 1 : 0);
+	d.set_df_property("test_method", "hidden", test ? 0 : 1);
+	d.set_df_property("test_method", "reqd", test ? 1 : 0);
+}
+
+// An Operational check goes through its work instruction: the test methods
+// written under it are offered (all of them while none is linked yet).
+async function qi_from_work_instruction(d, quiet) {
+	const wi = d.get_value("work_instruction");
+	const methods = wi ? await frappe.db.get_list("Test Method", { filters: { procedure: wi }, pluck: "name", limit: 100 }) : [];
+	d.fields_dict.test_method.get_query = () => (methods.length ? { filters: { name: ["in", methods] } } : {});
+	d.set_df_property(
+		"test_method",
+		"description",
+		!wi ? __("Choose the work instruction first.") : methods.length ? __("{0} test method(s) under {1}.", [methods.length, wi]) : __("No test method is linked to {0} yet: all are offered.", [wi])
+	);
+	if (!quiet && methods.length === 1 && !d.get_value("test_method")) d.set_value("test_method", methods[0]);
+}
+
+// A Test row takes its unit, instruments and (when unset) work instruction from the Test Method.
+async function qi_from_test_method(d, st) {
+	const tm = d.get_value("test_method");
+	if (!tm) return;
+	const doc = await frappe.db.get_doc("Test Method", tm);
+	if (doc.result_unit && !d.get_value("unit")) d.set_value("unit", doc.result_unit);
+	if (doc.procedure && !d.get_value("work_instruction")) d.set_value("work_instruction", doc.procedure);
+	if (!st.inst[""].size && (doc.instruments || []).length) {
+		const items = doc.instruments.map((i) => i.instrument_item);
+		(await qi_instruments()).filter((a) => items.includes(a.item_code)).forEach((a) => st.inst[""].add(a.name));
+		qi_render_instruments(d, st);
+	}
+}
+
+// ---- measuring instruments ----
+// One choice for every stage, and per stage "same as every stage" or its own.
+// Search narrows the list; a tick on an instrument type takes all its units.
+
+async function qi_render_instruments(d, st) {
+	const $w = d.fields_dict.inst_html.$wrapper;
+	const all = await qi_instruments();
+	const stages = Object.entries(QI_STAGE_NAMES).filter(([f]) => st.when.stages[f]);
+	if (st.inst_tab && !stages.some(([, s]) => s === st.inst_tab)) st.inst_tab = "";
+	const tab = st.inst_tab;
+	const own = tab === "" || !!st.inst[tab];
+	const set = tab === "" ? st.inst[""] : st.inst[tab] || st.inst[""];
+	const q = st.inst_filter.toLowerCase();
+	const groups = {};
+	all.filter((a) => !q || `${a.item_name} ${a.asset_name} ${a.name} ${a.location || ""}`.toLowerCase().includes(q)).forEach((a) => (groups[a.item_name] = groups[a.item_name] || []).push(a));
+	const short = (a) => (a.asset_name || a.name).replace(a.item_name, "").trim() || a.name;
+	const count = (s) => (s ? s.size : null);
+	const tab_label = (s) => {
+		const n = s === "" ? count(st.inst[""]) : st.inst[s] ? count(st.inst[s]) : null;
+		return n == null ? __("same") : n ? n : __("any");
+	};
+	$w.html(`<div class="qi-inst-tabs">
+			<button type="button" class="qi-pill ${tab === "" ? "on" : ""}" data-tab="">${__("Every stage")} <span class="qi-badge">${tab_label("")}</span></button>
+			${stages.map(([f, s]) => `<button type="button" class="qi-pill ${tab === s ? "on" : ""}" data-tab="${s}">${qi_esc(QI_STAGES.find(([x]) => x === f)[1])} <span class="qi-badge">${tab_label(s)}</span></button>`).join("")}
+		</div>
+		${tab ? `<label class="qi-inst-same"><input type="checkbox" ${own ? "" : "checked"}> ${__("Same instruments as every stage")}</label>` : ""}
+		<div class="qi-inst-head">
+			<input type="search" class="form-control input-sm qi-inst-search" placeholder="${__("Search instruments, e.g. micrometer, 0013")}" value="${qi_esc(st.inst_filter)}">
+			<span class="text-muted small qi-inst-note">${
+				!own ? __("Uses the every-stage choice.") : set.size ? __("{0} ticked: the inspector chooses one of these.", [set.size]) : __("None ticked: any measuring instrument.")
+			}</span>
+			${own ? `<a class="qi-inst-all small">${__("Tick shown")}</a> · <a class="qi-inst-none small">${__("Clear")}</a>` : ""}
+		</div>
+		<div class="qi-inst ${own ? "" : "off"}">${
+			Object.entries(groups)
+				.map(([name, assets]) => {
+					const on = assets.filter((a) => set.has(a.name)).length;
+					return `<div class="qi-inst-grp">
+						<label class="qi-inst-type"><input type="checkbox" data-grp="${qi_esc(name)}" ${on === assets.length ? "checked" : ""} ${on && on < assets.length ? 'data-partial="1"' : ""} ${own ? "" : "disabled"}>
+							${qi_esc(name)} <span class="text-muted">(${assets.length})</span></label>
+						<div class="qi-inst-assets">${assets
+							.map(
+								(a) => `<label class="qi-inst-asset ${set.has(a.name) ? "on" : ""}" title="${qi_esc(a.name)}${a.location ? " · " + qi_esc(a.location) : ""}">
+									<input type="checkbox" data-asset="${qi_esc(a.name)}" ${set.has(a.name) ? "checked" : ""} ${own ? "" : "disabled"}> ${qi_esc(short(a))}</label>`
+							)
+							.join("")}</div></div>`;
+				})
+				.join("") || `<div class="text-muted small">${__("No instrument matches.")}</div>`
+		}</div>`);
+	$w.find("[data-partial]").prop("indeterminate", true);
+	const redraw = () => qi_render_instruments(d, st);
+	$w.find("[data-tab]").on("click", (e) => {
+		st.inst_tab = String($(e.currentTarget).data("tab") || "");
+		redraw();
+	});
+	$w.find(".qi-inst-same input").on("change", (e) => {
+		st.inst[tab] = e.currentTarget.checked ? null : new Set(st.inst[""]);
+		redraw();
+	});
+	const $search = $w.find(".qi-inst-search");
+	$search.on(
+		"input",
+		frappe.utils.debounce(() => {
+			st.inst_filter = $search.val() || "";
+			redraw().then(() => {
+				const el = $w.find(".qi-inst-search")[0];
+				el.focus();
+				el.setSelectionRange(el.value.length, el.value.length);
+			});
+		}, 250)
+	);
+	$w.find("input[data-grp]").on("change", (e) => {
+		const tick = e.currentTarget.checked;
+		groups[$(e.currentTarget).data("grp")].forEach((a) => (tick ? set.add(a.name) : set.delete(a.name)));
+		redraw();
+	});
+	$w.find("input[data-asset]").on("change", (e) => {
+		const name = $(e.currentTarget).data("asset");
+		e.currentTarget.checked ? set.add(name) : set.delete(name);
+		redraw();
+	});
+	$w.find(".qi-inst-all").on("click", () => {
+		Object.values(groups).flat().forEach((a) => set.add(a.name));
+		redraw();
+	});
+	$w.find(".qi-inst-none").on("click", () => {
+		set.clear();
+		redraw();
+	});
+	const n = st.inst[""].size;
+	const per = stages.filter(([, s]) => st.inst[s]).length;
+	d.fields_dict.inst_section.wrapper
+		.find(".section-head")
+		.first()
+		.contents()
+		.filter((_, node) => node.nodeType === 3 && node.textContent.trim())
+		.first()
+		.replaceWith(`${__("Measuring instruments")} · ${n ? __("{0} chosen", [n]) : __("any")}${per ? " · " + __("{0} stage(s) differ", [per]) : ""}`);
+}
+
+async function qi_save_balloon(frm, row, v, position, dialog, st) {
+	v = qi_dev_apply(st, qi_numbers(v));
+	const w = st.when;
+	const visual = st.row_type === "Visual";
+	const bad = visual ? [] : qi_bad_numbers(v).filter((f) => !dialog.fields_dict[f].df.hidden);
+	if (bad.length) {
+		frappe.msgprint(__("Not a number: {0}", [bad.map((f) => dialog.fields_dict[f].df.label).join(", ")]));
+		return;
+	}
+	if (!visual && !st.tt) {
+		frappe.msgprint(__("Choose how the tolerance is shown on the drawing."));
+		return;
+	}
+	if (!Object.values(w.stages).some(Boolean) && !(row && (row.custom_stage_fai || row.custom_stage_type_test))) {
+		frappe.msgprint(__("Choose at least one inspection stage."));
+		return;
+	}
+	let tolerance_type = visual ? null : st.tt;
+	let tol = v.tol;
+	// A general-tolerance angle becomes an explicit Angle with the ISO 2768 value.
+	if (tolerance_type === QI_TT.GEN && v.unit === "°") {
+		if (!v.angle_side) {
+			frappe.msgprint(__("Give the shorter side of the angle so the ISO 2768 angular tolerance can be found."));
+			return;
+		}
+		const { message: m } = await frappe.call({
+			method: `${QI_API}.compute_limits`,
+			args: { ...qi_limit_args(st, v), general: frm.doc.custom_general_tolerance },
+		});
+		if (m.error) {
+			frappe.msgprint(m.error);
+			return;
+		}
+		tolerance_type = QI_TT.ANG;
+		tol = (m.max_value - m.min_value) / 2;
+	}
+	const need = new Set(visual ? [] : QI_TT_FIELDS[tolerance_type] || []);
+	const keep = (f, val) => (need.has(f) ? val : null); // boxes the kind doesn't use are cleared
+	const target = row || frm.add_child(QI_ROWS);
+	const before = row ? { ...row } : null;
+	const values = {
+		custom_row_type: st.row_type,
+		specification: v.specification,
+		custom_balloon_no: v.balloon_no || target.custom_balloon_no || "",
+		custom_test_method: st.row_type === "Test" ? v.test_method : null,
+		custom_work_instruction: st.row_type === "Test" ? v.work_instruction : null,
+		custom_unit: visual ? "" : v.unit,
+		custom_class: st.cls,
+		custom_spec_text: visual ? "" : qi_callout({ ...st, tt: st.tt }, v),
+		custom_tolerance_type: tolerance_type,
+		custom_nominal: keep("nominal", v.nominal),
+		custom_tol: tolerance_type === QI_TT.ANG ? tol : keep("tol", tol),
+		custom_upper_dev: keep("upper_dev", v.upper_dev),
+		custom_lower_dev: keep("lower_dev", v.lower_dev),
+		custom_fit_class: keep("fit_class", v.fit_class),
+		custom_gdt_symbol: keep("gdt_symbol", v.gdt_symbol),
+		custom_datums: keep("datums", v.datums),
+		custom_frequency: w.frequency,
+		custom_frequency_n: w.frequency_n,
+		custom_sampling: w.sampling,
+		custom_fixed_count: w.fixed_count,
+		custom_instruments: visual ? null : qi_join_instruments(st.inst, w.stages) || null,
+		custom_in_process_at: w.in_process_at || "Every check",
+		...w.stages,
+	};
+	if ([QI_TT.LIM, QI_TT.MIN].includes(tolerance_type)) values.min_value = v.lower;
+	if ([QI_TT.LIM, QI_TT.MAX].includes(tolerance_type)) values.max_value = v.upper;
+	if (position) values.custom_position = JSON.stringify(position);
+	Object.assign(target, values);
+	dialog.__saved = true;
+	frm.dirty();
+	try {
+		await frm.save();
+		if (frm.is_dirty()) throw new Error("not saved"); // frm.save() resolves even when the server refuses
+		dialog.hide();
+	} catch (e) {
+		dialog.__saved = false;
+		// the server refused: take the row back out (new) or put it back (edit), and keep the popup open
+		if (before) Object.assign(target, before);
+		else frm.doc[QI_ROWS] = frm.doc[QI_ROWS].filter((x) => x !== target);
+		frm.refresh_field(QI_ROWS);
+		frm.doc.__unsaved = 0;
+		frm.toolbar && frm.toolbar.refresh();
+	}
+}
+
+// ---- the drawing, inside the popup ----
+// The region round the box, from a sharp copy of the page the builder keeps.
+
+async function qi_drawing_pane(frm, d, $host, pos) {
+	const builder = frm.__qi_builder;
+	if (!frm.doc.custom_drawing || !builder || !builder.drawing_url) return $host.remove();
+	const page = (pos && pos.page) || builder.page || 1;
+	$host.html(`<div class="qi-dp"><div class="qi-dp-msg text-muted small">${__("Loading drawing…")}</div></div>`);
+	try {
+		const hi = await builder.hires(page);
+		const boxes = (frm.doc[QI_ROWS] || []).map(qi_pos).filter((p) => p && (p.page || 1) === page);
+		const focus = pos && pos.w && (pos.page || 1) === page ? { ...pos } : null;
+		window.iso_qi_pdf.closeup($host, hi).show(focus, focus ? boxes.filter((p) => JSON.stringify(p) !== JSON.stringify(pos)).concat(focus) : boxes);
+	} catch (e) {
+		$host.find(".qi-dp-msg").text(__("Could not show the drawing here"));
+	}
+}
+
+// ---- general tolerances, inside the popup ----
+// The drawing's title block values, shown (and changeable) where they are used.
+
+function qi_render_general(d, st, frm, refresh) {
+	const $w = d.fields_dict.general_html.$wrapper;
+	if (st.row_type !== "Dimension") return $w.empty();
+	const opts = (f) => (frappe.meta.get_docfield(frm.doctype, f).options || "").split("\n");
+	const select = (f, title) => {
+		const cur = frm.doc[f] || "None";
+		return `<label class="qi-gen-item">${qi_esc(title)}
+			<select class="form-control input-xs" data-f="${f}">${opts(f)
+				.map((o) => `<option value="${qi_esc(o)}" ${o === cur ? "selected" : ""}>${qi_esc(o === "None" ? __("none on the drawing") : o)}</option>`)
+				.join("")}</select></label>`;
+	};
+	const missing = st.tt === QI_TT.GEN && (!frm.doc.custom_general_tolerance || frm.doc.custom_general_tolerance === "None");
+	$w.html(`<div class="qi-gen ${missing ? "warn" : ""}">
+		<span class="qi-gen-title">${__("General tolerances on this drawing")}</span>
+		${select("custom_general_tolerance", __("Linear & angular (ISO 2768-1)"))}
+		${select("custom_general_geometric", __("Geometric (ISO 2768-2)"))}
+		<span class="text-muted small">${__("Used for any size printed without its own tolerance. Saved with this characteristic.")}</span>
+	</div>`);
+	$w.find("select").on("change", (e) => {
+		const f = $(e.currentTarget).data("f");
+		frm.doc[f] = e.currentTarget.value;
+		frm.refresh_field(f);
+		frm.dirty();
+		refresh();
+	});
 }
 
 function qi_render_type(d, st, refresh) {
 	const $w = d.fields_dict.type_html.$wrapper;
 	$w.html(`<div class="qi-seg">${QI_ROW_TYPES.map(
-		([v, icon, label]) => `<button type="button" class="qi-seg-btn ${st.row_type === v ? "on" : ""}" data-v="${v}"><span>${icon}</span>${qi_esc(label)}</button>`
+		([v, label]) => `<button type="button" class="qi-seg-btn ${st.row_type === v ? "on" : ""}" data-v="${v}">${qi_esc(label)}</button>`
 	).join("")}</div>`);
 	$w.find(".qi-seg-btn").on("click", (e) => {
 		const v = $(e.currentTarget).data("v");
@@ -945,21 +1444,6 @@ function qi_render_dev_signs(d, st, refresh) {
 	d.set_df_property("lower_dev", "label", ll);
 }
 
-function qi_show_fields(d, st) {
-	const need = new Set(st.row_type === "Visual" ? [] : QI_TT_FIELDS[st.tt] || []);
-	if (st.tt === QI_TT.GEN && d.get_value("unit") === "°") need.add("angle_side");
-	QI_TOL_FIELDS.forEach((f) => d.set_df_property(f, "hidden", need.has(f) ? 0 : 1));
-	d.set_df_property("tol", "label", st.tt === QI_TT.GEO ? __("Tolerance zone") : st.tt === QI_TT.ANG ? __("± Tolerance (°)") : __("± Tolerance"));
-	d.set_df_property("nominal", "label", st.tt === QI_TT.ANG ? __("Nominal angle (°)") : __("Nominal"));
-	const visual = st.row_type === "Visual";
-	d.set_df_property("tol_section", "hidden", visual ? 1 : 0);
-	d.set_df_property("tol_inputs", "hidden", visual ? 1 : 0);
-	d.set_df_property("unit", "hidden", visual ? 1 : 0);
-	d.set_df_property("inst_section", "hidden", visual ? 1 : 0);
-	d.set_df_property("test_method", "hidden", st.row_type === "Test" ? 0 : 1);
-	d.set_df_property("test_method", "reqd", st.row_type === "Test" ? 1 : 0);
-}
-
 function qi_preview_html(d, html) {
 	d.fields_dict.limits_preview.$wrapper.html(`<div class="qi-preview">${html}</div>`);
 }
@@ -992,7 +1476,8 @@ function qi_accept_text(m, unit, tt) {
 	return `${m.min_display} ≤ x ≤ ${m.max_display}${u}`;
 }
 
-function qi_preview(d, st, general) {
+function qi_preview(d, st, frm) {
+	const general = frm.doc.custom_general_tolerance;
 	if (st.row_type === "Visual") {
 		qi_preview_html(d, `<div class="qi-pv"><span>${__("Judged")}</span><b>OK / NG</b></div>`);
 		return;
@@ -1005,12 +1490,12 @@ function qi_preview(d, st, general) {
 		return;
 	}
 	const callout = qi_callout(st, v);
-	const drawing = `<div class="qi-pv"><span>${__("On the drawing")}</span><b>${
+	const drawing = `<div class="qi-pv"><span>${__("As specified")}</span><b>${
 		callout ? qi_esc(callout) + (unit && ![QI_TT.ANG, QI_TT.GEO].includes(st.tt) ? " " + qi_esc(unit) : "") : "…"
 	}</b></div>`;
 	if (st.tt === QI_TT.GEN && (!general || general === "None")) {
-		qi_preview_html(d, `${drawing}<div class="qi-pv"><span>${__("Accept")}</span><span class="text-warning">${__(
-			"Set the drawing's General tolerance (ISO 2768-1) at the top of the template first."
+		qi_preview_html(d, `${drawing}<div class="qi-pv"><span>${__("Acceptance range")}</span><span class="text-warning">${__(
+			"Choose the drawing's general tolerance (ISO 2768-1) above."
 		)}</span></div>`);
 		return;
 	}
@@ -1019,209 +1504,60 @@ function qi_preview(d, st, general) {
 		.then(({ message: m }) => {
 			if (m.error) {
 				const msg = callout ? qi_esc(m.error) : __("fill in the boxes on the left");
-				qi_preview_html(d, `${drawing}<div class="qi-pv"><span>${__("Accept")}</span><span class="text-muted">${msg}</span></div>`);
+				qi_preview_html(d, `${drawing}<div class="qi-pv"><span>${__("Acceptance range")}</span><span class="text-muted">${msg}</span></div>`);
 				return;
 			}
 			const accept = m.inspected ? qi_accept_text(m, st.tt === QI_TT.ANG ? "°" : unit, st.tt) : __("not inspected (reference only)");
-			qi_preview_html(d, `${drawing}<div class="qi-pv ok"><span>${__("Accept")}</span><b>${accept}</b></div>`);
+			qi_preview_html(d, `${drawing}<div class="qi-pv ok"><span>${__("Acceptance range")}</span><b>${accept}</b></div>`);
 		});
-}
-
-// A Test row takes its unit and instruments from the Test Method.
-async function qi_from_test_method(d, st) {
-	const tm = d.get_value("test_method");
-	if (!tm) return;
-	const doc = await frappe.db.get_doc("Test Method", tm);
-	if (doc.result_unit && !d.get_value("unit")) d.set_value("unit", doc.result_unit);
-	if (!st.instruments.size && (doc.instruments || []).length) {
-		const items = doc.instruments.map((i) => i.instrument_item);
-		(await qi_instruments()).filter((a) => items.includes(a.item_code)).forEach((a) => st.instruments.add(a.name));
-		qi_render_instruments(d, st);
-	}
-}
-
-async function qi_render_instruments(d, st) {
-	const $w = d.fields_dict.inst_html.$wrapper;
-	const all = await qi_instruments();
-	const groups = {};
-	all.forEach((a) => (groups[a.item_name] = groups[a.item_name] || []).push(a));
-	const short = (a) => (a.asset_name || a.name).replace(a.item_name, "").trim() || a.name;
-	const draw = () => {
-		const n = st.instruments.size;
-		$w.html(`<div class="qi-inst-head">
-				<span class="text-muted small">${
-					n ? __("{0} ticked: the inspector chooses one of these.", [n]) : __("None ticked: the inspector can choose any measuring instrument.")
-				}</span>
-				<a class="qi-inst-all small">${__("Tick all")}</a> · <a class="qi-inst-none small">${__("Clear")}</a>
-			</div>
-			<div class="qi-inst">${Object.entries(groups)
-				.map(([name, assets]) => {
-					const on = assets.filter((a) => st.instruments.has(a.name)).length;
-					return `<div class="qi-inst-grp">
-						<label class="qi-inst-type"><input type="checkbox" data-grp="${qi_esc(name)}" ${on === assets.length ? "checked" : ""} ${
-							on && on < assets.length ? 'data-partial="1"' : ""
-						}> ${qi_esc(name)} <span class="text-muted">(${assets.length})</span></label>
-						<div class="qi-inst-assets">${assets
-							.map(
-								(a) => `<label class="qi-inst-asset ${st.instruments.has(a.name) ? "on" : ""}" title="${qi_esc(a.name)}">
-									<input type="checkbox" data-asset="${qi_esc(a.name)}" ${st.instruments.has(a.name) ? "checked" : ""}> ${qi_esc(short(a))}</label>`
-							)
-							.join("")}</div></div>`;
-				})
-				.join("")}</div>`);
-		$w.find("[data-partial]").prop("indeterminate", true);
-		$w.find("input[data-grp]").on("change", (e) => {
-			const assets = groups[$(e.currentTarget).data("grp")];
-			const tick = e.currentTarget.checked;
-			assets.forEach((a) => (tick ? st.instruments.add(a.name) : st.instruments.delete(a.name)));
-			draw();
-		});
-		$w.find("input[data-asset]").on("change", (e) => {
-			const name = $(e.currentTarget).data("asset");
-			e.currentTarget.checked ? st.instruments.add(name) : st.instruments.delete(name);
-			draw();
-		});
-		$w.find(".qi-inst-all").on("click", () => {
-			all.forEach((a) => st.instruments.add(a.name));
-			draw();
-		});
-		$w.find(".qi-inst-none").on("click", () => {
-			st.instruments.clear();
-			draw();
-		});
-	};
-	draw();
-}
-
-async function qi_save_balloon(frm, row, v, position, dialog, st) {
-	v = qi_dev_apply(st, qi_numbers(v));
-	const visual = st.row_type === "Visual";
-	const bad = visual ? [] : qi_bad_numbers(v).filter((f) => !dialog.fields_dict[f].df.hidden);
-	if (bad.length) {
-		frappe.msgprint(__("Not a number: {0}", [bad.map((f) => dialog.fields_dict[f].df.label).join(", ")]));
-		return;
-	}
-	if (!visual && !st.tt) {
-		frappe.msgprint(__("Choose how the tolerance is shown on the drawing."));
-		return;
-	}
-	if (!QI_DIALOG_STAGES.some(([f]) => v[f]) && !(row && (row.custom_stage_fai || row.custom_stage_type_test))) {
-		frappe.msgprint(__("Tick at least one stage."));
-		return;
-	}
-	let tolerance_type = visual ? null : st.tt;
-	let tol = v.tol;
-	// A general-tolerance angle becomes an explicit Angle with the ISO 2768 value.
-	if (tolerance_type === QI_TT.GEN && v.unit === "°") {
-		if (!v.angle_side) {
-			frappe.msgprint(__("Give the shorter side of the angle so the ISO 2768 angular tolerance can be found."));
-			return;
-		}
-		const { message: m } = await frappe.call({
-			method: `${QI_API}.compute_limits`,
-			args: { ...qi_limit_args(st, v), general: frm.doc.custom_general_tolerance },
-		});
-		if (m.error) {
-			frappe.msgprint(m.error);
-			return;
-		}
-		tolerance_type = QI_TT.ANG;
-		tol = (m.max_value - m.min_value) / 2;
-	}
-	const need = new Set(visual ? [] : QI_TT_FIELDS[tolerance_type] || []);
-	const keep = (f, val) => (need.has(f) ? val : null); // boxes the kind doesn't use are cleared
-	const target = row || frm.add_child(QI_ROWS);
-	const before = row ? { ...row } : null;
-	const values = {
-		custom_row_type: st.row_type,
-		specification: v.specification,
-		custom_balloon_no: v.balloon_no || target.custom_balloon_no || "",
-		custom_test_method: st.row_type === "Test" ? v.test_method : null,
-		custom_unit: visual ? "" : v.unit,
-		custom_class: v.class,
-		custom_spec_text: visual ? "" : qi_callout({ ...st, tt: st.tt }, v),
-		custom_tolerance_type: tolerance_type,
-		custom_nominal: keep("nominal", v.nominal),
-		custom_tol: tolerance_type === QI_TT.ANG ? tol : keep("tol", tol),
-		custom_upper_dev: keep("upper_dev", v.upper_dev),
-		custom_lower_dev: keep("lower_dev", v.lower_dev),
-		custom_fit_class: keep("fit_class", v.fit_class),
-		custom_gdt_symbol: keep("gdt_symbol", v.gdt_symbol),
-		custom_datums: keep("datums", v.datums),
-		custom_frequency: v.frequency,
-		custom_frequency_n: v.frequency_n,
-		custom_sampling: v.sampling,
-		custom_fixed_count: v.fixed_count,
-		custom_instruments: visual ? null : [...st.instruments].join("\n") || null,
-		custom_in_process_at: v.in_process_at || "Every check",
-	};
-	if ([QI_TT.LIM, QI_TT.MIN].includes(tolerance_type)) values.min_value = v.lower;
-	if ([QI_TT.LIM, QI_TT.MAX].includes(tolerance_type)) values.max_value = v.upper;
-	QI_DIALOG_STAGES.forEach(([f]) => (values[f] = v[f] ? 1 : 0));
-	if (position) values.custom_position = JSON.stringify(position);
-	Object.assign(target, values);
-	dialog.__saved = true;
-	frm.dirty();
-	try {
-		await frm.save();
-		if (frm.is_dirty()) throw new Error("not saved"); // frm.save() resolves even when the server refuses
-		dialog.hide();
-	} catch (e) {
-		dialog.__saved = false;
-		// the server refused: take the row back out (new) or put it back (edit), and keep the popup open
-		if (before) Object.assign(target, before);
-		else frm.doc[QI_ROWS] = frm.doc[QI_ROWS].filter((x) => x !== target);
-		frm.refresh_field(QI_ROWS);
-		frm.doc.__unsaved = 0;
-		frm.toolbar && frm.toolbar.refresh();
-	}
 }
 
 // --------------------------------------------------------- drawing picker --
 
+// The item's drawings, each one viewable before it is chosen. Without an Item,
+// straight to upload.
 function qi_pick_drawing(frm) {
-	if (!frm.doc.custom_item) {
-		frappe.msgprint(__("Set the Item first: drawings are listed from its BOMs."));
+	if (frm.is_new()) {
+		frappe.msgprint(__("Give the plan a name and save it first."));
 		return;
 	}
-	frappe.call({ method: `${QI}.drawing_options`, args: { item: frm.doc.custom_item } }).then(({ message: files }) => {
+	const upload = () =>
+		new frappe.ui.FileUploader({
+			doctype: frm.doctype,
+			docname: frm.doc.name,
+			fieldname: "custom_drawing",
+			allow_multiple: false,
+			make_attachments_public: true, // files on this site are public
+			restrictions: { allowed_file_types: [".pdf", ".png", ".jpg", ".jpeg"] },
+			on_success: (file) => qi_use_drawing(frm, file.name),
+		});
+	if (!frm.doc.custom_item) return upload();
+	frappe.call({ method: `${QI}.drawing_options`, args: { item: frm.doc.custom_item } }).then(async ({ message: files }) => {
+		files = files || [];
+		await frappe.require("/assets/iso_compliance/js/qi_pdf.js");
+		let picker = null;
 		const d = new frappe.ui.Dialog({
-			title: __("Pick drawing"),
-			size: "large",
+			title: __("Choose the drawing"),
+			size: "extra-large",
 			fields: [{ fieldname: "list", fieldtype: "HTML" }],
-			primary_action_label: __("Upload new drawing"),
+			primary_action_label: __("Use this drawing"),
 			primary_action: () => {
+				const chosen = picker && picker.chosen();
+				if (!chosen) return frappe.show_alert(__("Click a drawing to look at it first."));
 				d.hide();
-				new frappe.ui.FileUploader({
-					doctype: frm.doctype,
-					docname: frm.doc.name,
-					fieldname: "custom_drawing",
-					allow_multiple: false,
-					make_attachments_public: true, // files on this site are public
-					restrictions: { allowed_file_types: [".pdf", ".png", ".jpg", ".jpeg"] },
-					on_success: (file) => qi_use_drawing(frm, file.name),
-				});
+				qi_use_drawing(frm, chosen);
+			},
+			secondary_action_label: __("Upload new drawing"),
+			secondary_action: () => {
+				d.hide();
+				upload();
 			},
 		});
-		const rows = (files || [])
-			.map(
-				(f) => `<tr><td><a href="${qi_esc(f.file_url)}" target="_blank">${qi_esc(f.file_name)}</a></td>
-				<td class="text-muted">${qi_esc(f.attached_to_doctype)} ${qi_esc(f.attached_to_name)}${f.bom_default ? " · " + __("default") : ""}${
-					f.attached_to_doctype === "BOM" && !f.bom_active ? " · " + __("inactive") : ""
-				}</td>
-				<td><button class="btn btn-xs btn-primary" data-file="${qi_esc(f.name)}">${__("Use")}</button></td></tr>`
-			)
-			.join("");
-		d.fields_dict.list.$wrapper.html(
-			files && files.length
-				? `<table class="table table-sm"><tbody>${rows}</tbody></table>`
-				: `<div class="text-muted">${__("No PDF or image is attached to {0}'s BOMs or Item. Upload one.", [qi_esc(frm.doc.custom_item)])}</div>`
-		);
-		d.fields_dict.list.$wrapper.find("button[data-file]").on("click", (e) => {
-			d.hide();
-			qi_use_drawing(frm, $(e.currentTarget).data("file"));
-		});
+		d.onhide = () => picker && picker.close();
 		d.show();
+		const $w = d.fields_dict.list.$wrapper;
+		if (files.length) picker = window.iso_qi_pdf.chooser($w, files, { current: frm.doc.custom_drawing_file });
+		else $w.html(`<div class="text-muted">${__("No PDF or image is attached to {0}'s BOMs or Item. Upload one.", [qi_esc(frm.doc.custom_item)])}</div>`);
 	});
 }
 
@@ -1314,7 +1650,7 @@ function qi_new_revision(frm) {
 			frappe
 				.call({ method: `${QI}.new_revision`, args: { template: frm.doc.name, revision: v.revision }, freeze: true })
 				.then(({ message }) => {
-					frappe.show_alert(__("Revision created. Pick its drawing, check the balloons, then move the BOMs over."));
+					frappe.show_alert(__("Revision created. Pick its drawing, check the numbers, then move the BOMs over."));
 					frappe.set_route("Form", "Quality Inspection Template", message);
 				}),
 		__("New Revision"),
@@ -1345,9 +1681,14 @@ function qi_move_dialog(frm, old) {
 // ------------------------------------------------------------------ style --
 
 frappe.dom.set_style(`
-.qi-builder{padding:12px 15px 18px;border-top:1px solid var(--border-color)}
-.qi-b-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:8px}
-.qi-b-title{font-weight:600;font-size:var(--text-lg)}
+.qi-builder{padding:4px 15px 18px;border-top:1px solid var(--border-color);display:flex;flex-direction:column;gap:14px}
+.qi-col-head{font-size:var(--text-xs);font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin:4px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--border-color)}
+.qi-b-block{border:1px solid var(--border-color);border-radius:10px;padding:12px 14px;background:var(--card-bg)}
+.qi-b-block:empty{display:none}
+.qi-b-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border-color)}
+.qi-b-title{font-weight:600;font-size:var(--text-base);color:var(--heading-color, var(--text-color))}
+.qi-b-nodrawing{padding:6px 0}
+.qi-b-used .qi-b-subtitle:first-child{margin-top:0}
 .qi-b-status{font-size:var(--text-sm);color:var(--text-muted)}
 .qi-b-status.locked{color:var(--orange-600)}
 .qi-b-subtitle{font-weight:600;margin:14px 0 6px}
@@ -1365,7 +1706,8 @@ frappe.dom.set_style(`
 .qi-balloon{position:absolute;top:-11px;left:-11px;min-width:22px;height:22px;padding:0 4px;border-radius:11px;background:var(--blue-500);color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center}
 .qi-box.selected .qi-balloon{background:var(--orange-500)}
 .qi-balloon.static{position:static;display:inline-flex}
-.qi-b-table{margin-top:12px;overflow-x:auto}
+.qi-b-table{overflow-x:auto}
+.qi-b-table .table{margin-bottom:0}
 .qi-rows tr[data-row]{cursor:pointer}
 .qi-rows tr.selected td{background:var(--yellow-50)}
 .grid-row.qi-row-selected .data-row{background:var(--yellow-50)}
@@ -1376,7 +1718,7 @@ frappe.dom.set_style(`
 .qi-used-line{padding:3px 0}
 .qi-preview{padding:10px 12px;border-radius:8px;background:var(--gray-50);min-height:34px;display:flex;flex-direction:column;gap:6px}
 .qi-pv{display:flex;gap:10px;align-items:baseline}
-.qi-pv span{min-width:92px;color:var(--text-muted);font-size:var(--text-sm)}
+.qi-pv span{min-width:120px;color:var(--text-muted);font-size:var(--text-sm)}
 .qi-pv b{font-size:var(--text-lg);font-variant-numeric:tabular-nums}
 .qi-pv.ok b{color:var(--green-700)}
 .qi-mono{font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -1385,11 +1727,54 @@ frappe.dom.set_style(`
 .qi-seg-btn{border:1px solid var(--border-color);background:var(--fg-color);border-radius:8px;padding:6px 12px;display:inline-flex;gap:6px;align-items:center;font-size:var(--text-md)}
 .qi-seg-btn.sm{padding:3px 10px;font-size:var(--text-sm);min-width:40px;justify-content:center}
 .qi-seg-btn.on{border-color:var(--primary);background:var(--primary);color:var(--white)}
-.qi-chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:6px;margin-bottom:12px}
-.qi-chip{border:1px solid var(--border-color);background:var(--fg-color);border-radius:8px;padding:6px 8px;text-align:left;display:flex;flex-direction:column;gap:1px}
+.qi-chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:5px;margin-bottom:10px}
+.qi-chip{border:1px solid var(--border-color);background:var(--fg-color);border-radius:8px;padding:4px 7px;text-align:left;display:flex;flex-direction:column;gap:0}
 .qi-chip:hover{border-color:var(--gray-500)}
 .qi-chip.on{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary);background:var(--blue-50)}
-.qi-chip-sym{font-size:18px;font-weight:600;line-height:1.2}
+.qi-chip-sym{font-size:15px;font-weight:600;line-height:1.2}
+.qi-dialog .modal-dialog.modal-lg{max-width:720px}
+.qi-dialog .modal-content{max-height:calc(100vh - 3.5rem);display:flex;flex-direction:column}
+.qi-dialog .modal-body{overflow-y:auto;flex:1 1 auto;min-height:0;padding-top:8px}
+.qi-dialog .form-section .section-head{margin-bottom:6px}
+.qi-dialog .form-section{padding-top:10px;padding-bottom:4px}
+.qi-dialog .frappe-control .help-box{margin-top:2px}
+.qi-dp-host{padding:10px var(--padding-md, 15px) 0;flex:none}
+.qi-dialog .qi-seg{margin-bottom:0}
+.qi-dp{position:relative;min-height:40px}
+.qi-dp canvas{display:block;width:100%;height:200px;border:1px solid var(--border-color);border-radius:8px;cursor:grab;touch-action:none;background:#e9e9e9}
+.qi-dp-tools{position:absolute;top:6px;right:6px;display:flex;gap:4px}
+.qi-dp-tools button{min-width:30px;height:28px;border:1px solid var(--border-color);border-radius:6px;background:var(--fg-color);font-size:var(--text-sm);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.qi-dp-msg{padding:10px 2px}
+@media (max-width:640px){.qi-dp canvas{height:150px}}
+.qi-dialog .form-section .section-head{font-size:var(--text-sm);font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted)}
+.qi-dialog .form-section{border-top:1px solid var(--border-color)}
+.qi-dialog .form-section:first-child,.qi-dialog .form-section:not(:has(.section-head)){border-top:0}
+.qi-when{display:flex;flex-direction:column;gap:12px}
+.qi-when-row{display:grid;grid-template-columns:170px 1fr;gap:10px;align-items:center}
+.qi-when-label{font-size:var(--text-sm);font-weight:500;color:var(--text-color)}
+.qi-when-n{display:inline-flex;gap:6px;align-items:center;margin:0 0 0 6px;font-size:var(--text-sm);color:var(--text-muted)}
+.qi-when-n input{width:70px;height:28px}
+.qi-tip{display:inline-flex;width:15px;height:15px;border-radius:50%;border:1px solid var(--gray-400);color:var(--gray-600);font-size:10px;font-style:italic;font-weight:600;align-items:center;justify-content:center;cursor:help;margin-left:4px}
+.qi-pill.check.on{background:var(--primary);border-color:var(--primary)}
+.qi-inst-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.qi-badge{display:inline-block;margin-left:4px;padding:0 6px;border-radius:8px;background:rgba(0,0,0,.08);font-size:11px}
+.qi-pill.on .qi-badge{background:rgba(255,255,255,.25)}
+.qi-inst-same{display:flex;gap:6px;align-items:center;font-size:var(--text-sm);margin:0 0 8px}
+.qi-inst-search{max-width:280px}
+.qi-inst.off{opacity:.5}
+@media (max-width:640px){.qi-when-row{grid-template-columns:1fr}}
+.qi-pills{display:flex;gap:6px;flex-wrap:wrap}
+.qi-pill{border:1px solid var(--border-color);background:var(--fg-color);border-radius:999px;padding:4px 14px;font-size:var(--text-sm);font-weight:500}
+.qi-pill.on{background:var(--gray-700);border-color:var(--gray-700);color:var(--white)}
+.qi-pill.ctq.on{background:var(--red-600);border-color:var(--red-600)}
+.qi-pill.major.on{background:var(--orange-500);border-color:var(--orange-500)}
+.qi-gen{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding:6px 10px;margin-bottom:10px;border-radius:8px;background:var(--gray-50)}
+.qi-gen.warn{background:var(--yellow-50);box-shadow:inset 0 0 0 1px var(--yellow-300)}
+.qi-gen-title{font-weight:600;font-size:var(--text-sm)}
+.qi-gen-item{display:inline-flex;gap:6px;align-items:center;margin:0;font-size:var(--text-sm);color:var(--text-muted)}
+.qi-gen-item select{width:auto;height:26px;padding:0 6px}
+.qi-gen .small{flex-basis:100%}
+.qi-legacy td{font-variant-numeric:tabular-nums}
 .qi-chip-name{font-size:var(--text-sm);font-weight:500}
 .qi-chip-ex{font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .qi-prefix{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px}

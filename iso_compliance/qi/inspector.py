@@ -24,10 +24,11 @@ def _load(qi: str, ptype="read"):
 	return doc
 
 
-def _instruments(src, row, cache):
-	"""The instruments the template allows for this row; failing that, those of
-	its Test Method's instrument items; failing that, every measuring instrument."""
-	names = instrument_list(src.custom_instruments) if src else []
+def _instruments(src, row, cache, stage=None):
+	"""The instruments the template allows for this row at this stage; failing
+	that, those of its Test Method's instrument items; failing that, every
+	measuring instrument."""
+	names = instrument_list(src.custom_instruments, stage) if src else []
 	if not names and row.custom_test_method:
 		items = frappe.get_all("Test Method Instrument", filters={"parent": row.custom_test_method}, pluck="instrument_item")
 		names = [a.name for a in cache["all"] if a.item_code in items]
@@ -58,7 +59,7 @@ def get_inspection(qi: str) -> dict:
 	cache, rows = {"all": measuring_instruments(), "cal": {}}, []
 	for r in drawing_rows(doc):
 		src = tpl_rows.get(r.custom_balloon_no)
-		instruments = _instruments(src, r, cache) if r.custom_row_type != "Visual" else []
+		instruments = _instruments(src, r, cache, doc.custom_stage) if r.custom_row_type != "Visual" else []
 		rows.append({
 			"name": r.name,
 			"balloon": r.custom_balloon_no,
@@ -73,7 +74,9 @@ def get_inspection(qi: str) -> dict:
 			"min_display": T.display_limit(r.min_value) if r.custom_row_type != "Visual" else "",
 			"max_display": T.display_limit(r.max_value) if r.custom_row_type != "Visual" else "",
 			"test_method": r.custom_test_method,
-			"procedure": r.custom_test_method and frappe.db.get_value("Test Method", r.custom_test_method, "procedure"),
+			# the row's work instruction, else its Test Method's
+			"procedure": (src and src.get("custom_work_instruction"))
+			or (r.custom_test_method and frappe.db.get_value("Test Method", r.custom_test_method, "procedure")),
 			"required": cint(r.custom_sample_count),
 			"position": src.custom_position if src else None,
 			"instruments": instruments,
@@ -126,7 +129,7 @@ def save_measurement(qi: str, row_key: str, sample_no: int, value: str | None = 
 		as_dict=True,
 	)
 	if not reading:
-		frappe.throw(_("Balloon {0} is not on this inspection").format(row_key))
+		frappe.throw(_("No. {0} is not on this inspection").format(row_key))
 	if sample_no < 1:
 		frappe.throw(_("Sample number must be 1 or more"))
 	value = (value or "").strip()

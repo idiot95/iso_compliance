@@ -48,10 +48,8 @@ def is_drawing_template(template) -> bool:
 
 def validate(doc, method=None):
 	"""doc_events: Quality Inspection Template.validate"""
-	if not doc.get(ROWS) and not doc.custom_item:
-		# the core rule (rows mandatory), kept for every template that is not a
-		# drawing template in the making
-		frappe.throw(_("Add at least one parameter."), frappe.MandatoryError)
+	# A plan may start empty, with or without an Item or a drawing: its rows
+	# come from the characteristics table, one at a time.
 	_link_drawing(doc)
 	if not is_drawing_template(doc):
 		return
@@ -65,20 +63,20 @@ def validate(doc, method=None):
 		try:
 			_apply_row(row, general)
 		except T.ToleranceError as e:
-			errors.append(_("Balloon {0}: {1}").format(row.custom_balloon_no, e))
+			errors.append(_("No. {0}: {1}").format(row.custom_balloon_no, e))
 		_clean_instruments(row)
 		if not any(cint(row.get(f)) for f in STAGES):
-			errors.append(_("Balloon {0}: tick at least one stage").format(row.custom_balloon_no))
+			errors.append(_("No. {0}: tick at least one stage").format(row.custom_balloon_no))
 		if row.custom_row_type == "Material" and not cint(row.custom_stage_incoming):
-			errors.append(_("Balloon {0}: a Material row is read off the supplier's certificate, so tick Incoming").format(row.custom_balloon_no))
+			errors.append(_("No. {0}: a Material row is read off the supplier's certificate, so tick Incoming").format(row.custom_balloon_no))
 		if row.custom_row_type == "Test" and not row.custom_test_method:
-			errors.append(_("Balloon {0}: a Test row needs a Test Method").format(row.custom_balloon_no))
+			errors.append(_("No. {0}: an Operational row needs a Test Method").format(row.custom_balloon_no))
 		if row.custom_frequency in ("Every N lots", "Every N months") and cint(row.custom_frequency_n) < 1:
-			errors.append(_("Balloon {0}: enter N for '{1}'").format(row.custom_balloon_no, row.custom_frequency))
+			errors.append(_("No. {0}: enter N for '{1}'").format(row.custom_balloon_no, row.custom_frequency))
 		if row.custom_sampling == "Fixed number" and cint(row.custom_fixed_count) < 1:
-			errors.append(_("Balloon {0}: enter how many pieces").format(row.custom_balloon_no))
+			errors.append(_("No. {0}: enter how many pieces").format(row.custom_balloon_no))
 	if errors:
-		frappe.throw("<br>".join(errors), title=_("Drawing template"))
+		frappe.throw("<br>".join(errors), title=_("Inspection plan"))
 	_check_lock(doc)
 
 
@@ -89,24 +87,16 @@ def _assign_balloons(doc):
 		key = (row.custom_balloon_no or "").strip()
 		if key:
 			if key in seen:
-				frappe.throw(_("Balloon {0} is used on rows {1} and {2}").format(key, seen[key], row.idx))
+				frappe.throw(_("No. {0} is used on rows {1} and {2}").format(key, seen[key], row.idx))
 			seen[key] = row.idx
 			row.custom_balloon_no = key
-	numbers = [int(k) for k in seen if k.isdigit()]
-	nxt = {"Dimension": max(numbers, default=0) + 1}
-	for prefix in ("T", "V", "M"):
-		n = [int(k[1:]) for k in seen if k[:1] == prefix and k[1:].isdigit()]
-		nxt[prefix] = max(n, default=0) + 1
+	# one running number for every kind of row; older T1 / V1 / M1 numbers stay
+	nxt = max((int(k) for k in seen if k.isdigit()), default=0) + 1
 	for row in rows:
 		if row.custom_balloon_no or not row.custom_row_type:
 			continue
-		if row.custom_row_type == "Dimension":
-			row.custom_balloon_no = str(nxt["Dimension"])
-			nxt["Dimension"] += 1
-		else:
-			p = {"Test": "T", "Visual": "V", "Material": "M"}.get(row.custom_row_type, "V")
-			row.custom_balloon_no = f"{p}{nxt[p]}"
-			nxt[p] += 1
+		row.custom_balloon_no = str(nxt)
+		nxt += 1
 
 
 def row_limits(row, general=None) -> dict | None:
@@ -182,7 +172,7 @@ def _check_lock(doc):
 	if _signature(before) != _signature(doc):
 		frappe.throw(
 			_("This template is locked because inspections have been submitted against it. "
-			  "Drawing, balloons, limits and stages can only change through New Revision."),
+			  "Drawing, numbers, limits and stages can only change through New Revision."),
 			title=_("Template locked"),
 		)
 
@@ -330,6 +320,11 @@ def on_update(doc, method=None):
 	record leaves the drawing in place -- Frappe removes a stored file only when
 	no File record points at it any more."""
 	url = doc.get("custom_drawing")
+	if url:
+		try:
+			page_images(doc)  # for prints; skipped while the stored set is current
+		except Exception:
+			frappe.log_error(title=f"Drawing page images: {doc.name}")
 	if not url or frappe.db.exists("File", {"file_url": url, "attached_to_doctype": doc.doctype,
 	                                         "attached_to_name": doc.name}):
 		return
@@ -366,14 +361,41 @@ def measuring_instruments() -> list[dict]:
 	)
 
 
-def instrument_list(text) -> list[str]:
-	return [x.strip() for x in (text or "").splitlines() if x.strip()]
+#: Stages an instrument choice can be narrowed to (Quality Inspection custom_stage values).
+INSTRUMENT_STAGES = ("Incoming", "In Process", "Final")
+
+
+def instrument_map(text) -> dict[str, list[str]]:
+	"""custom_instruments, one Asset per line: a bare name is allowed at every
+	stage, "Incoming: ASSET" only at that stage. {"": [...], "Incoming": [...]}"""
+	out: dict[str, list[str]] = {}
+	for line in (text or "").splitlines():
+		line = line.strip()
+		if not line:
+			continue
+		stage, sep, name = line.partition(":")
+		if sep and stage.strip() in INSTRUMENT_STAGES:
+			out.setdefault(stage.strip(), []).append(name.strip())
+		else:
+			out.setdefault("", []).append(line)
+	return out
+
+
+def instrument_list(text, stage: str | None = None) -> list[str]:
+	"""The instruments allowed at a stage: that stage's own list when it has
+	one, else the every-stage list."""
+	m = instrument_map(text)
+	return (m.get(stage) if stage else None) or m.get("", [])
 
 
 def _clean_instruments(row):
-	names = list(dict.fromkeys(instrument_list(row.get("custom_instruments"))))
-	known = set(frappe.get_all("Asset", filters={"name": ("in", names or [""])}, pluck="name"))
-	row.custom_instruments = "\n".join(n for n in names if n in known) or None
+	m = instrument_map(row.get("custom_instruments"))
+	names = {n for names in m.values() for n in names}
+	known = set(frappe.get_all("Asset", filters={"name": ("in", list(names) or [""])}, pluck="name"))
+	lines = [n for n in dict.fromkeys(m.get("", [])) if n in known]
+	for stage in INSTRUMENT_STAGES:
+		lines += [f"{stage}: {n}" for n in dict.fromkeys(m.get(stage, [])) if n in known]
+	row.custom_instruments = "\n".join(lines) or None
 
 
 @frappe.whitelist()
@@ -385,24 +407,27 @@ def save_page_images(template: str, drawing_hash: str, pages) -> list[str]:
 
 	pages = frappe.parse_json(pages) if isinstance(pages, str) else pages
 	doc = frappe.get_doc("Quality Inspection Template", template)
+	return _store_pages(doc, drawing_hash, [base64.b64decode(u.split(",", 1)[1]) for u in pages])
+
+
+def _store_pages(doc, drawing_hash: str, images: list[bytes]) -> list[str]:
 	for old in frappe.get_all(
 		"File",
-		filters={"attached_to_doctype": "Quality Inspection Template", "attached_to_name": template,
+		filters={"attached_to_doctype": "Quality Inspection Template", "attached_to_name": doc.name,
 		         "attached_to_field": "custom_drawing_pages"},
 		pluck="name",
 	):
 		frappe.delete_doc("File", old, ignore_permissions=True)
 	urls = []
-	for i, data_url in enumerate(pages, 1):
-		content = base64.b64decode(data_url.split(",", 1)[1])
+	for i, content in enumerate(images, 1):
 		f = frappe.get_doc(
 			{
 				"doctype": "File",
-				"file_name": f"{frappe.scrub(template)[:60]}-page-{i}.jpg",
+				"file_name": f"{frappe.scrub(doc.name)[:60]}-page-{i}.jpg",
 				"is_private": 0,  # files on this site are public (developer, 2026-10-13)
 				"content": content,
 				"attached_to_doctype": "Quality Inspection Template",
-				"attached_to_name": template,
+				"attached_to_name": doc.name,
 				"attached_to_field": "custom_drawing_pages",
 			}
 		).insert(ignore_permissions=True)
@@ -410,6 +435,44 @@ def save_page_images(template: str, drawing_hash: str, pages) -> list[str]:
 	# not a change the user made: leave `modified` alone, or the open form's next save is refused
 	doc.db_set("custom_drawing_pages", frappe.as_json({"hash": drawing_hash, "pages": urls}), update_modified=False)
 	return urls
+
+
+def page_images(doc) -> list[str]:
+	"""The drawing's pages as images for prints, made on the server when missing
+	or stale, so a print never depends on someone having opened the plan in a
+	browser. PDFs are rasterised with pypdfium2 (an ERPNext dependency); an
+	image drawing is its own single page."""
+	url = doc.get("custom_drawing")
+	if not url:
+		return []
+	if not url.lower().endswith(".pdf"):
+		return [url]
+	drawing_hash = doc.get("custom_drawing_hash") or url
+	try:
+		stored = frappe.parse_json(doc.get("custom_drawing_pages") or "{}") or {}
+	except Exception:
+		stored = {}
+	if stored.get("hash") == drawing_hash and stored.get("pages"):
+		return stored["pages"]
+	name = frappe.db.get_value("File", {"file_url": url}, "name")
+	if not name:
+		return []
+	import io
+
+	import pypdfium2
+
+	pdf = pypdfium2.PdfDocument(frappe.get_doc("File", name).get_content())
+	images = []
+	try:
+		for page in pdf:
+			width = page.get_width() or 1
+			bitmap = page.render(scale=1600 / width)
+			buf = io.BytesIO()
+			bitmap.to_pil().convert("RGB").save(buf, format="JPEG", quality=85)
+			images.append(buf.getvalue())
+	finally:
+		pdf.close()
+	return _store_pages(doc, drawing_hash, images)
 
 
 # -------------------------------------------------------------- revisions --
@@ -516,6 +579,40 @@ def start_template(item: str, drawing_no: str | None = None, revision: str | Non
 		"custom_drawing_file": file,
 	}).insert()
 	return doc.name
+
+
+@frappe.whitelist()
+def plan_choices(item: str) -> list[dict]:
+	"""Plans a BOM or Item of this item can use: the item's own plans first
+	(newest first, superseded last), each with its drawing and row count."""
+	frappe.has_permission("Item", "read", item, throw=True)
+	plans = frappe.get_all(
+		"Quality Inspection Template",
+		filters={"custom_item": item},
+		fields=["name", "custom_drawing_no", "custom_drawing_revision", "custom_superseded_by", "custom_locked", "modified"],
+		order_by="modified desc",
+	)
+	for p in plans:
+		p["rows"] = frappe.db.count("Item Quality Inspection Parameter",
+		                            {"parenttype": "Quality Inspection Template", "parent": p.name, "custom_row_type": ("is", "set")})
+	plans.sort(key=lambda p: bool(p.custom_superseded_by))
+	return plans
+
+
+@frappe.whitelist()
+def use_plan(doctype: str, name: str, template: str | None = None):
+	"""Point one BOM or Item at a plan (or at none). Any plan may be chosen,
+	an earlier one included; the change is noted on the record."""
+	require_quality_manager()
+	if doctype not in ("BOM", "Item"):
+		frappe.throw(_("Only BOMs and Items use an inspection plan"))
+	if template and not frappe.db.exists("Quality Inspection Template", template):
+		frappe.throw(_("Inspection plan {0} does not exist").format(template))
+	current = frappe.db.get_value(doctype, name, "quality_inspection_template")
+	if current == (template or None):
+		return
+	frappe.db.set_value(doctype, name, "quality_inspection_template", template or None)
+	frappe.get_doc(doctype, name).add_comment("Info", _("Inspection plan: {0} → {1}").format(current or _("none"), template or _("none")))
 
 
 @frappe.whitelist()

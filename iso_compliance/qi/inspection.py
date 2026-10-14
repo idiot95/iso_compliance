@@ -63,35 +63,63 @@ def applies(doc) -> bool:
 
 
 def resolve_template(item_code: str, bom_no: str | None = None, explicit: str | None = None) -> str | None:
-	"""BOM's template → Item's → Item Group default (up the tree). An
-	explicit template wins only if it is a drawing template."""
+	"""The inspection plan for an item: the BOM's, then the Item's, then its
+	Item Group's default (up the tree), then a new-format plan made for the item
+	but not tagged. A new-format (drawing) plan anywhere in that order wins over
+	an old one, so an inspection never loads the old plan while a new one
+	exists. An explicit plan wins only if it is new-format."""
 	if explicit and is_drawing_template(explicit):
 		return explicit
+	found = []
 	if bom_no:
-		t = frappe.db.get_value("BOM", bom_no, "quality_inspection_template")
-		if t:
-			return t
-	t = frappe.db.get_value("Item", item_code, "quality_inspection_template")
-	if t:
-		return t
-	group = frappe.db.get_value("Item", item_code, "item_group")
-	if group:
-		lft, rgt = frappe.db.get_value("Item Group", group, ["lft", "rgt"])
-		for g in frappe.get_all(
-			"Item Group",
-			filters={"lft": ("<=", lft), "rgt": (">=", rgt), "custom_default_qi_template": ("is", "set")},
-			fields=["custom_default_qi_template"],
-			order_by="lft desc",
-			limit=1,
+		found.append(frappe.db.get_value("BOM", bom_no, "quality_inspection_template"))
+	if item_code:
+		found.append(frappe.db.get_value("Item", item_code, "quality_inspection_template"))
+		group = frappe.db.get_value("Item", item_code, "item_group")
+		if group:
+			lft, rgt = frappe.db.get_value("Item Group", group, ["lft", "rgt"])
+			found += frappe.get_all(
+				"Item Group",
+				filters={"lft": ("<=", lft), "rgt": (">=", rgt), "custom_default_qi_template": ("is", "set")},
+				pluck="custom_default_qi_template",
+				order_by="lft desc",
+			)
+	found = [t for t in found if t]
+	new = next((t for t in found if is_drawing_template(t)), None)
+	if not new and item_code:
+		# a new-format plan made for this item but not tagged on it yet: the
+		# latest revision that is not superseded
+		for t in frappe.get_all(
+			"Quality Inspection Template",
+			filters={"custom_item": item_code, "custom_superseded_by": ("is", "not set")},
+			pluck="name",
+			order_by="modified desc",
 		):
-			return g.custom_default_qi_template
-	return explicit
+			if is_drawing_template(t):
+				new = t
+				break
+	return new or (found[0] if found else explicit)
+
+
+def use_new_plan(doc):
+	"""A new inspection that arrived with an old-format plan (ERPNext fills the
+	Item's) takes the item's new-format plan instead, and its readings are
+	rebuilt from it."""
+	if not doc.is_new() or doc.docstatus != 0 or not doc.item_code:
+		return
+	if doc.quality_inspection_template and is_drawing_template(doc.quality_inspection_template):
+		return
+	plan = resolve_template(doc.item_code, doc.get("bom_no"))
+	if plan and is_drawing_template(plan):
+		doc.quality_inspection_template = plan
+		doc.set("readings", [])
 
 
 # ------------------------------------------------------------------ hooks --
 
 
 def before_validate(doc, method=None):
+	use_new_plan(doc)
 	if not applies(doc):
 		return
 	if not doc.custom_stage:
@@ -694,3 +722,27 @@ def drawing_template_for(item_code: str, bom_no: str | None = None, explicit: st
 	"""For the Inspect buttons: the drawing template that would load, if any."""
 	t = resolve_template(item_code, bom_no, explicit)
 	return t if is_drawing_template(t) else None
+
+
+@frappe.whitelist()
+def plan_preview(item_code: str, bom_no: str | None = None, stage: str | None = None, explicit: str | None = None) -> dict:
+	"""For the new-inspection start dialog: the plan that would load, its
+	drawing, and how many of its characteristics are checked at this stage."""
+	frappe.has_permission("Item", "read", item_code, throw=True)
+	template = resolve_template(item_code, bom_no, explicit)
+	if not template:
+		return {"template": None}
+	tpl = frappe.get_doc("Quality Inspection Template", template)
+	rows = [r for r in tpl.get(ROWS) if r.custom_row_type]
+	field = STAGE_FIELD.get(stage)
+	return {
+		"template": template,
+		"new_format": bool(rows),
+		"drawing": tpl.custom_drawing,
+		"drawing_no": tpl.custom_drawing_no,
+		"revision": tpl.custom_drawing_revision,
+		"superseded_by": tpl.custom_superseded_by,
+		"rows": len(rows) or len(tpl.get(ROWS) or []),
+		"due": sum(1 for r in rows if field and cint(r.get(field)) and r.custom_tolerance_type != T.REFERENCE),
+		"positions": [r.custom_position for r in rows if r.custom_position and field and cint(r.get(field))],
+	}
