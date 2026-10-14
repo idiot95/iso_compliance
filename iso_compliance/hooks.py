@@ -98,7 +98,9 @@ doctype_js = {
 	"Purchase Order": "public/js/purchase_order.js",
 	# quality_inspection.js: SOP-005/006 one-click NCR. qi_inspection.js: drawing inspection.
 	"Quality Inspection": ["public/js/quality_inspection.js", "public/js/qi_inspection.js"],
-	"Work Order": "public/js/qi_work_order.js",
+	"Work Order": ["public/js/inspection_waiting.js", "public/js/qi_work_order.js"],
+	# SOP-006: what waits in Inspection Required, with its Inspect button.
+	"Stock Entry": "public/js/inspection_waiting.js",
 	"Job Card": "public/js/qi_job_card.js",
 	# Drawing-based inspection: Create › Inspection template (EXTERNAL_CHANGES §5).
 	"BOM": "public/js/qi_start_template.js",
@@ -107,7 +109,8 @@ doctype_js = {
 	"Quality Inspection Template": "public/js/qi_template.js",
 	# SOP-006 material identification labels. material_labels.js holds the sheet
 	# dialog both sides share; the per-doctype file only names the button.
-	"Purchase Receipt": ["public/js/material_labels.js", "public/js/purchase_receipt.js", "public/js/qi_purchase_receipt.js"],
+	"Purchase Receipt": ["public/js/material_labels.js", "public/js/purchase_receipt.js", "public/js/qi_purchase_receipt.js",
+	                     "public/js/inspection_waiting.js"],
 	"Delivery Note": ["public/js/material_labels.js", "public/js/delivery_note.js"],
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
@@ -235,10 +238,10 @@ doc_events = {
 	# on a drawing template, so existing inspections behave as before.
 	"Quality Inspection": {
 		"before_validate": "iso_compliance.qi.inspection.before_validate",
-		"validate": "iso_compliance.qi.inspection.validate",
-		"before_submit": "iso_compliance.qi.inspection.before_submit",
-		"on_submit": "iso_compliance.qi.inspection.on_submit",
-		"on_cancel": "iso_compliance.qi.inspection.on_cancel",
+		"validate": ["iso_compliance.qi.inspection.validate", "iso_compliance.overrides.inspection_flow.qi_validate"],
+		"before_submit": ["iso_compliance.qi.inspection.before_submit", "iso_compliance.overrides.inspection_flow.qi_before_submit"],
+		"on_submit": ["iso_compliance.qi.inspection.on_submit", "iso_compliance.overrides.inspection_flow.qi_on_submit"],
+		"on_cancel": ["iso_compliance.qi.inspection.on_cancel", "iso_compliance.overrides.inspection_flow.qi_on_cancel"],
 		"on_trash": "iso_compliance.qi.inspection.on_trash",
 	},
 	"Work Order": {
@@ -254,9 +257,29 @@ doc_events = {
 	},
 	# SOP-006: segregate rejected quantities, and warn when a consignment that
 	# should carry a Material Test Certificate arrives without one.
+	# SOP-006 (2026-10-14): QC rows post into Inspection Required after the
+	# receiving checks; posting flags the receipt for Engineering's inspection.
 	"Purchase Receipt": {
-		"validate": "iso_compliance.overrides.purchase_receipt.validate",
-		"before_submit": "iso_compliance.overrides.purchase_receipt.before_submit",
+		"validate": ["iso_compliance.overrides.purchase_receipt.validate", "iso_compliance.overrides.inspection_flow.pr_validate"],
+		"before_submit": ["iso_compliance.overrides.purchase_receipt.before_submit", "iso_compliance.overrides.inspection_flow.pr_before_submit"],
+		"on_submit": "iso_compliance.overrides.inspection_flow.pr_on_submit",
+	},
+	# Finished goods of QC groups wait in Inspection Required; only their
+	# inspection's transfer moves them out.
+	"Stock Entry": {
+		"before_validate": "iso_compliance.overrides.inspection_flow.se_before_validate",
+		"validate": "iso_compliance.overrides.inspection_flow.se_validate",
+		"before_submit": "iso_compliance.overrides.inspection_flow.se_before_submit",
+		"on_submit": "iso_compliance.overrides.inspection_flow.se_on_submit",
+		"on_cancel": "iso_compliance.overrides.inspection_flow.se_on_cancel",
+	},
+	"Delivery Note": {
+		"validate": "iso_compliance.overrides.inspection_flow.dn_validate",
+	},
+	# The Item Group's QC rule drives the item's inspection flag; items
+	# without batches get their item code as a barcode for the labels.
+	"Item": {
+		"validate": "iso_compliance.overrides.inspection_flow.item_validate",
 	},
 	# SOP-006 step 3: a batch born from a goods receipt records its supplier,
 	# so identity can be traced back from the shop floor.

@@ -1,7 +1,8 @@
 # Copyright (c) 2026, Hatim Carbon Co. Pvt. Ltd. and contributors
 # For license information, please see license.txt
 
-"""Material identification labels, printed eight to an A4 sheet.
+"""Material identification labels: eight to an A4 sheet, or one per label on a
+thermal roll.
 
 SOP-006 step 3 asks that accepted material be identified so that identity and
 traceability hold through storage and into production. The label is how that
@@ -26,6 +27,14 @@ Geometry is Avery L7165 and its many equivalents: 99.1 x 67.7 mm, two across and
 four down, 13.1 mm top and bottom margins, 4.65 mm side margins, 2.5 mm between
 the columns. Print the guides version on plain paper first and hold it against a
 label sheet to check the printer is not scaling the page.
+
+Thermal rolls print one label per page: the page is the label, so the printer
+driver only needs the same size set as its paper. Three common roll sizes are
+offered; LAYOUTS is the one place to add another.
+
+Besides the receipt and delivery buttons, the Stock Labels page prints for the
+stock already on the shelves (`stock_rows`, from the ledger) and answers "what
+is this and where should it be" for a scanned label (`lookup`).
 """
 
 from __future__ import annotations
@@ -49,6 +58,16 @@ SHEET = {
 	"col_gap": 2.5,
 }
 PER_SHEET = SHEET["cols"] * SHEET["rows"]
+
+#: What a label can be printed on. "sheet" layouts tile an A4 page; the others
+#: are thermal rolls, one label per page of that size.
+LAYOUTS = {
+	"a4-8": {"label": "A4 sheet, 8 labels (99.1 × 67.7 mm)", "w": SHEET["label_w"], "h": SHEET["label_h"], "sheet": True},
+	"thermal-100x50": {"label": "Thermal roll, 100 × 50 mm", "w": 100, "h": 50},
+	"thermal-75x50": {"label": "Thermal roll, 75 × 50 mm", "w": 75, "h": 50},
+	"thermal-50x25": {"label": "Thermal roll, 50 × 25 mm (barcode and name only)", "w": 50, "h": 25},
+}
+DEFAULT_LAYOUT = "a4-8"
 
 #: Printing more than this in one go is almost always a mistake -- a receipt line
 #: can carry 14,000 blocks -- so the dialog asks for confirmation past it.
@@ -180,7 +199,7 @@ def _batches_by_bundle(bundles: set[str]) -> dict[str, list[tuple[str, float]]]:
 
 
 @frappe.whitelist()
-def render_sheet(doctype: str, name: str, rows, guides: int | str = 0) -> str:
+def render_sheet(doctype: str, name: str, rows, guides: int | str = 0, layout: str = DEFAULT_LAYOUT) -> str:
 	"""The full printable HTML: `rows` repeated by each row's label count."""
 	if doctype not in SUPPORTED:
 		frappe.throw(_("{0} does not carry material labels.").format(doctype))
@@ -210,14 +229,16 @@ def render_sheet(doctype: str, name: str, rows, guides: int | str = 0) -> str:
 		if so_by_idx:
 			context["sales_order"] = so_by_idx.get(frappe.utils.cint(row.get("idx"))) or ""
 		# The barcode is identical for every copy of a batch, so render it once.
-		context["barcode"] = code128_svg(row.get("batch_no"))
+		# Without a batch it carries the item code, which every such item holds as
+		# an Item Barcode (SOP-006 setup), so the scan still resolves.
+		context["barcode"] = code128_svg(row.get("batch_no") or row.get("item_code"))
 		html = _label_html(context, SUPPORTED[doctype])
 		labels.extend([html] * count)
 
 	if not labels:
 		frappe.throw(_("Nothing to print: every line was set to zero labels."))
 
-	return _wrap_sheets(labels, guides=guides, title=f"{doctype} {name}")
+	return _wrap(labels, layout=layout, guides=guides, title=f"{doctype} {name}")
 
 
 def _incoming_header(doc) -> dict:
@@ -254,11 +275,19 @@ def _label_html(ctx: dict, kind: str) -> str:
 		else (
 			f'<div class="hcc-batch">{esc(batch)}</div>'
 			if batch
+			else f'<div class="hcc-bc">{barcode}</div><div class="hcc-batch">{esc(ctx.get("item_code"))}</div>'
+			if barcode
 			else f'<div class="hcc-nobatch">{esc(_("No batch"))}</div>'
 		)
 	)
 
-	if kind == "incoming":
+	if kind == "stock":
+		facts = [
+			(_("Supplier"), ctx.get("supplier")),
+			(_("Received"), ctx.get("date")),
+			(_("Store"), ctx.get("warehouse")),
+		]
+	elif kind == "incoming":
 		facts = [
 			(_("Supplier"), ctx.get("supplier")),
 			(_("Received"), ctx.get("date")),
@@ -285,26 +314,21 @@ def _label_html(ctx: dict, kind: str) -> str:
 </div>"""
 
 
-def _wrap_sheets(labels: list[str], guides: int = 0, title: str = "Labels") -> str:
-	s = SHEET
-	sheets = []
-	for page_start in range(0, len(labels), PER_SHEET):
-		page = labels[page_start : page_start + PER_SHEET]
-		cells = "".join(page)
-		# Pad the last sheet so the grid keeps its shape and nothing reflows.
-		cells += '<div class="hcc-label hcc-blank"></div>' * (PER_SHEET - len(page))
-		sheets.append(f'<div class="hcc-sheet">{cells}</div>')
-
-	guide_css = (
-		".hcc-label{outline:0.2mm dashed #bbb;outline-offset:-0.1mm}" if guides else ""
-	)
-
-	return f"""<!doctype html>
-<html><head><meta charset="utf-8"><title>{frappe.utils.escape_html(title)}</title>
-<style>
+def _wrap(labels: list[str], layout: str = DEFAULT_LAYOUT, guides: int = 0, title: str = "Labels") -> str:
+	lay = LAYOUTS.get(layout) or LAYOUTS[DEFAULT_LAYOUT]
+	w, h = lay["w"], lay["h"]
+	if lay.get("sheet"):
+		s = SHEET
+		pages = []
+		for page_start in range(0, len(labels), PER_SHEET):
+			page = labels[page_start : page_start + PER_SHEET]
+			cells = "".join(page)
+			# Pad the last sheet so the grid keeps its shape and nothing reflows.
+			cells += '<div class="hcc-label hcc-blank"></div>' * (PER_SHEET - len(page))
+			pages.append(f'<div class="hcc-sheet">{cells}</div>')
+		body = "".join(pages)
+		page_css = f"""
   @page {{ size: A4; margin: 0; }}
-  html,body {{ margin:0; padding:0; background:#fff; }}
-  body {{ font-family: Helvetica, Arial, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }}
   .hcc-sheet {{
     width: 210mm; height: 297mm; box-sizing: border-box;
     padding: {s["margin_top"]}mm {s["margin_side"]}mm;
@@ -314,10 +338,35 @@ def _wrap_sheets(labels: list[str], guides: int = 0, title: str = "Labels") -> s
     page-break-after: always; break-after: page;
   }}
   .hcc-sheet:last-child {{ page-break-after: auto; break-after: auto; }}
+  .hcc-label {{ padding: 4mm 5mm; }}"""
+	else:
+		# a roll: every label is its own page of exactly the label's size
+		body = "".join(labels)
+		small = h < 35
+		page_css = f"""
+  @page {{ size: {w}mm {h}mm; margin: 0; }}
+  .hcc-label {{ padding: {1.5 if small else 2.5}mm {2 if small else 3.5}mm; page-break-after: always; break-after: page; }}
+  .hcc-label:last-child {{ page-break-after: auto; break-after: auto; }}
+  .hcc-logo {{ height: 6mm; {"display:none;" if small else ""} }}
+  .hcc-item {{ font-size: {8 if small else 10}pt; -webkit-line-clamp: {1 if small else 2}; }}
+  .hcc-bc, .hcc-bc svg {{ height: {8 if small else 10}mm; }}
+  .hcc-batch {{ font-size: {8 if small else 11}pt; }}
+  .hcc-facts {{ font-size: 7.5pt; {"display:none;" if small else ""} }}
+  .hcc-facts th {{ width: 16mm; }}
+  .hcc-ref {{ {"display:none;" if small else ""} }}"""
+
+	guide_css = (
+		".hcc-label{outline:0.2mm dashed #bbb;outline-offset:-0.1mm}" if guides else ""
+	)
+
+	return f"""<!doctype html>
+<html><head><meta charset="utf-8"><title>{frappe.utils.escape_html(title)}</title>
+<style>
+  html,body {{ margin:0; padding:0; background:#fff; }}
+  body {{ font-family: Helvetica, Arial, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }}
   .hcc-label {{
-    width: {s["label_w"]}mm; height: {s["label_h"]}mm; box-sizing: border-box;
-    padding: 4mm 5mm; overflow: hidden;
-    display: flex; flex-direction: column;
+    width: {w}mm; height: {h}mm; box-sizing: border-box;
+    overflow: hidden; display: flex; flex-direction: column;
   }}
   .hcc-blank {{ visibility: hidden; }}
   .hcc-top {{ display:flex; align-items:center; gap:3mm; }}
@@ -327,7 +376,7 @@ def _wrap_sheets(labels: list[str], guides: int = 0, title: str = "Labels") -> s
     display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
   }}
   .hcc-bc {{ margin: 1.5mm 0 0; height: 11mm; }}
-  .hcc-bc svg {{ height: 11mm; width: auto; display:block; }}
+  .hcc-bc svg {{ height: 11mm; width: auto; max-width: 100%; display:block; }}
   .hcc-batch {{ font-size: 12pt; font-weight: 700; letter-spacing: 0.4pt; margin-top: 0.5mm; }}
   .hcc-nobatch {{ font-size: 9pt; color:#888; margin: 2mm 0; font-style: italic; }}
   .hcc-facts {{ margin-top: auto; border-collapse: collapse; width:100%; font-size: 8.5pt; }}
@@ -335,6 +384,217 @@ def _wrap_sheets(labels: list[str], guides: int = 0, title: str = "Labels") -> s
                    vertical-align:top; width: 22mm; }}
   .hcc-facts td {{ text-align:left; padding:0; }}
   .hcc-ref {{ font-size: 7pt; color:#999; margin-top: 1mm; }}
+  {page_css}
   {guide_css}
 </style></head>
-<body onload="window.print()">{"".join(sheets)}</body></html>"""
+<body onload="window.print()">{body}</body></html>"""
+
+
+# ---------------------------------------------------------------------------
+# Stock on the shelves
+# ---------------------------------------------------------------------------
+
+
+@frappe.whitelist()
+def layouts() -> list[dict]:
+	return [{"value": k, "label": _(v["label"])} for k, v in LAYOUTS.items()]
+
+
+def _batch_balances(warehouse=None, item_code=None, batch_no=None) -> list[dict]:
+	"""Batch-wise balance per warehouse from the ledger: bundles for current
+	entries, the SLE's own batch_no for entries made before bundles existed."""
+	cond, args = ["sle.is_cancelled = 0"], {}
+	for field, value in (("warehouse", warehouse), ("item_code", item_code)):
+		if value:
+			cond.append(f"sle.{field} = %({field})s")
+			args[field] = value
+	where = " and ".join(cond)
+	bcond = " and sbe.batch_no = %(batch_no)s" if batch_no else ""
+	lcond = " and sle.batch_no = %(batch_no)s" if batch_no else ""
+	args["batch_no"] = batch_no
+	return frappe.db.sql(
+		f"""select item_code, warehouse, batch_no, sum(qty) as qty from (
+			select sle.item_code, sle.warehouse, sbe.batch_no, sbe.qty
+			from `tabStock Ledger Entry` sle
+			join `tabSerial and Batch Entry` sbe on sbe.parent = sle.serial_and_batch_bundle
+			where {where} and ifnull(sbe.batch_no, '') != ''{bcond}
+			union all
+			select sle.item_code, sle.warehouse, sle.batch_no, sle.actual_qty
+			from `tabStock Ledger Entry` sle
+			where {where} and ifnull(sle.serial_and_batch_bundle, '') = '' and ifnull(sle.batch_no, '') != ''{lcond}
+		) t group by item_code, warehouse, batch_no having abs(sum(qty)) > 0.0001""",
+		args,
+		as_dict=True,
+	)
+
+
+@frappe.whitelist()
+def stock_rows(warehouse: str | None = None, item_group: str | None = None, item_code: str | None = None) -> list[dict]:
+	"""One row per item (and batch) in stock, for labelling what is already on the
+	shelves. One label each by default; the count is the operator's."""
+	frappe.has_permission("Bin", "read", throw=True)
+	items = {
+		i.name: i
+		for i in frappe.get_all(
+			"Item",
+			filters={"is_stock_item": 1, "disabled": 0, **({"name": item_code} if item_code else {}),
+			         **({"item_group": ("descendants of (inclusive)", item_group)} if item_group else {})},
+			fields=["name", "item_name", "has_batch_no", "stock_uom", "item_group"],
+			limit_page_length=0,
+		)
+	}
+	if not items:
+		return []
+	rows = []
+	bins = frappe.get_all(
+		"Bin",
+		filters={"actual_qty": (">", 0), "item_code": ("in", list(items)), **({"warehouse": warehouse} if warehouse else {})},
+		fields=["item_code", "warehouse", "actual_qty"],
+		limit_page_length=0,
+	)
+	batched = set()
+	for b in bins:
+		item = items[b.item_code]
+		if item.has_batch_no:
+			batched.add((b.item_code, b.warehouse))
+			continue
+		rows.append({"item_code": b.item_code, "item_name": item.item_name, "batch_no": None, "warehouse": b.warehouse,
+		             "qty": b.actual_qty, "uom": item.stock_uom, "labels": 1})
+	if batched:
+		for r in _batch_balances(warehouse=warehouse, item_code=item_code):
+			if (r.item_code, r.warehouse) in batched and r.qty > 0:
+				item = items[r.item_code]
+				rows.append({"item_code": r.item_code, "item_name": item.item_name, "batch_no": r.batch_no,
+				             "warehouse": r.warehouse, "qty": r.qty, "uom": item.stock_uom, "labels": 1})
+	rows.sort(key=lambda r: (r["warehouse"], r["item_code"], r["batch_no"] or ""))
+	return rows
+
+
+@frappe.whitelist()
+def render_stock(rows, layout: str = DEFAULT_LAYOUT, guides: int | str = 0) -> str:
+	"""Labels for stock already on the shelves: rows of item, batch, warehouse, count."""
+	frappe.has_permission("Bin", "read", throw=True)
+	if isinstance(rows, str):
+		rows = frappe.parse_json(rows)
+	batches = {
+		b.name: b
+		for b in frappe.get_all(
+			"Batch",
+			filters={"name": ("in", [r.get("batch_no") for r in rows if r.get("batch_no")] or [""])},
+			fields=["name", "supplier", "manufacturing_date", "creation"],
+		)
+	}
+	suppliers = {}
+	labels = []
+	for row in rows or []:
+		count = frappe.utils.cint(row.get("labels"))
+		if count < 1 or not row.get("item_code"):
+			continue
+		batch = batches.get(row.get("batch_no"))
+		supplier = batch and batch.supplier
+		if supplier and supplier not in suppliers:
+			suppliers[supplier] = frappe.db.get_value("Supplier", supplier, "supplier_name") or supplier
+		context = {
+			"item_name": row.get("item_name") or frappe.db.get_value("Item", row["item_code"], "item_name"),
+			"item_code": row["item_code"],
+			"batch_no": row.get("batch_no"),
+			"supplier": suppliers.get(supplier, ""),
+			"date": format_date(batch.manufacturing_date or batch.creation) if batch else "",
+			"warehouse": row.get("warehouse") or "",
+			"reference": row["item_code"] if row.get("batch_no") else "",
+			"barcode": code128_svg(row.get("batch_no") or row["item_code"]),
+		}
+		labels.extend([_label_html(context, "stock")] * count)
+	if not labels:
+		frappe.throw(_("Nothing to print: every line was set to zero labels."))
+	return _wrap(labels, layout=layout, guides=guides, title=_("Stock labels"))
+
+
+# ---------------------------------------------------------------------------
+# Scan: what is this, where is it, where should it be
+# ---------------------------------------------------------------------------
+
+
+@frappe.whitelist()
+def lookup(code: str) -> dict:
+	"""Everything Stores needs from one scanned label."""
+	from erpnext.stock.utils import scan_barcode
+
+	frappe.has_permission("Bin", "read", throw=True)
+	code = (code or "").strip()
+	if not code:
+		return {}
+	hit = scan_barcode(code) or {}
+	item_code, batch_no = hit.get("item_code"), hit.get("batch_no")
+	if not item_code and frappe.db.exists("Item", code):
+		item_code = code
+	if not item_code:
+		return {"found": False, "code": code}
+
+	item = frappe.db.get_value("Item", item_code, ["item_name", "item_group", "stock_uom", "has_batch_no", "image"], as_dict=True)
+	company = frappe.defaults.get_user_default("Company") or frappe.db.get_single_value("Global Defaults", "default_company")
+	# where it lives: the item's default warehouse, else its group's, else the site's
+	home = frappe.db.get_value("Item Default", {"parent": item_code, "company": company}, "default_warehouse")
+	if not home:
+		home = frappe.db.get_value("Item Default", {"parent": item.item_group, "parenttype": "Item Group", "company": company},
+		                           "default_warehouse")
+	if not home:
+		home = frappe.db.get_single_value("Stock Settings", "default_warehouse")
+
+	if batch_no:
+		where = [{"warehouse": r.warehouse, "qty": r.qty} for r in _batch_balances(item_code=item_code, batch_no=batch_no)]
+	else:
+		where = [{"warehouse": b.warehouse, "qty": b.actual_qty}
+		         for b in frappe.get_all("Bin", filters={"item_code": item_code, "actual_qty": ("!=", 0)},
+		                                 fields=["warehouse", "actual_qty"], order_by="actual_qty desc")]
+
+	# stock waiting in Inspection Required belongs where its inspection sends it
+	from iso_compliance.overrides.inspection_flow import _is_inspection_warehouse
+
+	inspection = []
+	if any(_is_inspection_warehouse(w["warehouse"]) for w in where):
+		inspection = _waiting_lots(item_code, batch_no)
+	batch = frappe.db.get_value("Batch", batch_no, ["supplier", "manufacturing_date", "expiry_date", "reference_doctype",
+	                                                  "reference_name"], as_dict=True) if batch_no else None
+	return {
+		"found": True,
+		"code": code,
+		"item_code": item_code,
+		"item_name": item.item_name,
+		"item_group": item.item_group,
+		"uom": item.stock_uom,
+		"batch_no": batch_no,
+		"batch": batch,
+		"home": home,
+		"where": where,
+		"inspection": inspection,
+	}
+
+
+def _waiting_lots(item_code, batch_no) -> list[dict]:
+	"""Receipts and Manufacture entries holding this item in Inspection Required,
+	with where each lot goes and how far it has got: not inspected, inspection
+	started, or inspected with its transfer drafted but not yet posted."""
+	from iso_compliance.overrides.inspection_flow import _is_inspection_warehouse, _row_batch, waiting
+
+	parents = set()
+	for dt, child, field in (("Purchase Receipt", "Purchase Receipt Item", "warehouse"),
+	                         ("Stock Entry", "Stock Entry Detail", "t_warehouse")):
+		for r in frappe.get_all(child, filters={"item_code": item_code, "docstatus": 1, field: ("like", "Inspection Required%")},
+		                        fields=["parent", field], order_by="creation desc", limit=50):
+			if _is_inspection_warehouse(r.get(field)):
+				parents.add((dt, child, r.parent))
+	out = []
+	for dt, child, name in sorted(parents):
+		for r in waiting(dt, name):
+			if r["item_code"] != item_code:
+				continue
+			if batch_no:
+				src = frappe.db.get_value(child, r["row"], ["batch_no", "serial_and_batch_bundle"], as_dict=True)
+				if _row_batch(src) != batch_no:
+					continue
+			transfer = r["inspection"] and frappe.db.get_value("Quality Inspection", r["inspection"], "custom_transfer_entry")
+			if r["state"] == "done" and (not transfer or frappe.db.get_value("Stock Entry", transfer, "docstatus") == 1):
+				continue  # released and moved
+			out.append(dict(r, reference_type=dt, reference_name=name, transfer=transfer))
+	return out

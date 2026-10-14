@@ -1,4 +1,6 @@
-// Material identification labels (SOP-006), eight to an A4 sheet.
+// Material identification labels (SOP-006): eight to an A4 sheet, or a thermal
+// roll (the layouts live in iso_compliance.api.labels.LAYOUTS). Labels for stock
+// already on the shelves, and the scan lookup, are on the Stock Labels page.
 //
 // Shared by the incoming label on Purchase Receipt and the outgoing label on
 // Delivery Note. The label count is typed per batch and never derived from the
@@ -20,7 +22,10 @@ hcc.labels.add_button = function (frm, label) {
 	);
 };
 
-hcc.labels.open_dialog = function (frm) {
+hcc.labels.open_dialog = async function (frm) {
+	if (!hcc.labels.layouts) {
+		hcc.labels.layouts = (await frappe.call({ method: "iso_compliance.api.labels.layouts" })).message;
+	}
 	frappe.call({
 		method: "iso_compliance.api.labels.get_label_rows",
 		args: { doctype: frm.doctype, name: frm.doc.name },
@@ -56,7 +61,7 @@ hcc.labels.show = function (frm, rows) {
 				)}${
 					unbatched
 						? `<br><span style="color:var(--orange-600)">${__(
-								"{0} line(s) have no batch: they print without a barcode, because there is no batch for a scan to resolve to.",
+								"{0} line(s) have no batch: their barcode carries the item code instead.",
 								[unbatched]
 						  )}</span>`
 						: ""
@@ -80,6 +85,14 @@ hcc.labels.show = function (frm, rows) {
 				],
 			},
 			{
+				fieldname: "layout",
+				fieldtype: "Select",
+				label: __("Print on"),
+				options: hcc.labels.layouts || [],
+				default: "a4-8",
+				change: () => refresh_total(),
+			},
+			{
 				fieldname: "guides",
 				fieldtype: "Check",
 				label: __("Show cutting guides"),
@@ -99,16 +112,10 @@ hcc.labels.show = function (frm, rows) {
 			}
 			const go = () => {
 				dialog.hide();
-				hcc.labels.print(frm, data, dialog.get_value("guides"));
+				hcc.labels.print(frm, data, dialog.get_value("guides"), dialog.get_value("layout"));
 			};
 			if (total > hcc.labels.WARN_THRESHOLD) {
-				frappe.confirm(
-					__("That is {0} labels across {1} A4 sheet(s). Print them?", [
-						total,
-						Math.ceil(total / 8),
-					]),
-					go
-				);
+				frappe.confirm(__("Print {0} labels?", [total]), go);
 			} else {
 				go();
 			}
@@ -119,11 +126,11 @@ hcc.labels.show = function (frm, rows) {
 	const refresh_total = () => {
 		const data = dialog.get_value("rows") || [];
 		const total = data.reduce((sum, d) => sum + cint(d.labels), 0);
-		const sheets = Math.ceil(total / 8);
+		const sheet = (dialog.get_value("layout") || "a4-8") === "a4-8";
 		dialog.fields_dict.total.$wrapper.html(
 			`<div style="padding:6px 0;font-weight:600">${__("Total")}: ${total} ${__(
 				"label(s)"
-			)} — ${sheets} ${__("A4 sheet(s)")}${
+			)}${sheet ? ` — ${Math.ceil(total / 8)} ${__("A4 sheet(s)")}` : ""}${
 				total > hcc.labels.WARN_THRESHOLD
 					? ` <span style="color:var(--orange-600);font-weight:400">(${__(
 							"will ask to confirm"
@@ -137,7 +144,7 @@ hcc.labels.show = function (frm, rows) {
 	dialog.show();
 };
 
-hcc.labels.print = function (frm, rows, guides) {
+hcc.labels.print = function (frm, rows, guides, layout) {
 	frappe.call({
 		method: "iso_compliance.api.labels.render_sheet",
 		args: {
@@ -145,6 +152,7 @@ hcc.labels.print = function (frm, rows, guides) {
 			name: frm.doc.name,
 			rows: JSON.stringify(rows),
 			guides: guides ? 1 : 0,
+			layout: layout || "a4-8",
 		},
 		freeze: true,
 		freeze_message: __("Building the sheet…"),

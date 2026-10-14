@@ -10,3 +10,4 @@ iso_compliance.patches.retire_nc_inspection_template
 iso_compliance.patches.retire_tcr_review_chain
 iso_compliance.patches.qi_inspector_role
 iso_compliance.patches.qi_issue_mtc_groups
+iso_compliance.patches.sop_006_post_first

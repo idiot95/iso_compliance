@@ -133,7 +133,7 @@ const QI_INSP = "iso_compliance.qi.inspection";
 const QI_START_STAGES = [
 	["Incoming", __("Incoming"), __("Goods received: a row of a Purchase Receipt.")],
 	["In Process", __("In process"), __("During production: a Job Card, at first-off, patrol or last-off.")],
-	["Final", __("Final"), __("Finished goods before release: a lot of a Work Order.")],
+	["Final", __("Final"), __("Finished goods waiting in Inspection Required after a Work Order is finished.")],
 ];
 
 function qi_start_dialog(frm) {
@@ -157,9 +157,7 @@ function qi_start_dialog(frm) {
 			{ fieldname: "work_order", fieldtype: "Link", options: "Work Order", label: __("Work Order"),
 				get_query: () => ({ filters: { docstatus: 1, status: ["not in", ["Completed", "Stopped", "Closed"]] } }) },
 			{ fieldtype: "Column Break" },
-			{ fieldname: "lot_qty", fieldtype: "Float", label: __("Lot quantity"), depends_on: "work_order" },
-			{ fieldname: "sample_size", fieldtype: "Float", label: __("Sample size"), depends_on: "work_order",
-				description: __("From the sampling percentage in Inspection Settings; change if needed.") },
+			{ fieldname: "final_html", fieldtype: "HTML", depends_on: "work_order" },
 			{ fieldtype: "Section Break", label: __("Inspection plan that will load") },
 			{ fieldname: "plan_html", fieldtype: "HTML" },
 		],
@@ -183,8 +181,7 @@ function qi_start_dialog(frm) {
 		d.set_df_property("job_card", "hidden", st.stage !== "In Process");
 		d.set_df_property("check_point", "hidden", st.stage !== "In Process");
 		d.set_df_property("work_order", "hidden", st.stage !== "Final");
-		d.set_df_property("lot_qty", "hidden", st.stage !== "Final");
-		d.set_df_property("sample_size", "hidden", st.stage !== "Final");
+		d.set_df_property("final_html", "hidden", st.stage !== "Final");
 	};
 	const plan = async () => {
 		const $p = d.fields_dict.plan_html.$wrapper;
@@ -250,8 +247,11 @@ function qi_start_dialog(frm) {
 		const wo = d.get_value("work_order");
 		if (!wo) return;
 		const { message: v } = await frappe.db.get_value("Work Order", wo, ["production_item", "bom_no"]);
-		const { message: info } = await frappe.call({ method: `${QI_INSP}.final_inspection_info`, args: { work_order: wo } });
-		d.set_values({ lot_qty: info.lot_qty, sample_size: info.sample_size });
+		const { message: lots } = await frappe.call({ method: "iso_compliance.overrides.inspection_flow.waiting_for_work_order", args: { work_order: wo } });
+		st.lots = lots || [];
+		d.fields_dict.final_html.$wrapper.html(`<p class="small ${st.lots.length ? "" : "text-muted"}">${st.lots.length
+			? __("Waiting in Inspection Required: {0}", [st.lots.map((r) => `${esc(r.stock_entry)} · ${format_number(r.qty)} ${esc(r.uom || "")}`).join(", ")])
+			: __("Nothing waiting. Finish the Work Order first: its Manufacture entry puts the finished goods in Inspection Required.")}</p>`);
 		Object.assign(st, { item: v.production_item, bom: v.bom_no, explicit: null });
 		plan();
 	};
@@ -262,7 +262,20 @@ function qi_start_dialog(frm) {
 				? { method: "start_receipt_inspection", args: { purchase_receipt: v.purchase_receipt, row: v.pr_row } }
 				: st.stage === "In Process"
 				? { method: "start_job_card_inspection", args: { job_card: v.job_card, check_point: v.check_point } }
-				: { method: "start_final_inspection", args: { work_order: v.work_order, lot_qty: v.lot_qty, sample_size: v.sample_size } };
+				: null;
+		if (!call) {
+			// Final: the oldest lot of the Work Order waiting in Inspection Required
+			const lot = (st.lots || [])[0];
+			if (!lot) return frappe.msgprint(__("Finish the Work Order first (Finish → Manufacture entry): that puts the finished goods in Inspection Required."));
+			const { message: qi } = await frappe.call({
+				method: "iso_compliance.overrides.inspection_flow.start_inspection",
+				args: { reference_type: "Stock Entry", reference_name: lot.stock_entry, row: lot.row },
+				freeze: true, freeze_message: __("Starting the inspection…"),
+			});
+			d.__started = true;
+			d.hide();
+			return frappe.set_route("Form", "Quality Inspection", qi);
+		}
 		const { message: name } = await frappe.call({ method: `${QI_INSP}.${call.method}`, args: call.args, freeze: true, freeze_message: __("Starting the inspection…") });
 		d.__started = true;
 		d.hide();
@@ -288,7 +301,8 @@ function qi_start_dialog(frm) {
 const qi_wide = () => window.matchMedia("(min-width: 992px)").matches;
 
 // What stays on a drawing inspection's form besides the entry screen.
-const QI_KEEP = ["custom_disposition", "custom_concession_no", "custom_non_conformance", "inspected_by", "verified_by", "remarks", "custom_print_all_sheets"];
+const QI_KEEP = ["custom_disposition", "custom_concession_no", "custom_non_conformance", "custom_accepted_qty", "custom_rejected_qty",
+	"custom_transfer_entry", "inspected_by", "verified_by", "remarks", "custom_print_all_sheets"];
 
 function qi_focus_layout(frm, entry) {
 	const focus = !frm.__qi_all;
