@@ -527,20 +527,23 @@ def duplicate(template: str, name: str) -> str:
 @frappe.whitelist()
 def earlier_revisions(template: str) -> list[dict]:
 	"""Other, not yet superseded templates of the same drawing and item that
-	still have BOMs or Items on them: what a new revision can take over."""
+	still have BOMs or Items on them: what a new revision can take over. One of
+	the same revision is a variant (Duplicate), not an earlier revision."""
 	doc = frappe.get_doc("Quality Inspection Template", template)
 	if not (doc.custom_drawing_no and doc.custom_item):
 		return []
 	out = []
-	for name in frappe.get_all(
+	for t in frappe.get_all(
 		"Quality Inspection Template",
 		filters={"custom_drawing_no": doc.custom_drawing_no, "custom_item": doc.custom_item,
 		         "name": ("!=", template), "custom_superseded_by": ("is", "not set")},
-		pluck="name",
+		fields=["name", "custom_drawing_revision"],
 	):
-		users = used_by(name)
+		if (t.custom_drawing_revision or "") == (doc.custom_drawing_revision or ""):
+			continue
+		users = used_by(t.name)
 		if users["boms"] or users["items"]:
-			out.append({"name": name, **users})
+			out.append({"name": t.name, **users})
 	return out
 
 

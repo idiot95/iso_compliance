@@ -183,10 +183,19 @@ function qi_start_dialog(frm) {
 			st.mode = String($(e.currentTarget).data("m"));
 			show_mode();
 		});
+		// an item with a drawing plan always inspects on it: saving swaps any old
+		// template for it (inspection.use_new_plan), so the old format is not offered
+		const blocked = !!(st.plan && st.plan.new_format);
 		d.set_df_property("new_section", "hidden", st.mode !== "new");
 		d.set_df_property("old_section", "hidden", st.mode !== "old");
-		d.fields_dict.old_html.$wrapper.html(`<div class="text-muted small">${__("Opens ERPNext's standard inspection form with what is inspected filled in. Readings are typed into its grid; there is no drawing or inspector screen.")}</div>`);
+		d.set_df_property("old_template", "hidden", blocked);
+		// the checkpoint is recorded on drawing inspections only
+		d.set_df_property("check_point", "hidden", st.stage !== "In Process" || st.mode === "old");
+		d.fields_dict.old_html.$wrapper.html(blocked
+			? `<div class="qi-start-plan warn">${__("{0} has a new-format plan ({1}); inspections load it. Use New format.", [esc(st.item), esc(st.plan.template)])}</div>`
+			: `<div class="text-muted small" style="margin-bottom:8px">${__("Opens ERPNext's standard inspection form with what is inspected filled in. Readings are typed into its grid; there is no drawing or inspector screen.")}</div>`);
 		d.set_primary_action(st.mode === "old" ? __("Open old-format form") : __("Start inspection"), (v) => (st.mode === "old" ? open_old(v) : start(v)));
+		d.get_primary_btn().prop("disabled", st.mode === "old" && blocked);
 	};
 	const show_stage = () => {
 		d.fields_dict.stage_html.$wrapper.html(`<div class="qi-start-stages">${QI_START_STAGES.map(
@@ -201,12 +210,15 @@ function qi_start_dialog(frm) {
 		d.set_df_property("purchase_receipt", "hidden", st.stage !== "Incoming");
 		d.set_df_property("pr_row", "hidden", st.stage !== "Incoming");
 		d.set_df_property("job_card", "hidden", st.stage !== "In Process");
-		d.set_df_property("check_point", "hidden", st.stage !== "In Process");
+		d.set_df_property("check_point", "hidden", st.stage !== "In Process" || st.mode === "old");
 		d.set_df_property("work_order", "hidden", st.stage !== "Final");
 		d.set_df_property("final_html", "hidden", st.stage !== "Final");
 	};
 	const plan = async () => {
 		const $p = d.fields_dict.plan_html.$wrapper;
+		st.plan = null;
+		d.set_value("old_template", ""); // the last item's
+		show_mode();
 		if (!st.item) {
 			$p.html(`<div class="text-muted small">${__("Choose what is inspected above.")}</div>`);
 			return;
@@ -217,6 +229,7 @@ function qi_start_dialog(frm) {
 			args: { item_code: st.item, bom_no: st.bom, stage: st.stage, explicit: st.explicit },
 		});
 		st.plan = m;
+		show_mode();
 		if (!m.template) {
 			$p.html(`<div class="qi-start-plan warn">${__("{0} has no inspection plan. Build one from its BOM's Inspection Plan tab first.", [esc(st.item)])}</div>`);
 			return;
@@ -306,6 +319,7 @@ function qi_start_dialog(frm) {
 	};
 	// Old format: fill ERPNext's own form from what was chosen above
 	const open_old = async (v) => {
+		if (st.plan && st.plan.new_format) return;
 		const lot = (st.lots || [])[0];
 		const ref =
 			st.stage === "Incoming" ? v.purchase_receipt && { inspection_type: "Incoming", reference_type: "Purchase Receipt", reference_name: v.purchase_receipt, child_row_reference: v.pr_row }
