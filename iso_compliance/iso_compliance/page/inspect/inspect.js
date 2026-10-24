@@ -97,7 +97,20 @@ class Inspector {
 		this.$root.html(`
 			<div class="qi-head">
 				<div class="qi-head-main">
-					<div class="qi-sub">${esc(d.name)} · ${esc(d.drawing_no || "")}${d.drawing_revision ? " " + __("Rev") + " " + esc(d.drawing_revision) : ""} · ${__("Lot")} ${esc(d.lot_qty || "")} · ${__("Sample")} ${esc(d.sample_size)}</div>
+					<div class="qi-crumbs">${[
+						d.reference_type && d.reference_name
+							? `<a href="/app/${frappe.router.slug(d.reference_type)}/${encodeURIComponent(d.reference_name)}">‹ ${esc(__(d.reference_type))} ${esc(d.reference_name)}</a>`
+							: "",
+						d.work_order && d.reference_type !== "Work Order" ? `<a href="/app/work-order/${encodeURIComponent(d.work_order)}">${__("Work Order")} ${esc(d.work_order)}</a>` : "",
+						`<a href="/app/quality-inspection/${encodeURIComponent(d.name)}">${esc(d.name)}</a>`,
+					].filter(Boolean).join('<span class="qi-crumb-sep">/</span>')}</div>
+					<div class="qi-title">${esc(d.item_code)}${d.item_name && d.item_name !== d.item_code ? ` <span class="qi-title-sub">${esc(d.item_name)}</span>` : ""}</div>
+					<div class="qi-pills">${[
+						[__("Stage"), __(d.stage || "") + (d.check_point ? " · " + __(d.check_point) : "")],
+						[__("Drawing"), [d.drawing_no, d.drawing_revision && __("Rev") + " " + d.drawing_revision].filter(Boolean).join(" ")],
+						[__("Lot"), d.lot_qty],
+						[__("Sample"), d.sample_size],
+					].filter(([, v]) => v).map(([k, v]) => `<span class="qi-hpill"><span>${esc(k)}</span>${esc(v)}</span>`).join("")}</div>
 				</div>
 				<div class="qi-progress">
 					<span>${__("{0} of {1} done", [done, d.rows.length])}</span>
@@ -584,7 +597,20 @@ frappe.dom.set_style(`
 .qi-insp button{min-height:44px;border-radius:10px;border:1px solid var(--border-color);background:var(--card-bg);color:var(--text-color);font-size:14px;padding:0 12px}
 .qi-insp button.primary{background:var(--gray-900);color:#fff;border-color:var(--gray-900);font-weight:500}
 .qi-insp button:disabled{opacity:.45}
-.qi-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;padding:8px 0 12px}
+.qi-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:8px 16px;padding:12px 0 14px}
+.qi-insp{padding:0 24px 32px;max-width:1680px;margin:0 auto}
+@media (max-width:991px){.qi-insp{padding:0 20px 28px}}
+@media (max-width:767px){.qi-insp{padding:0 16px 24px}}
+.qi-head-main{display:flex;flex-direction:column;gap:6px;min-width:0}
+.qi-crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:13px}
+.qi-crumbs a{color:var(--text-muted)}
+.qi-crumbs a:hover{color:var(--text-color);text-decoration:underline}
+.qi-crumb-sep{color:var(--gray-400)}
+.qi-title{font-size:20px;font-weight:600;color:var(--text-color);line-height:1.25}
+.qi-title-sub{font-weight:400;color:var(--text-muted)}
+.qi-insp .qi-pills{display:flex;flex-wrap:wrap;gap:6px}
+.qi-insp .qi-hpill{display:inline-flex;align-items:baseline;gap:6px;font-size:13px;padding:2px 10px;border-radius:8px;background:var(--gray-100);color:var(--text-color)}
+.qi-insp .qi-hpill>span{font-size:12px;color:var(--text-muted)}
 .qi-sub{font-size:13px;color:var(--text-muted)}
 .qi-progress{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-muted)}
 .qi-bar{width:140px;height:8px;border-radius:4px;background:var(--gray-200);overflow:hidden;display:block}
