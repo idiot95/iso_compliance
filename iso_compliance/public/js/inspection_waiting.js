@@ -69,13 +69,9 @@ hcc.inspection.pick = function (doctype, name, rows) {
 };
 
 // How many pieces of the lot to measure, the settings' percentage offered.
-hcc.inspection.ask_sample = function (lot, suggested, then) {
-	frappe.prompt(
-		[{ fieldname: "n", fieldtype: "Int", label: __("Sample size (pieces)"), reqd: 1, default: suggested || 1, description: __("Lot {0}", [format_number(lot)]) }],
-		(v) => then(v.n),
-		__("Sample size"),
-		__("Start inspection")
-	);
+hcc.inspection.ask_sample = async function (lot, suggested, then) {
+	await frappe.require("/assets/iso_compliance/js/qi_sample.js");
+	window.iso_qi_sample.ask({ lot, suggested, then });
 };
 
 frappe.ui.form.on("Purchase Receipt", { refresh: hcc.inspection.show_waiting });

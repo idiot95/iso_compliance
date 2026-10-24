@@ -314,13 +314,8 @@ function qi_start_dialog(frm) {
 				frappe.set_route("Form", "Quality Inspection", qi);
 			};
 			if (lot.state !== "todo") return begin(); // started already: as it is
-			return frappe.prompt(
-				[{ fieldname: "n", fieldtype: "Int", label: __("Sample size (pieces)"), reqd: 1, default: lot.default_sample || 1,
-					description: __("Lot {0}", [format_number(lot.qty)]) }],
-				(v) => begin(v.n),
-				__("Sample size"),
-				__("Start inspection")
-			);
+			await frappe.require("/assets/iso_compliance/js/qi_sample.js");
+			return window.iso_qi_sample.ask({ lot: lot.qty, suggested: lot.default_sample, then: begin });
 		}
 		const { message: name } = await frappe.call({ method: `${QI_INSP}.${call.method}`, args: call.args, freeze: true, freeze_message: __("Starting the inspection…") });
 		d.__started = true;
@@ -452,31 +447,38 @@ async function qi_entry(frm) {
 		if (state.filter === "ctq") return r.class === "CTQ";
 		return true;
 	};
-	const meta = (label, value) => (value ? `<span class="qi-e-pill"><span>${label}</span>${value}</span>` : "");
 	const link = (dt, name) => (name ? `<a href="/app/${frappe.router.slug(dt)}/${encodeURIComponent(name)}">${esc(name)}</a>` : "");
+	// What is inspected (title), the figures that matter (tiles: lot, the sample
+	// with its picker, progress, out of spec), then where it comes from (a quiet
+	// label / value list). Counts update in place, so the picker keeps its state.
+	const detail = (label, value) => (value ? `<div class="qi-e-dt">${label}</div><div class="qi-e-dd">${value}</div>` : "");
 	const head = () => {
 		const c = counts();
 		const done = c.all - c.todo;
 		return `<div class="qi-e-head">
 			<div class="qi-e-title-row">
-				<div class="qi-e-title">${esc(d.item_code)} <span>${esc(d.item_name || "")}</span></div>
-				<div class="qi-e-progress">
-					${c.failed ? `<span class="indicator-pill red">${__("{0} out of spec", [c.failed])}</span>` : ""}
-					<span>${__("{0} of {1} done", [done, c.all])}</span>
-					<span class="qi-e-bar"><span style="width:${c.all ? Math.round((done / c.all) * 100) : 0}%"></span></span>
-					<button class="btn btn-xs btn-default qi-e-full">${__("Full-screen inspector")}</button>
-				</div>
+				<div><div class="qi-e-kicker">${esc(__(d.stage || ""))} ${__("inspection")}${d.check_point ? " · " + esc(__(d.check_point)) : ""}</div>
+					<div class="qi-e-title">${esc(d.item_code)} <span>${esc(d.item_name || "")}</span></div></div>
+				<button class="btn btn-sm btn-default qi-e-full">${__("Full-screen inspector")}</button>
 			</div>
-			<div class="qi-e-metas">
-				${meta(__("Stage"), esc(__(d.stage || "")) + (d.check_point ? " · " + esc(__(d.check_point)) : ""))}
-				${meta(__("Lot"), esc(d.lot_qty || ""))}
-				${ro ? meta(__("Sample"), esc(d.sample_size)) : `<button type="button" class="qi-e-pill qi-e-sample" title="${__("Change the sample size")}"><span>${__("Sample")}</span>${esc(d.sample_size)} ${frappe.utils.icon("edit", "xs")}</button>`}
-				${meta(__("Drawing"), esc([d.drawing_no, d.drawing_revision && "Rev " + d.drawing_revision].filter(Boolean).join(" ")))}
-				${meta(__("Plan"), link("Quality Inspection Template", d.template))}
-				${meta(esc(__(d.reference_type || "")), link(d.reference_type, d.reference_name))}
-				${meta(__("Work Order"), link("Work Order", d.work_order))}
-				${meta(__("Customer"), esc(d.customer || ""))}
-				${d.supplier_cert ? meta(__("Supplier 3.1"), `<a href="${esc(d.supplier_cert)}" target="_blank" rel="noopener">${__("open")}</a>`) : ""}
+			<div class="qi-e-stats">
+				<div class="qi-e-stat"><div class="qi-e-stat-l">${__("Lot")}</div><div class="qi-e-stat-v">${esc(format_number(d.lot_qty || 0, null, 0))}</div><div class="qi-e-stat-s">${__("pieces")}</div></div>
+				<div class="qi-e-stat wide"><div class="qi-e-stat-l">${__("Sample")}</div>${
+					ro
+						? `<div class="qi-e-stat-v">${esc(d.sample_size)}</div><div class="qi-e-stat-s">${__("pieces")}</div>`
+						: `<div class="qi-e-sample-host"></div><button type="button" class="btn btn-xs btn-primary qi-e-sample-apply" style="display:none">${__("Apply")}</button>`
+				}</div>
+				<div class="qi-e-stat"><div class="qi-e-stat-l">${__("Measured")}</div><div class="qi-e-stat-v"><span class="qi-e-done">${done}</span><small> / ${c.all}</small></div>
+					<span class="qi-e-bar"><span style="width:${c.all ? Math.round((done / c.all) * 100) : 0}%"></span></span></div>
+				<div class="qi-e-stat"><div class="qi-e-stat-l">${__("Out of spec")}</div><div class="qi-e-stat-v qi-e-out ${c.failed ? "bad" : ""}">${c.failed}</div><div class="qi-e-stat-s">${__("characteristics")}</div></div>
+			</div>
+			<div class="qi-e-details">
+				${detail(__("Drawing"), esc([d.drawing_no, d.drawing_revision && __("Rev") + " " + d.drawing_revision].filter(Boolean).join(" ")))}
+				${detail(__("Plan"), link("Quality Inspection Template", d.template))}
+				${detail(esc(__(d.reference_type || "")), link(d.reference_type, d.reference_name))}
+				${detail(__("Work Order"), link("Work Order", d.work_order))}
+				${detail(__("Customer"), esc(d.customer || ""))}
+				${d.supplier_cert ? detail(__("Supplier 3.1"), `<a href="${esc(d.supplier_cert)}" target="_blank" rel="noopener">${__("open")}</a>`) : ""}
 			</div>
 		</div>`;
 	};
@@ -541,7 +543,11 @@ async function qi_entry(frm) {
 		}${out ? `<div class="text-danger">${__("{0} out", [out])}</div>` : ""}`);
 	};
 	const refresh_counts = () => {
-		$e.find(".qi-e-head").replaceWith(head());
+		const k = counts();
+		const done = k.all - k.todo;
+		$e.find(".qi-e-done").text(done);
+		$e.find(".qi-e-head .qi-e-bar > span").css("width", (k.all ? Math.round((done / k.all) * 100) : 0) + "%");
+		$e.find(".qi-e-out").text(k.failed).toggleClass("bad", !!k.failed);
 		const c = counts();
 		$e.find(".qi-e-tools [data-f]").each((_, el) => $(el).find(".qi-badge").text(c[$(el).data("f")]));
 	};
@@ -684,17 +690,21 @@ async function qi_entry(frm) {
 		await frappe.call({ method: "iso_compliance.qi.inspector.add_sample", args: { qi: frm.doc.name, row_key: d.rows[i].balloon } });
 		qi_entry(frm);
 	});
-	$e.on("click", ".qi-e-sample", () =>
-		frappe.prompt(
-			[{ fieldname: "n", fieldtype: "Int", label: __("Pieces to measure"), reqd: 1, default: d.sample_size, description: d.lot_qty ? __("Lot {0}", [d.lot_qty]) : "" }],
-			async (v) => {
-				await frappe.call({ method: "iso_compliance.qi.inspector.set_sample_size", args: { qi: frm.doc.name, sample_size: v.n }, freeze: true });
+	if (!ro) {
+		frappe.require("/assets/iso_compliance/js/qi_sample.js").then(() => {
+			const $apply = $e.find(".qi-e-sample-apply");
+			state.sample = window.iso_qi_sample.mount($e.find(".qi-e-sample-host"), {
+				lot: d.lot_qty,
+				value: d.sample_size,
+				suggested: d.default_sample,
+				on_change: (n) => $apply.toggle(n !== cint(d.sample_size)),
+			});
+			$apply.on("click", async () => {
+				await frappe.call({ method: "iso_compliance.qi.inspector.set_sample_size", args: { qi: frm.doc.name, sample_size: state.sample.get() }, freeze: true });
 				await frm.reload_doc();
-			},
-			__("Sample size"),
-			__("Set")
-		)
-	);
+			});
+		});
+	}
 	$e.on("change", ".qi-e-cond", (ev) =>
 		frappe.call({ method: "iso_compliance.qi.inspector.save_condition", args: { qi: frm.doc.name, row: $(ev.currentTarget).data("row"), actual: ev.currentTarget.value } })
 	);
@@ -748,10 +758,20 @@ frappe.dom.set_style(`
 .qi-e-progress{display:flex;gap:10px;align-items:center;font-size:var(--text-sm);color:var(--text-muted)}
 .qi-e-bar{width:120px;height:8px;border-radius:4px;background:var(--gray-200);overflow:hidden;display:block}
 .qi-e-bar span{display:block;height:100%;background:var(--green-600)}
-.qi-e-metas{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.qi-e-pill{display:inline-flex;align-items:baseline;gap:6px;font-size:var(--text-sm);padding:3px 10px;border-radius:8px;background:var(--gray-100);color:var(--text-color);border:0}
-.qi-e-pill>span{font-size:var(--text-xs);color:var(--text-muted)}
-button.qi-e-pill{border:1px dashed var(--gray-400);cursor:pointer}
+.qi-e-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:14px}
+.qi-e-stat{border:1px solid var(--border-color);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.qi-e-stat.wide{grid-column:span 2}
+.qi-e-stat-l{font-size:var(--text-xs);font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted)}
+.qi-e-stat-v{font-size:22px;font-weight:600;line-height:1.15;font-variant-numeric:tabular-nums;color:var(--text-color)}
+.qi-e-stat-v small{font-size:var(--text-base);font-weight:500;color:var(--text-muted)}
+.qi-e-stat-v.bad{color:var(--red-600)}
+.qi-e-stat-s{font-size:var(--text-xs);color:var(--text-muted)}
+.qi-e-stat .qi-e-bar{width:100%;margin-top:4px}
+.qi-e-sample-apply{align-self:flex-start}
+.qi-e-details{display:grid;grid-template-columns:max-content 1fr max-content 1fr;gap:6px 16px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border-color);font-size:var(--text-sm)}
+.qi-e-dt{color:var(--text-muted)}
+.qi-e-dd{color:var(--text-color);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:991px){.qi-e-details{grid-template-columns:max-content 1fr}.qi-e-stat.wide{grid-column:span 1}}
 .qi-e-cell.pending{border-color:var(--yellow-500)!important;background:var(--yellow-50)!important}
 .qi-e-body{display:grid;grid-template-columns:minmax(300px,2fr) 3fr;gap:14px;align-items:start}
 .qi-e-body.nodwg{grid-template-columns:1fr}

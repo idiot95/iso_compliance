@@ -14,7 +14,7 @@ from frappe import _
 from frappe.utils import cint, flt, now_datetime
 
 from iso_compliance.qi import tolerance as T
-from iso_compliance.qi.inspection import QI, calibration, drawing_rows, row_summary
+from iso_compliance.qi.inspection import QI, calibration, default_sample, drawing_rows, row_summary
 from iso_compliance.qi.template import ROWS, instrument_list, measuring_instruments
 
 
@@ -93,6 +93,7 @@ def get_inspection(qi: str) -> dict:
 		"supplier_cert": doc.get("custom_supplier_cert"),
 		"lot_qty": doc.custom_lot_qty,
 		"sample_size": doc.sample_size,
+		"default_sample": default_sample(doc.custom_lot_qty) if doc.custom_lot_qty else None,
 		"reference_type": doc.reference_type,
 		"reference_name": doc.reference_name,
 		"work_order": doc.custom_work_order,
