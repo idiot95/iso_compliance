@@ -111,6 +111,8 @@ function qi_form_layout(frm) {
 		const $f = frm.fields_dict[f] && $(frm.fields_dict[f].wrapper);
 		if ($f && !$f.prev(".qi-col-head").length) $f.before(`<div class="qi-col-head">${label}</div>`);
 	});
+	// the fields say what they are; the header and the pickers say the rest
+	["custom_item", "custom_bom", "custom_general_tolerance"].forEach((f) => frm.set_df_property(f, "description", ""));
 	const legacy = qi_is_legacy(frm);
 	frm.set_df_property("custom_drawing_section", "hidden", legacy ? 1 : 0);
 	if (legacy) {
@@ -251,6 +253,7 @@ class QIBuilder {
 			this.render_legacy();
 			return;
 		}
+		this.render_header();
 		const locked = !!d.custom_locked;
 		const editable = qi_can_edit() && !locked;
 		const pick_label = d.custom_drawing ? __("Change drawing") : d.custom_item ? __("Choose drawing") : __("Upload drawing");
@@ -259,9 +262,6 @@ class QIBuilder {
 			<div class="qi-b-block">
 				<div class="qi-b-head">
 					<div class="qi-b-title">${__("Drawing")}</div>
-					<span class="qi-b-status ${locked ? "locked" : ""}">${
-						locked ? __("Locked · inspections submitted; change through New Revision") : __("Editable")
-					}</span>
 					<span class="qi-b-spacer"></span>
 					${editable ? `<button class="btn btn-xs btn-default qi-pick-btn">${pick_label}</button>` : ""}
 					${editable && d.custom_drawing ? `<button class="btn btn-xs qi-mode ${this.mode === "draw" ? "btn-primary" : "btn-default"}" data-mode="draw">${__("Mark on drawing")}</button>` : ""}
@@ -506,6 +506,9 @@ class QIBuilder {
 
 	// ---- rows ----
 
+	// One line per characteristic, grouped by kind: what it is (with its class),
+	// what is accepted (the drawing's callout under it), at which stages, and
+	// how many pieces when that differs from the lot sample. Cards on a phone.
 	render_table() {
 		const rows = (this.doc[QI_ROWS] || []).filter((r) => r.custom_row_type);
 		const $t = this.$panel.find(".qi-b-table");
@@ -514,44 +517,42 @@ class QIBuilder {
 			$t.html(`<div class="qi-empty">${__("No characteristics yet. Mark one on the drawing, or use Add above.")}</div>`);
 			return;
 		}
-		const stages = (r) =>
-			QI_STAGES.filter(([f]) => r[f])
-				.map(([, l]) => l)
-				.join(", ");
-		const how = (r) =>
-			[
-				r.custom_sampling === "Fixed number" ? __("{0} pcs", [r.custom_fixed_count || "?"]) : __("lot sample"),
-				r.custom_frequency && r.custom_frequency !== "Every lot" ? r.custom_frequency.replace(" N ", ` ${r.custom_frequency_n || "N"} `) : "",
-			]
-				.filter(Boolean)
-				.join(" · ");
-		const inst = (r) => {
+		const pill = (text, cls = "") => `<span class="qi-t-pill ${cls}">${qi_esc(text)}</span>`;
+		const STAGE_SHORT = { custom_stage_incoming: __("Inc"), custom_stage_in_process: __("Proc"), custom_stage_final: __("Final"),
+			custom_stage_fai: __("FAI"), custom_stage_type_test: __("Type") };
+		const stages = (r) => QI_STAGES.map(([f, l]) => `<span class="qi-t-stage ${r[f] ? "on" : ""}" title="${qi_esc(l)}">${qi_esc(STAGE_SHORT[f])}</span>`).join("");
+		const callout = (r) =>
+			r.custom_spec_text
+				? qi_esc(r.custom_spec_text) + (r.custom_unit && r.custom_unit !== "°" && r.custom_tolerance_type !== "Geometric (GD&T)" ? " " + qi_esc(r.custom_unit) : "")
+				: "";
+		const sampling = (r) => {
 			const n = (r.custom_instruments || "").split("\n").filter(Boolean).length;
-			return n ? __("{0} chosen", [n]) : r.custom_row_type === "Visual" ? "" : `<span class="text-muted">${__("any")}</span>`;
+			const freq = r.custom_frequency && r.custom_frequency !== "Every lot" ? r.custom_frequency.replace(" N ", ` ${r.custom_frequency_n || "N"} `) : "";
+			return `<div class="qi-t-main">${r.custom_sampling === "Fixed number" ? __("{0} pcs", [qi_esc(r.custom_fixed_count || "?")]) : `<span class="qi-t-dim">${__("Lot")}</span>`}</div>
+				<div class="qi-t-sub">${[freq && qi_esc(freq), r.custom_row_type === "Visual" ? "" : n ? __("{0} instrument(s)", [n]) : __("Any instrument")].filter(Boolean).join(" · ")}</div>`;
 		};
+		const line = (r) => `<div class="qi-t-row ${this.selected === r.name ? "selected" : ""}" data-row="${r.name}">
+			<div class="qi-t-no"><span class="qi-balloon static">${qi_esc(r.custom_balloon_no || "")}</span></div>
+			<div class="qi-t-what"><div class="qi-t-name">${qi_esc(r.specification)}</div>
+				<div class="qi-t-pills">${r.custom_class ? pill(r.custom_class, "class-" + r.custom_class.toLowerCase()) : ""}${
+					r.custom_test_method ? pill(r.custom_test_method) : ""}${
+					r.custom_row_type === "Dimension" && !qi_pos(r) ? pill(__("No box on drawing"), "warn") : ""}</div></div>
+			<div class="qi-t-accept"><div class="qi-t-main qi-mono">${qi_esc(qi_limit_text(r))}</div>${
+				callout(r) ? `<div class="qi-t-sub qi-mono">${__("Drawing")} ${callout(r)}</div>` : ""}</div>
+			<div class="qi-t-stages">${stages(r)}</div>
+			<div class="qi-t-how">${sampling(r)}</div>
+		</div>`;
+		const kinds = [...QI_ROW_TYPES.map(([v]) => v), ...new Set(rows.map((r) => r.custom_row_type))].filter((v, i, a) => a.indexOf(v) === i);
+		const groups = kinds
+			.map((k) => [k, rows.filter((r) => r.custom_row_type === k)])
+			.filter(([, rs]) => rs.length)
+			.map(([k, rs]) => `<div class="qi-t-group"><span>${qi_esc(qi_type_label(k))}</span>${pill(String(rs.length))}</div>${rs.map(line).join("")}`)
+			.join("");
 		this.$panel.find(".qi-b-count").text(__("{0} · click a row to change it", [rows.length]));
-		$t.html(`<table class="table table-sm qi-rows">
-			<thead><tr><th>${__("No.")}</th><th>${__("Parameter")}</th><th>${__("As specified")}</th>
-			<th>${__("Acceptance range")}</th><th>${__("Classification")}</th><th>${__("Stages")}</th><th>${__("Sample")}</th><th>${__("Instruments")}</th></tr></thead>
-			<tbody>${rows
-				.map(
-					(r) => `<tr data-row="${r.name}" class="${this.selected === r.name ? "selected" : ""}">
-				<td><span class="qi-balloon static">${qi_esc(r.custom_balloon_no || "")}</span>${
-						r.custom_row_type === "Dimension" && !qi_pos(r) ? ` <span class="text-warning" title="${__("No box on the drawing")}">◌</span>` : ""
-					}</td>
-				<td>${qi_esc(r.specification)}<div class="text-muted small">${qi_esc(qi_type_label(r.custom_row_type))}${r.custom_test_method ? " · " + qi_esc(r.custom_test_method) : ""}</div></td>
-				<td class="qi-mono">${qi_esc(r.custom_spec_text || "")}${
-					r.custom_spec_text && r.custom_unit && r.custom_unit !== "°" && r.custom_tolerance_type !== "Geometric (GD&T)" ? " " + qi_esc(r.custom_unit) : ""
-				}</td>
-				<td class="qi-mono">${qi_esc(qi_limit_text(r))}</td>
-				<td>${r.custom_class ? `<span class="qi-class ${r.custom_class.toLowerCase()}">${qi_esc(r.custom_class)}</span>` : ""}</td>
-				<td class="small">${qi_esc(stages(r))}</td>
-				<td class="small">${qi_esc(how(r))}</td>
-				<td class="small">${inst(r)}</td>
-			</tr>`
-				)
-				.join("")}</tbody></table>`);
-		$t.find("tr[data-row]").on("click", (e) => {
+		$t.html(`<div class="qi-t">
+			<div class="qi-t-head"><div>${__("No.")}</div><div>${__("Characteristic")}</div><div>${__("Accept")}</div><div>${__("Stages")}</div><div>${__("Sampling")}</div></div>
+			${groups}</div>`);
+		$t.find(".qi-t-row[data-row]").on("click", (e) => {
 			const name = $(e.currentTarget).data("row");
 			this.select(name);
 			if (qi_can_edit() && !this.doc.custom_locked) qi_balloon_dialog(this.frm, locals["Item Quality Inspection Parameter"][name]);
@@ -595,10 +596,57 @@ class QIBuilder {
 		});
 	}
 
+	// What the plan is and where it stands, as label : value pills, above
+	// the setup fields (which fold away once the plan has characteristics).
+	render_header() {
+		const d = this.doc;
+		const section = this.frm.fields_dict.custom_drawing_section;
+		if (!section) return;
+		let $h = $(this.frm.wrapper).find(".qi-hd");
+		if (!$h.length) {
+			$h = $(`<div class="qi-hd card-section"></div>`); // not form-section: Frappe hides those without fields
+			$(section.wrapper).closest(".form-section").first().before($h);
+		}
+		if (this.frm.is_new() || qi_is_legacy(this.frm)) {
+			$h.empty().hide();
+			return;
+		}
+		const rows = (d[QI_ROWS] || []).filter((r) => r.custom_row_type).length;
+		const status = d.custom_superseded_by
+			? `<span class="qi-hd-status red">${__("Superseded by {0}", [qi_esc(d.custom_superseded_by)])}</span>`
+			: d.custom_locked
+			? `<span class="qi-hd-status orange" title="${__("Inspections submitted")}">${__("Locked · change through New Revision")}</span>`
+			: `<span class="qi-hd-status green">${__("Editable")}</span>`;
+		const kv = (label, value, cls = "") => `<span class="qi-hd-pill ${cls}"><span>${qi_esc(label)}</span>${value}</span>`;
+		const dwg = d.custom_drawing
+			? qi_esc([d.custom_drawing_no, d.custom_drawing_revision && __("Rev {0}", [d.custom_drawing_revision])].filter(Boolean).join(" · ") || __("attached"))
+			: __("None");
+		$h.show().html(`<div class="qi-hd-top"><div class="qi-hd-name">${qi_esc(d.quality_inspection_template_name || d.name)}</div>${status}</div>
+			<div class="qi-hd-pills">
+				${kv(__("Item"), `<b class="qi-hd-item">${qi_esc(d.custom_item || "—")}</b>`)}
+				${kv(__("BOM"), qi_esc(d.custom_bom || "—"), d.custom_bom ? "" : "dim")}
+				${kv(__("Drawing"), dwg, d.custom_drawing ? "" : "dim")}
+				${d.custom_general_tolerance && d.custom_general_tolerance !== "None" ? kv(__("Tolerance"), qi_esc(d.custom_general_tolerance)) : ""}
+				${kv(__("Characteristics"), String(rows), rows ? "" : "warn")}
+				<span class="qi-hd-used">${kv(__("Used by"), "…", "dim")}</span>
+			</div>`);
+		if (d.custom_item) {
+			frappe.db.get_value("Item", d.custom_item, "item_name").then(({ message }) => {
+				if (message && message.item_name) $h.find(".qi-hd-item").after(` <span class="qi-hd-sub">${qi_esc(message.item_name)}</span>`);
+			});
+		}
+	}
+
 	render_used_by() {
 		const $u = this.$panel.find(".qi-b-used");
 		if (this.frm.is_new()) return;
 		frappe.call({ method: `${QI}.used_by`, args: { template: this.doc.name } }).then(({ message: m }) => {
+			const n = m.boms.length + m.items.length + m.groups.length;
+			$(this.frm.wrapper).find(".qi-hd-used").html(
+				`<span class="qi-hd-pill ${n ? "" : "warn"}"><span>${__("Used by")}</span>${
+					n ? [m.boms.length && __("{0} BOM(s)", [m.boms.length]), m.items.length && __("{0} Item(s)", [m.items.length]), m.groups.length && __("{0} group(s)", [m.groups.length])].filter(Boolean).join(" · ") : __("nothing yet")
+				}</span>`
+			);
 			const can = qi_can_edit();
 			const line = (dt, name, extra) =>
 				`<div class="qi-used-line"><a href="/app/${frappe.router.slug(dt)}/${encodeURIComponent(name)}">${qi_esc(dt)} ${qi_esc(name)}</a>
@@ -612,9 +660,7 @@ class QIBuilder {
 			];
 			$u.html(`<div class="qi-b-subtitle">${__("Used by")}</div>${
 				html.length ? html.join("") : `<div class="text-muted small">${__("Nothing points at this template yet. Use Tag Items / BOMs.")}</div>`
-			}<div class="text-muted small" style="margin-top:6px">${__(
-				"Once an inspection is submitted against this plan, its drawing, numbers and limits lock; changes go through New Revision."
-			)}</div>`);
+			}`);
 			$u.find(".qi-untag").on("click", (e) => {
 				const { dt, name } = $(e.currentTarget).data();
 				frappe.confirm(__("Remove this template from {0} {1}?", [dt, name]), () =>
@@ -1724,10 +1770,48 @@ frappe.dom.set_style(`
 .qi-balloon{position:absolute;top:-11px;left:-11px;min-width:22px;height:22px;padding:0 4px;border-radius:11px;background:var(--blue-500);color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center}
 .qi-box.selected .qi-balloon{background:var(--orange-500)}
 .qi-balloon.static{position:static;display:inline-flex}
-.qi-b-table{overflow-x:auto}
 .qi-b-table .table{margin-bottom:0}
-.qi-rows tr[data-row]{cursor:pointer}
-.qi-rows tr.selected td{background:var(--yellow-50)}
+.qi-hd{margin:0 0 4px;padding:16px 35px 14px;border-bottom:1px solid var(--border-color);display:flex;flex-direction:column;gap:10px}
+.qi-hd-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.qi-hd-name{font-size:var(--text-xl);font-weight:600;color:var(--text-color)}
+.qi-hd-status{font-size:var(--text-xs);font-weight:600;padding:2px 8px;border-radius:10px}
+.qi-hd-status.green{background:var(--green-100);color:var(--green-700)}
+.qi-hd-status.orange{background:var(--orange-100);color:var(--orange-700)}
+.qi-hd-status.red{background:var(--red-100);color:var(--red-700)}
+.qi-hd-pills{display:flex;flex-wrap:wrap;gap:6px}
+.qi-hd-used{display:contents}
+.qi-hd-pill{display:inline-flex;align-items:baseline;gap:6px;font-size:var(--text-sm);padding:3px 10px;border-radius:8px;background:var(--gray-100);color:var(--text-color)}
+.qi-hd-pill>span:first-child{font-size:var(--text-xs);color:var(--text-muted)}
+.qi-hd-pill.dim{color:var(--text-muted)}
+.qi-hd-pill.warn{background:var(--yellow-50);color:var(--yellow-800)}
+.qi-hd-sub{color:var(--text-muted)}
+.qi-t{--qi-t-cols:44px minmax(150px,1.5fr) minmax(150px,1.2fr) 196px minmax(110px,.8fr);font-size:var(--text-sm)}
+.qi-t-head,.qi-t-row{display:grid;grid-template-columns:var(--qi-t-cols);gap:12px;align-items:start;padding:10px 8px}
+.qi-t-head{padding-top:4px;padding-bottom:6px;border-bottom:1px solid var(--border-color);font-size:var(--text-xs);font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted)}
+.qi-t-group{display:flex;align-items:center;gap:6px;padding:14px 8px 6px;font-size:var(--text-xs);font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted)}
+.qi-t-row{border-bottom:1px solid var(--border-color);cursor:pointer;border-radius:6px}
+.qi-t-row:hover{background:var(--gray-50)}
+.qi-t-row.selected{background:var(--yellow-50)}
+.qi-t-name{font-size:var(--text-base);font-weight:600;color:var(--text-color)}
+.qi-t-pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.qi-t-pills:empty{display:none}
+.qi-t-pill{display:inline-block;font-size:11px;font-weight:500;line-height:16px;padding:0 6px;border-radius:8px;background:var(--gray-100);color:var(--text-color)}
+.qi-t-pill.class-ctq{background:var(--red-100);color:var(--red-700)}
+.qi-t-pill.class-major{background:var(--orange-100);color:var(--orange-700)}
+.qi-t-pill.warn{background:var(--yellow-100);color:var(--yellow-800)}
+.qi-t-main{font-size:var(--text-base);font-weight:600;color:var(--text-color)}
+.qi-t-sub{font-size:var(--text-xs);color:var(--text-muted);margin-top:2px}
+.qi-t-dim{font-weight:400;color:var(--text-muted)}
+.qi-t-stages{display:flex;gap:3px;flex-wrap:nowrap}
+.qi-t-stage{font-size:11px;line-height:20px;padding:0 6px;border-radius:6px;border:1px solid var(--border-color);color:var(--gray-400)}
+.qi-t-stage.on{background:var(--gray-800);border-color:var(--gray-800);color:#fff}
+@media (max-width:767px){
+	.qi-t-head{display:none}
+	.qi-t-row{grid-template-columns:32px 1fr auto;grid-template-areas:"no what accept" "no stages how";row-gap:8px;padding:12px 4px}
+	.qi-t-no{grid-area:no}.qi-t-what{grid-area:what}.qi-t-accept{grid-area:accept;text-align:right}
+	.qi-t-stages{grid-area:stages;flex-wrap:wrap}.qi-t-stage:not(.on){display:none}.qi-t-how{grid-area:how;text-align:right}
+	.qi-hd{padding-left:15px;padding-right:15px}
+}
 .grid-row.qi-row-selected .data-row{background:var(--yellow-50)}
 .qi-class{font-size:11px;padding:1px 6px;border-radius:8px;background:var(--gray-100)}
 .qi-class.ctq{background:var(--red-100);color:var(--red-700)}

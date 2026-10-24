@@ -39,8 +39,10 @@ def _tt(*types):
 
 
 TEMPLATE_FIELDS = [
+	# folded once the plan has characteristics: open while it is being set up
 	dict(fieldname="custom_drawing_section", fieldtype="Section Break", label="Item and drawing",
-	     insert_after="quality_inspection_template_name", collapsible=0),
+	     insert_after="quality_inspection_template_name", collapsible=1,
+	     collapsible_depends_on="eval:doc.__islocal || !doc.custom_item || !(doc.item_quality_inspection_parameter || []).some((r) => r.custom_row_type)"),
 	dict(fieldname="custom_item", fieldtype="Link", options="Item", label="Item",
 	     insert_after="custom_drawing_section",
 	     description="The drawing is picked from this item's BOMs and attachments."),

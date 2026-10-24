@@ -653,6 +653,8 @@
   "fieldtype": "Section Break",
   "label": "Item and drawing",
   "insert_after": "quality_inspection_template_name",
+  "collapsible": 1,
+  "collapsible_depends_on": "eval:doc.__islocal || !doc.custom_item || !(doc.item_quality_inspection_parameter || []).some((r) => r.custom_row_type)",
   "module": "ISO Compliance"
  },
  {
