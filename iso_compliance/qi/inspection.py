@@ -166,6 +166,14 @@ def before_submit(doc, method=None):
 			(short_ctq if r.custom_class == "CTQ" else short_other).append(
 				f"{r.custom_balloon_no} {r.specification} ({cint(r.custom_n)}/{need})"
 			)
+	if doc.custom_stage == "In Process":
+		# a check records what that Job Card did; the other rows may stay unmeasured,
+		# CTQ included (developer, 2026-10-24)
+		short = short_ctq + short_other
+		if short:
+			frappe.msgprint(_("Not measured at this check:") + "<br>" + "<br>".join(short),
+			                indicator="blue", title=_("In-process check"))
+		short_ctq, short_other = [], []
 	if short_ctq:
 		frappe.throw(
 			_("Every sample must be measured on CTQ rows before submitting:") + "<br>" + "<br>".join(short_ctq),

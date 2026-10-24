@@ -250,7 +250,8 @@ class Inspector {
 				<button class="qi-next-r ${this.from_review ? "" : "primary"}">${
 					this.row < d.rows.length - 1 ? __("Next") + ": #" + esc(d.rows[this.row + 1].balloon) + " " + esc(d.rows[this.row + 1].specification) : __("Review and submit")
 				}</button>
-			</div>`);
+			</div>
+			${!this.readonly && !this.from_review && this.row < d.rows.length - 1 ? `<button class="qi-go-review">${__("Review and submit")}</button>` : ""}`);
 		this.bind_card(r);
 	}
 
@@ -275,7 +276,7 @@ class Inspector {
 		$p.find(".qi-chip").on("click", (e) => this.go_sample(Number($(e.currentTarget).data("n"))));
 		$p.find(".qi-prev-r").on("click", () => this.go_row(this.row - 1));
 		$p.find(".qi-next-r").on("click", () => (this.row < this.d.rows.length - 1 ? this.go_row(this.row + 1) : this.open_review()));
-		$p.find(".qi-to-review").on("click", () => this.open_review());
+		$p.find(".qi-to-review, .qi-go-review").on("click", () => this.open_review());
 		$p.find(".qi-ok").on("click", () => this.save(r, "OK", true));
 		$p.find(".qi-ng").on("click", () => this.save(r, "NG", true));
 		$in.on("keydown", (e) => {
@@ -358,6 +359,7 @@ class Inspector {
 		this.row = Math.min(Math.max(0, i), this.d.rows.length - 1);
 		this.sample = this.next_empty(this.d.rows[this.row]);
 		this.render_panel();
+		this.update_progress();
 		this.focus_balloon();
 	}
 
@@ -376,6 +378,7 @@ class Inspector {
 		const { message: s } = await frappe.call({ method: `${INSPECT_API}.summary`, args: { qi: d.name } });
 		const failed = s.rows.filter((r) => r.status === "Rejected");
 		const short = s.rows.filter((r) => r.n < r.required);
+		const in_process = d.stage === "In Process"; // a check covers what that Job Card did; the rest may stay open
 		const any_fail = failed.length > 0;
 		const disp = d.disposition || (any_fail ? "" : "Accepted");
 		const opt = (value, label, note, disabled) =>
@@ -385,9 +388,9 @@ class Inspector {
 		$p.html(`
 			<div class="qi-card">
 				<div class="qi-card-head small"><strong>${__("{0} characteristics", [s.rows.length])}</strong>
-				<span><span class="qi-ok-text">${__("{0} pass", [s.rows.length - failed.length])}</span>${
+				<span><span class="qi-ok-text">${__("{0} pass", [s.rows.filter((r) => r.n > 0 && r.status !== "Rejected").length])}</span>${
 					any_fail ? ` · <span class="qi-bad-text">${__("{0} out of spec", [failed.length])}</span>` : ""
-				}</span></div>
+				}${short.some((r) => !r.n) ? ` · <span class="qi-muted">${__("{0} not measured", [short.filter((r) => !r.n).length])}</span>` : ""}</span></div>
 				${failed
 					.map(
 						(r) => `<button class="qi-fail" data-b="${esc(r.balloon)}"><span>#${esc(r.balloon)} ${esc(r.specification)}${r.class ? " (" + esc(r.class) + ")" : ""}</span><span>${__(
@@ -396,7 +399,10 @@ class Inspector {
 						)}${r.obs_min != null ? " · " + esc(r.obs_min) + " – " + esc(r.obs_max) : ""}</span></button>`
 					)
 					.join("")}
-				${short
+				${in_process && short.length ? `<div class="qi-skipped"><span>${__("Not measured at this check")}</span>${short
+					.map((r) => `<button class="qi-short-chip" data-b="${esc(r.balloon)}">#${esc(r.balloon)}</button>`)
+					.join("")}</div>` : ""}
+				${(in_process ? [] : short)
 					.map(
 						(r) =>
 							`<button class="qi-short" data-b="${esc(r.balloon)}"><span>#${esc(r.balloon)} ${esc(r.specification)}${r.class === "CTQ" ? " (CTQ)" : ""}</span><span>${__(
@@ -432,7 +438,7 @@ class Inspector {
 			$p.find(".qi-concession").toggle(e.currentTarget.value === "Accept under Concession");
 		});
 		// opened from here to fix or finish: the row offers the way back
-		$p.find(".qi-fail, .qi-short").on("click", (e) => {
+		$p.find(".qi-fail, .qi-short, .qi-short-chip").on("click", (e) => {
 			this.from_review = true;
 			this.go_row(d.rows.findIndex((r) => r.balloon === String($(e.currentTarget).data("b"))));
 			// straight to the reading that failed, not the next empty one
@@ -650,6 +656,10 @@ frappe.dom.set_style(`
 .qi-howto{font-size:13px}
 .qi-nav{display:flex;gap:10px}.qi-nav button{flex:1;height:52px}
 .qi-to-review{width:100%;height:52px;margin-bottom:10px}
+.qi-go-review{width:100%;height:44px;margin-top:10px}
+.qi-skipped{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;font-size:13px;color:var(--text-muted)}
+.qi-skipped>span{margin-right:2px}
+.qi-insp .qi-short-chip{border:1px solid var(--border-color);border-radius:8px;padding:2px 8px;font-size:12px;background:transparent}
 .qi-bad-text{color:var(--bad)}.qi-ok-text{color:var(--ok)}
 .qi-insp .qi-fail,.qi-insp .qi-short{display:flex;justify-content:space-between;gap:8px;text-align:left;border:0;font-size:13px}
 .qi-insp .qi-fail{background:var(--badbg);color:var(--bad)}
