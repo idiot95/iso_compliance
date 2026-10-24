@@ -8,14 +8,14 @@
  "docstatus": 0,
  "doctype": "Print Format",
  "font_size": 0,
- "html": "{%- from \"iso_compliance/templates/includes/en10204.html\" import styles, head, products, results, statement, sign -%}\n{#- EN 10204 type 3.1: inspection certificate, results of specific inspection of the\n    delivered batches; item groups that issue a material certificate add the\n    supplier trace and material properties (mtc_row). -#}\n{%- set d = en10204(doc, \"3.1\") -%}\n{{ styles() }}\n<div class=\"en\">\n{{ head(d) }}\n{{ products(d) }}\n{{ results(d) }}\n{%- for r in d.rows if r.mtc %}\n{%- set m = r.mtc %}\n<div class=\"en-h\">{{ r.item_code }} &middot; material traceability</div>\n<table class=\"en-t\"><thead><tr><th style=\"width:12%\">Role</th><th style=\"width:18%\">Material</th><th style=\"width:14%\">Batch / heat</th><th style=\"width:22%\">Supplier</th><th style=\"width:14%\">Receipt</th><th>Supplier certificate</th></tr></thead><tbody>\n{%- for s in m.sources %}<tr><td>{{ s.role }}</td><td>{{ s.item }}</td><td>{{ s.batch }}{% if s.heat_no %} / {{ s.heat_no }}{% endif %}</td>\n\t<td>{{ s.supplier or \"&mdash;\" }}</td><td>{{ s.receipt }}</td><td>{% if s.certificate %}{{ s.certificate_name }}{% else %}<span class=\"en-gap\">not on file</span>{% endif %}</td></tr>\n{%- else %}<tr><td colspan=\"6\" class=\"en-gap\">No receipt trace for this delivery.</td></tr>{%- endfor %}\n</tbody></table>\n{%- if m.properties %}\n<div class=\"en-h\">{{ r.item_code }} &middot; material properties</div>\n<table class=\"en-t\"><thead><tr><th>Property</th><th style=\"width:18%\">Method</th><th style=\"width:20%\">Requirement</th><th style=\"width:18%\">Result</th><th style=\"width:12%\">Source</th></tr></thead><tbody>\n{%- for p in m.properties %}<tr><td>{{ p.property }}</td><td>{{ p.method or \"&mdash;\" }}</td><td>{{ p.limits }} {{ p.unit }}</td>\n\t<td class=\"{{ '' if p.ok else 'en-nok' }}\">{{ p.result or \"&mdash;\" }} {{ p.unit if p.result }}</td><td>{{ p.source }}</td></tr>{%- endfor %}\n</tbody></table>\n{%- endif %}\n{%- endfor %}\n{{ statement(d, \"We hereby certify that the products supplied are in compliance with the requirements of the order. The test results given are based on specific inspection of the products supplied.\") }}\n{{ sign(d, \"Manufacturer's authorised inspection representative, independent of the manufacturing department\") }}\n</div>\n",
+ "html": "{%- from \"iso_compliance/templates/includes/en10204.html\" import styles, head, products, results, trace, statement, sign -%}\n{#- EN 10204 type 3.1: inspection certificate, results of specific inspection of the\n    delivered batches; item groups that issue a material certificate add the\n    supplier trace and material properties (mtc_row). -#}\n{%- set d = en10204(doc, \"3.1\") -%}\n{{ styles() }}\n<div class=\"rp\">\n{{ head(d) }}\n{{ products(d) }}\n{{ results(d) }}\n{%- for r in d.rows if r.mtc %}{{ trace(r) }}{% endfor %}\n{{ statement(d, \"We hereby certify that the products supplied are in compliance with the requirements of the order. The test results given are based on specific inspection of the products supplied.\") }}\n{{ sign(d, \"Authorised inspection representative, independent of the manufacturing department\") }}\n</div>\n",
  "idx": 0,
  "line_breaks": 0,
  "margin_bottom": 12.0,
  "margin_left": 10.0,
  "margin_right": 10.0,
  "margin_top": 12.0,
- "modified": "2026-10-14 13:00:00.000000",
+ "modified": "2026-10-25 00:31:57.052931",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Material Test Certificate 3.1",
@@ -24,5 +24,6 @@
  "print_format_type": "Jinja",
  "raw_printing": 0,
  "show_section_headings": 0,
- "standard": "Yes"
+ "standard": "Yes",
+ "pdf_generator": "chrome"
 }

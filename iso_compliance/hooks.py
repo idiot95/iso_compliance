@@ -159,6 +159,8 @@ jinja = {
 		"iso_compliance.qi.certificates.dn_records",
 		"iso_compliance.qi.certificates.mtc_row",
 		"iso_compliance.qi.certificates.en10204",
+		# the company block shared by every report
+		"iso_compliance.qi.certificates.letterhead",
 	],
 }
 

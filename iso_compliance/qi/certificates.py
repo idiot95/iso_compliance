@@ -109,7 +109,8 @@ def qi_record(name: str) -> dict | None:
 			"class": r.custom_class or "",
 			"test_method": r.custom_test_method or "",
 			"instruments": [
-				{"name": a, "cal_due": calibration(a).get("due")} for a in instruments
+				{"name": a, "label": frappe.db.get_value("Asset", a, "asset_name") or a, "cal_due": calibration(a).get("due")}
+				for a in instruments
 			],
 			"values": values,
 			"n": len(values),
@@ -144,6 +145,7 @@ def qi_record(name: str) -> dict | None:
 		"item_name": qi.item_name,
 		"batch_no": qi.batch_no,
 		"stage": qi.custom_stage,
+		"check_point": qi.get("custom_check_point"),
 		"report_date": qi.report_date,
 		"lot_qty": qi.custom_lot_qty,
 		"sample_size": qi.sample_size,
@@ -348,10 +350,11 @@ def mtc_row(row) -> dict | None:
 
 # Titles as HCC issues them (developer, 2026-10-14); the type number keeps each
 # one tied to its EN 10204 definition.
+#: The designations EN 10204:2004 gives each type (table A.1).
 EN10204 = {
-	"2.1": {"title": "Certificate of Conformity", "form_no": "HCCPL/QMS/FRM-040"},
-	"2.2": {"title": "Inspection Report", "form_no": "HCCPL/QMS/FRM-041"},
-	"3.1": {"title": "Detailed Inspection Report", "form_no": "HCCPL/QMS/FRM-039"},
+	"2.1": {"title": "Declaration of compliance with the order", "form_no": "HCCPL/QMS/FRM-040"},
+	"2.2": {"title": "Test report", "form_no": "HCCPL/QMS/FRM-041"},
+	"3.1": {"title": "Inspection certificate", "form_no": "HCCPL/QMS/FRM-039"},
 }
 
 
@@ -431,6 +434,21 @@ def _drawing_ref(item_code: str) -> str:
 		return ""
 	no, rev = frappe.db.get_value("Quality Inspection Template", t, ["custom_drawing_no", "custom_drawing_revision"])
 	return " Rev ".join(x for x in (no, rev) if x)
+
+
+def letterhead(company: str) -> dict:
+	"""The company block every report prints at the top: name, logo, address
+	and whatever contact details the Company record holds."""
+	c = frappe.db.get_value("Company", company, ["company_name", "company_logo", "phone_no", "email", "website", "tax_id"],
+	                        as_dict=True) or frappe._dict()
+	contact = [x for x in (c.phone_no and f"Tel {c.phone_no}", c.email, c.website) if x]
+	return {
+		"name": c.company_name or company,
+		"logo": _data_uri(c.company_logo) if c.company_logo else None,
+		"address": _company_address(company),
+		"contact": " · ".join(contact),
+		"gstin": c.tax_id,
+	}
 
 
 def _company_address(company: str) -> str:

@@ -1,0 +1,112 @@
+{#- The parts every test report and certificate shares: letterhead, title with
+    the report number, a details grid, remarks, sign-off and the form footer.
+    Laid out as a paper test report is: black on white, ruled tables, labels in
+    sentence case. Chrome and wkhtmltopdf safe: tables only.
+
+    lh: iso_compliance.qi.certificates.letterhead(company) -#}
+
+{%- macro styles() -%}
+<style>
+	.rp { font-family: Arial, Helvetica, sans-serif; font-size: 8.8pt; line-height: 1.3; color: #000; }
+	.rp table { border-collapse: collapse; width: 100%; }
+	.rp b, .rp strong { font-weight: bold; }
+
+	.rp-lh td { vertical-align: middle; padding: 0; }
+	.rp-lh-logo { width: 58pt; }
+	.rp-lh-logo img { width: 52pt; height: auto; display: block; }
+	.rp-lh-name { font-size: 13.5pt; font-weight: bold; }
+	.rp-lh-addr { font-size: 7.8pt; margin-top: 1pt; }
+	.rp-rule { border-top: 1.6pt solid #000; border-bottom: 0.5pt solid #000; height: 1.5pt; margin: 6pt 0 10pt; }
+
+	.rp-title td { vertical-align: top; padding: 0; }
+	.rp-title-main { font-size: 13pt; font-weight: bold; text-transform: uppercase; padding-top: 4pt; }
+	.rp-title-sub { font-size: 8.4pt; margin-top: 2pt; }
+	.rp-refs { width: 38%; }
+	.rp-refs table td { border: 0.6pt solid #000; padding: 2.5pt 5pt; font-size: 8.2pt; }
+	.rp-refs table td:first-child { width: 36%; background: #eee; white-space: nowrap; }
+	.rp-refs table td:last-child { white-space: nowrap; }
+
+	.rp-grid { margin: 10pt 0 0; }
+	.rp-grid th, .rp-grid td { border: 0.6pt solid #000; padding: 3pt 5pt; font-size: 8.4pt; text-align: left; vertical-align: top; }
+	.rp-grid th { background: #eee; font-weight: normal; width: 16%; white-space: nowrap; }
+
+	.rp-h { font-size: 9.4pt; font-weight: bold; margin: 12pt 0 4pt; page-break-after: avoid; }
+	.rp-h small { font-weight: normal; font-size: 8pt; }
+	.rp-t th, .rp-t td { border: 0.6pt solid #000; padding: 2.8pt 4pt; font-size: 8.2pt; text-align: left; vertical-align: top; }
+	.rp-t th { background: #eee; font-weight: bold; }
+	.rp-t tr { page-break-inside: avoid; }
+	.rp-t .c { text-align: center; }
+	.rp-t .r { text-align: right; }
+	.rp-t .n { font-variant-numeric: tabular-nums; white-space: nowrap; }
+	.rp-t .nok, .rp-nok { font-weight: bold; text-decoration: underline; }
+	.rp-small { font-size: 7.6pt; }
+
+	.rp-remarks { border: 0.6pt solid #000; padding: 4pt 6pt; margin-top: 10pt; font-size: 8.4pt; page-break-inside: avoid; }
+	.rp-statement { margin-top: 12pt; font-size: 9pt; page-break-inside: avoid; }
+
+	.rp-sign { margin-top: 14pt; page-break-inside: avoid; }
+	.rp-sign th, .rp-sign td { border: 0.6pt solid #000; padding: 3pt 5pt; font-size: 8.2pt; text-align: left; vertical-align: top; }
+	.rp-sign th { background: #eee; font-weight: bold; }
+	.rp-sign td.lbl { width: 13%; background: #eee; }
+	.rp-sign tr.sig td { height: 30pt; }
+
+	.rp-foot { margin-top: 8pt; font-size: 7pt; page-break-inside: avoid; }
+	.rp-foot td { padding: 2pt 0 0; border-top: 0.5pt solid #000; }
+	.rp-foot td.r { text-align: right; }
+	.rp-draft { font-weight: bold; }
+	.rp-break { page-break-before: always; }
+</style>
+{%- endmacro -%}
+
+{#- company block and the double rule under it -#}
+{%- macro letterhead(lh) -%}
+<table class="rp-lh"><tr>
+	{%- if lh.logo %}<td class="rp-lh-logo"><img src="{{ lh.logo }}"></td>{% endif %}
+	<td><div class="rp-lh-name">{{ lh.name }}</div>
+		{%- if lh.address %}<div class="rp-lh-addr">{{ lh.address }}</div>{% endif %}
+		{%- if lh.contact or lh.gstin %}<div class="rp-lh-addr">{{ lh.contact }}{% if lh.contact and lh.gstin %} &middot; {% endif %}{% if lh.gstin %}GSTIN {{ lh.gstin }}{% endif %}</div>{% endif %}</td>
+</tr></table>
+<div class="rp-rule"></div>
+{%- endmacro -%}
+
+{#- title in the middle, the report's own references boxed on the right.
+    refs: [(label, value), ...] -#}
+{%- macro title(main, sub, refs) -%}
+<table class="rp-title"><tr>
+	<td style="padding-right:12pt"><div class="rp-title-main">{{ main }}</div>{% if sub %}<div class="rp-title-sub">{{ sub }}</div>{% endif %}</td>
+	<td class="rp-refs"><table>{% for label, value in refs %}<tr><td>{{ label }}</td><td><b>{{ value }}</b></td></tr>{% endfor %}</table></td>
+</tr></table>
+{%- endmacro -%}
+
+{#- label / value pairs, two pairs to a row. pairs: [(label, value), ...];
+    a value that is none or "" prints blank, as on a paper form -#}
+{%- macro grid(pairs) -%}
+<table class="rp-grid">
+{%- for row in pairs | batch(2) %}<tr>
+	{%- for label, value in row %}<th>{{ label }}</th><td{% if row | length == 1 %} colspan="3"{% endif %}>{{ value if value not in (none, "") else "" }}</td>{% endfor %}
+</tr>{%- endfor %}
+</table>
+{%- endmacro -%}
+
+{%- macro remarks(text) -%}
+<div class="rp-remarks"><b>Remarks:</b> {{ text }}</div>
+{%- endmacro -%}
+
+{#- sign-off grid: one column per role, rows for name, signature and date.
+    cols: [(role, name, date), ...] -#}
+{%- macro signoff(cols) -%}
+<table class="rp-sign">
+	<tr><th class="lbl"></th>{% for role, name, date in cols %}<th>{{ role }}</th>{% endfor %}</tr>
+	<tr><td class="lbl">Name</td>{% for role, name, date in cols %}<td>{{ name or "" }}</td>{% endfor %}</tr>
+	<tr class="sig"><td class="lbl">Signature</td>{% for c in cols %}<td></td>{% endfor %}</tr>
+	<tr><td class="lbl">Date</td>{% for role, name, date in cols %}<td>{{ frappe.format(date, {"fieldtype": "Date"}) if date else "" }}</td>{% endfor %}</tr>
+</table>
+{%- endmacro -%}
+
+{#- form number with its issue and revision on the left, the report number on the right -#}
+{%- macro footer(form_no, issue_rev, report_no, draft=None) -%}
+<table class="rp-foot"><tr>
+	<td>{{ form_no }} &middot; {{ issue_rev }}</td>
+	<td class="r">{% if draft %}<span class="rp-draft">{{ draft }}</span> &middot; {% endif %}{{ report_no }}</td>
+</tr></table>
+{%- endmacro -%}

@@ -13,7 +13,7 @@
  "margin_right": 10.0,
  "margin_top": 12.0,
  "creation": "2026-10-12 12:00:00.000000",
- "modified": "2026-10-12 12:00:00.000000",
+ "modified": "2026-10-25 00:30:18.090683",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "owner": "Administrator",
@@ -24,5 +24,6 @@
  "standard": "Yes",
  "name": "Sampling and Inspection Record (QI)",
  "doc_type": "Quality Inspection",
- "html": "{#- Sampling & Inspection Record for one drawing-based inspection (QI SPEC v2 §4.7). -#}\n{%- from \"iso_compliance/templates/includes/qi_sampling_record.html\" import record, record_styles -%}\n{%- set rec = qi_record(doc.name) -%}\n{{ record_styles() }}\n{%- if rec -%}{{ record(rec, doc.company) }}\n{%- else -%}<p style=\"font-family:Arial,sans-serif;font-size:9pt\">{{ doc.name }} is not a drawing-based inspection; use the standard print.</p>{%- endif -%}\n"
+ "html": "{#- Sampling & Inspection Record for one drawing-based inspection (QI SPEC v2 §4.7). -#}\n{%- from \"iso_compliance/templates/includes/qi_sampling_record.html\" import record, record_styles -%}\n{%- set rec = qi_record(doc.name) -%}\n{{ record_styles() }}\n{%- if rec -%}{{ record(rec, doc.company) }}\n{%- else -%}<p style=\"font-family:Arial,Helvetica,sans-serif;font-size:9pt\">{{ doc.name }} is not on a new-format inspection plan; use the standard print.</p>{%- endif -%}\n",
+ "pdf_generator": "chrome"
 }

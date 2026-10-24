@@ -13,7 +13,7 @@
  "margin_right": 10.0,
  "margin_top": 12.0,
  "creation": "2026-10-12 12:00:00.000000",
- "modified": "2026-10-12 12:00:00.000000",
+ "modified": "2026-10-25 00:30:18.090395",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "owner": "Administrator",
@@ -24,5 +24,6 @@
  "standard": "Yes",
  "name": "Sampling and Inspection Record",
  "doc_type": "Delivery Note",
- "html": "{#- Sampling & Inspection Record for every drawing-based inspection behind this delivery (QI SPEC v2 §4.7). -#}\n{%- from \"iso_compliance/templates/includes/qi_sampling_record.html\" import record, record_styles -%}\n{{ record_styles() }}\n{%- set ns = namespace(n=0) -%}\n{%- for row in doc.items -%}\n{%- for rec in dn_records(row) -%}\n<div class=\"{{ 'sir-break' if ns.n }}\">{{ record(rec, doc.company) }}</div>\n{%- set ns.n = ns.n + 1 -%}\n{%- endfor -%}\n{%- endfor -%}\n{%- if not ns.n -%}\n<p style=\"font-family:Arial,sans-serif;font-size:9pt\">No drawing-based inspection stands behind the items on {{ doc.name }}, so there is no Sampling &amp; Inspection Record for it.</p>\n{%- endif -%}\n"
+ "html": "{#- Sampling & Inspection Record for every drawing-based inspection behind this delivery (QI SPEC v2 §4.7). -#}\n{%- from \"iso_compliance/templates/includes/qi_sampling_record.html\" import record, record_styles -%}\n{{ record_styles() }}\n{%- set ns = namespace(n=0) -%}\n{%- for row in doc.items -%}\n{%- for rec in dn_records(row) -%}\n<div class=\"{{ 'rp-break' if ns.n }}\">{{ record(rec, doc.company) }}</div>\n{%- set ns.n = ns.n + 1 -%}\n{%- endfor -%}\n{%- endfor -%}\n{%- if not ns.n -%}\n<p style=\"font-family:Arial,Helvetica,sans-serif;font-size:9pt\">No drawing-based inspection stands behind the items on {{ doc.name }}, so there is no sampling and inspection record for it.</p>\n{%- endif -%}\n",
+ "pdf_generator": "chrome"
 }

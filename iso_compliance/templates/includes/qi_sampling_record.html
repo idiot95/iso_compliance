@@ -1,131 +1,115 @@
-{#- Sampling & Inspection Record: one drawing inspection (QI SPEC v2 §4.7).
-    Used by the Delivery Note and Quality Inspection print formats of the
-    same name. wkhtmltopdf-safe: tables and absolute positioning only. -#}
+{#- Sampling & Inspection Record: one drawing inspection (QI SPEC v2 §4.7),
+    printed as an inspection report on the shared report kit. Used by the
+    Delivery Note and Quality Inspection print formats of the same name. -#}
+{%- import "iso_compliance/templates/includes/report.html" as rp -%}
+
 {%- macro record_styles() -%}
+{{ rp.styles() }}
 <style>
-	.sir { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 8.6pt; color: #111; }
-	.sir-band { border-bottom: 2pt solid #1f3d2b; padding-bottom: 5pt; margin-bottom: 8pt; width: 100%; }
-	.sir-band td { vertical-align: bottom; }
-	.sir-co { font-size: 12pt; font-weight: 800; color: #1f3d2b; }
-	.sir-title { font-size: 13pt; font-weight: 800; letter-spacing: 1pt; text-align: right; }
-	.sir-sub { font-size: 7.2pt; color: #555; }
-	table.sir-meta { width: 100%; border-collapse: collapse; margin-bottom: 8pt; }
-	.sir-meta td { border: 0.6pt solid #000; padding: 3pt 5pt; font-size: 8pt; vertical-align: top; }
-	.sir-lbl { font-size: 6pt; text-transform: uppercase; letter-spacing: 0.4pt; color: #555; font-weight: 700; display: block; }
-	.sir-h { font-size: 8.8pt; font-weight: 700; margin: 8pt 0 3pt; color: #1f3d2b; }
-	.sir-drawing { position: relative; width: 100%; border: 0.5pt solid #999; margin-bottom: 6pt; page-break-inside: avoid; }
-	.sir-drawing img { width: 100%; display: block; }
-	.sir-box { position: absolute; border: 1.4pt solid #8a8a8a; }
-	.sir-box.ok { border-color: #1f7a4a; }
-	.sir-box.bad { border: 2.2pt solid #c0262d; background: rgba(192, 38, 45, 0.12); }
-	.sir-bal { position: absolute; top: -8pt; left: -8pt; width: 15pt; height: 15pt; line-height: 15pt; border-radius: 8pt;
-		background: #8a8a8a; color: #fff; font-size: 7pt; font-weight: 700; text-align: center; }
-	.sir-box.ok .sir-bal { background: #1f7a4a; }
-	.sir-box.bad .sir-bal { background: #c0262d; width: 18pt; height: 18pt; line-height: 18pt; border-radius: 9pt; top: -10pt; left: -10pt; }
-	.sir-key { font-size: 6.6pt; color: #444; margin: -3pt 0 6pt; }
-	.sir-key b { display: inline-block; width: 8pt; height: 8pt; border-radius: 4pt; vertical-align: -1pt; margin: 0 2pt 0 8pt; }
-	.sir-sum td { font-size: 8pt; padding: 3pt 6pt; border: 0.6pt solid #000; text-align: center; }
-	.sir-sum strong { font-size: 11pt; display: block; }
-	table.sir-rows { width: 100%; border-collapse: collapse; margin: 2pt 0 8pt; }
-	.sir-rows th, .sir-rows td { border: 0.5pt solid #666; padding: 2.5pt 4pt; font-size: 7.4pt; text-align: left; vertical-align: top; }
-	.sir-rows th { background: #f2f2f2; font-size: 6.4pt; text-transform: uppercase; letter-spacing: 0.3pt; }
-	.sir-rows tr { page-break-inside: avoid; }
-	.sir-v { display: inline-block; min-width: 26pt; padding: 0 2pt; margin: 0 1pt 1pt 0; border: 0.4pt solid #ccc; font-size: 6.8pt; text-align: right; }
-	.sir-v.bad { border-color: #c0262d; color: #c0262d; font-weight: 700; }
-	.sir-v i { color: #888; font-style: normal; font-size: 5.6pt; margin-right: 2pt; }
-	.sir-ok { color: #1f5d3f; font-weight: 700; }
-	.sir-nok { color: #c0262d; font-weight: 700; }
-	.sir-ctq { font-size: 6pt; font-weight: 700; color: #c0262d; }
-	.sir-disp { border: 0.8pt solid #1f3d2b; background: #f4f6f4; padding: 5pt 7pt; font-size: 8.2pt; margin: 8pt 0; }
-	.sir-disp.conc { border-color: #b26a00; background: #fff8eb; }
-	table.sir-sign { width: 100%; margin-top: 16pt; }
-	.sir-sign td { width: 50%; font-size: 7.8pt; vertical-align: bottom; padding-top: 22pt; }
-	.sir-line { border-top: 0.6pt solid #000; padding-top: 2pt; width: 75%; }
-	.sir-foot { margin-top: 10pt; border-top: 0.5pt solid #999; padding-top: 3pt; font-size: 6.2pt; color: #666; }
-	.sir-break { page-break-before: always; }
+	.sir-dwg-wrap { text-align: center; margin: 2pt 0 2pt; page-break-inside: avoid; }
+	.sir-dwg { position: relative; display: inline-block; border: 0.6pt solid #000; }
+	.sir-dwg img { display: block; max-width: 100%; max-height: 84mm; width: auto; height: auto; }
+	.sir-box { position: absolute; border: 1.2pt solid #555; }
+	.sir-box.bad { border: 2pt solid #c00; }
+	.sir-bal { position: absolute; top: -7pt; left: -7pt; width: 13pt; height: 13pt; line-height: 13pt; border-radius: 7pt;
+		background: #fff; border: 0.8pt solid #000; color: #000; font-size: 6.6pt; font-weight: bold; text-align: center; }
+	.sir-box.bad .sir-bal { border-color: #c00; color: #c00; }
+	.sir-note { font-size: 7.4pt; margin: 1pt 0 0; }
 </style>
 {%- endmacro -%}
 
 {%- macro record(rec, company) -%}
-<div class="sir">
-<table class="sir-band"><tr>
-	<td><div class="sir-co">{{ company or "" }}</div><div class="sir-sub">Quality Management System &middot; ISO 9001:2015</div></td>
-	<td class="sir-title">SAMPLING &amp; INSPECTION RECORD</td>
-</tr></table>
-
-<table class="sir-meta"><tr>
-	<td style="width:30%"><span class="sir-lbl">Item</span><strong>{{ rec.item_code }}</strong><div class="sir-sub">{{ rec.item_name or "" }}</div></td>
-	<td style="width:20%"><span class="sir-lbl">Drawing</span>{{ rec.drawing_no or "&mdash;" }}{% if rec.drawing_revision %} &middot; Rev {{ rec.drawing_revision }}{% endif %}</td>
-	<td style="width:16%"><span class="sir-lbl">Stage</span>{{ rec.stage or "&mdash;" }}</td>
-	<td style="width:17%"><span class="sir-lbl">Inspection</span>{{ rec.name }}<div class="sir-sub">{{ frappe.format(rec.report_date, {"fieldtype": "Date"}) }}</div></td>
-	<td style="width:17%"><span class="sir-lbl">Lot / Sample</span>{{ frappe.format(rec.lot_qty, {"fieldtype": "Float"}) if rec.lot_qty else "&mdash;" }} / {{ frappe.format(rec.sample_size, {"fieldtype": "Float"}) }}</td>
-</tr><tr>
-	<td><span class="sir-lbl">Reference</span>{{ rec.reference }}{% if rec.work_order %}<div class="sir-sub">Work Order {{ rec.work_order }}</div>{% endif %}</td>
-	<td><span class="sir-lbl">Customer</span>{{ rec.customer or "&mdash;" }}</td>
-	<td><span class="sir-lbl">Batch</span>{{ rec.batch_no or "&mdash;" }}</td>
-	<td colspan="2"><span class="sir-lbl">Work instructions</span>{% for w in rec.work_instructions %}{{ w.doc.split("/")[-1] }}{% if w.revision %} Rev {{ w.revision }}{% endif %}{% if not loop.last %} &middot; {% endif %}{% else %}&mdash;{% endfor %}</td>
-</tr></table>
-
-<table class="sir-sum" style="width:100%;border-collapse:collapse;margin-bottom:6pt"><tr>
-	<td><strong class="sir-ok">{{ rec.counts.conform }}</strong>conform</td>
-	<td><strong class="{{ 'sir-nok' if rec.counts.failed }}">{{ rec.counts.failed }}</strong>out of specification</td>
-	<td><strong>{{ rec.counts.open }}</strong>not fully measured</td>
-	<td><strong>{{ "Draft" if rec.docstatus == 0 else rec.disposition }}</strong>{{ "not submitted" if rec.docstatus == 0 else "disposition" }}</td>
-</tr></table>
+{%- set lh = letterhead(company) -%}
+{%- set stage = (rec.stage or "") ~ " inspection" ~ (" · " ~ rec.check_point if rec.check_point else "") -%}
+{%- set ns = namespace(cols=1) -%}
+{%- for r in rec.rows %}{% set ns.cols = [ns.cols, r.required or 0, r.n or 0] | max %}{% endfor -%}
+{%- set wide = ns.cols > 10 -%}
+<div class="rp">
+{{ rp.letterhead(lh) }}
+{{ rp.title("Inspection report", "Sampling and inspection record", [
+	("Report no.", rec.name),
+	("Date", frappe.format(rec.report_date, {"fieldtype": "Date"})),
+	("Stage", stage),
+]) }}
+{{ rp.grid([
+	("Item code", rec.item_code),
+	("Description", rec.item_name),
+	("Drawing no.", (rec.drawing_no or "") ~ (" Rev " ~ rec.drawing_revision if rec.drawing_revision else "")),
+	("Customer", rec.customer),
+	("Reference", rec.reference),
+	("Work Order", rec.work_order),
+	("Batch no.", rec.batch_no),
+	("Lot quantity", frappe.format(rec.lot_qty, {"fieldtype": "Float"}) if rec.lot_qty else ""),
+	("Sample size", frappe.format(rec.sample_size, {"fieldtype": "Float"})),
+	("Inspection plan", rec.template),
+	("Work instruction", rec.work_instructions | map(attribute="doc") | map("replace", "HCCPL/QMS/", "") | join(", ")),
+]) }}
 
 {%- for page in rec.pages %}
-<div class="sir-h">Drawing{% if rec.sheets > 1 %} &middot; sheet {{ page.no }} of {{ rec.sheets }}{% endif %} &mdash; numbers as inspected</div>
-<div class="sir-key"><b style="background:#1f7a4a"></b>conforms<b style="background:#c0262d"></b>out of specification<b style="background:#8a8a8a"></b>not fully measured</div>
-<div class="sir-drawing">
+<div class="rp-h">Drawing{% if rec.sheets > 1 %}, sheet {{ page.no }} of {{ rec.sheets }}{% endif %}</div>
+<div class="sir-dwg-wrap"><div class="sir-dwg">
 	<img src="{{ page.image }}">
 	{%- for b in page.boxes %}
-	<div class="sir-box {{ b.state }}" style="left:{{ b.x }}%;top:{{ b.y }}%;width:{{ b.w }}%;height:{{ b.h }}%"><div class="sir-bal">{{ b.balloon }}</div></div>
+	<div class="sir-box {{ 'bad' if b.state == 'bad' }}" style="left:{{ b.x }}%;top:{{ b.y }}%;width:{{ b.w }}%;height:{{ b.h }}%"><div class="sir-bal">{{ b.balloon }}</div></div>
 	{%- endfor %}
-</div>
+</div></div>
+<div class="sir-note">Characteristic numbers refer to the results below.{% if rec.failed %} Numbers in red are out of specification.{% endif %}</div>
 {%- endfor %}
 
-<div class="sir-h">Characteristics and measured values</div>
-<table class="sir-rows">
-	<thead><tr><th style="width:4%">#</th><th style="width:17%">Characteristic</th><th style="width:13%">As on drawing</th>
-		<th style="width:11%">Limits</th><th style="width:10%">Instrument</th><th>Values (sample no.)</th>
-		<th style="width:5%">n</th><th style="width:10%">Observed</th><th style="width:8%">Result</th></tr></thead>
+<div class="rp-h">Results</div>
+<table class="rp-t">
+	<thead><tr>
+		<th class="c" style="width:4%">No.</th><th>Characteristic</th><th style="width:10%">Specification</th>
+		<th style="width:11%">Limits</th><th style="width:17%">Instrument</th>
+		{%- if wide %}<th style="width:28%">Readings</th><th class="c" style="width:10%">Min / Max</th>
+		{%- else %}{% for i in range(1, ns.cols + 1) %}<th class="c" style="width:{{ [6, (36 / ns.cols) | int] | min }}%">{{ i }}</th>{% endfor %}{% endif %}
+		<th class="c" style="width:8%">Result</th>
+	</tr></thead>
 	<tbody>
 	{%- for r in rec.rows %}
+	{%- set done = r.n and r.n >= (r.required or 0) -%}
 	<tr>
-		<td><strong>{{ r.balloon }}</strong></td>
-		<td>{{ r.specification }}{% if r["class"] == "CTQ" %} <span class="sir-ctq">CTQ</span>{% endif %}{% if r.test_method %}<div class="sir-sub">{{ r.test_method }}</div>{% endif %}</td>
-		<td>{{ r.spec_text or "&mdash;" }}</td>
-		<td>{{ r.limits }} {{ r.unit }}</td>
-		<td>{% for a in r.instruments %}{{ a.name }}{% if a.cal_due %}<div class="sir-sub">cal. due {{ frappe.format(a.cal_due, {"fieldtype": "Date"}) }}</div>{% endif %}{% else %}&mdash;{% endfor %}</td>
-		<td>{%- for v in r["values"] %}<span class="sir-v {{ 'bad' if v.bad }}"><i>{{ v.n }}</i>{{ v.value }}</span>{% endfor -%}</td>
-		<td>{{ r.n }}{% if r.required and r.n < r.required %}/{{ r.required }}{% endif %}</td>
-		<td>{% if r.min is not none and r.n %}{{ r.min }}{% if r.max != r.min %} &ndash; {{ r.max }}{% endif %}{% else %}&mdash;{% endif %}</td>
-		<td>{% if r.bad %}<span class="sir-nok">Out of spec</span>{% elif r.required and r.n < r.required %}Not fully measured{% else %}<span class="sir-ok">Conforms</span>{% endif %}</td>
+		<td class="c">{{ r.balloon }}</td>
+		<td>{{ r.specification }}{% if r["class"] == "CTQ" %} (CTQ){% endif %}{% if r.test_method %}<div class="rp-small">{{ r.test_method }}</div>{% endif %}</td>
+		<td>{{ r.spec_text }}</td>
+		<td class="n">{{ r.limits }} {{ r.unit }}</td>
+		<td>{% for a in r.instruments %}{{ a.label }}{% if a.label != a.name %}<div class="rp-small">{{ a.name }}</div>{% endif %}{% if not loop.last %}<br>{% endif %}{% endfor %}</td>
+		{%- if wide %}
+		<td class="n">{% for v in r["values"] %}<span class="{{ 'rp-nok' if v.bad }}">{{ v.value }}</span>{% if not loop.last %}, {% endif %}{% endfor %}</td>
+		<td class="c n">{% if r.min is not none and r.n %}{{ r.min }}{% if r.max != r.min %} / {{ r.max }}{% endif %}{% endif %}</td>
+		{%- else %}
+		{%- for i in range(1, ns.cols + 1) %}
+		{%- set v = r["values"] | selectattr("n", "equalto", i) | first %}
+		<td class="c n {{ 'nok' if v and v.bad }}">{{ v.value if v else ("" if i <= (r.required or 0) else "") }}</td>
+		{%- endfor %}
+		{%- endif %}
+		<td class="c">{% if r.bad %}<span class="rp-nok">NOT OK</span>{% elif done %}OK{% elif not r.n %}Not measured{% else %}Incomplete{% endif %}</td>
 	</tr>
 	{%- endfor %}
 	</tbody>
 </table>
 
 {%- if rec.conditions %}
-<div class="sir-h">Test conditions</div>
-<table class="sir-rows"><thead><tr><th style="width:6%">#</th><th>Condition</th><th style="width:18%">Set</th><th style="width:14%">Actual</th></tr></thead><tbody>
-{%- for c in rec.conditions %}<tr><td>{{ c.row }}</td><td>{{ c.condition }}</td><td>{{ c.set }}{% if c.tol %} &plusmn; {{ c.tol }}{% endif %} {{ c.unit or "" }}</td><td>{{ c.actual if c.actual is not none else "&mdash;" }}</td></tr>{%- endfor %}
+<div class="rp-h">Test conditions</div>
+<table class="rp-t"><thead><tr><th class="c" style="width:6%">No.</th><th>Condition</th><th style="width:20%">Set value</th><th style="width:16%">Actual</th></tr></thead><tbody>
+{%- for c in rec.conditions %}<tr><td class="c">{{ c.row }}</td><td>{{ c.condition }}</td><td class="n">{{ c.set }}{% if c.tol %} &plusmn; {{ c.tol }}{% endif %} {{ c.unit or "" }}</td><td class="n">{{ c.actual if c.actual is not none else "" }}</td></tr>{%- endfor %}
 </tbody></table>
 {%- endif %}
 
-<div class="sir-disp {{ 'conc' if rec.disposition == 'Accept under Concession' }}">
-	<strong>Disposition: {{ rec.disposition }}</strong>
-	{%- if rec.disposition == "Accept under Concession" %} &mdash; accepted although
-	{{ rec.failed | length }} characteristic{{ "s" if rec.failed | length != 1 }} ({% for r in rec.failed %}#{{ r.balloon }}{% if not loop.last %}, {% endif %}{% endfor %})
-	did not meet specification{% if rec.concession_no %}, under concession no. {{ rec.concession_no }}{% endif %}.{% endif %}
-	{%- if rec.non_conformance %} Non Conformance {{ rec.non_conformance }}.{% endif %}
-	{%- if rec.docstatus == 0 %} <strong>DRAFT &mdash; inspection not submitted.</strong>{% endif %}
-</div>
+{{ rp.remarks(
+	rec.rows | length ~ (" characteristic" if rec.rows | length == 1 else " characteristics") ~ " inspected: " ~ rec.counts.conform ~ " conforming, " ~ rec.counts.failed ~ " not conforming"
+	~ (", " ~ rec.counts.open ~ " not measured or incomplete" if rec.counts.open else "") ~ ". "
+	~ "Decision: " ~ ("not submitted (draft)" if rec.docstatus == 0 else rec.disposition) ~ "."
+	~ (" Accepted under concession" ~ (" no. " ~ rec.concession_no if rec.concession_no else "") ~ " although no. "
+		~ (rec.failed | map(attribute="balloon") | join(", ")) ~ " did not meet specification." if rec.disposition == "Accept under Concession" else "")
+	~ (" Non-conformance " ~ rec.non_conformance ~ " raised." if rec.non_conformance else "")
+) }}
 
-<table class="sir-sign"><tr>
-	<td><div class="sir-line">Inspected by: {{ rec.inspected_by }}</div></td>
-	<td><div class="sir-line">Quality: {{ rec.verified_by }}</div></td>
-</tr></table>
-<div class="sir-foot">{{ rec.form_no }} &middot; Issue 01 / Rev 00 &middot; Sampling &amp; Inspection Record &middot; template {{ rec.template }} &middot; generated {{ frappe.utils.now_datetime().strftime("%d-%m-%Y %H:%M") }}</div>
+{{ rp.signoff([
+	("Inspected by", rec.inspected_by, rec.report_date),
+	("Reviewed by", rec.verified_by, None),
+	("Approved by", "", None),
+]) }}
+{{ rp.footer(rec.form_no, "Issue 01 / Rev 00", rec.name, "DRAFT" if rec.docstatus == 0 else None) }}
 </div>
 {%- endmacro -%}

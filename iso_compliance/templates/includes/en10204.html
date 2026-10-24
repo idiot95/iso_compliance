@@ -1,100 +1,79 @@
-{#- EN 10204:2004 inspection documents: 2.1 Certificate of Conformity, 2.2
-    Inspection Report, 3.1 Detailed Inspection Report. One layout, the data from
-    qi.certificates.en10204(). wkhtmltopdf-safe: tables only.
-    Hierarchy: header (who, what) > reference strip > sections > statement >
-    signatures > footer. -#}
+{#- EN 10204:2004 inspection documents: 2.1 declaration of compliance with the
+    order, 2.2 test report, 3.1 inspection certificate. One layout on the shared
+    report kit, the data from qi.certificates.en10204(). -#}
+{%- import "iso_compliance/templates/includes/report.html" as rp -%}
+
 {%- macro styles() -%}
-<style>
-	.en { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 8.8pt; line-height: 1.4; color: #1d2320; }
-	table.en-band { width: 100%; margin-bottom: 14pt; border-collapse: collapse; }
-	.en-band td { vertical-align: middle; padding: 0; }
-	.en-logo { width: 42pt; height: 42pt; display: block; }
-	.en-co { padding-left: 10pt !important; }
-	.en-co b { display: block; font-size: 12pt; color: #2f4a2c; }
-	.en-addr { font-size: 7.2pt; color: #6b736e; margin-top: 2pt; }
-	.en-std { text-align: right; font-size: 7.6pt; font-weight: 700; letter-spacing: 1.2pt; color: #456b40; }
-	.en-title { text-align: right; font-size: 17pt; font-weight: 700; color: #1d2320; margin-top: 2pt; line-height: 1.15; }
-	.en-title span { color: #456b40; }
-	.en-rule { height: 2pt; background: #456b40; margin: 0 0 12pt; font-size: 0; }
-	table.en-ref { width: 100%; border-collapse: collapse; margin-bottom: 16pt; background: #f4f7f3; }
-	.en-ref td { width: 25%; padding: 7pt 9pt; vertical-align: top; border-left: 2pt solid #fff; }
-	.en-ref td:first-child { border-left: 0; }
-	.en-lbl { display: block; font-size: 6.4pt; text-transform: uppercase; letter-spacing: 0.6pt; color: #6b736e; margin-bottom: 2pt; }
-	.en-val { font-size: 9.2pt; font-weight: 700; }
-	.en-date { font-size: 7.6pt; color: #4b524e; }
-	.en-h { font-size: 7.8pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1pt; color: #456b40;
-		border-bottom: 0.8pt solid #c9d6c6; padding-bottom: 3pt; margin: 16pt 0 6pt; page-break-after: avoid; }
-	.en-h2 { font-size: 8.6pt; font-weight: 700; margin: 10pt 0 3pt; page-break-after: avoid; }
-	.en-h2 span { font-weight: 400; color: #6b736e; }
-	table.en-t { width: 100%; border-collapse: collapse; margin-bottom: 4pt; }
-	.en-t th { text-align: left; font-size: 6.6pt; text-transform: uppercase; letter-spacing: 0.5pt; color: #4b524e;
-		font-weight: 700; padding: 4pt 6pt; border-bottom: 0.9pt solid #1d2320; }
-	.en-t td { padding: 5pt 6pt; border-bottom: 0.4pt solid #dde3dc; vertical-align: top; font-size: 8.4pt; }
-	.en-t tr { page-break-inside: avoid; }
-	.en-r { text-align: right !important; }
-	.en-muted { color: #6b736e; }
-	.en-basis { font-size: 7.2pt; color: #6b736e; margin: 0 0 3pt; }
-	.en-nok { color: #b42318; font-weight: 700; }
-	.en-gap { color: #9a5b00; }
-	.en-statement { border-left: 3pt solid #456b40; background: #f4f7f3; padding: 9pt 12pt; font-size: 9.4pt;
-		margin: 18pt 0 4pt; page-break-inside: avoid; }
-	.en-note { font-size: 7.4pt; color: #9a5b00; margin-top: 4pt; }
-	table.en-sign { width: 100%; margin-top: 30pt; border-collapse: collapse; page-break-inside: avoid; }
-	.en-sign td { width: 50%; vertical-align: bottom; padding: 0 20pt 0 0; }
-	.en-line { border-top: 0.7pt solid #1d2320; padding-top: 3pt; font-size: 7.8pt; font-weight: 700; }
-	.en-sub { font-size: 7pt; color: #6b736e; }
-	.en-foot { margin-top: 18pt; border-top: 0.4pt solid #c9cfc8; padding-top: 4pt; font-size: 6.4pt; color: #8a918c; }
-	.en-draft { color: #b42318; font-weight: 700; }
-</style>
+{{ rp.styles() }}
 {%- endmacro -%}
 
+{#- letterhead, title with the certificate number, and the order details -#}
 {%- macro head(d) -%}
-<table class="en-band"><tr>
-	<td style="width:44pt">{% if d.logo %}<img class="en-logo" src="{{ d.logo }}">{% endif %}</td>
-	<td class="en-co" style="width:44%"><b>{{ d.company }}</b>{% if d.address %}<div class="en-addr">{{ d.address }}</div>{% endif %}</td>
-	<td><div class="en-std">EN 10204:2004</div><div class="en-title"><span>{{ d.type }}</span> {{ d.title }}</div></td>
-</tr></table>
-<div class="en-rule">&nbsp;</div>
-<table class="en-ref"><tr>
-	<td><span class="en-lbl">Purchaser</span><span class="en-val">{{ d.customer }}</span></td>
-	<td><span class="en-lbl">Purchaser's order</span>{% for p in d.po %}<span class="en-val">{{ p.no }}</span>{% if p.date %} <span class="en-date">{{ frappe.format(p.date, {"fieldtype": "Date"}) }}</span>{% endif %}{% if not loop.last %}<br>{% endif %}{% else %}&mdash;{% endfor %}</td>
-	<td><span class="en-lbl">Delivery note</span><span class="en-val">{{ d.delivery_note }}</span> <span class="en-date">{{ frappe.format(d.delivery_date, {"fieldtype": "Date"}) }}</span></td>
-	<td><span class="en-lbl">Document no.</span><span class="en-val">{{ d.number }}</span> <span class="en-date">{{ frappe.format(d.issued, {"fieldtype": "Date"}) }}</span></td>
-</tr></table>
+{{ rp.letterhead(letterhead(d.company)) }}
+{{ rp.title(d.title, "Type " ~ d.type ~ " to EN 10204:2004", [
+	("Certificate no.", d.number),
+	("Date", frappe.format(d.issued, {"fieldtype": "Date"})),
+]) }}
+{%- set orders = [] -%}
+{%- for p in d.po %}{% set _ = orders.append(p.no ~ (" dated " ~ frappe.format(p.date, {"fieldtype": "Date"}) if p.date else "")) %}{% endfor -%}
+{{ rp.grid([
+	("Purchaser", d.customer),
+	("Purchaser's order", orders | join(", ")),
+	("Delivery note", d.delivery_note ~ " dated " ~ frappe.format(d.delivery_date, {"fieldtype": "Date"})),
+	("Manufacturer", d.company),
+]) }}
 {%- endmacro -%}
 
 {%- macro products(d) -%}
-<div class="en-h">Products supplied</div>
-<table class="en-t"><thead><tr><th style="width:5%">Pos.</th><th style="width:14%">Item no.</th><th>Description</th>
-	{% if d.show_drawing %}<th style="width:17%">Drawing no.</th>{% endif %}<th style="width:16%">Batch no.</th><th style="width:12%" class="en-r">Quantity</th></tr></thead><tbody>
-{%- for r in d.rows %}<tr><td class="en-muted">{{ loop.index }}</td><td><b>{{ r.item_code }}</b></td><td>{{ r.item_name }}</td>
-	{% if d.show_drawing %}<td>{{ r.drawing or "&mdash;" }}</td>{% endif %}<td>{{ r.batches | join(", ") or "&mdash;" }}</td>
-	<td class="en-r">{{ frappe.format(r.qty, {"fieldtype": "Float"}) }} {{ r.uom }}</td></tr>{%- endfor %}
+<div class="rp-h">Products supplied</div>
+<table class="rp-t"><thead><tr><th class="c" style="width:6%">Pos.</th><th style="width:14%">Item no.</th><th>Description</th>
+	{% if d.show_drawing %}<th style="width:16%">Drawing no.</th>{% endif %}<th style="width:16%">Batch no.</th><th class="r" style="width:12%">Quantity</th></tr></thead><tbody>
+{%- for r in d.rows %}<tr><td class="c">{{ loop.index }}</td><td>{{ r.item_code }}</td><td>{{ r.item_name }}</td>
+	{% if d.show_drawing %}<td>{{ r.drawing or "" }}</td>{% endif %}<td>{{ r.batches | join(", ") }}</td>
+	<td class="r n">{{ frappe.format(r.qty, {"fieldtype": "Float"}) }} {{ r.uom }}</td></tr>{%- endfor %}
 </tbody></table>
 {%- endmacro -%}
 
 {%- macro results(d) -%}
-<div class="en-h">Inspection results</div>
+<div class="rp-h">Test results</div>
 {%- for r in d.rows %}
-<div class="en-h2">Pos. {{ loop.index }} &middot; {{ r.item_code }} <span>{{ r.item_name }}</span></div>
-{%- if r.basis %}<div class="en-basis">Basis: {{ r.basis }}</div>{% endif %}
-<table class="en-t"><thead><tr><th>Characteristic</th><th style="width:30%">Specified requirement</th><th style="width:26%">Result</th></tr></thead><tbody>
-{%- for t in r.results %}<tr><td>{{ t.characteristic }}</td><td>{{ t.requirement }} {{ t.unit }}</td>
-	<td class="{{ '' if t.ok else 'en-nok' }}"><b>{{ t.result }}</b> {{ t.unit }}</td></tr>
-{%- else %}<tr><td colspan="3" class="en-gap">No inspection results recorded.</td></tr>{%- endfor %}
-</tbody></table>
+<table class="rp-t" style="margin-bottom:6pt">
+	<thead>
+		<tr><th colspan="3">Pos. {{ loop.index }}: {{ r.item_code }} {{ r.item_name }}{% if r.basis %} <span style="font-weight:normal">(basis: {{ r.basis }})</span>{% endif %}</th></tr>
+		<tr><th>Characteristic</th><th style="width:30%">Specified requirement</th><th style="width:26%">Result</th></tr>
+	</thead><tbody>
+	{%- for t in r.results %}<tr><td>{{ t.characteristic }}</td><td class="n">{{ t.requirement }} {{ t.unit }}</td>
+		<td class="n {{ '' if t.ok else 'nok' }}">{{ t.result }} {{ t.unit }}{% if not t.ok %} (not conforming){% endif %}</td></tr>
+	{%- else %}<tr><td colspan="3">No test results are recorded for this position.</td></tr>{%- endfor %}
+	</tbody>
+</table>
 {%- endfor %}
 {%- endmacro -%}
 
+{#- 3.1 only: where the material came from, and its properties as certified -#}
+{%- macro trace(r) -%}
+{%- set m = r.mtc -%}
+<div class="rp-h">Material traceability <small>{{ r.item_code }}</small></div>
+<table class="rp-t"><thead><tr><th style="width:12%">Role</th><th style="width:16%">Material</th><th style="width:16%">Batch / heat no.</th><th style="width:22%">Supplier</th><th style="width:14%">Receipt</th><th>Supplier certificate</th></tr></thead><tbody>
+{%- for s in m.sources %}<tr><td>{{ s.role | capitalize }}</td><td>{{ s.item }}</td><td>{{ s.batch }}{% if s.heat_no %} / {{ s.heat_no }}{% endif %}</td>
+	<td>{{ s.supplier or "" }}</td><td>{{ s.receipt }}</td><td>{{ s.certificate_name if s.certificate else "Not on file" }}</td></tr>
+{%- else %}<tr><td colspan="6">No receipt trace for this delivery.</td></tr>{%- endfor %}
+</tbody></table>
+{%- if m.properties %}
+<div class="rp-h">Material properties <small>{{ r.item_code }}</small></div>
+<table class="rp-t"><thead><tr><th>Property</th><th style="width:18%">Method</th><th style="width:20%">Requirement</th><th style="width:18%">Result</th><th style="width:14%">Source</th></tr></thead><tbody>
+{%- for p in m.properties %}<tr><td>{{ p.property }}</td><td>{{ p.method or "" }}</td><td class="n">{{ p.limits }} {{ p.unit }}</td>
+	<td class="n {{ '' if p.ok else 'nok' }}">{{ p.result or "" }} {{ p.unit if p.result }}</td><td>{{ p.source }}</td></tr>{%- endfor %}
+</tbody></table>
+{%- endif %}
+{%- endmacro -%}
+
 {%- macro statement(d, text) -%}
-<div class="en-statement">{{ text }}</div>
-{%- if d.concessions %}<div class="en-note">Accepted under concession {{ d.concessions | join(", ") }}.</div>{% endif %}
+<div class="rp-statement">{{ text }}</div>
+{%- if d.concessions %}{{ rp.remarks("Accepted under concession " ~ (d.concessions | join(", ")) ~ ".") }}{% endif %}
 {%- endmacro -%}
 
 {%- macro sign(d, who) -%}
-<table class="en-sign"><tr>
-	<td><div class="en-line">{{ who }}</div><div class="en-sub">Name and position</div></td>
-	<td><div class="en-line">Date and signature</div><div class="en-sub">Company stamp</div></td>
-</tr></table>
-<div class="en-foot">{{ d.form_no }} &middot; Issue 01 / Rev 00 &middot; {{ d.number }}{% if d.draft %} &middot; <span class="en-draft">DRAFT: delivery note not submitted</span>{% endif %}</div>
+{{ rp.signoff([(who, "", none)]) }}
+{{ rp.footer(d.form_no, "Issue 01 / Rev 00", d.number, "DRAFT: delivery note not submitted" if d.draft else None) }}
 {%- endmacro -%}
