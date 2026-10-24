@@ -996,9 +996,9 @@ function qi_render_class(d, st) {
 
 const QI_WHEN = {
 	in_process_at: [
-		["Every check", __("Every check"), __("At every in-process check of the Work Order: first-off, patrol and last-off.")],
-		["First-off only", __("First-off only"), __("Only on the first pieces off a new set-up.")],
-		["First-off and last-off", __("First-off and last-off"), __("On the first pieces off the set-up and on the last pieces of the run.")],
+		["Every check", __("Every check"), __("At every in-process check of the Work Order: First, Random and Last Check.")],
+		["First Check only", __("First Check only"), __("Only on the first pieces off a new set-up.")],
+		["First and Last Check", __("First and Last Check"), __("On the first pieces off the set-up and on the last pieces of the run.")],
 	],
 	frequency: [
 		["Every lot", __("Every lot"), __("Checked on every lot that reaches this stage.")],

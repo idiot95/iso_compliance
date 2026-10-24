@@ -370,13 +370,13 @@ def _last_before(doctype, fieldname):
 
 PHASE_E_ROW_FIELDS = [
 	dict(fieldname="custom_in_process_at", fieldtype="Select", label="In process, check at",
-	     options="Every check\nFirst-off only\nFirst-off and last-off", default="Every check",
+	     options="Every check\nFirst Check only\nFirst and Last Check", default="Every check",
 	     insert_after="custom_stage_type_test", depends_on="custom_stage_in_process",
-	     description="First-off: start of the Work Order's run. Patrol: during it. Last-off: its end."),
+	     description="First Check: start of the Work Order's run. Random Check: during it. Last Check: its end."),
 ]
 PHASE_E_INSPECTION_FIELDS = [
 	dict(fieldname="custom_check_point", fieldtype="Select", label="Check point",
-	     options="\nFirst-off\nPatrol\nLast-off", insert_after="custom_stage",
+	     options="\nFirst Check\nRandom Check\nLast Check", insert_after="custom_stage",
 	     depends_on='eval:doc.custom_stage=="In Process"'),
 	dict(fieldname="custom_supplier_cert", fieldtype="Attach", label="Supplier's 3.1 certificate", read_only=1,
 	     insert_after="custom_drawing", depends_on='eval:doc.custom_stage=="Incoming"',

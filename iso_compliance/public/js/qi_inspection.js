@@ -132,7 +132,7 @@ function qi_old_format_note(frm) {
 const QI_INSP = "iso_compliance.qi.inspection";
 const QI_START_STAGES = [
 	["Incoming", __("Incoming"), __("Goods received: a row of a Purchase Receipt.")],
-	["In Process", __("In process"), __("During production: a Job Card, at first-off, patrol or last-off.")],
+	["In Process", __("In process"), __("During production: a Job Card, at the First, Random or Last Check.")],
 	["Final", __("Final"), __("Finished goods waiting in Inspection Required after a Work Order is finished.")],
 ];
 
@@ -153,7 +153,7 @@ function qi_start_dialog(frm) {
 				get_query: () => ({ filters: { docstatus: ["<", 2] } }) },
 			{ fieldname: "pr_row", fieldtype: "Select", label: __("Item received"), depends_on: "purchase_receipt" },
 			{ fieldname: "job_card", fieldtype: "Link", options: "Job Card", label: __("Job Card"), get_query: () => ({ filters: { docstatus: 0 } }) },
-			{ fieldname: "check_point", fieldtype: "Select", label: __("Checkpoint"), options: "First-off\nPatrol\nLast-off", depends_on: "job_card" },
+			{ fieldname: "check_point", fieldtype: "Select", label: __("Checkpoint"), options: "First Check\nRandom Check\nLast Check", depends_on: "job_card" },
 			// finishing the Work Order puts its goods in Inspection Required, so the
 			// ones to offer are those with goods still waiting -- Completed included
 			{ fieldname: "work_order", fieldtype: "Link", options: "Work Order", label: __("Work Order"),

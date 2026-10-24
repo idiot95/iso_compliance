@@ -321,24 +321,24 @@ def _snapshot(doc, tpl, rows):
 
 
 def at_check_point(row, doc) -> bool:
-	"""In-process rows can be limited to the first-off (and last-off) check."""
+	"""In-process rows can be limited to the First Check (and Last Check)."""
 	if doc.custom_stage != "In Process":
 		return True
 	at = row.get("custom_in_process_at") or "Every check"
-	point = doc.get("custom_check_point") or "Patrol"
-	if at == "First-off only":
-		return point == "First-off"
-	if at == "First-off and last-off":
-		return point in ("First-off", "Last-off")
+	point = doc.get("custom_check_point") or "Random Check"
+	if at == "First Check only":
+		return point == "First Check"
+	if at == "First and Last Check":
+		return point in ("First Check", "Last Check")
 	return True
 
 
 def default_check_point(work_order) -> str:
-	"""First-off until the Work Order has a submitted first-off, then Patrol."""
+	"""First Check until the Work Order has a submitted First Check, then Random Check."""
 	if work_order and frappe.db.exists(QI, {"custom_work_order": work_order, "custom_stage": "In Process",
-	                                         "custom_check_point": "First-off", "docstatus": 1}):
-		return "Patrol"
-	return "First-off"
+	                                         "custom_check_point": "First Check", "docstatus": 1}):
+		return "Random Check"
+	return "First Check"
 
 
 def _history(doc, balloon):
@@ -683,11 +683,11 @@ def job_card_check_points(job_card: str) -> dict:
 @frappe.whitelist()
 def start_job_card_inspection(job_card: str, check_point: str | None = None) -> str:
 	"""An in-process inspection at a check point. A draft at the same check
-	point is reopened; patrols can be repeated through the run."""
+	point is reopened; Random Checks can be repeated through the run."""
 	_check_can_inspect()
 	jc = frappe.get_doc("Job Card", job_card)
 	check_point = check_point or default_check_point(jc.work_order)
-	if check_point not in ("First-off", "Patrol", "Last-off"):
+	if check_point not in ("First Check", "Random Check", "Last Check"):
 		frappe.throw(_("Unknown check point {0}").format(check_point))
 	existing = frappe.db.get_value(QI, {"reference_type": "Job Card", "reference_name": jc.name,
 	                                    "custom_check_point": check_point, "docstatus": 0})
@@ -704,7 +704,7 @@ def start_job_card_inspection(job_card: str, check_point: str | None = None) -> 
 		"reference_name": jc.name,
 		"item_code": jc.production_item,
 		"bom_no": jc.bom_no,
-		"sample_size": 1 if check_point in ("First-off", "Last-off") else default_sample(lot),
+		"sample_size": 1 if check_point in ("First Check", "Last Check") else default_sample(lot),
 		"report_date": nowdate(),
 		"inspected_by": frappe.session.user,
 		"quality_inspection_template": template,

@@ -1733,7 +1733,7 @@
       "step_no": "3",
       "step_title": "Inspect in process",
       "responsible": "Engineer (Quality Manager)",
-      "step_content": "<p>At each checkpoint (first-off, patrol, last-off), start the inspection from the Job Card's Inspect button.</p>",
+      "step_content": "<p>At each checkpoint (First Check, Random Check, Last Check), start the inspection from the Job Card's Inspect button.</p>",
       "erp_record": "Job Card → Inspect; Quality Inspection (FRM-009)"
      },
      {

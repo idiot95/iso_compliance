@@ -20,8 +20,8 @@ frappe.ui.form.on("Job Card", {
 	},
 });
 
-// First-off at the start of the Work Order's run, patrols during it,
-// last-off at its end. One Job Card can carry several.
+// First Check at the start of the Work Order's run, Random Checks during it,
+// Last Check at its end. One Job Card can carry several.
 function qi_check_point_dialog(frm) {
 	frappe.call({ method: "iso_compliance.qi.inspection.job_card_check_points", args: { job_card: frm.doc.name } }).then(({ message: o }) => {
 		const esc = frappe.utils.escape_html;
@@ -39,10 +39,10 @@ function qi_check_point_dialog(frm) {
 					fieldname: "check_point",
 					fieldtype: "Select",
 					label: __("Check point"),
-					options: "First-off\nPatrol\nLast-off",
+					options: "First Check\nRandom Check\nLast Check",
 					default: o.default,
 					reqd: 1,
-					description: __("First-off and last-off check one piece; a patrol samples the run."),
+					description: __("First and Last Check look at one piece; a Random Check samples the run."),
 				},
 			],
 			primary_action_label: __("Start inspection"),
