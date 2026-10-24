@@ -179,6 +179,48 @@ def save_condition(qi: str, row: str, actual=None):
 	frappe.db.set_value("QI Condition", row, "actual", None if actual in (None, "") else flt(actual))
 
 
+def _draft_for_writing(qi: str):
+	if frappe.db.get_value(QI, qi, "docstatus") != 0:
+		frappe.throw(_("This inspection is already submitted."))
+	if not frappe.has_permission(QI, "write", qi):
+		frappe.throw(_("Not permitted"), frappe.PermissionError)
+
+
+@frappe.whitelist(methods=["POST"])
+def set_sample_size(qi: str, sample_size: int):
+	"""The inspector picks the sample. Rows on the lot sample follow it; rows
+	with a fixed number of pieces, and values read off a 3.1, keep theirs."""
+	from iso_compliance.qi.inspection import required_samples
+
+	_draft_for_writing(qi)
+	n = cint(sample_size)
+	lot = flt(frappe.db.get_value(QI, qi, "custom_lot_qty"))
+	if n < 1:
+		frappe.throw(_("The sample must be at least 1 piece."))
+	if lot and n > lot:
+		frappe.throw(_("The sample can't be larger than the lot ({0}).").format(frappe.format(lot)))
+	template = frappe.db.get_value(QI, qi, "quality_inspection_template")
+	plan = {r.custom_balloon_no: r for r in frappe.get_doc("Quality Inspection Template", template).get(ROWS) if r.custom_row_type}
+	frappe.db.set_value(QI, qi, "sample_size", n)
+	for r in frappe.get_all("Quality Inspection Reading", filters={"parent": qi, "parenttype": QI},
+	                        fields=["name", "custom_balloon_no", "custom_row_type"]):
+		src = plan.get(r.custom_balloon_no)
+		if src:
+			frappe.db.set_value("Quality Inspection Reading", r.name, "custom_sample_count", required_samples(src, n))
+
+
+@frappe.whitelist(methods=["POST"])
+def add_sample(qi: str, row_key: str) -> int:
+	"""One more reading on one characteristic, beyond what the plan asks."""
+	_draft_for_writing(qi)
+	name, count = frappe.db.get_value("Quality Inspection Reading", {"parent": qi, "parenttype": QI, "custom_balloon_no": row_key},
+	                                  ["name", "custom_sample_count"]) or (None, 0)
+	if not name:
+		frappe.throw(_("No. {0} is not on this inspection").format(row_key))
+	frappe.db.set_value("Quality Inspection Reading", name, "custom_sample_count", cint(count) + 1)
+	return cint(count) + 1
+
+
 @frappe.whitelist(methods=["POST"])
 def finish(qi: str, disposition: str | None = None, concession_no: str | None = None,
            non_conformance: str | None = None, submit=0) -> dict:

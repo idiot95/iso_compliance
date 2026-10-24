@@ -276,7 +276,7 @@ def _row_batch(row) -> str | None:
 
 
 def _open_inspection(*, inspection_type, stage, reference_type, reference_name, row, item_code, lot, batch_no,
-                     bom_no=None, extra=None) -> str:
+                     bom_no=None, extra=None, sample=None) -> str:
 	"""A draft inspection for one waiting row, on the item's plan."""
 	from iso_compliance.qi.inspection import default_sample, resolve_template
 
@@ -293,7 +293,7 @@ def _open_inspection(*, inspection_type, stage, reference_type, reference_name, 
 		"child_row_reference": row,
 		"item_code": item_code,
 		"batch_no": batch_no,
-		"sample_size": default_sample(lot),
+		"sample_size": cint(sample) or default_sample(lot),
 		"report_date": frappe.utils.nowdate(),
 		"inspected_by": frappe.session.user,
 		"quality_inspection_template": resolve_template(item_code, bom_no),
@@ -308,6 +308,8 @@ def _open_inspection(*, inspection_type, stage, reference_type, reference_name, 
 def waiting(reference_type: str, reference_name: str) -> list[dict]:
 	"""The rows of a receipt or Manufacture entry still in Inspection Required, with
 	the state of their inspection: none, started (draft) or done."""
+	from iso_compliance.qi.inspection import default_sample
+
 	if reference_type not in ("Purchase Receipt", "Stock Entry"):
 		return []
 	frappe.has_permission(reference_type, "read", doc=reference_name, throw=True)
@@ -322,6 +324,7 @@ def waiting(reference_type: str, reference_name: str) -> list[dict]:
 		qi = frappe.db.get_value(QI, {"reference_type": reference_type, "reference_name": reference_name,
 		                              "child_row_reference": r.name, "docstatus": ("<", 2)}, ["name", "docstatus"], as_dict=True)
 		out.append({"row": r.name, "idx": r.idx, "item_code": r.item_code, "item_name": r.item_name, "qty": flt(r.qty),
+		            "default_sample": default_sample(flt(r.qty)),
 		            "uom": r.get("stock_uom") or r.get("uom"), "release": r.get("custom_release_warehouse"),
 		            "inspection": qi and qi.name, "state": "done" if qi and qi.docstatus == 1 else "started" if qi else "todo"})
 	return out
@@ -361,8 +364,9 @@ def work_orders_waiting(doctype, txt, searchfield, start, page_len, filters):
 
 
 @frappe.whitelist()
-def start_inspection(reference_type: str, reference_name: str, row: str) -> str:
-	"""Engineering starts (or resumes) the inspection of one waiting row."""
+def start_inspection(reference_type: str, reference_name: str, row: str, sample_size: int | None = None) -> str:
+	"""Engineering starts (or resumes) the inspection of one waiting row, on the
+	sample they chose (the settings' percentage of the lot when not given)."""
 	from iso_compliance.qi.inspection import _check_can_inspect
 
 	_check_can_inspect()
@@ -371,16 +375,18 @@ def start_inspection(reference_type: str, reference_name: str, row: str) -> str:
 		frappe.throw(_("That row is not waiting in Inspection Required."), title=_("Nothing to inspect"))
 	if w["inspection"]:
 		return w["inspection"]
+	if sample_size is not None and not 1 <= cint(sample_size) <= max(1, w["qty"]):
+		frappe.throw(_("The sample must be between 1 and the lot ({0}).").format(frappe.format(w["qty"])))
 	doc = frappe.get_doc(reference_type, reference_name)
 	src = next(r for r in doc.items if r.name == row)
 	if reference_type == "Purchase Receipt":
 		return _open_inspection(
 			inspection_type="Incoming", stage="Incoming", reference_type=reference_type, reference_name=reference_name,
-			row=row, item_code=src.item_code, lot=flt(src.qty), batch_no=_row_batch(src),
+			row=row, item_code=src.item_code, lot=flt(src.qty), batch_no=_row_batch(src), sample=sample_size,
 			extra={"custom_supplier_cert": doc.get("custom_material_test_certificate")})
 	return _open_inspection(
 		inspection_type="Outgoing", stage="Final", reference_type=reference_type, reference_name=reference_name,
-		row=row, item_code=src.item_code, lot=flt(src.qty), batch_no=_row_batch(src), bom_no=doc.get("bom_no"),
+		row=row, item_code=src.item_code, lot=flt(src.qty), batch_no=_row_batch(src), bom_no=doc.get("bom_no"), sample=sample_size,
 		extra={"custom_work_order": doc.get("work_order"), "bom_no": doc.get("bom_no"),
 		       "custom_customer": _wo_customer(doc.get("work_order"))})
 

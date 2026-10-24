@@ -32,15 +32,17 @@ hcc.inspection.show_waiting = async function (frm) {
 
 // One row: straight in. Several: say which, with where each one stands.
 hcc.inspection.pick = function (doctype, name, rows) {
-	const go = (r) =>
+	const start = (r, sample_size) =>
 		frappe
 			.call({
 				method: `${hcc.inspection.FLOW}.start_inspection`,
-				args: { reference_type: doctype, reference_name: name, row: r.row },
+				args: { reference_type: doctype, reference_name: name, row: r.row, sample_size },
 				freeze: true,
 				freeze_message: __("Starting the inspection…"),
 			})
 			.then(({ message }) => frappe.set_route("Form", "Quality Inspection", message));
+	// a new inspection asks how many pieces; a started one opens as it is
+	const go = (r) => (r.state === "todo" ? hcc.inspection.ask_sample(r.qty, r.default_sample, (n) => start(r, n)) : start(r));
 	if (rows.length === 1) return go(rows[0]);
 	const esc = frappe.utils.escape_html;
 	const state = { todo: __("Not started"), started: __("Started") };
@@ -64,6 +66,16 @@ hcc.inspection.pick = function (doctype, name, rows) {
 		go(rows[cint($(e.currentTarget).attr("data-i"))]);
 	});
 	d.show();
+};
+
+// How many pieces of the lot to measure, the settings' percentage offered.
+hcc.inspection.ask_sample = function (lot, suggested, then) {
+	frappe.prompt(
+		[{ fieldname: "n", fieldtype: "Int", label: __("Sample size (pieces)"), reqd: 1, default: suggested || 1, description: __("Lot {0}", [format_number(lot)]) }],
+		(v) => then(v.n),
+		__("Sample size"),
+		__("Start inspection")
+	);
 };
 
 frappe.ui.form.on("Purchase Receipt", { refresh: hcc.inspection.show_waiting });

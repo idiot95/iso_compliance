@@ -109,8 +109,11 @@ class Inspector {
 						[__("Stage"), __(d.stage || "") + (d.check_point ? " · " + __(d.check_point) : "")],
 						[__("Drawing"), [d.drawing_no, d.drawing_revision && __("Rev") + " " + d.drawing_revision].filter(Boolean).join(" ")],
 						[__("Lot"), d.lot_qty],
-						[__("Sample"), d.sample_size],
-					].filter(([, v]) => v).map(([k, v]) => `<span class="qi-hpill"><span>${esc(k)}</span>${esc(v)}</span>`).join("")}</div>
+					].filter(([, v]) => v).map(([k, v]) => `<span class="qi-hpill"><span>${esc(k)}</span>${esc(v)}</span>`).join("")}${
+						this.readonly
+							? `<span class="qi-hpill"><span>${__("Sample")}</span>${esc(d.sample_size)}</span>`
+							: `<button class="qi-hpill qi-set-sample" title="${__("Change the sample size")}"><span>${__("Sample")}</span>${esc(d.sample_size)} ${frappe.utils.icon("edit", "xs")}</button>`
+					}</div>
 				</div>
 				<div class="qi-progress">
 					<span>${__("{0} of {1} done", [done, d.rows.length])}</span>
@@ -131,6 +134,7 @@ class Inspector {
 			</div>`);
 		this.__close = null; // its pane was just replaced
 		this.$root.find(".qi-strip").on("click", () => this.$root.find(".qi-drawing").toggleClass("open") && this.draw_page());
+		this.$root.find(".qi-set-sample").on("click", () => this.ask_sample_size());
 		this.$root.find(".qi-zoom button").on("click", (e) => {
 			this.zoom = Math.min(4, Math.max(1, this.zoom + Number($(e.currentTarget).data("z")) * 0.5));
 			this.draw_page();
@@ -222,13 +226,13 @@ class Inspector {
 					<button class="qi-ok ${current === "OK" ? "on" : ""}" ${this.readonly ? "disabled" : ""}>OK</button>
 					<button class="qi-ng ${current === "NG" ? "on" : ""}" ${this.readonly ? "disabled" : ""}>NG</button></div>`
 				: `<label class="qi-field">${__("Reading")}${r.unit ? " (" + esc(r.unit) + ")" : ""}
-					<input class="qi-value ${this.is_bad(r, current) ? "bad" : ""}" inputmode="decimal" autocomplete="off" value="${current == null ? "" : esc(current)}" ${
+					<input class="qi-value ${this.is_bad(r, current) ? "bad" : current != null && current !== "" ? "ok" : ""}" inputmode="decimal" autocomplete="off" value="${current == null ? "" : esc(current)}" ${
 						this.readonly ? "disabled" : ""
 					}></label>`;
 		const grid = Array.from({ length: Math.max(r.required, r.values.length, 1) }, (_, i) => i + 1)
 			.map((n) => {
 				const v = value_at(n);
-				const cls = n === this.sample ? "cur" : v == null ? "empty" : this.is_bad(r, v) ? "bad" : "ok";
+				const cls = (v == null ? "empty" : this.is_bad(r, v) ? "bad" : "ok") + (n === this.sample ? " cur" : "");
 				return `<button class="qi-chip ${cls}" data-n="${n}" aria-label="${__("Sample")} ${n}">${v == null ? n : esc(v)}</button>`;
 			})
 			.join("");
@@ -254,7 +258,9 @@ class Inspector {
 				${wi ? `<a class="qi-howto" href="/app/controlled-document/${encodeURIComponent(wi)}" target="_blank">${__("How to do this")} · ${esc(wi.split("/").pop())}</a>` : ""}
 			</div>
 			<div class="qi-card">
-				<div class="qi-card-head small"><strong>${__("Readings")}</strong>${bad ? `<span class="qi-bad-text">${__("{0} out of spec", [bad])}</span>` : ""}</div>
+				<div class="qi-card-head small"><strong>${__("Readings")}</strong><span class="qi-read-tools">${bad ? `<span class="qi-bad-text">${__("{0} out of spec", [bad])}</span>` : ""}${
+					this.readonly ? "" : `<button class="qi-add-sample" title="${__("One more reading on this characteristic")}">+ ${__("Reading")}</button>`
+				}</span></div>
 				<div class="qi-grid">${grid}</div>
 			</div>
 			${this.from_review ? `<button class="qi-to-review primary">${__("Back to review")}</button>` : ""}
@@ -290,6 +296,13 @@ class Inspector {
 		$p.find(".qi-prev-r").on("click", () => this.go_row(this.row - 1));
 		$p.find(".qi-next-r").on("click", () => (this.row < this.d.rows.length - 1 ? this.go_row(this.row + 1) : this.open_review()));
 		$p.find(".qi-to-review, .qi-go-review").on("click", () => this.open_review());
+		$p.find(".qi-add-sample").on("click", async () => {
+			const { message: n } = await frappe.call({ method: `${INSPECT_API}.add_sample`, args: { qi: this.d.name, row_key: r.balloon } });
+			r.required = n;
+			this.sample = n;
+			this.render_panel();
+			this.update_progress();
+		});
 		$p.find(".qi-ok").on("click", () => this.save(r, "OK", true));
 		$p.find(".qi-ng").on("click", () => this.save(r, "NG", true));
 		$in.on("keydown", (e) => {
@@ -299,6 +312,10 @@ class Inspector {
 			}
 		});
 		$in.on("change", () => this.save(r, $in.val(), false));
+		$in.on("input", () => {
+			const v = $in.val().trim();
+			$in.toggleClass("bad", !!v && this.is_bad(r, v)).toggleClass("ok", !!v && !this.is_bad(r, v));
+		});
 		$p.find(".qi-cond-in").on("change", (e) => {
 			const row = $(e.currentTarget).data("row");
 			const val = e.currentTarget.value;
@@ -359,6 +376,21 @@ class Inspector {
 		const done = this.d.rows.filter((r) => r.values.length >= r.required).length;
 		this.$root.find(".qi-progress > span:first").text(__("{0} of {1} done", [done, this.d.rows.length]));
 		this.$root.find(".qi-bar > span").css("width", Math.round((done / this.d.rows.length) * 100) + "%");
+	}
+
+	ask_sample_size() {
+		const d = this.d;
+		frappe.prompt(
+			[{ fieldname: "n", fieldtype: "Int", label: __("Pieces to measure"), reqd: 1, default: d.sample_size,
+				description: d.lot_qty ? __("Lot {0}", [d.lot_qty]) : "" }],
+			async (v) => {
+				await frappe.call({ method: `${INSPECT_API}.set_sample_size`, args: { qi: d.name, sample_size: v.n }, freeze: true });
+				await this.load(d.name, true);
+				if (this.review) this.open_review();
+			},
+			__("Sample size"),
+			__("Set")
+		);
 	}
 
 	go_sample(n) {
@@ -683,6 +715,11 @@ frappe.dom.set_style(`
 .qi-nav{display:flex;gap:10px}.qi-nav button{flex:1;height:52px}
 .qi-to-review{width:100%;height:52px;margin-bottom:10px}
 .qi-go-review{width:100%;height:44px;margin-top:10px}
+.qi-insp button.qi-hpill{min-height:0;border:1px dashed var(--gray-400);cursor:pointer}
+.qi-read-tools{display:inline-flex;align-items:center;gap:10px}
+.qi-insp button.qi-add-sample{min-height:30px;font-size:13px;padding:0 10px}
+.qi-insp input.qi-value.ok{border-color:var(--ok);background:var(--okbg)}
+.qi-insp input.qi-value.bad{border-color:var(--bad);background:var(--badbg)}
 .qi-skipped{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;font-size:13px;color:var(--text-muted)}
 .qi-skipped>span{margin-right:2px}
 .qi-insp .qi-short-chip{border:1px solid var(--border-color);border-radius:8px;padding:2px 8px;font-size:12px;background:transparent}
