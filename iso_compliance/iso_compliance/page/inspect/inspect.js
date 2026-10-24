@@ -244,9 +244,10 @@ class Inspector {
 				<div class="qi-card-head small"><strong>${__("Readings")}</strong>${bad ? `<span class="qi-bad-text">${__("{0} out of spec", [bad])}</span>` : ""}</div>
 				<div class="qi-grid">${grid}</div>
 			</div>
+			${this.from_review ? `<button class="qi-to-review primary">${__("Back to review")}</button>` : ""}
 			<div class="qi-nav">
 				<button class="qi-prev-r" ${this.row === 0 ? "disabled" : ""}>${this.row > 0 ? __("Previous") + ": #" + esc(d.rows[this.row - 1].balloon) : __("Previous")}</button>
-				<button class="qi-next-r primary">${
+				<button class="qi-next-r ${this.from_review ? "" : "primary"}">${
 					this.row < d.rows.length - 1 ? __("Next") + ": #" + esc(d.rows[this.row + 1].balloon) + " " + esc(d.rows[this.row + 1].specification) : __("Review and submit")
 				}</button>
 			</div>`);
@@ -274,6 +275,7 @@ class Inspector {
 		$p.find(".qi-chip").on("click", (e) => this.go_sample(Number($(e.currentTarget).data("n"))));
 		$p.find(".qi-prev-r").on("click", () => this.go_row(this.row - 1));
 		$p.find(".qi-next-r").on("click", () => (this.row < this.d.rows.length - 1 ? this.go_row(this.row + 1) : this.open_review()));
+		$p.find(".qi-to-review").on("click", () => this.open_review());
 		$p.find(".qi-ok").on("click", () => this.save(r, "OK", true));
 		$p.find(".qi-ng").on("click", () => this.save(r, "NG", true));
 		$in.on("keydown", (e) => {
@@ -314,7 +316,12 @@ class Inspector {
 			r.status = m.status;
 			if (this.is_bad(r, m.value)) frappe.utils.play_sound && frappe.utils.play_sound("error");
 			if (advance && value) {
-				if (r.values.length >= r.required && this.row < this.d.rows.length - 1 && sample >= r.required) {
+				const still_bad = this.from_review && r.values.find((v) => this.is_bad(r, v.value));
+				if (this.from_review && r.values.length >= r.required && !still_bad) {
+					this.open_review(); // came to fix this one: straight back
+				} else if (still_bad && r.values.length >= r.required) {
+					this.go_sample(still_bad.sample_no); // the next one that failed
+				} else if (r.values.length >= r.required && this.row < this.d.rows.length - 1 && sample >= r.required) {
 					this.go_row(this.row + 1);
 				} else {
 					this.sample = Math.min(this.next_empty(r), Math.max(r.required, sample + 1));
@@ -358,6 +365,7 @@ class Inspector {
 
 	async open_review() {
 		this.review = true;
+		this.from_review = false;
 		this.render_panel();
 	}
 
@@ -423,7 +431,15 @@ class Inspector {
 			$(e.currentTarget).closest(".qi-radio").addClass("on");
 			$p.find(".qi-concession").toggle(e.currentTarget.value === "Accept under Concession");
 		});
-		$p.find(".qi-fail, .qi-short").on("click", (e) => this.go_row(d.rows.findIndex((r) => r.balloon === String($(e.currentTarget).data("b")))));
+		// opened from here to fix or finish: the row offers the way back
+		$p.find(".qi-fail, .qi-short").on("click", (e) => {
+			this.from_review = true;
+			this.go_row(d.rows.findIndex((r) => r.balloon === String($(e.currentTarget).data("b"))));
+			// straight to the reading that failed, not the next empty one
+			const r = d.rows[this.row];
+			const bad = r.values.find((v) => this.is_bad(r, v.value));
+			if (bad) this.go_sample(bad.sample_no);
+		});
 		$p.find(".qi-back").on("click", () => this.go_row(this.row));
 		$p.find(".qi-nc").on("click", () => this.raise_nc(failed));
 		$p.find(".qi-submit").on("click", () => this.finish(true));
@@ -633,6 +649,7 @@ frappe.dom.set_style(`
 .qi-cond input{height:40px;border-radius:8px;border:1px solid var(--border-color);padding:0 8px;min-width:0}
 .qi-howto{font-size:13px}
 .qi-nav{display:flex;gap:10px}.qi-nav button{flex:1;height:52px}
+.qi-to-review{width:100%;height:52px;margin-bottom:10px}
 .qi-bad-text{color:var(--bad)}.qi-ok-text{color:var(--ok)}
 .qi-insp .qi-fail,.qi-insp .qi-short{display:flex;justify-content:space-between;gap:8px;text-align:left;border:0;font-size:13px}
 .qi-insp .qi-fail{background:var(--badbg);color:var(--bad)}
