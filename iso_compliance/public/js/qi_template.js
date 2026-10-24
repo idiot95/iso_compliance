@@ -1557,7 +1557,7 @@ function qi_pick_drawing(frm) {
 		d.onhide = () => picker && picker.close();
 		d.show();
 		const $w = d.fields_dict.list.$wrapper;
-		if (files.length) picker = window.iso_qi_pdf.chooser($w, files, { current: frm.doc.custom_drawing_file });
+		if (files.length) picker = window.iso_qi_pdf.chooser($w, files, { current: frm.doc.custom_drawing_file, bom: frm.doc.custom_bom, item: frm.doc.custom_item });
 		else $w.html(`<div class="text-muted">${__("No PDF or image is attached to {0}'s BOMs or Item. Upload one.", [qi_esc(frm.doc.custom_item)])}</div>`);
 	});
 }

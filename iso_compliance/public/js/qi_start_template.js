@@ -40,7 +40,7 @@ iso_qi.start_template = async function (item, bom, { fresh = false } = {}) {
 		primary_action: async (v) => {
 			const { message } = await frappe.call({
 				method: "iso_compliance.qi.template.start_template",
-				args: { item: o.item, drawing_no: v.drawing_no, revision: v.revision, file: (picker && picker.chosen()) || null },
+				args: { item: o.item, bom: bom || null, drawing_no: v.drawing_no, revision: v.revision, file: (picker && picker.chosen()) || null },
 				freeze: true,
 			});
 			if (bom) await frappe.call({ method: "iso_compliance.qi.template.use_plan", args: { doctype: "BOM", name: bom, template: message } });
@@ -54,6 +54,8 @@ iso_qi.start_template = async function (item, bom, { fresh = false } = {}) {
 	if (o.drawings.length) {
 		$w.before(`<div class="qi-step">${__("1. Choose the drawing")}</div>`);
 		picker = window.iso_qi_pdf.chooser($w, o.drawings, {
+			bom,
+			item: o.item,
 			onpick: (f) => {
 				const g = guess(f && f.file_name);
 				d.set_values({ drawing_no: g.no, revision: g.rev });

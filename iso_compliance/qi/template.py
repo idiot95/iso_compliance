@@ -584,9 +584,11 @@ def start_options(item: str, bom: str | None = None) -> dict:
 
 
 @frappe.whitelist()
-def start_template(item: str, drawing_no: str | None = None, revision: str | None = None, file: str | None = None) -> str:
+def start_template(item: str, drawing_no: str | None = None, revision: str | None = None, file: str | None = None,
+                   bom: str | None = None) -> str:
 	"""Create the template for an item, with its drawing attached, and return
-	its name: the builder then opens on the drawing."""
+	its name: the builder then opens on the drawing. Built from a BOM, the plan
+	keeps it, so its drawings stay the ones offered."""
 	require_quality_manager()
 	name = suggested_name(drawing_no, revision, item) or item
 	if frappe.db.exists("Quality Inspection Template", name):
@@ -598,6 +600,7 @@ def start_template(item: str, drawing_no: str | None = None, revision: str | Non
 		"doctype": "Quality Inspection Template",
 		"quality_inspection_template_name": name,
 		"custom_item": item,
+		"custom_bom": bom if bom and frappe.db.get_value("BOM", bom, "item") == item else None,
 		"custom_drawing_no": drawing_no,
 		"custom_drawing_revision": revision,
 		"custom_drawing_file": file,

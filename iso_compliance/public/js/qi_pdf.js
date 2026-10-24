@@ -192,18 +192,40 @@ window.iso_qi_pdf = (() => {
 
 	// Drawings listed on the left, the clicked one shown on the right, so a
 	// drawing is seen before it is chosen. files: drawing_options() rows.
-	// Returns {chosen()}; onpick(file) runs on each click.
-	function chooser(host, files, { current, onpick } = {}) {
+	// Grouped: this BOM's drawings first, then the item's other BOMs and the
+	// Item's own attachments, folded away. Only this BOM's (or the current)
+	// drawing opens by itself. Returns {chosen()}; onpick(file) runs on each click.
+	function chooser(host, files, { current, onpick, bom, item } = {}) {
 		const esc = frappe.utils.escape_html;
-		const $h = $(host).html(`<div class="qi-pick"><div class="qi-pick-list">${files
-			.map(
-				(f) => `<button type="button" class="qi-pick-row" data-file="${esc(f.name)}">
-					<b>${esc(f.file_name)}</b>
-					<span class="text-muted small">${esc(f.attached_to_doctype)} ${esc(f.attached_to_name)}${f.bom_default ? " · " + __("default") : ""}${
-						f.attached_to_doctype === "BOM" && !f.bom_active ? " · " + __("inactive") : ""
-					}${f.name === current ? " · " + __("in use") : ""}</span></button>`
-			)
-			.join("")}</div>
+		const pill = (text, cls = "") => `<span class="qi-pick-pill ${cls}">${esc(text)}</span>`;
+		const row = (f) => `<button type="button" class="qi-pick-row" data-file="${esc(f.name)}">
+			<b>${esc(f.file_name)}</b>${f.name === current ? pill(__("in use"), "blue") : ""}</button>`;
+		const bom_pills = (f) => (f.bom_default ? pill(__("default")) : "") + (f.bom_active ? "" : pill(__("inactive"), "grey"));
+		const on_bom = (f) => f.attached_to_doctype === "BOM";
+		const mine = bom ? files.filter((f) => on_bom(f) && f.attached_to_name === bom) : [];
+		const others = files.filter((f) => on_bom(f) && f.attached_to_name !== bom);
+		const on_item = files.filter((f) => !on_bom(f));
+		const by_bom = {};
+		others.forEach((f) => (by_bom[f.attached_to_name] = by_bom[f.attached_to_name] || []).push(f));
+		const fold = (title, count, body, open) => `<details class="qi-pick-group" ${open ? "open" : ""}>
+			<summary><span class="qi-pick-head">${title}</span>${pill(String(count))}</summary>${body}</details>`;
+		const groups = [];
+		if (bom) {
+			groups.push(`<div class="qi-pick-group main"><div class="qi-pick-head">${__("This BOM")}</div>
+				<div class="qi-pick-sub">${esc(bom)}</div>
+				${mine.length ? mine.map(row).join("") : `<div class="qi-pick-none">${__("No drawing attached")}</div>`}</div>`);
+		}
+		if (others.length) {
+			groups.push(fold(bom ? __("Other BOMs") : __("BOMs"), Object.keys(by_bom).length,
+				Object.entries(by_bom).map(([name, fs]) => `<div class="qi-pick-bom"><div class="qi-pick-sub">${esc(name)} ${bom_pills(fs[0])}</div>${fs.map(row).join("")}</div>`).join(""),
+				!bom || others.some((f) => f.name === current)));
+		}
+		if (on_item.length) {
+			groups.push(fold(__("Item"), on_item.length,
+				`<div class="qi-pick-sub">${esc(item || on_item[0].attached_to_name)}</div>${on_item.map(row).join("")}`,
+				(!bom && !others.length) || on_item.some((f) => f.name === current)));
+		}
+		const $h = $(host).html(`<div class="qi-pick"><div class="qi-pick-list">${groups.join("")}</div>
 			<div class="qi-pick-view"><div class="text-muted small qi-pick-msg">${__("Click a drawing to look at it.")}</div></div></div>`);
 		let chosen = null;
 		let drawing = null;
@@ -219,7 +241,9 @@ window.iso_qi_pdf = (() => {
 				if (chosen !== name) return;
 				let page = 1;
 				const show = async () => {
-					$v.html(`<div class="qi-pick-bar small">${
+					// picked from another BOM or the Item: say where it hangs
+					const away = bom && !(on_bom(f) && f.attached_to_name === bom);
+					$v.html(`${away ? `<div class="qi-pick-away small">${__("From {0} {1}, not this BOM", [esc(f.attached_to_doctype), esc(f.attached_to_name)])}</div>` : ""}<div class="qi-pick-bar small">${
 						drawing.pages > 1
 							? `<button type="button" class="btn btn-xs btn-default" data-p="-1">‹</button> ${__("Sheet {0} of {1}", [page, drawing.pages])}
 								<button type="button" class="btn btn-xs btn-default" data-p="1">›</button>`
@@ -237,7 +261,7 @@ window.iso_qi_pdf = (() => {
 			}
 		};
 		$h.find(".qi-pick-row").on("click", (e) => view(String($(e.currentTarget).data("file"))));
-		const first = files.find((f) => f.name === current) || files[0];
+		const first = files.find((f) => f.name === current) || (bom ? mine[0] : files[0]);
 		// the dialog may still be opening: wait for a width before drawing
 		if (first) setTimeout(() => view(first.name), 250);
 		return { chosen: () => chosen, close: () => drawing && drawing.close() };
@@ -245,8 +269,23 @@ window.iso_qi_pdf = (() => {
 
 	frappe.dom.set_style(`
 .qi-pick{display:grid;grid-template-columns:minmax(200px,1fr) 2.2fr;gap:12px;min-height:360px}
-.qi-pick-list{display:flex;flex-direction:column;gap:6px;max-height:62vh;overflow:auto}
-.qi-pick-row{text-align:left;border:1px solid var(--border-color);background:var(--fg-color);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}
+.qi-pick-list{display:flex;flex-direction:column;gap:10px;max-height:62vh;overflow:auto}
+.qi-pick-group{display:flex;flex-direction:column;gap:6px;border:1px solid var(--border-color);border-radius:10px;padding:10px}
+.qi-pick-group.main{border-color:var(--primary);background:var(--blue-50)}
+details.qi-pick-group{background:var(--gray-50)}
+details.qi-pick-group>summary{cursor:pointer;display:flex;align-items:center;gap:6px;list-style:revert}
+details.qi-pick-group[open]>summary{margin-bottom:4px}
+.qi-pick-head{font-size:var(--text-xs);font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted)}
+.qi-pick-group.main .qi-pick-head{color:var(--primary)}
+.qi-pick-sub{font-size:var(--text-sm);font-weight:600;color:var(--text-color);display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+.qi-pick-bom{display:flex;flex-direction:column;gap:6px}
+.qi-pick-bom+.qi-pick-bom{border-top:1px dashed var(--border-color);padding-top:8px}
+.qi-pick-none{font-size:var(--text-sm);color:var(--text-muted);padding:4px 0}
+.qi-pick-pill{display:inline-block;font-size:11px;font-weight:500;line-height:16px;padding:0 6px;border-radius:8px;background:var(--gray-200);color:var(--text-color)}
+.qi-pick-pill.blue{background:var(--blue-100);color:var(--blue-700)}
+.qi-pick-pill.grey{background:var(--gray-100);color:var(--text-muted)}
+.qi-pick-away{background:var(--yellow-50);border:1px solid var(--yellow-300);border-radius:6px;padding:4px 8px;margin-bottom:6px}
+.qi-pick-row{text-align:left;border:1px solid var(--border-color);background:var(--fg-color);border-radius:8px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:6px}
 .qi-pick-row.on{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary);background:var(--blue-50)}
 .qi-pick-view{border:1px solid var(--border-color);border-radius:8px;padding:6px;max-height:62vh;overflow:auto;background:var(--gray-50)}
 .qi-pick-view canvas{display:block;margin:0 auto}
