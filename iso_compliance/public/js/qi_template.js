@@ -38,6 +38,7 @@ frappe.ui.form.on("Quality Inspection Template", {
 		if (frm.doc.custom_item || qi_is_drawing(frm)) {
 			frm.add_custom_button(__("Tag Items / BOMs"), () => qi_tag_dialog(frm));
 			frm.add_custom_button(__("New Revision"), () => qi_new_revision(frm));
+			frm.add_custom_button(__("Duplicate"), () => qi_duplicate(frm));
 		}
 	},
 
@@ -1654,6 +1655,23 @@ function qi_new_revision(frm) {
 					frappe.set_route("Form", "Quality Inspection Template", message);
 				}),
 		__("New Revision"),
+		__("Create")
+	);
+}
+
+// A variant of this plan (same drawing), copied untagged: the Items and BOMs on
+// the original keep loading the original until the copy is tagged on them.
+function qi_duplicate(frm) {
+	frappe.prompt(
+		[{ fieldname: "name", fieldtype: "Data", label: __("Name of the copy"), reqd: 1, default: __("{0} (copy)", [frm.doc.name]).slice(0, 140) }],
+		(v) =>
+			frappe
+				.call({ method: `${QI}.duplicate`, args: { template: frm.doc.name, name: v.name }, freeze: true })
+				.then(({ message }) => {
+					frappe.show_alert(__("Copy created. Change what differs, then Tag Items / BOMs."));
+					frappe.set_route("Form", "Quality Inspection Template", message);
+				}),
+		__("Duplicate"),
 		__("Create")
 	);
 }

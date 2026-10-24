@@ -339,6 +339,28 @@ def waiting_for_work_order(work_order: str) -> list[dict]:
 
 
 @frappe.whitelist()
+@frappe.validate_and_sanitize_search_inputs
+def work_orders_waiting(doctype, txt, searchfield, start, page_len, filters):
+	"""Work Order picker of the new-inspection dialog: Work Orders with finished
+	goods still waiting in Inspection Required. Finishing the Work Order is what
+	puts them there, so a fully finished (Completed) Work Order is the usual case."""
+	se = frappe.qb.DocType("Stock Entry")
+	wo = frappe.qb.DocType("Work Order")
+	return (
+		frappe.qb.from_(wo)
+		.join(se).on(se.work_order == wo.name)
+		.select(wo.name, wo.production_item, wo.status)
+		.distinct()
+		.where((se.purpose == "Manufacture") & (se.docstatus == 1) & (se.custom_inspection_pending == 1)
+		       & (wo.docstatus == 1)
+		       & (wo.name.like(f"%{txt}%") | wo.production_item.like(f"%{txt}%")))
+		.orderby(wo.name, order=frappe.qb.desc)
+		.limit(page_len).offset(start)
+		.run()
+	)
+
+
+@frappe.whitelist()
 def start_inspection(reference_type: str, reference_name: str, row: str) -> str:
 	"""Engineering starts (or resumes) the inspection of one waiting row."""
 	from iso_compliance.qi.inspection import _check_can_inspect

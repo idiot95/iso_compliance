@@ -504,6 +504,27 @@ def new_revision(template: str, revision: str) -> str:
 
 
 @frappe.whitelist()
+def duplicate(template: str, name: str) -> str:
+	"""Copy the template as a starting point for a variant: same drawing, rows
+	and limits, unlocked, not superseded and not tagged on anything. Unlike New
+	Revision the drawing is kept."""
+	require_quality_manager()
+	name = (name or "").strip()
+	if not name:
+		frappe.throw(_("Give the copy a name."))
+	if frappe.db.exists("Quality Inspection Template", name):
+		frappe.throw(_("{0} already exists").format(name))
+	old = frappe.get_doc("Quality Inspection Template", template)
+	new = frappe.copy_doc(old)
+	new.quality_inspection_template_name = name
+	new.custom_drawing_hash = old.custom_drawing_hash  # no_copy; the drawing itself is kept
+	new.custom_locked = 0
+	new.custom_superseded_by = None
+	new.insert()
+	return new.name
+
+
+@frappe.whitelist()
 def earlier_revisions(template: str) -> list[dict]:
 	"""Other, not yet superseded templates of the same drawing and item that
 	still have BOMs or Items on them: what a new revision can take over."""
