@@ -906,7 +906,7 @@ function qi_balloon_dialog(frm, row, defaults = {}, on_cancel) {
 		title: row ? __("Characteristic {0}", [r.custom_balloon_no]) : __("New characteristic"),
 		size: "large",
 		fields: [
-			{ fieldtype: "Section Break", fieldname: "char_section", label: __("Characteristic") },
+			{ fieldtype: "Section Break", fieldname: "char_section", label: __("What is checked") },
 			{ fieldname: "type_html", fieldtype: "HTML" },
 			{ fieldtype: "Section Break", fieldname: "what_section" },
 			{
@@ -916,7 +916,6 @@ function qi_balloon_dialog(frm, row, defaults = {}, on_cancel) {
 				label: __("Parameter"),
 				reqd: 1,
 				default: r.specification,
-				description: __("e.g. Width, Length, Hardness, Shunt length"),
 			},
 			{
 				fieldname: "work_instruction",
@@ -930,11 +929,11 @@ function qi_balloon_dialog(frm, row, defaults = {}, on_cancel) {
 			},
 			{ fieldname: "test_method", fieldtype: "Link", options: "Test Method", label: __("Test method"), default: r.custom_test_method, hidden: 1 },
 			{ fieldtype: "Column Break" },
-			{ fieldname: "balloon_no", fieldtype: "Data", label: __("Reference no."), default: r.custom_balloon_no, description: __("Blank: the next number") },
+			{ fieldname: "balloon_no", fieldtype: "Data", label: __("No."), default: r.custom_balloon_no, placeholder: __("Auto") },
 			{ fieldtype: "Column Break" },
 			{ fieldname: "class_html", fieldtype: "HTML" },
 
-			{ fieldtype: "Section Break", fieldname: "tol_section", label: __("Tolerance as specified on the drawing") },
+			{ fieldtype: "Section Break", fieldname: "tol_section", label: __("Tolerance on the drawing") },
 			{ fieldname: "general_html", fieldtype: "HTML" },
 			{ fieldname: "tt_html", fieldtype: "HTML" },
 			{ fieldname: "prefix_html", fieldtype: "HTML" },
@@ -975,10 +974,10 @@ function qi_balloon_dialog(frm, row, defaults = {}, on_cancel) {
 			{ fieldtype: "Section Break", fieldname: "preview_section" },
 			{ fieldname: "limits_preview", fieldtype: "HTML" },
 
-			{ fieldtype: "Section Break", fieldname: "when_section", label: __("Inspection stages, frequency and sample size"), collapsible: 1 },
+			{ fieldtype: "Section Break", fieldname: "when_section", label: __("When and how many"), collapsible: 1 },
 			{ fieldname: "when_html", fieldtype: "HTML" },
 
-			{ fieldtype: "Section Break", fieldname: "inst_section", label: __("Measuring instruments"), collapsible: 1 },
+			{ fieldtype: "Section Break", fieldname: "inst_section", label: __("Instruments"), collapsible: 1 },
 			{ fieldname: "inst_html", fieldtype: "HTML" },
 		],
 		primary_action_label: row ? __("Save") : __("Add"),
@@ -1018,6 +1017,9 @@ function qi_balloon_dialog(frm, row, defaults = {}, on_cancel) {
 	// the drawing sits between the title and the scrolling body, so it stays in view
 	const $host = $(`<div class="qi-dp-host"></div>`).insertAfter(d.$wrapper.find(".modal-header"));
 	qi_drawing_pane(frm, d, $host, defaults.position || qi_pos(r));
+	// what will be accepted, always in view while the boxes below are filled
+	$(`<div class="qi-result"></div>`).append(d.fields_dict.limits_preview.$wrapper).insertAfter($host);
+	d.set_df_property("preview_section", "hidden", 1);
 }
 
 const QI_CLASSES = [
@@ -1106,14 +1108,8 @@ function qi_when_title(d, st) {
 	const w = st.when;
 	const stages = Object.keys(QI_STAGE_NAMES).filter((f) => w.stages[f]).map((f) => QI_STAGES.find(([x]) => x === f)[1]);
 	const freq = w.frequency.replace(" N ", ` ${w.frequency_n || "N"} `);
-	const pieces = w.sampling === "Fixed number" ? __("{0} pcs", [w.fixed_count || "?"]) : __("sampling plan");
-	d.fields_dict.when_section.wrapper
-		.find(".section-head")
-		.first()
-		.contents()
-		.filter((_, n) => n.nodeType === 3 && n.textContent.trim())
-		.first()
-		.replaceWith(`${__("Inspection stages, frequency and sample size")} · ${stages.join(", ") || __("no stage")} · ${__(freq)} · ${pieces}`);
+	const pieces = w.sampling === "Fixed number" ? __("{0} pcs", [w.fixed_count || "?"]) : __("Sampling plan");
+	qi_section_pills(d, "when_section", __("When and how many"), [stages.join(", ") || __("no stage"), __(freq), pieces], !stages.length);
 }
 
 function qi_show_fields(d, st) {
@@ -1128,7 +1124,7 @@ function qi_show_fields(d, st) {
 	d.set_df_property("tol_inputs", "hidden", visual ? 1 : 0);
 	d.set_df_property("unit", "hidden", visual ? 1 : 0);
 	d.set_df_property("inst_section", "hidden", visual ? 1 : 0);
-	d.set_df_property("tol_section", "label", test || st.row_type === "Material" ? __("Acceptance limits") : __("Tolerance as specified on the drawing"));
+	d.set_df_property("tol_section", "label", test || st.row_type === "Material" ? __("Acceptance limits") : __("Tolerance on the drawing"));
 	d.set_df_property("work_instruction", "hidden", test ? 0 : 1);
 	d.set_df_property("work_instruction", "reqd", test ? 1 : 0);
 	d.set_df_property("test_method", "hidden", test ? 0 : 1);
@@ -1254,13 +1250,18 @@ async function qi_render_instruments(d, st) {
 	});
 	const n = st.inst[""].size;
 	const per = stages.filter(([, s]) => st.inst[s]).length;
-	d.fields_dict.inst_section.wrapper
-		.find(".section-head")
-		.first()
-		.contents()
-		.filter((_, node) => node.nodeType === 3 && node.textContent.trim())
-		.first()
-		.replaceWith(`${__("Measuring instruments")} · ${n ? __("{0} chosen", [n]) : __("any")}${per ? " · " + __("{0} stage(s) differ", [per]) : ""}`);
+	qi_section_pills(d, "inst_section", __("Instruments"), [n ? __("{0} chosen", [n]) : __("Any"), per ? __("{0} stage(s) differ", [per]) : ""]);
+}
+
+// A folded section's head: its title, then what is set in it as pills.
+function qi_section_pills(d, section, title, values, warn) {
+	const $head = d.fields_dict[section].wrapper.find(".section-head").first();
+	$head.contents().filter((_, n) => n.nodeType === 3 && n.textContent.trim()).remove();
+	$head.find(".qi-sec-title").remove();
+	$head.prepend(`<span class="qi-sec-title">${qi_esc(title)}${values
+		.filter(Boolean)
+		.map((v) => `<span class="qi-sec-pill ${warn ? "warn" : ""}">${qi_esc(v)}</span>`)
+		.join("")}</span>`);
 }
 
 async function qi_save_balloon(frm, row, v, position, dialog, st) {
@@ -1372,7 +1373,7 @@ async function qi_drawing_pane(frm, d, $host, pos) {
 
 function qi_render_general(d, st, frm, refresh) {
 	const $w = d.fields_dict.general_html.$wrapper;
-	if (st.row_type !== "Dimension") return $w.empty();
+	if (st.row_type !== "Dimension" || ![QI_TT.GEN, QI_TT.GEO].includes(st.tt)) return $w.empty();
 	const opts = (f) => (frappe.meta.get_docfield(frm.doctype, f).options || "").split("\n");
 	const select = (f, title) => {
 		const cur = frm.doc[f] || "None";
@@ -1383,10 +1384,9 @@ function qi_render_general(d, st, frm, refresh) {
 	};
 	const missing = st.tt === QI_TT.GEN && (!frm.doc.custom_general_tolerance || frm.doc.custom_general_tolerance === "None");
 	$w.html(`<div class="qi-gen ${missing ? "warn" : ""}">
-		<span class="qi-gen-title">${__("General tolerances on this drawing")}</span>
-		${select("custom_general_tolerance", __("Linear & angular (ISO 2768-1)"))}
-		${select("custom_general_geometric", __("Geometric (ISO 2768-2)"))}
-		<span class="text-muted small">${__("Used for any size printed without its own tolerance. Saved with this characteristic.")}</span>
+		<span class="qi-gen-title">${__("Drawing's general tolerance")}</span>
+		${select("custom_general_tolerance", __("ISO 2768-1"))}
+		${select("custom_general_geometric", __("ISO 2768-2"))}
 	</div>`);
 	$w.find("select").on("change", (e) => {
 		const f = $(e.currentTarget).data("f");
@@ -1421,8 +1421,8 @@ function qi_render_tt(d, st, refresh) {
 	const $w = d.fields_dict.tt_html.$wrapper;
 	$w.html(`<div class="qi-chips">${chips
 		.map(
-			([t, sym, name, ex]) => `<button type="button" class="qi-chip ${st.tt === t ? "on" : ""}" data-t="${qi_esc(t)}">
-				<span class="qi-chip-sym">${qi_esc(sym)}</span><span class="qi-chip-name">${qi_esc(name)}</span><span class="qi-chip-ex">${qi_esc(ex)}</span></button>`
+			([t, sym, name, ex]) => `<button type="button" class="qi-chip ${st.tt === t ? "on" : ""}" data-t="${qi_esc(t)}" title="${qi_esc(__("e.g.") + " " + ex)}">
+				<span class="qi-chip-sym">${qi_esc(sym)}</span><span class="qi-chip-name">${qi_esc(name)}</span></button>`
 		)
 		.join("")}</div>`);
 	$w.find(".qi-chip").on("click", (e) => {
@@ -1537,11 +1537,11 @@ function qi_preview(d, st, frm) {
 		return;
 	}
 	const callout = qi_callout(st, v);
-	const drawing = `<div class="qi-pv"><span>${__("As specified")}</span><b>${
+	const drawing = `<div class="qi-pv"><span>${__("Drawing")}</span><b>${
 		callout ? qi_esc(callout) + (unit && ![QI_TT.ANG, QI_TT.GEO].includes(st.tt) ? " " + qi_esc(unit) : "") : "…"
 	}</b></div>`;
 	if (st.tt === QI_TT.GEN && (!general || general === "None")) {
-		qi_preview_html(d, `${drawing}<div class="qi-pv"><span>${__("Acceptance range")}</span><span class="text-warning">${__(
+		qi_preview_html(d, `${drawing}<div class="qi-pv"><span>${__("Accept")}</span><span class="text-warning">${__(
 			"Choose the drawing's general tolerance (ISO 2768-1) above."
 		)}</span></div>`);
 		return;
@@ -1551,11 +1551,11 @@ function qi_preview(d, st, frm) {
 		.then(({ message: m }) => {
 			if (m.error) {
 				const msg = callout ? qi_esc(m.error) : __("fill in the boxes on the left");
-				qi_preview_html(d, `${drawing}<div class="qi-pv"><span>${__("Acceptance range")}</span><span class="text-muted">${msg}</span></div>`);
+				qi_preview_html(d, `${drawing}<div class="qi-pv"><span>${__("Accept")}</span><span class="text-muted">${msg}</span></div>`);
 				return;
 			}
 			const accept = m.inspected ? qi_accept_text(m, st.tt === QI_TT.ANG ? "°" : unit, st.tt) : __("not inspected (reference only)");
-			qi_preview_html(d, `${drawing}<div class="qi-pv ok"><span>${__("Acceptance range")}</span><b>${accept}</b></div>`);
+			qi_preview_html(d, `${drawing}<div class="qi-pv ok"><span>${__("Accept")}</span><b>${accept}</b></div>`);
 		});
 }
 
@@ -1829,12 +1829,18 @@ frappe.dom.set_style(`
 .qi-seg-btn{border:1px solid var(--border-color);background:var(--fg-color);border-radius:8px;padding:6px 12px;display:inline-flex;gap:6px;align-items:center;font-size:var(--text-md)}
 .qi-seg-btn.sm{padding:3px 10px;font-size:var(--text-sm);min-width:40px;justify-content:center}
 .qi-seg-btn.on{border-color:var(--primary);background:var(--primary);color:var(--white)}
-.qi-chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:5px;margin-bottom:10px}
-.qi-chip{border:1px solid var(--border-color);background:var(--fg-color);border-radius:8px;padding:4px 7px;text-align:left;display:flex;flex-direction:column;gap:0}
+.qi-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.qi-chip{border:1px solid var(--border-color);background:var(--fg-color);border-radius:8px;padding:5px 10px;display:inline-flex;align-items:center;gap:6px}
+.qi-result{padding:8px var(--padding-md, 15px) 10px;border-bottom:1px solid var(--border-color);flex:none}
+.qi-result .qi-preview{flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:6px 20px;min-height:0;padding:8px 12px}
+.qi-result .qi-pv span{min-width:0}
+.qi-sec-title{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px}
+.qi-sec-pill{font-size:11px;font-weight:500;text-transform:none;letter-spacing:0;line-height:18px;padding:0 8px;border-radius:9px;background:var(--gray-100);color:var(--text-color)}
+.qi-sec-pill.warn{background:var(--yellow-100);color:var(--yellow-800)}
 .qi-chip:hover{border-color:var(--gray-500)}
 .qi-chip.on{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary);background:var(--blue-50)}
-.qi-chip-sym{font-size:15px;font-weight:600;line-height:1.2}
-.qi-dialog .modal-dialog.modal-lg{max-width:720px}
+.qi-chip-sym{font-size:14px;font-weight:600;line-height:1.2;min-width:14px;text-align:center}
+.qi-dialog .modal-dialog.modal-lg{max-width:760px}
 .qi-dialog .modal-content{max-height:calc(100vh - 3.5rem);display:flex;flex-direction:column}
 .qi-dialog .modal-body{overflow-y:auto;flex:1 1 auto;min-height:0;padding-top:8px}
 .qi-dialog .form-section .section-head{margin-bottom:6px}
@@ -1856,6 +1862,10 @@ frappe.dom.set_style(`
 .qi-when-label{font-size:var(--text-sm);font-weight:500;color:var(--text-color)}
 .qi-when-n{display:inline-flex;gap:6px;align-items:center;margin:0 0 0 6px;font-size:var(--text-sm);color:var(--text-muted)}
 .qi-when-n input{width:70px;height:28px}
+@media (max-width:767px){
+	.qi-when-row{grid-template-columns:1fr;gap:6px}
+	.qi-dp canvas{height:150px}
+}
 .qi-tip{display:inline-flex;width:15px;height:15px;border-radius:50%;border:1px solid var(--gray-400);color:var(--gray-600);font-size:10px;font-style:italic;font-weight:600;align-items:center;justify-content:center;cursor:help;margin-left:4px}
 .qi-pill.check.on{background:var(--primary);border-color:var(--primary)}
 .qi-inst-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
