@@ -223,6 +223,23 @@ def add_sample(qi: str, row_key: str) -> int:
 
 
 @frappe.whitelist(methods=["POST"])
+def remove_sample(qi: str, row_key: str) -> int:
+	"""One reading fewer on one characteristic: the last slot, once it is empty."""
+	_draft_for_writing(qi)
+	name, count = frappe.db.get_value("Quality Inspection Reading", {"parent": qi, "parenttype": QI, "custom_balloon_no": row_key},
+	                                  ["name", "custom_sample_count"]) or (None, 0)
+	if not name:
+		frappe.throw(_("No. {0} is not on this inspection").format(row_key))
+	count = cint(count)
+	if count <= 1:
+		frappe.throw(_("At least one reading is needed."))
+	if frappe.db.exists("QI Measurement", {"quality_inspection": qi, "row_key": row_key, "sample_no": count}):
+		frappe.throw(_("Clear reading {0} of No. {1} first.").format(count, row_key))
+	frappe.db.set_value("Quality Inspection Reading", name, "custom_sample_count", count - 1)
+	return count - 1
+
+
+@frappe.whitelist(methods=["POST"])
 def finish(qi: str, disposition: str | None = None, concession_no: str | None = None,
            non_conformance: str | None = None, submit=0) -> dict:
 	"""Save the inspection (summarising every measurement), then submit if asked."""

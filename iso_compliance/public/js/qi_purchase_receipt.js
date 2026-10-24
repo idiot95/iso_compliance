@@ -19,14 +19,25 @@ frappe.ui.form.on("Purchase Receipt", {
 			const rows = (frm.doc.items || []).filter((r) => drawing.has(r.item_code));
 			if (!rows.length) return;
 			frm.add_custom_button(__("Incoming inspection"), () => {
-				const start = (row) =>
+				const call = (row, sample_size) =>
 					frappe
 						.call({
 							method: "iso_compliance.qi.inspection.start_receipt_inspection",
-							args: { purchase_receipt: frm.doc.name, row },
+							args: { purchase_receipt: frm.doc.name, row, sample_size },
 							freeze: true,
 						})
 						.then(({ message }) => frappe.set_route("inspect", message));
+				// a new inspection asks how many pieces; one already started opens as it is
+				const start = async (row) => {
+					const r = frm.doc.items.find((x) => x.name === row);
+					const lot = flt(r.received_qty) || flt(r.qty);
+					const { message: started } = await frappe.db.get_value("Quality Inspection",
+						{ reference_type: "Purchase Receipt", reference_name: frm.doc.name, child_row_reference: row, docstatus: ["<", 2] }, "name");
+					if (started && started.name) return call(row);
+					const { message: pct } = await frappe.db.get_single_value("Inspection Settings", "default_sample_percent");
+					await frappe.require("/assets/iso_compliance/js/qi_sample.js");
+					window.iso_qi_sample.ask({ lot, suggested: Math.min(lot, Math.max(1, Math.ceil((lot * (pct || 5)) / 100))), then: (n) => call(row, n) });
+				};
 				if (rows.length === 1) return start(rows[0].name);
 				const d = new frappe.ui.Dialog({
 					title: __("Which item?"),

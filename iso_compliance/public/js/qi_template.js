@@ -933,7 +933,7 @@ function qi_balloon_dialog(frm, row, defaults = {}, on_cancel) {
 			{ fieldtype: "Column Break" },
 			{ fieldname: "class_html", fieldtype: "HTML" },
 
-			{ fieldtype: "Section Break", fieldname: "tol_section", label: __("Tolerance on the drawing") },
+			{ fieldtype: "Section Break", fieldname: "tol_section", label: frm.doc.custom_drawing ? __("Tolerance on the drawing") : __("Tolerance") },
 			{ fieldname: "general_html", fieldtype: "HTML" },
 			{ fieldname: "tt_html", fieldtype: "HTML" },
 			{ fieldname: "prefix_html", fieldtype: "HTML" },
@@ -993,6 +993,7 @@ function qi_balloon_dialog(frm, row, defaults = {}, on_cancel) {
 			: null,
 	});
 	d.$wrapper.addClass("qi-dialog");
+	d.__qi_frm = frm;
 
 	const preview = frappe.utils.debounce(() => qi_preview(d, st, frm), 200);
 	const refresh = () => {
@@ -1018,7 +1019,8 @@ function qi_balloon_dialog(frm, row, defaults = {}, on_cancel) {
 	const $host = $(`<div class="qi-dp-host"></div>`).insertAfter(d.$wrapper.find(".modal-header"));
 	qi_drawing_pane(frm, d, $host, defaults.position || qi_pos(r));
 	// what will be accepted, always in view while the boxes below are filled
-	$(`<div class="qi-result"></div>`).append(d.fields_dict.limits_preview.$wrapper).insertAfter($host);
+	// above the body, not after the drawing pane, which removes itself when there is no drawing
+	$(`<div class="qi-result"></div>`).append(d.fields_dict.limits_preview.$wrapper).insertBefore(d.$wrapper.find(".modal-body"));
 	d.set_df_property("preview_section", "hidden", 1);
 }
 
@@ -1124,7 +1126,7 @@ function qi_show_fields(d, st) {
 	d.set_df_property("tol_inputs", "hidden", visual ? 1 : 0);
 	d.set_df_property("unit", "hidden", visual ? 1 : 0);
 	d.set_df_property("inst_section", "hidden", visual ? 1 : 0);
-	d.set_df_property("tol_section", "label", test || st.row_type === "Material" ? __("Acceptance limits") : __("Tolerance on the drawing"));
+	d.set_df_property("tol_section", "label", test || st.row_type === "Material" ? __("Acceptance limits") : d.__qi_frm && !d.__qi_frm.doc.custom_drawing ? __("Tolerance") : __("Tolerance on the drawing"));
 	d.set_df_property("work_instruction", "hidden", test ? 0 : 1);
 	d.set_df_property("work_instruction", "reqd", test ? 1 : 0);
 	d.set_df_property("test_method", "hidden", test ? 0 : 1);
@@ -1537,7 +1539,7 @@ function qi_preview(d, st, frm) {
 		return;
 	}
 	const callout = qi_callout(st, v);
-	const drawing = `<div class="qi-pv"><span>${__("Drawing")}</span><b>${
+	const drawing = `<div class="qi-pv"><span>${frm.doc.custom_drawing ? __("Drawing") : __("Spec")}</span><b>${
 		callout ? qi_esc(callout) + (unit && ![QI_TT.ANG, QI_TT.GEO].includes(st.tt) ? " " + qi_esc(unit) : "") : "…"
 	}</b></div>`;
 	if (st.tt === QI_TT.GEN && (!general || general === "None")) {

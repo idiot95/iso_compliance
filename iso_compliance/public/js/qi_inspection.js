@@ -295,7 +295,7 @@ function qi_start_dialog(frm) {
 		if (!st.plan || !st.plan.new_format) return frappe.msgprint(__("There is no new-format plan to start from."));
 		const call =
 			st.stage === "Incoming"
-				? { method: "start_receipt_inspection", args: { purchase_receipt: v.purchase_receipt, row: v.pr_row } }
+				? { method: "start_receipt_inspection", args: { purchase_receipt: v.purchase_receipt, row: v.pr_row, sample_size: st.sample_for === v.pr_row ? st.sample : null }, ask: true }
 				: st.stage === "In Process"
 				? { method: "start_job_card_inspection", args: { job_card: v.job_card, check_point: v.check_point } }
 				: null;
@@ -316,6 +316,23 @@ function qi_start_dialog(frm) {
 			if (lot.state !== "todo") return begin(); // started already: as it is
 			await frappe.require("/assets/iso_compliance/js/qi_sample.js");
 			return window.iso_qi_sample.ask({ lot: lot.qty, suggested: lot.default_sample, then: begin });
+		}
+		const started = call.ask && !call.args.sample_size
+			? (await frappe.db.get_value("Quality Inspection", { reference_type: "Purchase Receipt", reference_name: v.purchase_receipt, child_row_reference: v.pr_row, docstatus: ["<", 2] }, "name")).message
+			: null;
+		if (call.ask && !call.args.sample_size && !(started && started.name)) {
+			// a receipt row: how many pieces of it to measure
+			const r = (st.rows || []).find((x) => x.name === v.pr_row) || {};
+			const lot = flt(r.received_qty) || flt(r.qty);
+			const { message: pct } = await frappe.db.get_single_value("Inspection Settings", "default_sample_percent");
+			await frappe.require("/assets/iso_compliance/js/qi_sample.js");
+			return window.iso_qi_sample.ask({
+				lot, suggested: Math.min(lot, Math.max(1, Math.ceil((lot * (pct || 5)) / 100))),
+				then: (n) => {
+					Object.assign(st, { sample: n, sample_for: v.pr_row });
+					start(v);
+				},
+			});
 		}
 		const { message: name } = await frappe.call({ method: `${QI_INSP}.${call.method}`, args: call.args, freeze: true, freeze_message: __("Starting the inspection…") });
 		d.__started = true;
@@ -400,7 +417,7 @@ async function qi_entry(frm) {
 	$e.off(); // bound afresh below on every refresh
 	const { message: d } = await frappe.call({ method: "iso_compliance.qi.inspector.get_inspection", args: { qi: frm.doc.name } });
 	const prev = frm.__qi_entry || {};
-	const state = (frm.__qi_entry = { d, row: 0, instrument: {}, filter: prev.filter || "all", q: prev.q || "", hide_dwg: !!prev.hide_dwg });
+	const state = (frm.__qi_entry = { d, row: 0, instrument: prev.instrument || {}, filter: prev.filter || "all", q: prev.q || "", hide_dwg: !!prev.hide_dwg });
 	const ro = !d.can_write;
 	const bad = (r, v) => {
 		if (v == null || v === "") return false;
@@ -539,7 +556,7 @@ async function qi_entry(frm) {
 		const $tr = $e.find(`tr[data-i="${i}"]`);
 		$tr.removeClass("done failed").addClass(row_state(r));
 		$tr.find(".qi-e-res").html(`${r.values.length}/${r.required}${
-			ro ? "" : ` <button type="button" class="btn btn-xs btn-default qi-e-add" data-i="${i}" title="${__("One more reading")}">+</button>`
+			ro ? "" : ` <span class="qi-e-addrm">${r.required > 1 ? `<button type="button" class="btn btn-xs btn-default qi-e-rm" data-i="${i}" title="${__("One reading fewer")}">−</button>` : ""}<button type="button" class="btn btn-xs btn-default qi-e-add" data-i="${i}" title="${__("One more reading")}">+</button></span>`
 		}${out ? `<div class="text-danger">${__("{0} out", [out])}</div>` : ""}`);
 	};
 	const refresh_counts = () => {
@@ -685,9 +702,10 @@ async function qi_entry(frm) {
 		// readings typed while it was missing save now
 		$e.find(`input.qi-e-cell.pending[data-i="${i}"]`).each((_, el) => $(el).trigger("change"));
 	});
-	$e.on("click", ".qi-e-add", async (ev) => {
+	$e.on("click", ".qi-e-add, .qi-e-rm", async (ev) => {
 		const i = Number($(ev.currentTarget).data("i"));
-		await frappe.call({ method: "iso_compliance.qi.inspector.add_sample", args: { qi: frm.doc.name, row_key: d.rows[i].balloon } });
+		const method = $(ev.currentTarget).hasClass("qi-e-rm") ? "remove_sample" : "add_sample";
+		await frappe.call({ method: `iso_compliance.qi.inspector.${method}`, args: { qi: frm.doc.name, row_key: d.rows[i].balloon } });
 		qi_entry(frm);
 	});
 	if (!ro) {
@@ -814,6 +832,7 @@ button.qi-e-cell{text-align:center;color:var(--text-muted)}
 .qi-e-inst{max-width:150px;height:30px;border:1px solid var(--border-color);border-radius:6px;font-size:var(--text-sm);background:var(--control-bg)}
 .qi-e-inst.need{border-color:var(--orange-400);background:var(--yellow-50)}
 .qi-e-res{white-space:nowrap;font-size:var(--text-xs)}
+.qi-e-addrm{display:inline-flex;gap:3px;margin-left:4px}
 .qi-e-empty{padding:16px}
 .qi-e-conds{padding:8px 12px;border-top:1px solid var(--border-color)}
 .qi-e-conds summary{font-weight:600;cursor:pointer}

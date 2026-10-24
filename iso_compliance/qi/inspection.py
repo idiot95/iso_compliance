@@ -630,7 +630,7 @@ def start_final_inspection(work_order: str, lot_qty: float, sample_size: float) 
 
 
 @frappe.whitelist()
-def start_receipt_inspection(purchase_receipt: str, row: str) -> str:
+def start_receipt_inspection(purchase_receipt: str, row: str, sample_size: int | None = None) -> str:
 	_check_can_inspect()
 	pr = frappe.get_doc("Purchase Receipt", purchase_receipt)
 	item = next((i for i in pr.items if i.name == row), None)
@@ -652,6 +652,8 @@ def start_receipt_inspection(purchase_receipt: str, row: str) -> str:
 	if not is_drawing_template(template):
 		frappe.throw(_("{0} has no drawing template.").format(item.item_code))
 	lot = flt(item.received_qty) or flt(item.qty)
+	if sample_size is not None and not 1 <= cint(sample_size) <= max(1, lot):
+		frappe.throw(_("The sample must be between 1 and the lot ({0}).").format(frappe.format(lot)))
 	qi = frappe.get_doc({
 		"doctype": QI,
 		"inspection_type": "Incoming",
@@ -660,7 +662,7 @@ def start_receipt_inspection(purchase_receipt: str, row: str) -> str:
 		"child_row_reference": item.name,
 		"item_code": item.item_code,
 		"batch_no": item.get("batch_no"),
-		"sample_size": default_sample(lot),
+		"sample_size": cint(sample_size) or default_sample(lot),
 		"report_date": nowdate(),
 		"inspected_by": frappe.session.user,
 		"quality_inspection_template": template,

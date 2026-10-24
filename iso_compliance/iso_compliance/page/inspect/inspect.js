@@ -240,7 +240,7 @@ class Inspector {
 					${r.row_type !== "Dimension" ? `<span class="qi-type">${esc({ Material: __("From 3.1"), Test: __("Operational"), Visual: __("Visual") }[r.row_type] || r.row_type)}</span>` : ""}</div>
 					${r.class ? `<span class="qi-class ${esc(r.class.toLowerCase())}">${esc(r.class)}</span>` : ""}
 				</div>
-				<div class="qi-spec"><span>${__("As on drawing")}</span><strong>${esc(r.spec_text || "")}${r.spec_text ? " → " : ""}${esc(this.limit_text(r))}</strong></div>
+				<div class="qi-spec"><span>${d.drawing ? __("As on drawing") : __("Spec")}</span><strong>${esc(r.spec_text || "")}${r.spec_text ? " → " : ""}${esc(this.limit_text(r))}</strong></div>
 				${r.test_method ? `<div class="qi-muted">${esc(r.test_method)}</div>` : ""}
 				${r.row_type === "Material" ? `<div class="qi-banner">${__("Read this value off the supplier's 3.1 certificate.")}
 					${d.supplier_cert ? ` <a href="${esc(d.supplier_cert)}" target="_blank" rel="noopener">${__("Open the certificate")}</a>` : ` <b>${__("No certificate is attached to the Purchase Receipt.")}</b>`}</div>` : ""}
@@ -256,7 +256,7 @@ class Inspector {
 			</div>
 			<div class="qi-card">
 				<div class="qi-card-head small"><strong>${__("Readings")}</strong><span class="qi-read-tools">${bad ? `<span class="qi-bad-text">${__("{0} out of spec", [bad])}</span>` : ""}${
-					this.readonly ? "" : `<button class="qi-add-sample" title="${__("One more reading on this characteristic")}">+ ${__("Reading")}</button>`
+					this.readonly ? "" : `${r.required > 1 ? `<button class="qi-add-sample qi-rm-sample" title="${__("One reading fewer")}">− ${__("Reading")}</button>` : ""}<button class="qi-add-sample" title="${__("One more reading on this characteristic")}">+ ${__("Reading")}</button>`
 				}</span></div>
 				<div class="qi-grid">${grid}</div>
 			</div>
@@ -293,10 +293,11 @@ class Inspector {
 		$p.find(".qi-prev-r").on("click", () => this.go_row(this.row - 1));
 		$p.find(".qi-next-r").on("click", () => (this.row < this.d.rows.length - 1 ? this.go_row(this.row + 1) : this.open_review()));
 		$p.find(".qi-to-review, .qi-go-review").on("click", () => this.open_review());
-		$p.find(".qi-add-sample").on("click", async () => {
-			const { message: n } = await frappe.call({ method: `${INSPECT_API}.add_sample`, args: { qi: this.d.name, row_key: r.balloon } });
+		$p.find(".qi-add-sample").on("click", async (e) => {
+			const rm = $(e.currentTarget).hasClass("qi-rm-sample");
+			const { message: n } = await frappe.call({ method: `${INSPECT_API}.${rm ? "remove_sample" : "add_sample"}`, args: { qi: this.d.name, row_key: r.balloon } });
 			r.required = n;
-			this.sample = n;
+			this.sample = Math.min(rm ? this.sample : n, n);
 			this.render_panel();
 			this.update_progress();
 		});
