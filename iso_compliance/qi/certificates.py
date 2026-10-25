@@ -51,18 +51,19 @@ def _sheet(file_url: str) -> dict | None:
 	content = frappe.get_doc("File", name).get_content()
 	if isinstance(content, str):
 		content = content.encode()
-	width = 100.0
+	width, ratio = 100.0, 1.0
 	try:
 		from io import BytesIO
 
 		from PIL import Image
 
 		w, h = Image.open(BytesIO(content)).size
-		width = round(min(SHEET_W_MM, SHEET_H_MM * w / h) / SHEET_W_MM * 100, 1)
+		ratio = w / h
+		width = round(min(SHEET_W_MM, SHEET_H_MM * ratio) / SHEET_W_MM * 100, 1)
 	except Exception:
 		pass
 	mime = "image/png" if file_url.lower().endswith(".png") else "image/jpeg"
-	return {"image": f"data:{mime};base64,{base64.b64encode(content).decode()}", "width": width}
+	return {"image": f"data:{mime};base64,{base64.b64encode(content).decode()}", "width": width, "ratio": ratio}
 
 
 def _data_uri(file_url: str) -> str | None:
@@ -536,9 +537,12 @@ def letterhead(company: str) -> dict:
 	c = frappe.db.get_value("Company", company, ["company_name", "company_logo", "phone_no", "email", "website", "tax_id"],
 	                        as_dict=True) or frappe._dict()
 	contact = [x for x in (c.phone_no and f"Tel {c.phone_no}", c.email, c.website) if x]
+	logo = _sheet(c.company_logo) if c.company_logo else None
 	return {
 		"name": c.company_name or company,
-		"logo": _data_uri(c.company_logo) if c.company_logo else None,
+		"logo": logo["image"] if logo else None,
+		# printed 30 pt high; the width keeps the logo's proportions (an auto width collapses in a table cell)
+		"logo_width": round(30 * logo["ratio"], 1) if logo else None,
 		"address": _company_address(company),
 		"contact": " · ".join(contact),
 		"gstin": c.tax_id,

@@ -49,13 +49,9 @@
 	<tr><td class="c">{{ pos }}</td><td>{{ t.characteristic }}</td><td class="n">{{ t.requirement }} {{ t.unit }}</td>
 		<td class="n">{% if t.ok %}{{ t.result }}{% else %}<span class="rp-nok">{{ t.result }}</span>{% endif %}</td><td class="r">{{ t.n }}</td></tr>
 	{%- endfor %}{%- endfor %}
-	{%- if not ns.any %}<tr><td colspan="5">No test results are recorded for these products.</td></tr>{% endif %}
+	{%- if not ns.any %}<tr><td colspan="5">None recorded</td></tr>{% endif %}
 	</tbody>
 </table>
-<div class="rp-note">
-	{%- if d.type == "2.2" %}Results from non-specific inspection of the same products.{% else %}Results from specific inspection of the products supplied.{% endif %}
-	Full readings: the inspection reports listed above.
-</div>
 {%- endif %}
 
 {%- if d.type == "3.1" %}
@@ -74,15 +70,12 @@
 {%- endif %}
 
 <div class="rp-line">
-	{%- if d.type == "3.1" %}We certify that the products listed above comply with the requirements of the order. The results are from specific inspection of the products supplied.
+	{%- if d.type == "3.1" %}We certify that the products listed above comply with the requirements of the order.
 	{%- else %}We declare that the products listed above comply with the requirements of the order.{% endif %}
-	{%- if d.concessions %} Accepted under concession {{ d.concessions | join(", ") }}.{% endif %}
+	{%- if d.concessions %} Concession: {{ d.concessions | join(", ") }}.{% endif %}
 </div>
 
-{{ rp.signatures([
-	"Authorised inspection representative, independent of manufacturing · name · date" if d.type == "3.1"
-	else "For " ~ d.company ~ " · authorised signatory · date"
-]) }}
+{{ rp.signatures(["Inspection representative · date" if d.type == "3.1" else "Authorised signatory · date"]) }}
 
 {%- endcall %}
 </div>

@@ -37,7 +37,7 @@
 {%- set many = rec.rows | selectattr("n", "gt", 1) | list | length -%}
 {%- set conform = rec.counts.conform -%}
 {%- set total = rec.rows | length -%}
-{%- set decision = "Draft, not submitted" if rec.docstatus == 0 else rec.disposition -%}
+{%- set decision = "Draft" if rec.docstatus == 0 else rec.disposition -%}
 <div class="rp">
 {%- call rp.page(lh, "Inspection Report", "No. " ~ rec.name ~ " · " ~ date,
 	rec.form_no ~ " Issue 01 / Rev 00 · " ~ lh.address, rec.name) %}
@@ -74,11 +74,7 @@
 	{%- endfor %}
 	</tbody>
 </table>
-<div class="rp-note">
-	{%- if ctq %}* Critical to quality. {% endif -%}
-	{%- if many %}Every reading is in Annex A. {% endif -%}
-	{%- if rec.pages %}Characteristic numbers are marked on the drawing in Annex {{ "B" if many else "A" }}.{% endif -%}
-</div>
+{%- if ctq %}<div class="rp-note">* CTQ</div>{% endif %}
 
 {%- if rec.conditions %}
 <table class="rp-t">
@@ -88,11 +84,11 @@
 {%- endif %}
 
 <div class="rp-line">
-	{{ conform }} of {{ total }} characteristic{{ "s" if total != 1 }} conform.
-	{%- if rec.failed %} No. {{ rec.failed | map(attribute="balloon") | join(", ") }} {{ "is" if rec.failed | length == 1 else "are" }} out of specification.{% endif %}
-	{%- if rec.counts.open %} {{ rec.counts.open }} not measured or incomplete.{% endif %}
-	{{ decision }}{% if rec.disposition == "Accept under Concession" and rec.concession_no %}, concession no. {{ rec.concession_no }}{% endif %}.
-	{%- if rec.non_conformance %} Non-conformance {{ rec.non_conformance }} raised.{% endif %}
+	Conforming: {{ conform }} / {{ total }}
+	{%- if rec.failed %} &nbsp;·&nbsp; Out of specification: No. {{ rec.failed | map(attribute="balloon") | join(", ") }}{% endif %}
+	{%- if rec.counts.open %} &nbsp;·&nbsp; Open: {{ rec.counts.open }}{% endif %}
+	{%- if rec.disposition == "Accept under Concession" and rec.concession_no %} &nbsp;·&nbsp; Concession: {{ rec.concession_no }}{% endif %}
+	{%- if rec.non_conformance %} &nbsp;·&nbsp; Non-conformance: {{ rec.non_conformance }}{% endif %}
 </div>
 
 {{ rp.signatures([
@@ -102,7 +98,7 @@
 
 {%- if many %}
 {%- set main_unit = rec.main_unit -%}
-{{ rp.annex("Annex A · Readings", rec.item_code ~ " · " ~ frappe.format(rec.sample_size, {"fieldtype": "Float"}) ~ " samples" ~ (" · values in " ~ main_unit ~ " unless stated" if main_unit else "")) }}
+{{ rp.annex("Annex A · Readings", "Samples: " ~ frappe.format(rec.sample_size, {"fieldtype": "Float"}) ~ (" · Unit: " ~ main_unit if main_unit else "")) }}
 {%- for r in rec.rows if r.n %}
 {%- set vals = r["values"] %}
 {%- set unit = r.unit if r.unit and r.type != "Visual" and r.unit | lower != main_unit | lower else "" %}
@@ -131,7 +127,6 @@
 	<div class="box {{ 'bad' if b.state == 'bad' }}" style="left:{{ b.x }}%;top:{{ b.y }}%;width:{{ b.w }}%;height:{{ b.h }}%"><div class="bal">{{ b.balloon }}</div></div>
 	{%- endfor %}
 </div>
-<div class="rp-note">Numbers refer to the characteristics on page 1.{% if rec.failed %} A characteristic out of specification is marked with a heavy red box.{% endif %}</div>
 {%- endfor %}
 
 {%- endcall %}

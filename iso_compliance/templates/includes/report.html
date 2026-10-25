@@ -19,7 +19,8 @@
 	table.rp-page > tbody > tr > td { padding: 0; vertical-align: top; }
 
 	.rp-head td { vertical-align: middle; padding: 0 0 7pt; border-bottom: 1.5pt solid #111; }
-	.rp-head img { width: 30pt; height: 30pt; display: block; }
+	.rp-head td.logo { width: 1%; }
+	.rp-head img { height: 30pt; max-width: none; display: block; }  /* width and min-width from lh.logo_width: without a min-width the table shrinks the cell to nothing */
 	.rp-co { font-size: 11pt; font-weight: bold; padding-left: 9pt !important; }
 	.rp-doc { text-align: right; }
 	.rp-doc b { display: block; font-size: 13.5pt; }
@@ -72,7 +73,7 @@
 <table class="rp-page">
 	<thead><tr><td>
 		<table class="rp-head"><tr>
-			{%- if lh.logo %}<td style="width:30pt"><img src="{{ lh.logo }}" alt=""></td>{% endif %}
+			{%- if lh.logo %}<td class="logo"><img src="{{ lh.logo }}" alt="" style="width:{{ lh.logo_width }}pt; min-width:{{ lh.logo_width }}pt"></td>{% endif %}
 			<td class="rp-co">{{ lh.name }}</td>
 			<td class="rp-doc"><b>{{ title }}</b><span>{{ line }}</span></td>
 		</tr></table>
