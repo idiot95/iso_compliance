@@ -161,6 +161,7 @@ jinja = {
 		"iso_compliance.qi.certificates.en10204",
 		# the company block shared by every report
 		"iso_compliance.qi.certificates.letterhead",
+		"iso_compliance.qi.certificates.report_fonts",
 	],
 }
 

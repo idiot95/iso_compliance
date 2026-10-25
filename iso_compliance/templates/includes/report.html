@@ -7,7 +7,8 @@
 
 {%- macro styles() -%}
 <style>
-	.rp { font-family: Arial, Helvetica, sans-serif; font-size: 9pt; line-height: 1.3; color: #111; }
+	{{ report_fonts() }}
+	.rp { font-family: Arimo, Arial, Helvetica, sans-serif; font-size: 9pt; line-height: 1.3; color: #111; }
 	.rp table { border-collapse: collapse; width: 100%; }
 
 	/* the page: header and footer are the head and foot of one table, so Chrome repeats them on every sheet */

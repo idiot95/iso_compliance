@@ -9,13 +9,14 @@
 {%- macro record_styles() -%}
 {{ rp.styles() }}
 <style>
-	.ax { margin-bottom: 7pt; page-break-inside: avoid; }
-	.ax td { font-size: 9pt; padding: 0.5pt 0; font-variant-numeric: tabular-nums; }
-	.ax tr.h td { border-top: 0.75pt solid #111; padding: 3pt 0 2pt; }
-	.ax td.v { text-align: right; padding-right: 6pt; width: 8.2%; }
-	.ax td.k { color: #555; width: 8%; }
-	.dwg { position: relative; border: 0.75pt solid #111; margin-top: 2pt; }
-	.dwg img { display: block; width: 100%; height: auto; }  /* uncapped: the boxes are placed in % of this image */
+	.ax { margin-bottom: 6pt; table-layout: fixed; page-break-inside: avoid; }
+	.ax td { font-size: 9pt; line-height: 11.5pt; padding: 0; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; }
+	.ax tr.h td { border-top: 0.75pt solid #111; padding: 3pt 0 1.5pt; }
+	.ax tr.h td.r { text-align: right; }
+	.ax td.v { text-align: right; padding-right: 4.5pt; }
+	.ax td.k { color: #555; }
+	.dwg { position: relative; border: 0.75pt solid #111; margin: 2pt auto 0; page-break-inside: avoid; }
+	.dwg img { display: block; width: 100%; height: auto; }  /* the boxes are placed in % of this image; the width is set so a sheet fits one page */
 	.box { position: absolute; border: 1.5pt solid #111; }
 	.box.bad { border: 2.2pt solid #c00; }
 	.bal { position: absolute; top: -7pt; left: -7pt; width: 13pt; height: 13pt; line-height: 13pt; border-radius: 7pt;
@@ -95,19 +96,22 @@
 ]) }}
 
 {%- if many %}
-{{ rp.annex("Annex A · Readings", rec.item_code ~ " · " ~ frappe.format(rec.sample_size, {"fieldtype": "Float"}) ~ " samples") }}
+{%- set main_unit = rec.main_unit -%}
+{{ rp.annex("Annex A · Readings", rec.item_code ~ " · " ~ frappe.format(rec.sample_size, {"fieldtype": "Float"}) ~ " samples" ~ (" · values in " ~ main_unit ~ " unless stated" if main_unit else "")) }}
 {%- for r in rec.rows if r.n %}
 {%- set vals = r["values"] %}
+{%- set unit = r.unit if r.unit and r.type != "Visual" and r.unit | lower != main_unit | lower else "" %}
 <table class="ax">
-	<tr class="h"><td colspan="6"><b>{{ r.balloon }} · {{ r.specification }}</b></td>
-		<td colspan="5" style="text-align:right">{{ r.limits }}{% if r.unit and r.type != "Visual" %} {{ r.unit }}{% endif %}{% if r.min is not none %} · min {{ r.min }} · max {{ r.max }}{% endif %}</td></tr>
+	<colgroup><col style="width:52px">{% for i in range(10) %}<col>{% endfor %}</colgroup>
+	<tr class="h"><td colspan="6"><b>{{ r.balloon }} · {{ r.specification }}{% if r.type == "Visual" %} (visual){% endif %}</b></td>
+		<td colspan="5" class="r">{{ r.limits }}{% if unit %} {{ unit }}{% endif %}{% if r.min is not none and r.min != "" %} · min {{ r.min }} · max {{ r.max }}{% endif %}</td></tr>
 	{%- if r.type == "Visual" and not r.bad %}
 	<tr><td class="k">1&ndash;{{ r.n }}</td><td colspan="10">all OK</td></tr>
 	{%- else %}
 	{%- for line in vals | batch(10) %}
 	<tr><td class="k">{{ line[0].n }}&ndash;{{ line[-1].n }}</td>
 		{%- for v in line %}<td class="v"><span class="{{ 'rp-nok' if v.bad }}">{{ v.value }}</span></td>{% endfor %}
-		{%- for i in range(10 - line | length) %}<td class="v"></td>{% endfor %}</tr>
+		{%- for i in range(10 - line | length) %}<td></td>{% endfor %}</tr>
 	{%- endfor %}
 	{%- endif %}
 </table>
@@ -116,7 +120,7 @@
 
 {%- for page in rec.pages %}
 {{ rp.annex("Annex " ~ ("B" if many else "A") ~ " · Drawing", (rec.drawing_no or "") ~ (" Rev " ~ rec.drawing_revision if rec.drawing_revision else "") ~ " · sheet " ~ page.no ~ " of " ~ rec.sheets) }}
-<div class="dwg">
+<div class="dwg" style="width:{{ page.width or 100 }}%">
 	<img src="{{ page.image }}" alt="">
 	{%- for b in page.boxes %}
 	<div class="box {{ 'bad' if b.state == 'bad' }}" style="left:{{ b.x }}%;top:{{ b.y }}%;width:{{ b.w }}%;height:{{ b.h }}%"><div class="bal">{{ b.balloon }}</div></div>

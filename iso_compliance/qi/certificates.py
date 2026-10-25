@@ -34,7 +34,15 @@ MTC_FORMAT = "Material Test Certificate 3.1"
 RECORD_FORM_NO = "HCCPL/QMS/FRM-038"
 
 
-def _data_uri(file_url: str) -> str | None:
+#: the drawing area of an A4 sheet at 12 mm margins, under the header strip and annex heading
+SHEET_W_MM, SHEET_H_MM = 186, 212
+
+
+def _sheet(file_url: str) -> dict | None:
+	"""One drawing page for print: the image as a data URI and the width (in %
+	of the text column) at which the whole page fits on one A4 sheet. A page
+	taller than the sheet would split, and Chrome then paints the image on
+	one sheet and the boxes on another."""
 	if not file_url:
 		return None
 	name = frappe.db.get_value("File", {"file_url": file_url}, "name")
@@ -43,8 +51,50 @@ def _data_uri(file_url: str) -> str | None:
 	content = frappe.get_doc("File", name).get_content()
 	if isinstance(content, str):
 		content = content.encode()
+	width = 100.0
+	try:
+		from io import BytesIO
+
+		from PIL import Image
+
+		w, h = Image.open(BytesIO(content)).size
+		width = round(min(SHEET_W_MM, SHEET_H_MM * w / h) / SHEET_W_MM * 100, 1)
+	except Exception:
+		pass
 	mime = "image/png" if file_url.lower().endswith(".png") else "image/jpeg"
-	return f"data:{mime};base64,{base64.b64encode(content).decode()}"
+	return {"image": f"data:{mime};base64,{base64.b64encode(content).decode()}", "width": width}
+
+
+def _data_uri(file_url: str) -> str | None:
+	sheet = _sheet(file_url)
+	return sheet["image"] if sheet else None
+
+
+def _decimals(*texts) -> int:
+	out = 0
+	for t in texts:
+		t = str(t or "").strip()
+		if "." in t and t.replace(".", "", 1).lstrip("-").isdigit():
+			out = max(out, len(t.split(".")[1]))
+	return out
+
+
+def _dp(r, raw) -> int | None:
+	"""Decimals a numeric row prints with: as many as its limits or readings
+	carry, and at least two for millimetres (37.70 – 38.00)."""
+	if r.custom_row_type == "Visual" or r.custom_tolerance_type == T.ANGLE:
+		return None
+	d = _decimals(T.display_limit(r.min_value), T.display_limit(r.max_value), *raw)
+	return max(d, 2) if (r.custom_unit or "mm") == "mm" else d
+
+
+def _fixed(x, dp):
+	if dp is None or x is None or x == "":
+		return x
+	try:
+		return f"{float(x):.{dp}f}"
+	except (TypeError, ValueError):
+		return x
 
 
 def _pages(template: str) -> list[str]:
@@ -61,10 +111,12 @@ def _pages(template: str) -> list[str]:
 			return []
 
 
-def _limit_text(r) -> str:
+def _limit_text(r, dp=None) -> str:
 	if r.custom_row_type == "Visual":
 		return "OK / NG"
 	lo, hi = T.display_limit(r.min_value), T.display_limit(r.max_value)
+	if dp is not None:
+		lo, hi = (x if x == "—" else _fixed(x, dp) for x in (lo, hi))
 	if lo == "—":
 		return f"≤ {hi}"
 	if hi == "—":
@@ -86,6 +138,7 @@ def qi_record(name: str) -> dict | None:
 	for r in drawing_rows(qi):
 		vals = data.get(r.custom_balloon_no, [])
 		lo, hi = flt(r.min_value), flt(r.max_value)
+		dp = _dp(r, [m.value for m in vals])
 		values = []
 		for m in vals:
 			if r.custom_row_type == "Visual":
@@ -96,14 +149,14 @@ def qi_record(name: str) -> dict | None:
 					bad = x < lo - 1e-9 or x > hi + 1e-9
 				except (ValueError, T.ToleranceError):
 					bad = True
-			values.append({"n": m.sample_no, "value": m.value, "bad": bad})
+			values.append({"n": m.sample_no, "value": _fixed(m.value, dp), "bad": bad})
 		instruments = sorted({m.instrument for m in vals if m.instrument})
 		rows.append({
 			"balloon": r.custom_balloon_no,
 			"type": r.custom_row_type,
 			"specification": r.specification,
 			"spec_text": r.custom_spec_text or "",
-			"limits": _limit_text(r),
+			"limits": _limit_text(r, dp),
 			"unit": r.custom_unit or "",
 			"class": r.custom_class or "",
 			"test_method": r.custom_test_method or "",
@@ -114,8 +167,8 @@ def qi_record(name: str) -> dict | None:
 			"values": values,
 			"n": len(values),
 			"required": cint(r.custom_sample_count),
-			"min": r.custom_obs_min if r.custom_row_type != "Visual" else None,
-			"max": r.custom_obs_max if r.custom_row_type != "Visual" else None,
+			"min": _fixed(r.custom_obs_min, dp) if r.custom_row_type != "Visual" else None,
+			"max": _fixed(r.custom_obs_max, dp) if r.custom_row_type != "Visual" else None,
 			"status": r.status,
 			# from the values themselves: the row's status is refreshed only when the inspection is saved
 			"bad": r.status == "Rejected" or any(v["bad"] for v in values),
@@ -135,7 +188,7 @@ def qi_record(name: str) -> dict | None:
 	urls = _pages(qi.quality_inspection_template)
 	every = cint(qi.get("custom_print_all_sheets"))
 	keep = [i for i in range(1, len(urls) + 1) if every or i in boxes] or ([1] if urls else [])
-	pages = [{"no": i, "image": _data_uri(urls[i - 1]), "boxes": boxes.get(i, [])} for i in keep]
+	pages = [{"no": i, **(_sheet(urls[i - 1]) or {"image": None}), "boxes": boxes.get(i, [])} for i in keep]
 	conditions = [c for c in qi.get("custom_conditions") or []]
 	return {
 		"name": qi.name,
@@ -171,6 +224,8 @@ def qi_record(name: str) -> dict | None:
 			for c in conditions
 		],
 		"rows": rows,
+		# the unit most measured rows share: Annex A states it once ("values in mm unless stated")
+		"main_unit": max(units, key=units.count) if (units := [r["unit"] for r in rows if r["type"] != "Visual" and r["unit"]]) else "",
 		"pages": [p for p in pages if p["image"]],
 		"failed": [r for r in rows if r["bad"]],
 		"sheets": len(urls),
@@ -453,6 +508,26 @@ def _place(address: str | None) -> str:
 		return ""
 	a = frappe.db.get_value("Address", address, ["city", "country"], as_dict=True) or {}
 	return ", ".join(x for x in (a.get("city"), a.get("country")) if x)
+
+
+_FONTS: str | None = None
+
+
+def report_fonts() -> str:
+	"""@font-face rules embedding Arimo (Apache 2.0, metrically Arial) as data
+	URIs: the PDF server has only DejaVu, which sets wider than the reports
+	were designed in."""
+	global _FONTS
+	if _FONTS is None:
+		css = []
+		for weight in (400, 700):
+			path = frappe.get_app_path("iso_compliance", "public", "fonts", f"arimo-latin-{weight}-normal.woff2")
+			with open(path, "rb") as f:
+				data = base64.b64encode(f.read()).decode()
+			css.append(f"@font-face {{ font-family: 'Arimo'; font-weight: {weight}; font-style: normal; "
+			           f"src: url(data:font/woff2;base64,{data}) format('woff2'); }}")
+		_FONTS = "\n".join(css)
+	return _FONTS
 
 
 def letterhead(company: str) -> dict:
