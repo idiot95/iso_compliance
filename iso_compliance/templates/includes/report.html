@@ -89,7 +89,7 @@
 {%- macro details(fields) -%}
 <table class="rp-details">
 {%- for row in fields | batch(4) %}<tr>
-	{%- for label, value, sub, bold in row %}<td><div class="rp-l">{{ label }}</div><div class="rp-v {{ 'b' if bold }}">{{ value if value not in (none, "") else "" }}</div>{% if sub %}<div class="rp-s">{{ sub }}</div>{% endif %}</td>{% endfor %}
+	{%- for label, value, sub, bold in row %}<td><div class="rp-l">{{ label }}</div><div class="rp-v {{ 'b' if bold }}">{{ value if value not in (none, "") else "&nbsp;" }}</div>{% if sub %}<div class="rp-s">{{ sub }}</div>{% endif %}</td>{% endfor %}
 	{%- for i in range(4 - row | length) %}<td></td>{% endfor %}
 </tr>{%- endfor %}
 </table>

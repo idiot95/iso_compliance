@@ -9,12 +9,17 @@
 {%- macro record_styles() -%}
 {{ rp.styles() }}
 <style>
-	.ax { margin-bottom: 6pt; table-layout: fixed; page-break-inside: avoid; }
-	.ax td { font-size: 9pt; line-height: 11.5pt; padding: 0; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; }
-	.ax tr.h td { border-top: 0.75pt solid #111; padding: 3pt 0 1.5pt; }
-	.ax tr.h td.r { text-align: right; }
-	.ax td.v { text-align: right; padding-right: 4.5pt; }
-	.ax td.k { color: #555; }
+	/* Annex A: one ruled block per characteristic, ten readings to a line */
+	.ax { margin-bottom: 8pt; table-layout: fixed; border: 0.75pt solid #111; page-break-inside: avoid; }
+	.ax td { font-size: 9.5pt; padding: 2.5pt 5pt; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden;
+		border-left: 0.5pt solid #bbb; border-top: 0.5pt solid #bbb; text-align: right; }
+	.ax tr.h td { background: #ededed; border-top: 0; border-bottom: 0.75pt solid #111; border-left: 0; padding: 3.5pt 5pt; font-size: 9pt; }
+	.ax tr.h td.l { text-align: left; }
+	.ax tr.h + tr td { border-top: 0; }
+	.ax td.k { text-align: left; color: #444; background: #f6f6f6; border-left: 0; border-right: 0.75pt solid #111; font-size: 8.5pt; }
+	.ax td.k + td { border-left: 0; }
+	.ax td.bad { background: #e2e2e2; font-weight: bold; text-decoration: underline; }
+	.ax td.all { text-align: left; }
 	.dwg { position: relative; border: 0.75pt solid #111; margin: 2pt auto 0; page-break-inside: avoid; }
 	.dwg img { display: block; width: 100%; height: auto; }  /* the boxes are placed in % of this image; the width is set so a sheet fits one page */
 	.box { position: absolute; border: 1.5pt solid #111; }
@@ -102,15 +107,15 @@
 {%- set vals = r["values"] %}
 {%- set unit = r.unit if r.unit and r.type != "Visual" and r.unit | lower != main_unit | lower else "" %}
 <table class="ax">
-	<colgroup><col style="width:52px">{% for i in range(10) %}<col>{% endfor %}</colgroup>
-	<tr class="h"><td colspan="6"><b>{{ r.balloon }} · {{ r.specification }}{% if r.type == "Visual" %} (visual){% endif %}</b></td>
-		<td colspan="5" class="r">{{ r.limits }}{% if unit %} {{ unit }}{% endif %}{% if r.min is not none and r.min != "" %} · min {{ r.min }} · max {{ r.max }}{% endif %}</td></tr>
+	<colgroup><col style="width:13%">{% for i in range(10) %}<col>{% endfor %}</colgroup>
+	<tr class="h"><td colspan="6" class="l"><b>{{ r.balloon }} · {{ r.specification }}{% if r.type == "Visual" %} (visual){% endif %}</b></td>
+		<td colspan="5">{{ r.limits }}{% if unit %} {{ unit }}{% endif %}{% if r.min is not none and r.min != "" %} &nbsp;·&nbsp; min {{ r.min }} &nbsp;·&nbsp; max {{ r.max }}{% endif %}</td></tr>
 	{%- if r.type == "Visual" and not r.bad %}
-	<tr><td class="k">1&ndash;{{ r.n }}</td><td colspan="10">all OK</td></tr>
+	<tr><td class="k">1&ndash;{{ r.n }}</td><td colspan="10" class="all">all OK</td></tr>
 	{%- else %}
 	{%- for line in vals | batch(10) %}
 	<tr><td class="k">{{ line[0].n }}&ndash;{{ line[-1].n }}</td>
-		{%- for v in line %}<td class="v"><span class="{{ 'rp-nok' if v.bad }}">{{ v.value }}</span></td>{% endfor %}
+		{%- for v in line %}<td class="{{ 'bad' if v.bad }}">{{ v.value }}</td>{% endfor %}
 		{%- for i in range(10 - line | length) %}<td></td>{% endfor %}</tr>
 	{%- endfor %}
 	{%- endif %}

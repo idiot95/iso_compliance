@@ -16,9 +16,9 @@
 {%- set orders = d.po | map(attribute="no") | join(", ") -%}
 {%- set order_dates = [] -%}{% for p in d.po if p.date %}{% set _ = order_dates.append(frappe.format(p.date, {"fieldtype": "Date"})) %}{% endfor -%}
 <div class="rp">
-{%- call rp.page(lh, d.title, "EN 10204:2004 type " ~ d.type ~ " · No. " ~ d.delivery_note ~ " · " ~ date,
+{%- call rp.page(lh, d.title, "EN 10204:2004 type " ~ d.type ~ " · No. " ~ d.ref ~ " · " ~ date,
 	d.form_no ~ " " ~ d.issue ~ " · " ~ lh.address,
-	("DRAFT · " if d.draft else "") ~ d.delivery_note) %}
+	("DRAFT · " if d.draft else "") ~ d.ref) %}
 
 {{ rp.details([
 	("Customer", d.customer, d.customer_place, true),

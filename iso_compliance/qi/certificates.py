@@ -559,42 +559,50 @@ def _company_address(company: str) -> str:
 	return ", ".join(x for x in (a.address_line1, a.address_line2, city, a.country) if x)
 
 
-def en10204(delivery_note, doc_type: str) -> dict:
-	"""Everything an EN 10204 2.1 / 2.2 / 3.1 document prints for one Delivery Note."""
+def _cert_row(row, doc_type: str, concessions: list) -> dict:
+	"""One goods line of a certificate, with its results (2.2 / 3.1) and
+	material trace (3.1). `row` is a Delivery Note Item or a stand-in for one."""
 	from iso_compliance.utils import coc_row_aggregate
 
+	r = {"item_code": row.item_code, "item_name": row.item_name, "qty": row.qty, "uom": row.uom,
+	     "batches": _batches_of(row.get("serial_and_batch_bundle"), row.get("batch_no")),
+	     "drawing": _drawing_ref(row.item_code), "results": [], "basis": "", "mtc": None,
+	     "reports": _reports_of(row)}
+	if doc_type in ("2.2", "3.1"):
+		agg = coc_row_aggregate(row)
+		concessions += agg["concessions"]
+		r["results"] = _results(agg["parameters"])
+		if r["results"]:
+			r["basis"] = _("specific inspection of the batches supplied")
+		elif doc_type == "2.2":
+			qi, res = _latest_results(row.item_code)
+			if qi:
+				r["results"], r["basis"] = res, _("non-specific inspection, production of {0}").format(
+					frappe.utils.formatdate(qi.report_date))
+		if doc_type == "3.1":
+			r["mtc"] = mtc_row(row)
+	return r
+
+
+def en10204(delivery_note, doc_type: str, only_rows: list[str] | None = None) -> dict:
+	"""Everything an EN 10204 2.1 / 2.2 / 3.1 document prints for one Delivery
+	Note; `only_rows` (Delivery Note Item names) narrows it to those lines."""
 	dn = delivery_note if not isinstance(delivery_note, str) else frappe.get_doc("Delivery Note", delivery_note)
 	spec = EN10204[doc_type]
-	orders = sorted({r.against_sales_order for r in dn.items if r.get("against_sales_order")})
+	items = [row for row in dn.items if not only_rows or row.name in only_rows]
+	orders = sorted({r.against_sales_order for r in items if r.get("against_sales_order")})
 	po = [frappe.db.get_value("Sales Order", so, ["po_no", "po_date"], as_dict=True) for so in orders]
 	po = [p for p in po if p and p.po_no] or ([frappe._dict(po_no=dn.po_no, po_date=dn.po_date)] if dn.get("po_no") else [])
 	logo = frappe.db.get_value("Company", dn.company, "company_logo")
-	rows, concessions = [], []
-	for row in dn.items:
-		r = {"item_code": row.item_code, "item_name": row.item_name, "qty": row.qty, "uom": row.uom,
-		     "batches": _batches_of(row.get("serial_and_batch_bundle"), row.get("batch_no")),
-		     "drawing": _drawing_ref(row.item_code), "results": [], "basis": "", "mtc": None,
-		     "reports": _reports_of(row)}
-		if doc_type in ("2.2", "3.1"):
-			agg = coc_row_aggregate(row)
-			concessions += agg["concessions"]
-			r["results"] = _results(agg["parameters"])
-			if r["results"]:
-				r["basis"] = _("specific inspection of the batches supplied")
-			elif doc_type == "2.2":
-				qi, res = _latest_results(row.item_code)
-				if qi:
-					r["results"], r["basis"] = res, _("non-specific inspection, production of {0}").format(
-						frappe.utils.formatdate(qi.report_date))
-			if doc_type == "3.1":
-				r["mtc"] = mtc_row(row)
-		rows.append(r)
+	concessions = []
+	rows = [_cert_row(row, doc_type, concessions) for row in items]
 	return {
 		"type": doc_type,
 		"title": spec["title"],
 		"form_no": spec["form_no"],
 		"issue": spec["issue"],
 		"number": f"{dn.name}/{doc_type}",
+		"ref": dn.name,
 		"issued": dn.posting_date,
 		"company": dn.company,
 		"address": _company_address(dn.company),
@@ -610,6 +618,79 @@ def en10204(delivery_note, doc_type: str) -> dict:
 		"show_drawing": any(r["drawing"] for r in rows),
 		"concessions": list(dict.fromkeys(concessions)),
 		"draft": dn.docstatus != 1,
+	}
+
+
+def _qi_delivery(qi) -> tuple[str | None, list[str]]:
+	"""The Delivery Note an inspection is connected to, and its lines for the
+	inspected item: the despatch inspection on the note or a line, else a line
+	that delivered the inspected batch. (None, []) when nothing is connected."""
+	lines = lambda dn: frappe.get_all("Delivery Note Item", filters={"parent": dn, "item_code": qi.item_code}, pluck="name")
+	if qi.reference_type == "Delivery Note" and frappe.db.get_value("Delivery Note", qi.reference_name, "docstatus") != 2:
+		return qi.reference_name, lines(qi.reference_name)
+	hit = frappe.get_all("Delivery Note Item", filters={"quality_inspection": qi.name, "docstatus": ("<", 2)},
+	                     fields=["name", "parent"], order_by="creation desc", limit=1)
+	if hit:
+		return hit[0].parent, [hit[0].name]
+	if qi.batch_no:
+		hit = frappe.get_all("Delivery Note Item", filters={"item_code": qi.item_code, "batch_no": qi.batch_no,
+		                     "docstatus": ("<", 2)}, fields=["name", "parent"], order_by="creation desc", limit=1)
+		if hit:
+			return hit[0].parent, [r for r in lines(hit[0].parent) if r == hit[0].name]
+		bundle = frappe.db.sql("""select b.voucher_no, b.voucher_detail_no from `tabSerial and Batch Bundle` b
+			join `tabSerial and Batch Entry` e on e.parent = b.name
+			where b.voucher_type = 'Delivery Note' and b.item_code = %s and e.batch_no = %s and b.docstatus < 2
+			order by b.creation desc limit 1""", (qi.item_code, qi.batch_no), as_dict=True)
+		if bundle:
+			return bundle[0].voucher_no, [bundle[0].voucher_detail_no]
+	return None, []
+
+
+def qi_en10204(name: str, doc_type: str) -> dict:
+	"""The EN 10204 document printed from a Quality Inspection: the connected
+	Delivery Note's certificate for the inspected item, else one line from the
+	inspection itself with the delivery fields left blank to fill by hand."""
+	from iso_compliance.utils import coc_row_inspections
+
+	qi = frappe.get_doc("Quality Inspection", name)
+	dn, only = _qi_delivery(qi)
+	if dn:
+		return en10204(dn, doc_type, only or None)
+
+	stock_uom = frappe.db.get_value("Item", qi.item_code, "stock_uom")
+	row = frappe._dict(name=None, item_code=qi.item_code, item_name=qi.item_name, qty=qi.get("custom_lot_qty") or qi.sample_size,
+	                   uom=stock_uom, batch_no=qi.batch_no, serial_and_batch_bundle=None, quality_inspection=None)
+	chain = coc_row_inspections(row)
+	known = [q.name for q in (chain.get("incoming") or []) + chain["pdi"] + chain["in_process"]]
+	if qi.name not in known:
+		row.quality_inspection = qi.name  # absorbed as the despatch inspection
+	concessions = []
+	r = _cert_row(row, doc_type, concessions)
+	if qi.name not in r["reports"]:
+		r["reports"].insert(0, qi.name)
+	spec = EN10204[doc_type]
+	return {
+		"type": doc_type,
+		"title": spec["title"],
+		"form_no": spec["form_no"],
+		"issue": spec["issue"],
+		"number": f"{qi.name}/{doc_type}",
+		"ref": qi.name,
+		"issued": qi.report_date,
+		"company": qi.company,
+		"address": _company_address(qi.company),
+		"logo": None,
+		"customer": qi.get("custom_customer") or "",
+		"customer_place": "",
+		"lr_no": None,
+		"lr_date": None,
+		"po": [],
+		"delivery_note": None,
+		"delivery_date": None,
+		"rows": [r],
+		"show_drawing": bool(r["drawing"]),
+		"concessions": list(dict.fromkeys(concessions)),
+		"draft": qi.docstatus != 1,
 	}
 
 
