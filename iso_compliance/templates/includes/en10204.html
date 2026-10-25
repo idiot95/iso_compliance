@@ -1,79 +1,89 @@
-{#- EN 10204:2004 inspection documents: 2.1 declaration of compliance with the
-    order, 2.2 test report, 3.1 inspection certificate. One layout on the shared
-    report kit, the data from qi.certificates.en10204(). -#}
+{#- Delivery certificate: one document at three EN 10204:2004 levels, as designed
+    on the "HCC report formats" canvas. 2.1 (Certificate of Conformity) is the
+    goods and the declaration; 2.2 (Test Report) adds the test results of the
+    same products; 3.1 (Inspection Certificate) has the results of the delivered
+    batches, the material trace and the independent inspector's signature.
+    Every section grows by rows. Data: qi.certificates.en10204(). -#}
 {%- import "iso_compliance/templates/includes/report.html" as rp -%}
 
 {%- macro styles() -%}
 {{ rp.styles() }}
 {%- endmacro -%}
 
-{#- letterhead, title with the certificate number, and the order details -#}
-{%- macro head(d) -%}
-{{ rp.letterhead(letterhead(d.company)) }}
-{{ rp.title(d.title, "Type " ~ d.type ~ " to EN 10204:2004", [
-	("Certificate no.", d.number),
-	("Date", frappe.format(d.issued, {"fieldtype": "Date"})),
-]) }}
-{%- set orders = [] -%}
-{%- for p in d.po %}{% set _ = orders.append(p.no ~ (" dated " ~ frappe.format(p.date, {"fieldtype": "Date"}) if p.date else "")) %}{% endfor -%}
-{{ rp.grid([
-	("Purchaser", d.customer),
-	("Purchaser's order", orders | join(", ")),
-	("Delivery note", d.delivery_note ~ " dated " ~ frappe.format(d.delivery_date, {"fieldtype": "Date"})),
-	("Manufacturer", d.company),
-]) }}
-{%- endmacro -%}
+{%- macro certificate(d) -%}
+{%- set lh = letterhead(d.company) -%}
+{%- set date = frappe.format(d.issued, {"fieldtype": "Date"}) -%}
+{%- set orders = d.po | map(attribute="no") | join(", ") -%}
+{%- set order_dates = [] -%}{% for p in d.po if p.date %}{% set _ = order_dates.append(frappe.format(p.date, {"fieldtype": "Date"})) %}{% endfor -%}
+<div class="rp">
+{%- call rp.page(lh, d.title, "EN 10204:2004 type " ~ d.type ~ " · No. " ~ d.delivery_note ~ " · " ~ date,
+	d.form_no ~ " " ~ d.issue ~ " · " ~ lh.address,
+	("DRAFT · " if d.draft else "") ~ d.delivery_note) %}
 
-{%- macro products(d) -%}
-<div class="rp-h">Products supplied</div>
-<table class="rp-t"><thead><tr><th class="c" style="width:6%">Pos.</th><th style="width:14%">Item no.</th><th>Description</th>
-	{% if d.show_drawing %}<th style="width:16%">Drawing no.</th>{% endif %}<th style="width:16%">Batch no.</th><th class="r" style="width:12%">Quantity</th></tr></thead><tbody>
-{%- for r in d.rows %}<tr><td class="c">{{ loop.index }}</td><td>{{ r.item_code }}</td><td>{{ r.item_name }}</td>
-	{% if d.show_drawing %}<td>{{ r.drawing or "" }}</td>{% endif %}<td>{{ r.batches | join(", ") }}</td>
-	<td class="r n">{{ frappe.format(r.qty, {"fieldtype": "Float"}) }} {{ r.uom }}</td></tr>{%- endfor %}
-</tbody></table>
-{%- endmacro -%}
+{{ rp.details([
+	("Customer", d.customer, d.customer_place, true),
+	("Customer order", orders, order_dates | join(", "), false),
+	("Delivery note", d.delivery_note, frappe.format(d.delivery_date, {"fieldtype": "Date"}), false),
+	("Vehicle / LR no.", d.lr_no, frappe.format(d.lr_date, {"fieldtype": "Date"}) if d.lr_no and d.lr_date else none, false),
+]) }}
 
-{%- macro results(d) -%}
-<div class="rp-h">Test results</div>
-{%- for r in d.rows %}
-<table class="rp-t" style="margin-bottom:6pt">
-	<thead>
-		<tr><th colspan="3">Pos. {{ loop.index }}: {{ r.item_code }} {{ r.item_name }}{% if r.basis %} <span style="font-weight:normal">(basis: {{ r.basis }})</span>{% endif %}</th></tr>
-		<tr><th>Characteristic</th><th style="width:30%">Specified requirement</th><th style="width:26%">Result</th></tr>
-	</thead><tbody>
-	{%- for t in r.results %}<tr><td>{{ t.characteristic }}</td><td class="n">{{ t.requirement }} {{ t.unit }}</td>
-		<td class="n {{ '' if t.ok else 'nok' }}">{{ t.result }} {{ t.unit }}{% if not t.ok %} (not conforming){% endif %}</td></tr>
-	{%- else %}<tr><td colspan="3">No test results are recorded for this position.</td></tr>{%- endfor %}
+<table class="rp-t">
+	<thead><tr><th class="c" style="width:5%">Pos.</th><th style="width:12%">Item</th><th>Description</th>
+		<th style="width:15%">Batch</th><th class="r" style="width:11%">Quantity</th><th style="width:19%">Inspection report</th></tr></thead>
+	<tbody>
+	{%- for r in d.rows %}<tr><td class="c">{{ loop.index }}</td><td>{{ r.item_code }}</td><td>{{ r.item_name }}</td>
+		<td>{{ r.batches | join(", ") }}</td><td class="r n">{{ frappe.format(r.qty, {"fieldtype": "Float"}) }} {{ r.uom }}</td>
+		<td>{{ r.reports | join(", ") }}</td></tr>{%- endfor %}
 	</tbody>
 </table>
-{%- endfor %}
-{%- endmacro -%}
 
-{#- 3.1 only: where the material came from, and its properties as certified -#}
-{%- macro trace(r) -%}
-{%- set m = r.mtc -%}
-<div class="rp-h">Material traceability <small>{{ r.item_code }}</small></div>
-<table class="rp-t"><thead><tr><th style="width:12%">Role</th><th style="width:16%">Material</th><th style="width:16%">Batch / heat no.</th><th style="width:22%">Supplier</th><th style="width:14%">Receipt</th><th>Supplier certificate</th></tr></thead><tbody>
-{%- for s in m.sources %}<tr><td>{{ s.role | capitalize }}</td><td>{{ s.item }}</td><td>{{ s.batch }}{% if s.heat_no %} / {{ s.heat_no }}{% endif %}</td>
-	<td>{{ s.supplier or "" }}</td><td>{{ s.receipt }}</td><td>{{ s.certificate_name if s.certificate else "Not on file" }}</td></tr>
-{%- else %}<tr><td colspan="6">No receipt trace for this delivery.</td></tr>{%- endfor %}
-</tbody></table>
-{%- if m.properties %}
-<div class="rp-h">Material properties <small>{{ r.item_code }}</small></div>
-<table class="rp-t"><thead><tr><th>Property</th><th style="width:18%">Method</th><th style="width:20%">Requirement</th><th style="width:18%">Result</th><th style="width:14%">Source</th></tr></thead><tbody>
-{%- for p in m.properties %}<tr><td>{{ p.property }}</td><td>{{ p.method or "" }}</td><td class="n">{{ p.limits }} {{ p.unit }}</td>
-	<td class="n {{ '' if p.ok else 'nok' }}">{{ p.result or "" }} {{ p.unit if p.result }}</td><td>{{ p.source }}</td></tr>{%- endfor %}
-</tbody></table>
+{%- if d.type != "2.1" %}
+<div class="rp-h">Test results</div>
+<table class="rp-t">
+	<thead><tr><th class="c" style="width:5%">Pos.</th><th>Characteristic</th><th style="width:21%">Requirement</th>
+		<th style="width:21%">Result (min – max)</th><th class="r" style="width:6%">n</th></tr></thead>
+	<tbody>
+	{%- set ns = namespace(any=false) %}
+	{%- for r in d.rows %}{% set pos = loop.index %}
+	{%- for t in r.results %}{% set ns.any = true %}
+	<tr><td class="c">{{ pos }}</td><td>{{ t.characteristic }}</td><td class="n">{{ t.requirement }} {{ t.unit }}</td>
+		<td class="n">{% if t.ok %}{{ t.result }}{% else %}<span class="rp-nok">{{ t.result }}</span>{% endif %}</td><td class="r">{{ t.n }}</td></tr>
+	{%- endfor %}{%- endfor %}
+	{%- if not ns.any %}<tr><td colspan="5">No test results are recorded for these products.</td></tr>{% endif %}
+	</tbody>
+</table>
+<div class="rp-note">
+	{%- if d.type == "2.2" %}Results from non-specific inspection of the same products.{% else %}Results from specific inspection of the products supplied.{% endif %}
+	Full readings: the inspection reports listed above.
+</div>
 {%- endif %}
-{%- endmacro -%}
 
-{%- macro statement(d, text) -%}
-<div class="rp-statement">{{ text }}</div>
-{%- if d.concessions %}{{ rp.remarks("Accepted under concession " ~ (d.concessions | join(", ")) ~ ".") }}{% endif %}
-{%- endmacro -%}
+{%- if d.type == "3.1" %}
+{%- set trace = [] -%}
+{%- for r in d.rows if r.mtc %}{% set pos = loop.index %}{% for s in r.mtc.sources %}{% set _ = trace.append((pos, s)) %}{% endfor %}{% endfor %}
+{%- if trace %}
+<div class="rp-h">Material traceability</div>
+<table class="rp-t">
+	<thead><tr><th class="c" style="width:5%">Pos.</th><th>Material</th><th style="width:17%">Batch / heat no.</th><th style="width:27%">Supplier</th><th style="width:18%">Supplier certificate</th></tr></thead>
+	<tbody>
+	{%- for pos, s in trace %}<tr><td class="c">{{ pos }}</td><td>{{ s.item }}</td><td>{{ s.batch }}{% if s.heat_no %} / {{ s.heat_no }}{% endif %}</td>
+		<td>{{ s.supplier or "" }}</td><td>{{ s.certificate_name if s.certificate else "Not on file" }}</td></tr>{%- endfor %}
+	</tbody>
+</table>
+{%- endif %}
+{%- endif %}
 
-{%- macro sign(d, who) -%}
-{{ rp.signoff([(who, "", none)]) }}
-{{ rp.footer(d.form_no, "Issue 01 / Rev 00", d.number, "DRAFT: delivery note not submitted" if d.draft else None) }}
+<div class="rp-line">
+	{%- if d.type == "3.1" %}We certify that the products listed above comply with the requirements of the order. The results are from specific inspection of the products supplied.
+	{%- else %}We declare that the products listed above comply with the requirements of the order.{% endif %}
+	{%- if d.concessions %} Accepted under concession {{ d.concessions | join(", ") }}.{% endif %}
+</div>
+
+{{ rp.signatures([
+	"Authorised inspection representative, independent of manufacturing · name · date" if d.type == "3.1"
+	else "For " ~ d.company ~ " · authorised signatory · date"
+]) }}
+
+{%- endcall %}
+</div>
 {%- endmacro -%}

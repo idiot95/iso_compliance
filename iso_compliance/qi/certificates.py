@@ -27,7 +27,6 @@ from iso_compliance.qi.inspection import calibration, drawing_rows, measurements
 from iso_compliance.qi.template import ROWS, is_drawing_template
 
 RECORD_FORMAT = "Sampling and Inspection Record"
-DECLARATION_FORMAT = "Declaration of Compliance 2.1"
 TEST_REPORT_FORMAT = "Test Report 2.2"
 COC_FORMAT = "Certificate of Conformity"
 MTC_FORMAT = "Material Test Certificate 3.1"
@@ -350,11 +349,13 @@ def mtc_row(row) -> dict | None:
 
 # Titles as HCC issues them (developer, 2026-10-14); the type number keeps each
 # one tied to its EN 10204 definition.
-#: The designations EN 10204:2004 gives each type (table A.1).
+#: One delivery certificate at three EN 10204:2004 levels. 2.1 is the
+#: Certificate of Conformity (FRM-030), which replaced the separate 2.1
+#: declaration (FRM-040, retired 2026-10-25).
 EN10204 = {
-	"2.1": {"title": "Declaration of compliance with the order", "form_no": "HCCPL/QMS/FRM-040"},
-	"2.2": {"title": "Test report", "form_no": "HCCPL/QMS/FRM-041"},
-	"3.1": {"title": "Inspection certificate", "form_no": "HCCPL/QMS/FRM-039"},
+	"2.1": {"title": "Certificate of Conformity", "form_no": "HCCPL/QMS/FRM-030", "issue": "Issue 01 / Rev 01"},
+	"2.2": {"title": "Test Report", "form_no": "HCCPL/QMS/FRM-041", "issue": "Issue 01 / Rev 00"},
+	"3.1": {"title": "Inspection Certificate", "form_no": "HCCPL/QMS/FRM-039", "issue": "Issue 01 / Rev 00"},
 }
 
 
@@ -386,7 +387,7 @@ def _results(params) -> list[dict]:
 		if not res:
 			continue
 		out.append({"characteristic": p["specification"], "requirement": _requirement(p), "result": res,
-		            "unit": p.get("unit") or "", "ok": p.get("ok", True)})
+		            "unit": p.get("unit") or "", "ok": p.get("ok", True), "n": p.get("n") or ""})
 	return out
 
 
@@ -436,6 +437,24 @@ def _drawing_ref(item_code: str) -> str:
 	return " Rev ".join(x for x in (no, rev) if x)
 
 
+def _reports_of(row) -> list[str]:
+	"""The inspection reports that stand behind one delivered row: its despatch
+	and final inspections, else the inspection ERPNext linked on the row."""
+	from iso_compliance.utils import coc_row_inspections
+
+	chain = coc_row_inspections(row)
+	names = [qi.name for qi in chain["pdi"]] + ([chain["outgoing"].name] if chain["outgoing"] else [])
+	return list(dict.fromkeys(names)) or ([row.quality_inspection] if row.get("quality_inspection") else [])
+
+
+def _place(address: str | None) -> str:
+	"""City and country of an address, the way a certificate names a customer."""
+	if not address:
+		return ""
+	a = frappe.db.get_value("Address", address, ["city", "country"], as_dict=True) or {}
+	return ", ".join(x for x in (a.get("city"), a.get("country")) if x)
+
+
 def letterhead(company: str) -> dict:
 	"""The company block every report prints at the top: name, logo, address
 	and whatever contact details the Company record holds."""
@@ -479,7 +498,8 @@ def en10204(delivery_note, doc_type: str) -> dict:
 	for row in dn.items:
 		r = {"item_code": row.item_code, "item_name": row.item_name, "qty": row.qty, "uom": row.uom,
 		     "batches": _batches_of(row.get("serial_and_batch_bundle"), row.get("batch_no")),
-		     "drawing": _drawing_ref(row.item_code), "results": [], "basis": "", "mtc": None}
+		     "drawing": _drawing_ref(row.item_code), "results": [], "basis": "", "mtc": None,
+		     "reports": _reports_of(row)}
 		if doc_type in ("2.2", "3.1"):
 			agg = coc_row_aggregate(row)
 			concessions += agg["concessions"]
@@ -498,12 +518,16 @@ def en10204(delivery_note, doc_type: str) -> dict:
 		"type": doc_type,
 		"title": spec["title"],
 		"form_no": spec["form_no"],
+		"issue": spec["issue"],
 		"number": f"{dn.name}/{doc_type}",
 		"issued": dn.posting_date,
 		"company": dn.company,
 		"address": _company_address(dn.company),
 		"logo": _data_uri(logo) if logo else None,
 		"customer": dn.customer_name or dn.customer,
+		"customer_place": _place(dn.get("shipping_address_name") or dn.get("customer_address")),
+		"lr_no": dn.get("lr_no"),
+		"lr_date": dn.get("lr_date"),
 		"po": [{"no": p.po_no, "date": p.po_date} for p in po],
 		"delivery_note": dn.name,
 		"delivery_date": dn.posting_date,
@@ -613,7 +637,7 @@ def certificate_readiness(delivery_note: str) -> dict:
 				rejected and _("rejected inspections: {0}").format(", ".join(rejected)),
 				concessions and _("includes concession {0}").format(", ".join(concessions)),
 			),
-			"print_format": DECLARATION_FORMAT,
+			"print_format": COC_FORMAT,  # 2.1 is the Certificate of Conformity
 			"default": False,
 		},
 		"d22": {

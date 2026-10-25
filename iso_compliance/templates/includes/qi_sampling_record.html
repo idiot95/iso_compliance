@@ -1,115 +1,130 @@
-{#- Sampling & Inspection Record: one drawing inspection (QI SPEC v2 §4.7),
-    printed as an inspection report on the shared report kit. Used by the
-    Delivery Note and Quality Inspection print formats of the same name. -#}
+{#- Inspection report for one drawing inspection (QI SPEC v2 §4.7), as designed
+    on the "HCC report formats" canvas: page 1 holds one row per characteristic;
+    every reading is in Annex A (only when some characteristic has more than one)
+    and the marked drawing in Annex B, so more samples or characteristics add
+    rows and pages, never columns. Used by the Delivery Note and Quality
+    Inspection print formats "Sampling and Inspection Record". -#}
 {%- import "iso_compliance/templates/includes/report.html" as rp -%}
 
 {%- macro record_styles() -%}
 {{ rp.styles() }}
 <style>
-	.sir-dwg-wrap { text-align: center; margin: 2pt 0 2pt; page-break-inside: avoid; }
-	.sir-dwg { position: relative; display: inline-block; border: 0.6pt solid #000; }
-	.sir-dwg img { display: block; max-width: 100%; max-height: 84mm; width: auto; height: auto; }
-	.sir-box { position: absolute; border: 1.2pt solid #555; }
-	.sir-box.bad { border: 2pt solid #c00; }
-	.sir-bal { position: absolute; top: -7pt; left: -7pt; width: 13pt; height: 13pt; line-height: 13pt; border-radius: 7pt;
-		background: #fff; border: 0.8pt solid #000; color: #000; font-size: 6.6pt; font-weight: bold; text-align: center; }
-	.sir-box.bad .sir-bal { border-color: #c00; color: #c00; }
-	.sir-note { font-size: 7.4pt; margin: 1pt 0 0; }
+	.ax { margin-bottom: 7pt; page-break-inside: avoid; }
+	.ax td { font-size: 9pt; padding: 0.5pt 0; font-variant-numeric: tabular-nums; }
+	.ax tr.h td { border-top: 0.75pt solid #111; padding: 3pt 0 2pt; }
+	.ax td.v { text-align: right; padding-right: 6pt; width: 8.2%; }
+	.ax td.k { color: #555; width: 8%; }
+	.dwg { position: relative; border: 0.75pt solid #111; margin-top: 2pt; }
+	.dwg img { display: block; width: 100%; height: auto; }  /* uncapped: the boxes are placed in % of this image */
+	.box { position: absolute; border: 1.5pt solid #111; }
+	.box.bad { border: 2.2pt solid #c00; }
+	.bal { position: absolute; top: -7pt; left: -7pt; width: 13pt; height: 13pt; line-height: 13pt; border-radius: 7pt;
+		border: 0.75pt solid #111; background: #fff; font-size: 8pt; font-weight: bold; text-align: center; }
+	.box.bad .bal { border-color: #c00; color: #c00; }
 </style>
 {%- endmacro -%}
 
 {%- macro record(rec, company) -%}
 {%- set lh = letterhead(company) -%}
-{%- set stage = (rec.stage or "") ~ " inspection" ~ (" · " ~ rec.check_point if rec.check_point else "") -%}
-{%- set ns = namespace(cols=1) -%}
-{%- for r in rec.rows %}{% set ns.cols = [ns.cols, r.required or 0, r.n or 0] | max %}{% endfor -%}
-{%- set wide = ns.cols > 10 -%}
+{%- set date = frappe.format(rec.report_date, {"fieldtype": "Date"}) -%}
+{%- set ctq = rec.rows | selectattr("class", "equalto", "CTQ") | list | length -%}
+{%- set many = rec.rows | selectattr("n", "gt", 1) | list | length -%}
+{%- set conform = rec.counts.conform -%}
+{%- set total = rec.rows | length -%}
+{%- set decision = "Draft, not submitted" if rec.docstatus == 0 else rec.disposition -%}
 <div class="rp">
-{{ rp.letterhead(lh) }}
-{{ rp.title("Inspection report", "Sampling and inspection record", [
-	("Report no.", rec.name),
-	("Date", frappe.format(rec.report_date, {"fieldtype": "Date"})),
-	("Stage", stage),
-]) }}
-{{ rp.grid([
-	("Item code", rec.item_code),
-	("Description", rec.item_name),
-	("Drawing no.", (rec.drawing_no or "") ~ (" Rev " ~ rec.drawing_revision if rec.drawing_revision else "")),
-	("Customer", rec.customer),
-	("Reference", rec.reference),
-	("Work Order", rec.work_order),
-	("Batch no.", rec.batch_no),
-	("Lot quantity", frappe.format(rec.lot_qty, {"fieldtype": "Float"}) if rec.lot_qty else ""),
-	("Sample size", frappe.format(rec.sample_size, {"fieldtype": "Float"})),
-	("Inspection plan", rec.template),
-	("Work instruction", rec.work_instructions | map(attribute="doc") | map("replace", "HCCPL/QMS/", "") | join(", ")),
+{%- call rp.page(lh, "Inspection Report", "No. " ~ rec.name ~ " · " ~ date,
+	rec.form_no ~ " Issue 01 / Rev 00 · " ~ lh.address, rec.name) %}
+
+{{ rp.details([
+	("Item", rec.item_code, rec.item_name, true),
+	("Drawing", (rec.drawing_no or "") ~ (" Rev " ~ rec.drawing_revision if rec.drawing_revision else ""), none, false),
+	("Batch", rec.batch_no, none, false),
+	("Lot / sample", (frappe.format(rec.lot_qty, {"fieldtype": "Float"}) ~ " / " if rec.lot_qty else "") ~ frappe.format(rec.sample_size, {"fieldtype": "Float"}) ~ " pcs", none, false),
+	("Stage", (rec.stage or "") ~ (" · " ~ rec.check_point if rec.check_point else ""), none, false),
+	("Reference", rec.reference.split(" ")[-1] ~ (" · " ~ rec.work_order if rec.work_order else ""), none, false),
+	("Customer", rec.customer, none, false),
+	("Decision", decision, none, true),
 ]) }}
 
-{%- for page in rec.pages %}
-<div class="rp-h">Drawing{% if rec.sheets > 1 %}, sheet {{ page.no }} of {{ rec.sheets }}{% endif %}</div>
-<div class="sir-dwg-wrap"><div class="sir-dwg">
-	<img src="{{ page.image }}">
-	{%- for b in page.boxes %}
-	<div class="sir-box {{ 'bad' if b.state == 'bad' }}" style="left:{{ b.x }}%;top:{{ b.y }}%;width:{{ b.w }}%;height:{{ b.h }}%"><div class="sir-bal">{{ b.balloon }}</div></div>
-	{%- endfor %}
-</div></div>
-<div class="sir-note">Characteristic numbers refer to the results below.{% if rec.failed %} Numbers in red are out of specification.{% endif %}</div>
-{%- endfor %}
-
-<div class="rp-h">Results</div>
 <table class="rp-t">
 	<thead><tr>
-		<th class="c" style="width:4%">No.</th><th>Characteristic</th><th style="width:10%">Specification</th>
-		<th style="width:11%">Limits</th><th style="width:17%">Instrument</th>
-		{%- if wide %}<th style="width:28%">Readings</th><th class="c" style="width:10%">Min / Max</th>
-		{%- else %}{% for i in range(1, ns.cols + 1) %}<th class="c" style="width:{{ [6, (36 / ns.cols) | int] | min }}%">{{ i }}</th>{% endfor %}{% endif %}
-		<th class="c" style="width:8%">Result</th>
+		<th class="c" style="width:5%">No.</th><th>Characteristic</th><th style="width:20%">Limits</th>
+		<th class="r" style="width:5%">n</th><th class="r" style="width:9%">Min</th><th class="r" style="width:9%">Max</th>
+		<th class="c" style="width:10%">Result</th>
 	</tr></thead>
 	<tbody>
 	{%- for r in rec.rows %}
-	{%- set done = r.n and r.n >= (r.required or 0) -%}
+	{%- set done = r.n and r.n >= (r.required or 0) %}
 	<tr>
 		<td class="c">{{ r.balloon }}</td>
-		<td>{{ r.specification }}{% if r["class"] == "CTQ" %} (CTQ){% endif %}{% if r.test_method %}<div class="rp-small">{{ r.test_method }}</div>{% endif %}</td>
-		<td>{{ r.spec_text }}</td>
-		<td class="n">{{ r.limits }} {{ r.unit }}</td>
-		<td>{% for a in r.instruments %}{{ a.label }}{% if a.label != a.name %}<div class="rp-small">{{ a.name }}</div>{% endif %}{% if not loop.last %}<br>{% endif %}{% endfor %}</td>
-		{%- if wide %}
-		<td class="n">{% for v in r["values"] %}<span class="{{ 'rp-nok' if v.bad }}">{{ v.value }}</span>{% if not loop.last %}, {% endif %}{% endfor %}</td>
-		<td class="c n">{% if r.min is not none and r.n %}{{ r.min }}{% if r.max != r.min %} / {{ r.max }}{% endif %}{% endif %}</td>
-		{%- else %}
-		{%- for i in range(1, ns.cols + 1) %}
-		{%- set v = r["values"] | selectattr("n", "equalto", i) | first %}
-		<td class="c n {{ 'nok' if v and v.bad }}">{{ v.value if v else ("" if i <= (r.required or 0) else "") }}</td>
-		{%- endfor %}
-		{%- endif %}
+		<td>{{ r.specification }}{% if r.type == "Visual" %} (visual){% endif %}{% if r["class"] == "CTQ" %} *{% endif %}</td>
+		<td class="n" style="white-space:nowrap">{{ r.limits }}{% if r.unit and r.type != "Visual" %} {{ r.unit }}{% endif %}</td>
+		<td class="r">{{ r.n or "" }}</td>
+		<td class="r n">{{ r.min if r.min is not none and r.n else "" }}</td>
+		<td class="r n">{{ r.max if r.max is not none and r.n else "" }}</td>
 		<td class="c">{% if r.bad %}<span class="rp-nok">NOT OK</span>{% elif done %}OK{% elif not r.n %}Not measured{% else %}Incomplete{% endif %}</td>
 	</tr>
 	{%- endfor %}
 	</tbody>
 </table>
+<div class="rp-note">
+	{%- if ctq %}* Critical to quality. {% endif -%}
+	{%- if many %}Every reading is in Annex A. {% endif -%}
+	{%- if rec.pages %}Characteristic numbers are marked on the drawing in Annex {{ "B" if many else "A" }}.{% endif -%}
+</div>
 
 {%- if rec.conditions %}
-<div class="rp-h">Test conditions</div>
-<table class="rp-t"><thead><tr><th class="c" style="width:6%">No.</th><th>Condition</th><th style="width:20%">Set value</th><th style="width:16%">Actual</th></tr></thead><tbody>
-{%- for c in rec.conditions %}<tr><td class="c">{{ c.row }}</td><td>{{ c.condition }}</td><td class="n">{{ c.set }}{% if c.tol %} &plusmn; {{ c.tol }}{% endif %} {{ c.unit or "" }}</td><td class="n">{{ c.actual if c.actual is not none else "" }}</td></tr>{%- endfor %}
-</tbody></table>
+<table class="rp-t">
+	<thead><tr><th class="c" style="width:5%">No.</th><th>Test condition</th><th style="width:22%">Set value</th><th style="width:16%">Actual</th></tr></thead>
+	<tbody>{%- for c in rec.conditions %}<tr><td class="c">{{ c.row }}</td><td>{{ c.condition }}</td><td class="n">{{ c.set }}{% if c.tol %} &plusmn; {{ c.tol }}{% endif %} {{ c.unit or "" }}</td><td class="n">{{ c.actual if c.actual is not none else "" }}</td></tr>{%- endfor %}</tbody>
+</table>
 {%- endif %}
 
-{{ rp.remarks(
-	rec.rows | length ~ (" characteristic" if rec.rows | length == 1 else " characteristics") ~ " inspected: " ~ rec.counts.conform ~ " conforming, " ~ rec.counts.failed ~ " not conforming"
-	~ (", " ~ rec.counts.open ~ " not measured or incomplete" if rec.counts.open else "") ~ ". "
-	~ "Decision: " ~ ("not submitted (draft)" if rec.docstatus == 0 else rec.disposition) ~ "."
-	~ (" Accepted under concession" ~ (" no. " ~ rec.concession_no if rec.concession_no else "") ~ " although no. "
-		~ (rec.failed | map(attribute="balloon") | join(", ")) ~ " did not meet specification." if rec.disposition == "Accept under Concession" else "")
-	~ (" Non-conformance " ~ rec.non_conformance ~ " raised." if rec.non_conformance else "")
-) }}
+<div class="rp-line">
+	{{ conform }} of {{ total }} characteristic{{ "s" if total != 1 }} conform.
+	{%- if rec.failed %} No. {{ rec.failed | map(attribute="balloon") | join(", ") }} {{ "is" if rec.failed | length == 1 else "are" }} out of specification.{% endif %}
+	{%- if rec.counts.open %} {{ rec.counts.open }} not measured or incomplete.{% endif %}
+	{{ decision }}{% if rec.disposition == "Accept under Concession" and rec.concession_no %}, concession no. {{ rec.concession_no }}{% endif %}.
+	{%- if rec.non_conformance %} Non-conformance {{ rec.non_conformance }} raised.{% endif %}
+</div>
 
-{{ rp.signoff([
-	("Inspected by", rec.inspected_by, rec.report_date),
-	("Reviewed by", rec.verified_by, None),
-	("Approved by", "", None),
+{{ rp.signatures([
+	"Inspected by: " ~ (rec.inspected_by or "") ~ " · " ~ date,
+	"Approved by (Quality): " ~ (rec.verified_by or ""),
 ]) }}
-{{ rp.footer(rec.form_no, "Issue 01 / Rev 00", rec.name, "DRAFT" if rec.docstatus == 0 else None) }}
+
+{%- if many %}
+{{ rp.annex("Annex A · Readings", rec.item_code ~ " · " ~ frappe.format(rec.sample_size, {"fieldtype": "Float"}) ~ " samples") }}
+{%- for r in rec.rows if r.n %}
+{%- set vals = r["values"] %}
+<table class="ax">
+	<tr class="h"><td colspan="6"><b>{{ r.balloon }} · {{ r.specification }}</b></td>
+		<td colspan="5" style="text-align:right">{{ r.limits }}{% if r.unit and r.type != "Visual" %} {{ r.unit }}{% endif %}{% if r.min is not none %} · min {{ r.min }} · max {{ r.max }}{% endif %}</td></tr>
+	{%- if r.type == "Visual" and not r.bad %}
+	<tr><td class="k">1&ndash;{{ r.n }}</td><td colspan="10">all OK</td></tr>
+	{%- else %}
+	{%- for line in vals | batch(10) %}
+	<tr><td class="k">{{ line[0].n }}&ndash;{{ line[-1].n }}</td>
+		{%- for v in line %}<td class="v"><span class="{{ 'rp-nok' if v.bad }}">{{ v.value }}</span></td>{% endfor %}
+		{%- for i in range(10 - line | length) %}<td class="v"></td>{% endfor %}</tr>
+	{%- endfor %}
+	{%- endif %}
+</table>
+{%- endfor %}
+{%- endif %}
+
+{%- for page in rec.pages %}
+{{ rp.annex("Annex " ~ ("B" if many else "A") ~ " · Drawing", (rec.drawing_no or "") ~ (" Rev " ~ rec.drawing_revision if rec.drawing_revision else "") ~ " · sheet " ~ page.no ~ " of " ~ rec.sheets) }}
+<div class="dwg">
+	<img src="{{ page.image }}" alt="">
+	{%- for b in page.boxes %}
+	<div class="box {{ 'bad' if b.state == 'bad' }}" style="left:{{ b.x }}%;top:{{ b.y }}%;width:{{ b.w }}%;height:{{ b.h }}%"><div class="bal">{{ b.balloon }}</div></div>
+	{%- endfor %}
+</div>
+<div class="rp-note">Numbers refer to the characteristics on page 1.{% if rec.failed %} A characteristic out of specification is marked with a heavy red box.{% endif %}</div>
+{%- endfor %}
+
+{%- endcall %}
 </div>
 {%- endmacro -%}

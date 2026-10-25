@@ -8,14 +8,14 @@
  "docstatus": 0,
  "doctype": "Print Format",
  "font_size": 0,
- "html": "{%- from \"iso_compliance/templates/includes/en10204.html\" import styles, head, products, results, trace, statement, sign -%}\n{#- EN 10204 type 3.1: inspection certificate, results of specific inspection of the\n    delivered batches; item groups that issue a material certificate add the\n    supplier trace and material properties (mtc_row). -#}\n{%- set d = en10204(doc, \"3.1\") -%}\n{{ styles() }}\n<div class=\"rp\">\n{{ head(d) }}\n{{ products(d) }}\n{{ results(d) }}\n{%- for r in d.rows if r.mtc %}{{ trace(r) }}{% endfor %}\n{{ statement(d, \"We hereby certify that the products supplied are in compliance with the requirements of the order. The test results given are based on specific inspection of the products supplied.\") }}\n{{ sign(d, \"Authorised inspection representative, independent of the manufacturing department\") }}\n</div>\n",
+ "html": "{%- from \"iso_compliance/templates/includes/en10204.html\" import styles, certificate -%}\n{#- Delivery certificate, EN 10204 type 3.1 (one template, three levels). -#}\n{{ styles() }}\n{{ certificate(en10204(doc, \"3.1\")) }}\n",
  "idx": 0,
  "line_breaks": 0,
  "margin_bottom": 12.0,
- "margin_left": 10.0,
- "margin_right": 10.0,
+ "margin_left": 12.0,
+ "margin_right": 12.0,
  "margin_top": 12.0,
- "modified": "2026-10-25 00:31:57.052931",
+ "modified": "2026-10-25 09:08:51.270377",
  "modified_by": "Administrator",
  "module": "ISO Compliance",
  "name": "Material Test Certificate 3.1",
@@ -25,5 +25,6 @@
  "raw_printing": 0,
  "show_section_headings": 0,
  "standard": "Yes",
- "pdf_generator": "chrome"
+ "pdf_generator": "chrome",
+ "css": null
 }
