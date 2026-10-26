@@ -495,12 +495,13 @@ def _drawing_ref(item_code: str) -> str:
 
 def _reports_of(row) -> list[str]:
 	"""The inspection reports that stand behind one delivered row: its despatch
-	and final inspections, else the inspection ERPNext linked on the row."""
+	and final inspections, else its receipt inspections (for a traded item the
+	receipt inspection is the final one, QI SPEC v2 Phase E)."""
 	from iso_compliance.utils import coc_row_inspections
 
 	chain = coc_row_inspections(row)
 	names = [qi.name for qi in chain["pdi"]] + ([chain["outgoing"].name] if chain["outgoing"] else [])
-	return list(dict.fromkeys(names)) or ([row.quality_inspection] if row.get("quality_inspection") else [])
+	return list(dict.fromkeys(names)) or [qi.name for qi in chain.get("incoming") or []]
 
 
 def _place(address: str | None) -> str:
