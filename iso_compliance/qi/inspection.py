@@ -4,6 +4,8 @@
 """Drawing-based Quality Inspections (SPEC §4.3–4.5).
 
 Every hook starts with `applies()`: a draft inspection on a drawing template.
+An item with no plan at all is inspected on a one-off plan whose
+characteristics the inspection adds (`one_off_plan`).
 Anything else -- the ~1,300 inspections already on the site, and every new one
 on a legacy template -- passes through untouched, so ERPNext behaves exactly
 as before.
@@ -89,9 +91,10 @@ def resolve_template(item_code: str, bom_no: str | None = None, explicit: str | 
 	if not new and item_code:
 		# a new-format plan made for this item but not tagged on it yet: the
 		# latest revision that is not superseded
+		# (a one-off plan nobody saved stays with its own inspection)
 		for t in frappe.get_all(
 			"Quality Inspection Template",
-			filters={"custom_item": item_code, "custom_superseded_by": ("is", "not set")},
+			filters={"custom_item": item_code, "custom_superseded_by": ("is", "not set"), "custom_one_off": 0},
 			pluck="name",
 			order_by="modified desc",
 		):
@@ -99,6 +102,38 @@ def resolve_template(item_code: str, bom_no: str | None = None, explicit: str | 
 				new = t
 				break
 	return new or (found[0] if found else explicit)
+
+
+def one_off_plan(item_code: str) -> str:
+	"""A blank plan for an item with no plan at all. The inspection adds its
+	characteristics, no drawing needed (inspector.add_characteristic), and
+	Quality can then save it against the item or its group
+	(inspector.save_as_plan). Unsaved, it serves that one inspection only."""
+	base = _("{0} (no drawing)").format(item_code)
+	name, n = base, 1
+	while frappe.db.exists("Quality Inspection Template", name):
+		n += 1
+		name = f"{base} {n}"
+	return frappe.get_doc({
+		"doctype": "Quality Inspection Template",
+		"quality_inspection_template_name": name,
+		"custom_item": item_code,
+		"custom_drawing_source": "None",
+		"custom_one_off": 1,
+	}).insert(ignore_permissions=True).name
+
+
+def plan_or_one_off(item_code: str, bom_no: str | None = None, explicit: str | None = None) -> str:
+	"""The item's new-format plan, else (no plan at all) a one-off plan to build
+	in the inspection. An old-format plan stays on ERPNext's form until those
+	are phased out."""
+	template = resolve_template(item_code, bom_no, explicit)
+	if is_drawing_template(template):
+		return template
+	if template:
+		frappe.throw(_("{0} has only the old-format plan {1}: inspect it on the standard form, or build a new plan.").format(
+			item_code, template), title=_("Old-format plan"))
+	return one_off_plan(item_code)
 
 
 def use_new_plan(doc):
@@ -156,6 +191,8 @@ def validate(doc, method=None):
 def before_submit(doc, method=None):
 	if not is_drawing_template(doc.quality_inspection_template):
 		return
+	if not drawing_rows(doc):
+		frappe.throw(_("Add at least one characteristic before submitting."), title=_("Nothing inspected"))
 	if not doc.custom_disposition:
 		doc.custom_disposition = "Accepted" if doc.status == "Accepted" else "Rejected"
 		apply_disposition(doc)
@@ -270,6 +307,9 @@ def build_readings(doc):
 		and is_due(r, doc)
 	]
 	if not due:
+		if cint(tpl.custom_one_off):
+			_snapshot(doc, tpl, [])  # characteristics are added as the inspection goes
+			return
 		frappe.throw(
 			_("Nothing on {0} is due at stage {1} for this lot.").format(tpl.name, doc.custom_stage),
 			title=_("Nothing to inspect"),
@@ -309,6 +349,11 @@ def _snapshot(doc, tpl, rows):
 			"revision": frappe.db.get_value("Controlled Document", wi, "revision_number"),
 		})
 	doc.set("custom_conditions", [])
+	add_conditions(doc, rows)
+
+
+def add_conditions(doc, rows):
+	"""The set conditions of the Test rows' methods, for the inspector to confirm."""
 	for r in rows:
 		if r.custom_row_type != "Test" or not r.custom_test_method:
 			continue
@@ -586,11 +631,9 @@ def start_final_inspection(work_order: str, lot_qty: float, sample_size: float) 
 	if sample_size > lot_qty:
 		frappe.throw(_("The sample can't be larger than the lot."))
 	wo = frappe.get_doc("Work Order", work_order)
-	template = resolve_template(wo.production_item, wo.bom_no)
-	if not is_drawing_template(template):
-		frappe.throw(_("{0} has no drawing template on its BOM or item. Use a normal Quality Inspection.").format(wo.production_item))
 
 	se = frappe.get_doc(make_stock_entry(work_order, "Manufacture", lot_qty))
+	template = plan_or_one_off(wo.production_item, wo.bom_no)
 	# Stock carries no value on this site (accounting is in Tally; every
 	# valuation rate is zero), so the entry must allow zero rates or ERPNext
 	# refuses it. A row that does have a rate still uses it.
@@ -648,12 +691,10 @@ def start_receipt_inspection(purchase_receipt: str, row: str, sample_size: int |
 				item.idx, frappe.utils.get_link_to_form(QI, legacy)),
 			title=_("Already inspected"),
 		)
-	template = resolve_template(item.item_code)
-	if not is_drawing_template(template):
-		frappe.throw(_("{0} has no drawing template.").format(item.item_code))
 	lot = flt(item.received_qty) or flt(item.qty)
 	if sample_size is not None and not 1 <= cint(sample_size) <= max(1, lot):
 		frappe.throw(_("The sample must be between 1 and the lot ({0}).").format(frappe.format(lot)))
+	template = plan_or_one_off(item.item_code)
 	qi = frappe.get_doc({
 		"doctype": QI,
 		"inspection_type": "Incoming",
@@ -703,9 +744,7 @@ def start_job_card_inspection(job_card: str, check_point: str | None = None) -> 
 	                                    "custom_check_point": check_point, "docstatus": 0})
 	if existing:
 		return existing
-	template = resolve_template(jc.production_item, jc.bom_no, explicit=jc.quality_inspection_template)
-	if not is_drawing_template(template):
-		frappe.throw(_("{0} has no drawing template.").format(jc.production_item))
+	template = plan_or_one_off(jc.production_item, jc.bom_no, explicit=jc.quality_inspection_template)
 	lot = flt(jc.for_quantity)
 	qi = frappe.get_doc({
 		"doctype": QI,

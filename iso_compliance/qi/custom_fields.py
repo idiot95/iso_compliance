@@ -71,7 +71,11 @@ TEMPLATE_FIELDS = [
 	     description="Set when the first inspection on this template is submitted. Drawing, balloons, limits and stages can then only change through New Revision."),
 	dict(fieldname="custom_superseded_by", fieldtype="Link", options="Quality Inspection Template",
 	     label="Superseded by", read_only=1, no_copy=1, insert_after="custom_locked"),
-	dict(fieldname="custom_used_by", fieldtype="HTML", label="Used by", insert_after="custom_superseded_by"),
+	dict(fieldname="custom_one_off", fieldtype="Check", label="One-off plan", read_only=1, no_copy=1,
+	     insert_after="custom_superseded_by",
+	     description="Begun in an inspection of an item that had no plan, with its characteristics added there. "
+	                 "Save it against the item or its item group from the inspection to use it again."),
+	dict(fieldname="custom_used_by", fieldtype="HTML", label="Used by", insert_after="custom_one_off"),
 ]
 
 ROW_FIELDS = [

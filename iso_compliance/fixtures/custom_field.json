@@ -1140,6 +1140,19 @@
  },
  {
   "doctype": "Custom Field",
+  "name": "Quality Inspection Template-custom_one_off",
+  "dt": "Quality Inspection Template",
+  "fieldname": "custom_one_off",
+  "fieldtype": "Check",
+  "label": "One-off plan",
+  "insert_after": "custom_superseded_by",
+  "module": "ISO Compliance",
+  "description": "Begun in an inspection of an item that had no plan, with its characteristics added there. Save it against the item or its item group from the inspection to use it again.",
+  "no_copy": 1,
+  "read_only": 1
+ },
+ {
+  "doctype": "Custom Field",
   "name": "Item Quality Inspection Parameter-custom_datums",
   "dt": "Item Quality Inspection Parameter",
   "fieldname": "custom_datums",
@@ -1167,7 +1180,7 @@
   "fieldname": "custom_used_by",
   "fieldtype": "HTML",
   "label": "Used by",
-  "insert_after": "custom_superseded_by",
+  "insert_after": "custom_one_off",
   "module": "ISO Compliance"
  },
  {

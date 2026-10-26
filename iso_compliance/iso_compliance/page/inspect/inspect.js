@@ -120,6 +120,13 @@ class Inspector {
 			</div>
 			${d.superseded_by ? `<div class="qi-banner warn">${__("This drawing has a newer revision: {0}. Check with Quality before measuring.", [esc(d.superseded_by)])}</div>` : ""}
 			${this.readonly && d.docstatus === 0 ? `<div class="qi-banner">${__("You can view this inspection but not change it.")}</div>` : ""}
+			${d.one_off && (d.can_add || d.can_save_plan) ? `<div class="qi-banner warn qi-one-off"><span>${
+				d.can_add
+					? __("{0} has no inspection plan. Add each characteristic you check; no drawing is needed.", [esc(d.item_code)])
+					: __("These characteristics are not saved as {0}'s plan yet.", [esc(d.item_code)])
+			}</span><span class="qi-one-off-tools">${d.can_add ? `<button class="qi-add-char primary">+ ${__("Add characteristic")}</button>` : ""}${
+				d.can_save_plan && d.rows.length ? `<button class="qi-save-plan">${__("Save as plan")}</button>` : ""
+			}</span></div>` : ""}
 			<div class="qi-body">
 				<div class="qi-drawing">
 					<div class="qi-close"></div>
@@ -132,6 +139,8 @@ class Inspector {
 		this.__close = null; // its pane was just replaced
 		this.$root.find(".qi-strip").on("click", () => this.$root.find(".qi-drawing").toggleClass("open") && this.draw_page());
 		this.$root.find(".qi-set-sample").on("click", () => this.ask_sample_size());
+		this.$root.find(".qi-add-char").on("click", () => this.add_characteristic());
+		this.$root.find(".qi-save-plan").on("click", () => this.save_as_plan());
 		this.$root.find(".qi-zoom button").on("click", (e) => {
 			this.zoom = Math.min(4, Math.max(1, this.zoom + Number($(e.currentTarget).data("z")) * 0.5));
 			this.draw_page();
@@ -181,7 +190,7 @@ class Inspector {
 		const r = d.rows[this.row];
 		const $p = this.$root.find(".qi-panel");
 		if (!r) {
-			$p.html(`<div class="qi-empty">${__("No rows on this inspection.")}</div>`);
+			$p.html(`<div class="qi-empty">${d.can_add ? __("No characteristics yet. Add the first one above.") : __("No rows on this inspection.")}</div>`);
 			return;
 		}
 		const value_at = (n) => (r.values.find((v) => v.sample_no === n) || {}).value;
@@ -238,7 +247,9 @@ class Inspector {
 				<div class="qi-card-head">
 					<div><span class="qi-num">${esc(r.balloon)}</span><span class="qi-name">${esc(r.specification)}</span>
 					${r.row_type !== "Dimension" ? `<span class="qi-type">${esc({ Material: __("From 3.1"), Test: __("Operational"), Visual: __("Visual") }[r.row_type] || r.row_type)}</span>` : ""}</div>
-					${r.class ? `<span class="qi-class ${esc(r.class.toLowerCase())}">${esc(r.class)}</span>` : ""}
+					<span>${r.class ? `<span class="qi-class ${esc(r.class.toLowerCase())}">${esc(r.class)}</span>` : ""}${
+						r.removable ? ` <button class="qi-rm-char" title="${__("Take this characteristic off the inspection")}">${__("Remove")}</button>` : ""
+					}</span>
 				</div>
 				<div class="qi-spec"><span>${d.drawing ? __("As on drawing") : __("Spec")}</span><strong>${esc(r.spec_text || "")}${r.spec_text ? " → " : ""}${esc(this.limit_text(r))}</strong></div>
 				${r.test_method ? `<div class="qi-muted">${esc(r.test_method)}</div>` : ""}
@@ -273,6 +284,7 @@ class Inspector {
 
 	bind_card(r) {
 		const $p = this.$root.find(".qi-panel");
+		$p.find(".qi-rm-char").on("click", () => this.remove_characteristic(r));
 		const $in = $p.find(".qi-value");
 		const show_cal = () => {
 			const a = r.instruments.find((x) => x.name === $p.find(".qi-instrument").val());
@@ -536,6 +548,28 @@ class Inspector {
 		frappe.new_doc("Non Conformance");
 	}
 
+	// ------------------------------------------------- one-off plan (no plan) --
+
+	async add_characteristic() {
+		await frappe.require("/assets/iso_compliance/js/qi_one_off.js");
+		window.iso_qi_one_off.add(this.d, async (balloon) => {
+			await this.load(this.d.name);
+			this.go_row(Math.max(0, this.d.rows.findIndex((x) => x.balloon === balloon)));
+		});
+	}
+
+	remove_characteristic(r) {
+		frappe.confirm(__("Take No. {0} {1} off this inspection?", [esc(r.balloon), esc(r.specification)]), async () => {
+			await frappe.call({ method: `${INSPECT_API}.remove_characteristic`, args: { qi: this.d.name, row_key: r.balloon }, freeze: true });
+			await this.load(this.d.name);
+		});
+	}
+
+	async save_as_plan() {
+		await frappe.require("/assets/iso_compliance/js/qi_one_off.js");
+		window.iso_qi_one_off.save(this.d, () => this.load(this.d.name, true));
+	}
+
 	// ------------------------------------------------------------ drawing --
 
 	async load_drawing() {
@@ -648,6 +682,9 @@ frappe.dom.set_style(`
 .qi-saved{color:var(--ok)}.qi-saved.busy{color:var(--text-muted)}
 .qi-banner{padding:10px 12px;border-radius:10px;background:var(--gray-100);margin-bottom:10px;font-size:13px}
 .qi-banner.warn{background:var(--warnbg);color:var(--warn);border:1px solid #F5D9A8}
+.qi-one-off{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.qi-one-off-tools{display:flex;gap:8px}
+.qi-insp button.qi-rm-char{min-height:26px;padding:0 10px;font-size:12px;border-radius:8px}
 .qi-body{display:flex;gap:16px;align-items:flex-start}
 .qi-drawing{flex:1.25;min-width:0;position:sticky;top:60px}
 .qi-drawing.none{display:none}

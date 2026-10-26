@@ -14,8 +14,9 @@ from frappe import _
 from frappe.utils import cint, flt, now_datetime
 
 from iso_compliance.qi import tolerance as T
+from iso_compliance.qi.api import require_quality_manager
 from iso_compliance.qi.inspection import QI, calibration, default_sample, drawing_rows, row_summary
-from iso_compliance.qi.template import ROWS, instrument_list, measuring_instruments
+from iso_compliance.qi.template import ROWS, instrument_list, is_drawing_template, measuring_instruments
 
 
 def _load(qi: str, ptype="read"):
@@ -56,6 +57,9 @@ def get_inspection(qi: str) -> dict:
 	):
 		data.setdefault(m.row_key, []).append(m)
 
+	one_off = bool(cint(tpl.custom_one_off))
+	can_write = doc.docstatus == 0 and frappe.has_permission(QI, "write", doc)
+	can_add = one_off and can_write and not cint(tpl.custom_locked)
 	cache, rows = {"all": measuring_instruments(), "cal": {}}, []
 	for r in drawing_rows(doc):
 		src = tpl_rows.get(r.custom_balloon_no)
@@ -82,6 +86,7 @@ def get_inspection(qi: str) -> dict:
 			"instruments": instruments,
 			"values": data.get(r.custom_balloon_no, []),
 			"status": r.status,
+			"removable": can_add and not data.get(r.custom_balloon_no),
 		})
 	return {
 		"name": doc.name,
@@ -110,8 +115,13 @@ def get_inspection(qi: str) -> dict:
 		"conditions": [c.as_dict() for c in doc.custom_conditions],
 		"work_instructions": [w.as_dict() for w in doc.custom_work_instructions],
 		"rows": rows,
-		"can_write": doc.docstatus == 0 and frappe.has_permission(QI, "write", doc),
+		"can_write": can_write,
 		"can_submit": doc.docstatus == 0 and frappe.has_permission(QI, "submit", doc),
+		# no plan existed: characteristics are added here, then saved as a plan
+		"one_off": one_off,
+		"can_add": can_add,
+		"can_save_plan": one_off and bool({"Quality Manager", "System Manager"} & set(frappe.get_roles())),
+		"plan_groups": _item_groups(doc.item_code) if one_off else [],
 	}
 
 
@@ -267,3 +277,125 @@ def summary(qi: str) -> dict:
 			for r in drawing_rows(doc)
 		],
 	}
+
+
+# ------------------------------------------------- one-off plan (no plan) --
+# An item with no plan is inspected on a one-off plan (inspection.one_off_plan):
+# the inspector adds each characteristic here, no drawing needed, and Quality
+# saves the result as the plan of the item or its item group.
+
+#: what the add-characteristic dialog may set on a plan row
+CHARACTERISTIC_FIELDS = {
+	"row_type": "custom_row_type", "spec_text": "custom_spec_text", "class": "custom_class", "unit": "custom_unit",
+	"tolerance_type": "custom_tolerance_type", "nominal": "custom_nominal", "tol": "custom_tol",
+	"upper_dev": "custom_upper_dev", "lower_dev": "custom_lower_dev", "fit_class": "custom_fit_class",
+	"min": "min_value", "max": "max_value", "test_method": "custom_test_method",
+}
+
+
+def _one_off(doc):
+	"""The inspection's one-off plan, still open to new characteristics."""
+	tpl = frappe.get_doc("Quality Inspection Template", doc.quality_inspection_template)
+	if not cint(tpl.custom_one_off):
+		frappe.throw(_("This inspection follows the plan {0}. Change its characteristics there.").format(tpl.name))
+	if cint(tpl.custom_locked):
+		frappe.throw(_("The plan {0} is locked by a submitted inspection.").format(tpl.name))
+	return tpl
+
+
+def _item_groups(item_code: str) -> list[str]:
+	"""The item's group and those above it: where a plan saved for a group
+	still reaches this item (inspection.resolve_template climbs the tree)."""
+	group = frappe.db.get_value("Item", item_code, "item_group")
+	if not group:
+		return []
+	lft, rgt = frappe.db.get_value("Item Group", group, ["lft", "rgt"])
+	return frappe.get_all("Item Group", filters={"lft": ("<=", lft), "rgt": (">=", rgt)}, pluck="name", order_by="lft desc")
+
+
+@frappe.whitelist(methods=["POST"])
+def add_characteristic(qi: str, characteristic) -> str:
+	"""One characteristic onto the one-off plan and this inspection, checked at
+	this inspection's stage. The plan's own validation computes its limits."""
+	from iso_compliance.qi.inspection import STAGE_FIELD, add_conditions, required_samples, ROW_COPY
+
+	_draft_for_writing(qi)
+	doc = _load(qi, "write")
+	tpl = _one_off(doc)
+	c = frappe.parse_json(characteristic) or {}
+	name = (c.get("specification") or "").strip()
+	if not name:
+		frappe.throw(_("Name the characteristic."))
+	if c.get("row_type") not in ("Dimension", "Visual", "Test", "Material"):
+		frappe.throw(_("Choose what kind of characteristic it is."))
+	if c.get("tolerance_type") == T.REFERENCE:
+		frappe.throw(_("A reference dimension is not inspected."))
+	if not frappe.db.exists("Quality Inspection Parameter", name):
+		frappe.get_doc({"doctype": "Quality Inspection Parameter", "parameter": name}).insert(ignore_permissions=True)
+	row = tpl.append(ROWS, {
+		"specification": name,
+		**{field: c.get(key) for key, field in CHARACTERISTIC_FIELDS.items() if c.get(key) not in (None, "")},
+		STAGE_FIELD.get(doc.custom_stage, "custom_stage_final"): 1,
+		"custom_frequency": "Every lot", "custom_sampling": "Lot sample", "custom_in_process_at": "Every check",
+	})
+	tpl.flags.ignore_permissions = True
+	tpl.save()
+
+	reading = doc.append("readings", {})
+	for src, dst in ROW_COPY.items():
+		reading.set(dst, row.get(src))
+	reading.formula_based_criteria = 0
+	reading.manual_inspection = 1
+	reading.status = "Accepted"
+	reading.custom_sample_count = required_samples(row, doc.sample_size)
+	add_conditions(doc, [row])
+	doc.save()
+	return row.custom_balloon_no
+
+
+@frappe.whitelist(methods=["POST"])
+def remove_characteristic(qi: str, row_key: str):
+	"""Take back a characteristic added by mistake, before anything is measured on it."""
+	_draft_for_writing(qi)
+	doc = _load(qi, "write")
+	tpl = _one_off(doc)
+	if frappe.db.exists("QI Measurement", {"quality_inspection": qi, "row_key": row_key}):
+		frappe.throw(_("No. {0} has readings. Clear them first.").format(row_key))
+	for r in [r for r in tpl.get(ROWS) if r.custom_balloon_no == row_key]:
+		tpl.remove(r)
+	for r in [r for r in doc.readings if r.custom_balloon_no == row_key]:
+		doc.remove(r)
+	for c in [c for c in doc.custom_conditions if c.row_key == row_key]:
+		doc.remove(c)
+	tpl.flags.ignore_permissions = True
+	tpl.save()
+	doc.save()
+
+
+@frappe.whitelist(methods=["POST"])
+def save_as_plan(qi: str, target: str, item_group: str | None = None) -> str:
+	"""Keep the one-off plan as the inspection plan of the item, or of an item
+	group the item sits in, so later inspections load it. Draft or submitted."""
+	require_quality_manager()
+	doc = _load(qi)
+	tpl = frappe.get_doc("Quality Inspection Template", doc.quality_inspection_template)
+	if not cint(tpl.custom_one_off):
+		frappe.throw(_("{0} is already a saved plan.").format(tpl.name))
+	if not any(r.custom_row_type for r in tpl.get(ROWS)):
+		frappe.throw(_("Add at least one characteristic first."))
+	if target == "Item":
+		holder, field, name = "Item", "quality_inspection_template", doc.item_code
+	elif target == "Item Group":
+		if item_group not in _item_groups(doc.item_code):
+			frappe.throw(_("Choose {0}'s item group or one above it.").format(doc.item_code))
+		holder, field, name = "Item Group", "custom_default_qi_template", item_group
+	else:
+		frappe.throw(_("Save the plan against the Item or an Item Group."))
+	current = frappe.db.get_value(holder, name, field)
+	if current and current != tpl.name and is_drawing_template(current):
+		frappe.throw(_("{0} {1} already has the plan {2}.").format(_(holder), name, current), title=_("Plan exists"))
+	frappe.db.set_value(holder, name, field, tpl.name)
+	frappe.db.set_value("Quality Inspection Template", tpl.name, "custom_one_off", 0)
+	frappe.get_doc(holder, name).add_comment(
+		"Info", _("Inspection plan: {0} → {1} (built in {2})").format(current or _("none"), tpl.name, doc.name))
+	return name
