@@ -679,3 +679,140 @@ def plan_summary(template: str) -> dict:
 		"superseded_by": doc.custom_superseded_by,
 		"rows": rows,
 	}
+
+
+# ------------------------------------- building a plan from an inspection --
+# An inspection whose plan has nothing to measure (an old-format plan, or
+# none) gets its characteristics typed in on the inspection itself. They go
+# into a plan made for the item (no drawing); "Save as plan" then says where
+# that plan applies: the item, or its Item Group.
+
+#: what parse_spec returns -> the row field it fills
+SPEC_FIELDS = {"nominal": "custom_nominal", "tol": "custom_tol", "upper_dev": "custom_upper_dev",
+               "lower_dev": "custom_lower_dev", "fit_class": "custom_fit_class", "lower": "min_value", "upper": "max_value"}
+
+
+def _inspection_for_plan(qi: str):
+	require_quality_manager()
+	doc = frappe.get_doc("Quality Inspection", qi)
+	doc.check_permission("write")
+	if doc.docstatus != 0:
+		frappe.throw(_("{0} is already submitted.").format(qi))
+	return doc
+
+
+def _own_plan(doc) -> str:
+	"""The plan new characteristics of this inspection go into: its plan when
+	that is new-format and open for changes, else a new one for the item."""
+	cur = doc.quality_inspection_template
+	if cur and is_drawing_template(cur):
+		if cint(frappe.db.get_value("Quality Inspection Template", cur, "custom_locked")):
+			frappe.throw(_("{0} is locked: inspections were submitted on it. Change it through New Revision.").format(cur),
+			             title=_("Plan locked"))
+		return cur
+	base = suggested_name(None, None, doc.item_code) or doc.item_code
+	name, n = base, 1
+	while frappe.db.exists("Quality Inspection Template", name):
+		n += 1
+		name = f"{base} ({n})"
+	return frappe.get_doc({
+		"doctype": "Quality Inspection Template",
+		"quality_inspection_template_name": name,
+		"custom_item": doc.item_code,
+	}).insert().name
+
+
+@frappe.whitelist()
+def add_characteristic(qi: str, specification: str, row_type: str = "Dimension", spec: str | None = None,
+                       unit: str | None = None, ctq=0) -> dict:
+	"""Add one characteristic to the inspection's plan (made for the item if
+	it has none it can change) and to the inspection itself, ready to measure."""
+	from iso_compliance.qi.inspection import ROW_COPY, STAGE_FIELD, TYPE_STAGE, required_samples
+
+	doc = _inspection_for_plan(qi)
+	specification = (specification or "").strip()
+	if not specification:
+		frappe.throw(_("Enter the parameter"))
+	if row_type not in ("Dimension", "Visual"):
+		frappe.throw(_("A characteristic added here is a Dimension or Visual check"))
+	stage = doc.custom_stage or TYPE_STAGE.get(doc.inspection_type, "Final")
+	row = {
+		"specification": specification,
+		"custom_row_type": row_type,
+		"custom_class": "CTQ" if cint(ctq) else "",
+		"custom_unit": None if row_type == "Visual" else (unit or "mm"),
+		STAGE_FIELD[stage]: 1,
+	}
+	if row_type == "Dimension":
+		try:
+			parsed = T.parse_spec(spec)
+		except T.ToleranceError as e:
+			frappe.throw(str(e), title=_("Specification"))
+		if parsed["tolerance_type"] in (T.GENERAL, T.REFERENCE):
+			frappe.throw(_("Give the tolerance, e.g. 1.20 ± 0.05, 1.15 - 1.25 or max 1.30"), title=_("Specification"))
+		row.update({"custom_spec_text": spec.strip(), "custom_tolerance_type": parsed["tolerance_type"]})
+		row.update({SPEC_FIELDS[k]: v for k, v in parsed.items() if k in SPEC_FIELDS})
+	if not frappe.db.exists("Quality Inspection Parameter", specification):
+		frappe.get_doc({"doctype": "Quality Inspection Parameter", "parameter": specification}).insert()
+
+	plan = frappe.get_doc("Quality Inspection Template", _own_plan(doc))
+	plan.append(ROWS, row)
+	plan.save()
+	src = plan.get(ROWS)[-1]
+
+	if doc.quality_inspection_template != plan.name:
+		doc.quality_inspection_template = plan.name
+		doc.set("readings", [r for r in doc.readings if r.get("custom_row_type")])  # the old plan's rows go
+	doc.custom_stage = stage
+	reading = doc.append("readings", {})
+	for s, d in ROW_COPY.items():
+		reading.set(d, src.get(s))
+	reading.formula_based_criteria = 0
+	reading.manual_inspection = 1
+	reading.status = "Accepted"
+	reading.custom_sample_count = required_samples(src, doc.sample_size)
+	doc.save()
+	return {"plan": plan.name, "balloon": src.custom_balloon_no}
+
+
+@frappe.whitelist()
+def plan_scope(qi: str) -> dict:
+	"""For "Save as plan": the plan, and what the item and its Item Group use now."""
+	doc = frappe.get_doc("Quality Inspection", qi)
+	doc.check_permission("read")
+	group = frappe.db.get_value("Item", doc.item_code, "item_group")
+	return {
+		"plan": doc.quality_inspection_template,
+		"item": doc.item_code,
+		"item_name": doc.item_name,
+		"item_plan": frappe.db.get_value("Item", doc.item_code, "quality_inspection_template"),
+		"group": group,
+		"group_plan": frappe.db.get_value("Item Group", group, "custom_default_qi_template") if group else None,
+	}
+
+
+@frappe.whitelist()
+def save_as_plan(qi: str, scope: str, name: str | None = None) -> dict:
+	"""Name the inspection's plan and make it the plan of the item or of its
+	Item Group, so the next inspection of either loads it."""
+	doc = _inspection_for_plan(qi)
+	plan = doc.quality_inspection_template
+	if not is_drawing_template(plan):
+		frappe.throw(_("Add a characteristic first"))
+	name = (name or "").strip()
+	if name and name != plan:
+		if frappe.db.exists("Quality Inspection Template", name):
+			frappe.throw(_("{0} already exists").format(name))
+		plan = frappe.rename_doc("Quality Inspection Template", plan, name, force=True)
+	if scope == "item":
+		use_plan("Item", doc.item_code, plan)
+		return {"plan": plan, "doctype": "Item", "name": doc.item_code}
+	if scope == "item_group":
+		group = frappe.db.get_value("Item", doc.item_code, "item_group")
+		current = frappe.db.get_value("Item Group", group, "custom_default_qi_template")
+		if current != plan:
+			frappe.db.set_value("Item Group", group, "custom_default_qi_template", plan)
+			frappe.get_doc("Item Group", group).add_comment(
+				"Info", _("Inspection plan: {0} → {1}").format(current or _("none"), plan))
+		return {"plan": plan, "doctype": "Item Group", "name": group}
+	frappe.throw(_("Choose the item or its Item Group"))

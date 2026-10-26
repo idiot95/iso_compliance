@@ -121,6 +121,114 @@ function qi_old_format_note(frm) {
 		]),
 		"orange"
 	);
+	if (frappe.user.has_role(["Quality Manager", "System Manager"]))
+		frm.add_custom_button(__("Add characteristic"), () => qi_add_characteristic(frm));
+}
+
+// ------------------------------------------- characteristics on the inspection --
+// An inspection whose plan has nothing to measure gets its characteristics
+// typed in here. They go into a plan made for the item (no drawing), which
+// "Save as plan" then makes the plan of the item or of its Item Group.
+
+const QI_TPL = "iso_compliance.qi.template";
+
+async function qi_add_characteristic(frm) {
+	const esc = frappe.utils.escape_html;
+	const params = await frappe.db.get_list("Quality Inspection Parameter", { pluck: "name", limit: 0 });
+	const added = [];
+	let limits = "";
+	const d = new frappe.ui.Dialog({
+		title: __("Add characteristic"),
+		fields: [
+			{ fieldname: "specification", fieldtype: "Autocomplete", label: __("Parameter"), reqd: 1, options: params },
+			{ fieldname: "row_type", fieldtype: "Select", label: __("Type"), options: "Dimension\nVisual", default: "Dimension" },
+			{ fieldname: "ctq", fieldtype: "Check", label: __("CTQ") },
+			{ fieldtype: "Column Break" },
+			{ fieldname: "spec", fieldtype: "Data", label: __("Specification"), placeholder: "1.20 ± 0.05", depends_on: 'eval:doc.row_type=="Dimension"' },
+			{ fieldname: "unit", fieldtype: "Link", options: "UOM", label: __("Unit"), default: "mm", depends_on: 'eval:doc.row_type=="Dimension"' },
+			{ fieldtype: "Section Break" },
+			{ fieldname: "preview", fieldtype: "HTML" },
+		],
+		primary_action_label: __("Add"),
+		async primary_action(v) {
+			const { message: r } = await frappe.call({
+				method: `${QI_TPL}.add_characteristic`,
+				args: { qi: frm.doc.name, specification: v.specification, row_type: v.row_type, spec: v.spec, unit: v.unit, ctq: v.ctq },
+				freeze: true,
+			});
+			added.push(`${r.balloon} · ${v.specification}`);
+			d.set_values({ specification: "", spec: "", ctq: 0 });
+			limits = "";
+			preview();
+			d.fields_dict.specification.$input.focus();
+		},
+		secondary_action_label: __("Done"),
+		secondary_action: () => d.hide(),
+	});
+	const preview = () =>
+		d.fields_dict.preview.$wrapper.html(`<div class="qi-e-details">
+			${limits ? `<div class="qi-e-dt">${__("Limits")}</div><div class="qi-e-dd">${limits}</div>` : ""}
+			${added.length ? `<div class="qi-e-dt">${__("Added")}</div><div class="qi-e-dd">${added.map(esc).join("<br>")}</div>` : ""}
+			<div class="qi-e-dt">${__("Plan")}</div><div class="qi-e-dd">${esc(frm.doc.quality_inspection_template || "")}${added.length ? "" : " → " + __("new plan for {0}", [esc(frm.doc.item_code)])}</div>
+		</div>`);
+	// the limits as they will be saved, from the same parser the template builder uses
+	d.fields_dict.spec.$input.on("input", frappe.utils.debounce(async () => {
+		const text = d.get_value("spec");
+		if (!text) {
+			limits = "";
+			return preview();
+		}
+		const { message: p } = await frappe.call({ method: "iso_compliance.qi.api.parse_spec", args: { text } });
+		if (p.error) limits = `<span class="text-danger">${esc(p.error)}</span>`;
+		else {
+			const { message: l } = await frappe.call({ method: "iso_compliance.qi.api.compute_limits", args: p });
+			const unit = esc(d.get_value("unit") || "");
+			limits = l.error ? `<span class="text-danger">${esc(l.error)}</span>`
+				: `${esc(l.min_display)} – ${esc(l.max_display)} ${unit} <span class="text-muted">· ${esc(__(p.tolerance_type))}</span>`;
+		}
+		preview();
+	}, 300));
+	d.onhide = () => added.length && frm.reload_doc();
+	preview();
+	d.show();
+}
+
+async function qi_save_plan(frm) {
+	const esc = frappe.utils.escape_html;
+	const { message: s } = await frappe.call({ method: `${QI_TPL}.plan_scope`, args: { qi: frm.doc.name } });
+	const current = (p) => (!p ? __("none") : p === s.plan ? __("this plan") : esc(p));
+	const d = new frappe.ui.Dialog({
+		title: __("Save as plan"),
+		fields: [
+			{ fieldname: "name", fieldtype: "Data", label: __("Plan name"), default: s.plan, reqd: 1 },
+			{
+				fieldname: "scope", fieldtype: "Select", label: __("Use for"), default: "item",
+				options: [
+					{ value: "item", label: __("Item · {0}", [s.item]) },
+					...(s.group ? [{ value: "item_group", label: __("Item Group · {0}", [s.group]) }] : []),
+				],
+				onchange: () => now(),
+			},
+			{ fieldname: "now", fieldtype: "HTML" },
+		],
+		primary_action_label: __("Save"),
+		async primary_action(v) {
+			const { message: r } = await frappe.call({
+				method: `${QI_TPL}.save_as_plan`, args: { qi: frm.doc.name, scope: v.scope, name: v.name }, freeze: true,
+			});
+			d.hide();
+			frappe.show_alert({ message: `${esc(r.plan)} → ${esc(__(r.doctype))} ${esc(r.name)}`, indicator: "green" });
+			frm.reload_doc();
+		},
+	});
+	const now = () => {
+		const group = d.get_value("scope") === "item_group";
+		d.fields_dict.now.$wrapper.html(`<div class="qi-e-details">
+			<div class="qi-e-dt">${__("Plan now")}</div><div class="qi-e-dd">${current(group ? s.group_plan : s.item_plan)}</div>
+		</div>`);
+	};
+	now();
+	d.show();
 }
 
 // ----------------------------------------------------------- start dialog --
@@ -431,6 +539,9 @@ async function qi_entry(frm) {
 	const row_state = (r) => (r.values.some((x) => bad(r, x.value)) ? "failed" : r.values.length >= r.required ? "done" : "");
 	const cols = Math.max(1, ...d.rows.map(slots));
 	const type_label = { Dimension: "", Test: __("Operational"), Visual: __("Visual"), Material: __("from 3.1") };
+	// characteristics can be typed in here when the plan has none, or is one made this way (no drawing, not locked)
+	const editable = d.can_plan && (!d.plan_new || (!d.plan_locked && !d.plan_has_drawing));
+	const savable = d.can_plan && d.plan_new && !d.plan_locked && !d.plan_has_drawing;
 
 	const cell = (r, i, n) => {
 		if (n > slots(r)) return `<td class="qi-e-na"></td>`;
@@ -476,7 +587,10 @@ async function qi_entry(frm) {
 			<div class="qi-e-title-row">
 				<div><div class="qi-e-kicker">${esc(__(d.stage || ""))} ${__("inspection")}${d.check_point ? " · " + esc(__(d.check_point)) : ""}</div>
 					<div class="qi-e-title">${esc(d.item_code)} <span>${esc(d.item_name || "")}</span></div></div>
-				<button class="btn btn-sm btn-default qi-e-full">${__("Full-screen inspector")}</button>
+				<div class="qi-e-head-btns">
+					${savable ? `<button class="btn btn-sm btn-default qi-e-save-plan">${__("Save as plan")}</button>` : ""}
+					${d.rows.length ? `<button class="btn btn-sm btn-default qi-e-full">${__("Full-screen inspector")}</button>` : ""}
+				</div>
 			</div>
 			<div class="qi-e-stats">
 				<div class="qi-e-stat"><div class="qi-e-stat-l">${__("Lot")}</div><div class="qi-e-stat-v">${esc(format_number(d.lot_qty || 0, null, 0))}</div><div class="qi-e-stat-s">${__("pieces")}</div></div>
@@ -506,6 +620,7 @@ async function qi_entry(frm) {
 			${pill("all", __("All"))}${pill("todo", __("To do"))}${pill("failed", __("Out of spec"))}${c.ctq ? pill("ctq", __("CTQ")) : ""}
 			<input type="search" class="form-control input-sm qi-e-search" placeholder="${__("Find no. or parameter")}" value="${esc(state.q)}">
 			<span class="qi-b-spacer"></span>
+			${editable && d.rows.length ? `<button type="button" class="btn btn-xs btn-default qi-e-add-char">${__("+ Characteristic")}</button>` : ""}
 			${d.drawing ? `<button type="button" class="btn btn-xs btn-default qi-e-dwg-toggle">${state.hide_dwg ? __("Show drawing") : __("Hide drawing")}</button>` : ""}
 		</div>`;
 	};
@@ -531,11 +646,17 @@ async function qi_entry(frm) {
 			${d.drawing && !state.hide_dwg ? `<div class="qi-e-dwg"><div class="qi-e-close"></div></div>` : ""}
 			<div class="qi-e-card">
 				${toolbar()}
-				<div class="qi-e-scroll"><table class="qi-e-table">
+				<div class="qi-e-scroll"><table class="qi-e-table" ${d.rows.length ? "" : "hidden"}>
 					<thead><tr><th class="qi-e-s1">${__("No.")}</th><th class="qi-e-s2">${__("Parameter")}</th><th>${__("Range")}</th><th>${__("Instrument")}</th>
 						${Array.from({ length: cols }, (_, k) => `<th class="qi-e-sn">${k + 1}</th>`).join("")}<th>${__("Result")}</th></tr></thead>
 					<tbody>${rows_html()}</tbody></table>
-					<div class="qi-e-empty text-muted small" style="display:none">${__("No characteristic matches.")}</div></div>
+					<div class="qi-e-empty text-muted small" style="display:none">${__("No characteristic matches.")}</div>
+					${d.rows.length ? "" : `<div class="qi-e-none">
+						<div class="qi-e-none-t">${__("No characteristics")}</div>
+						<div class="qi-e-sub">${__("Plan")}: ${d.template ? link("Quality Inspection Template", d.template) : __("none")}${d.template && !d.plan_new ? " · " + __("old format") : ""}</div>
+						${editable ? `<button type="button" class="btn btn-sm btn-primary qi-e-add-char">${__("+ Add characteristic")}</button>`
+							: `<div class="qi-e-sub">${__("Added by: Quality Manager")}</div>`}
+					</div>`}</div>
 				${
 					d.conditions.length
 						? `<details class="qi-e-conds"><summary>${__("Test conditions")} (${d.conditions.length})</summary><table class="table table-sm"><tbody>${d.conditions
@@ -570,7 +691,7 @@ async function qi_entry(frm) {
 	};
 	const apply_filter = () => {
 		d.rows.forEach((r, i) => $e.find(`tr[data-i="${i}"]`).toggleClass("hidden", !visible(r)));
-		$e.find(".qi-e-empty").toggle(!d.rows.some(visible));
+		$e.find(".qi-e-empty").toggle(d.rows.length > 0 && !d.rows.some(visible));
 		$e.find(".qi-e-tools [data-f]").each((_, el) => $(el).toggleClass("on", $(el).data("f") === state.filter));
 	};
 	d.rows.forEach((_, i) => result(i));
@@ -743,6 +864,8 @@ async function qi_entry(frm) {
 		qi_entry(frm);
 	});
 	$e.on("click", ".qi-e-full", () => frappe.set_route("inspect", frm.doc.name));
+	$e.on("click", ".qi-e-add-char", () => qi_add_characteristic(frm));
+	$e.on("click", ".qi-e-save-plan", () => qi_save_plan(frm));
 	show(0);
 	if (!ro) {
 		const first = $e.find("tr:not(.hidden) input.qi-e-cell").filter((_, el) => !el.value)[0];
@@ -834,6 +957,10 @@ button.qi-e-cell{text-align:center;color:var(--text-muted)}
 .qi-e-res{white-space:nowrap;font-size:var(--text-xs)}
 .qi-e-addrm{display:inline-flex;gap:3px;margin-left:4px}
 .qi-e-empty{padding:16px}
+.qi-e-head-btns{display:flex;gap:6px}
+.qi-e-none{padding:28px 16px;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.qi-e-none-t{font-weight:600}
+.qi-e-none .btn{margin-top:6px}
 .qi-e-conds{padding:8px 12px;border-top:1px solid var(--border-color)}
 .qi-e-conds summary{font-weight:600;cursor:pointer}
 .qi-e-cond{width:90px;height:30px;border:1px solid var(--border-color);border-radius:6px;padding:0 6px}

@@ -45,8 +45,9 @@ def _instruments(src, row, cache, stage=None):
 @frappe.whitelist()
 def get_inspection(qi: str) -> dict:
 	doc = _load(qi)
-	tpl = frappe.get_doc("Quality Inspection Template", doc.quality_inspection_template)
-	tpl_rows = {r.custom_balloon_no: r for r in tpl.get(ROWS) if r.custom_row_type}
+	tpl = frappe.get_doc("Quality Inspection Template", doc.quality_inspection_template) \
+		if doc.quality_inspection_template else frappe._dict()
+	tpl_rows = {r.custom_balloon_no: r for r in tpl.get(ROWS) or [] if r.custom_row_type}
 	data = {}
 	for m in frappe.get_all(
 		"QI Measurement",
@@ -99,7 +100,12 @@ def get_inspection(qi: str) -> dict:
 		"work_order": doc.custom_work_order,
 		"customer": doc.custom_customer,
 		"template": doc.quality_inspection_template,
-		"superseded_by": tpl.custom_superseded_by,
+		"superseded_by": tpl.get("custom_superseded_by"),
+		# whether characteristics can be added here and saved as the item's or group's plan
+		"plan_new": bool(tpl_rows),
+		"plan_locked": bool(cint(tpl.get("custom_locked"))),
+		"plan_has_drawing": bool(tpl.get("custom_drawing")),
+		"can_plan": doc.docstatus == 0 and bool({"Quality Manager", "System Manager"} & set(frappe.get_roles())),
 		"drawing": doc.custom_drawing,
 		"drawing_no": doc.custom_drawing_no,
 		"drawing_revision": doc.custom_drawing_revision,
