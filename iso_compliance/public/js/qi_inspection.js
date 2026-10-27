@@ -48,8 +48,22 @@ frappe.ui.form.on("Quality Inspection", {
 		);
 		if (entry) qi_entry(frm);
 		else qi_render_measurements(frm);
+		qi_one_off_buttons(frm);
 	},
 });
+
+// The item had no plan: characteristics are added on this inspection, then
+// Quality saves them as the plan of the item or its group (qi_one_off.js).
+async function qi_one_off_buttons(frm) {
+	const tpl = frm.doc.quality_inspection_template;
+	if (!tpl || frm.is_new() || frm.doc.docstatus === 2) return;
+	const { message: t } = await frappe.db.get_value("Quality Inspection Template", tpl, "custom_one_off");
+	if (!t || !cint(t.custom_one_off)) return;
+	const { message: d } = await frappe.call({ method: "iso_compliance.qi.inspector.get_inspection", args: { qi: frm.doc.name } });
+	await frappe.require("/assets/iso_compliance/js/qi_one_off.js");
+	if (d.can_add) frm.add_custom_button(__("Add characteristic"), () => window.iso_qi_one_off.add(d, () => frm.reload_doc()));
+	if (d.can_save_plan && d.rows.length) frm.add_custom_button(__("Save as plan"), () => window.iso_qi_one_off.save(d, () => frm.reload_doc()));
+}
 
 function qi_render_measurements(frm) {
 	const field = frm.fields_dict.custom_measurements_html;
@@ -231,7 +245,7 @@ function qi_start_dialog(frm) {
 		st.plan = m;
 		show_mode();
 		if (!m.template) {
-			$p.html(`<div class="qi-start-plan warn">${__("{0} has no inspection plan. Build one from its BOM's Inspection Plan tab first.", [esc(st.item)])}</div>`);
+			$p.html(`<div class="qi-start-plan warn">${__("{0} has no inspection plan. Start the inspection and add each characteristic you check as you go; no drawing is needed. Quality can then save them as the plan of the item or its item group.", [esc(st.item)])}</div>`);
 			return;
 		}
 		if (!m.new_format) {
@@ -292,7 +306,8 @@ function qi_start_dialog(frm) {
 		plan();
 	};
 	const start = async (v) => {
-		if (!st.plan || !st.plan.new_format) return frappe.msgprint(__("There is no new-format plan to start from."));
+		// no plan at all starts on a one-off plan; an old-format one uses the Old format tab
+		if (!st.plan || (st.plan.template && !st.plan.new_format)) return frappe.msgprint(__("There is no new-format plan to start from."));
 		const call =
 			st.stage === "Incoming"
 				? { method: "start_receipt_inspection", args: { purchase_receipt: v.purchase_receipt, row: v.pr_row, sample_size: st.sample_for === v.pr_row ? st.sample : null }, ask: true }

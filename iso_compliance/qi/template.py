@@ -4,8 +4,9 @@
 """Drawing templates: validation, tagging to BOMs/Items, drawings, revisions.
 
 A *drawing template* is a Quality Inspection Template with at least one row
-whose `custom_row_type` is set. Every other template is a legacy template and
-everything here leaves it alone (SPEC §4.0).
+whose `custom_row_type` is set, or a one-off plan (`custom_one_off`) begun in an
+inspection of an item with no plan, which starts with none. Every other template
+is a legacy template and everything here leaves it alone (SPEC §4.0).
 """
 
 import frappe
@@ -30,7 +31,8 @@ DRAWING_EXTENSIONS = ("pdf", "png", "jpg", "jpeg")
 
 
 def is_drawing_template(template) -> bool:
-	"""True for a template name or doc that has drawing rows."""
+	"""True for a template name or doc that has drawing rows, or is a one-off
+	plan (new-format from its first characteristic, which an inspection adds)."""
 	if not template:
 		return False
 	if isinstance(template, str):
@@ -39,8 +41,8 @@ def is_drawing_template(template) -> bool:
 				"Item Quality Inspection Parameter",
 				{"parenttype": "Quality Inspection Template", "parent": template, "custom_row_type": ("is", "set")},
 			)
-		)
-	return any(r.get("custom_row_type") for r in template.get(ROWS) or [])
+		) or bool(frappe.db.get_value("Quality Inspection Template", template, "custom_one_off"))
+	return any(r.get("custom_row_type") for r in template.get(ROWS) or []) or bool(cint(template.get("custom_one_off")))
 
 
 # --------------------------------------------------------------- validate --
