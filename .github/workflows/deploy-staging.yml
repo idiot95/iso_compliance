@@ -34,7 +34,12 @@ jobs:
           HOST: ${{ secrets.STAGING_HOST }}
         run: |
           install -m 700 -d ~/.ssh
-          printf '%s\n' "$KEY" | tr -d '\r' > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          # Rebuild the key's line breaks, which a copy from a browser terminal can lose.
+          printf '%s' "$KEY" | tr -d '\r' \
+            | sed -e 's/-----BEGIN OPENSSH PRIVATE KEY-----//' -e 's/-----END OPENSSH PRIVATE KEY-----//' \
+            | tr -d ' \n\t' > /tmp/key.b64
+          { echo '-----BEGIN OPENSSH PRIVATE KEY-----'; fold -w 70 /tmp/key.b64; echo; echo '-----END OPENSSH PRIVATE KEY-----'; } > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
           ssh-keygen -y -f ~/.ssh/id_ed25519 > /dev/null || { echo '::error::STAGING_SSH_KEY is not a valid private key. Paste the whole private key file, BEGIN and END lines included.'; exit 1; }
           ssh-keyscan -t ed25519 "$HOST" >> ~/.ssh/known_hosts
 
