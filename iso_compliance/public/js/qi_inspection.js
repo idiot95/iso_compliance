@@ -56,7 +56,7 @@ frappe.ui.form.on("Quality Inspection", {
 // Quality saves them as the plan of the item or its group (qi_one_off.js).
 async function qi_one_off_buttons(frm) {
 	const tpl = frm.doc.quality_inspection_template;
-	if (!tpl || frm.doc.docstatus === 2) return;
+	if (!tpl || frm.is_new() || frm.doc.docstatus === 2) return;
 	const { message: t } = await frappe.db.get_value("Quality Inspection Template", tpl, "custom_one_off");
 	if (!t || !cint(t.custom_one_off)) return;
 	const { message: d } = await frappe.call({ method: "iso_compliance.qi.inspector.get_inspection", args: { qi: frm.doc.name } });
