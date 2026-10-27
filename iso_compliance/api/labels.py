@@ -1,8 +1,9 @@
 # Copyright (c) 2026, Hatim Carbon Co. Pvt. Ltd. and contributors
 # For license information, please see license.txt
 
-"""Material identification labels: eight to an A4 sheet, or one per label on a
-thermal roll.
+"""Material identification labels: eight or forty to an A4 sheet, or one per
+label on a thermal roll. Each carries the item code and name, the batch (as a
+barcode), and for received material the supplier and date of receipt.
 
 SOP-006 step 3 asks that accepted material be identified so that identity and
 traceability hold through storage and into production. The label is how that
@@ -23,10 +24,11 @@ Rendered as inline SVG by python-barcode, which is already in the bench venv.
 No CDN and no JavaScript, so the sheet prints identically from the browser and
 through wkhtmltopdf.
 
-Geometry is Avery L7165 and its many equivalents: 99.1 x 67.7 mm, two across and
-four down, 13.1 mm top and bottom margins, 4.65 mm side margins, 2.5 mm between
-the columns. Print the guides version on plain paper first and hold it against a
-label sheet to check the printer is not scaling the page.
+Sheet geometry is in SHEETS: Avery L7165 and its many equivalents (99.1 x 67.7
+mm, two across and four down), and the 40-up sheet of 39 x 35 mm labels, five
+across and eight down with no gaps, centred on the page. Print the guides
+version on plain paper first and hold it against a label sheet to check the
+printer is not scaling the page.
 
 Thermal rolls print one label per page: the page is the label, so the printer
 driver only needs the same size set as its paper. Three common roll sizes are
@@ -40,6 +42,7 @@ is this and where should it be" for a scanned label (`lookup`).
 from __future__ import annotations
 
 import io
+import re
 
 import frappe
 from frappe import _
@@ -47,22 +50,19 @@ from frappe.utils import format_date
 
 LOGO = "/assets/iso_compliance/images/hcc-mark.png"
 
-#: Avery L7165 and equivalents, in millimetres.
-SHEET = {
-	"label_w": 99.1,
-	"label_h": 67.7,
-	"cols": 2,
-	"rows": 4,
-	"margin_top": 13.1,
-	"margin_side": 4.65,
-	"col_gap": 2.5,
+#: A4 label sheets, in millimetres.
+SHEETS = {
+	# Avery L7165 and equivalents
+	"a4-8": {"label_w": 99.1, "label_h": 67.7, "cols": 2, "rows": 4, "margin_top": 13.1, "margin_side": 4.65, "col_gap": 2.5},
+	# 40 to a sheet, 39 x 35 mm, no gaps: (210 - 5 x 39) / 2 and (297 - 8 x 35) / 2
+	"a4-40": {"label_w": 39, "label_h": 35, "cols": 5, "rows": 8, "margin_top": 8.5, "margin_side": 7.5, "col_gap": 0},
 }
-PER_SHEET = SHEET["cols"] * SHEET["rows"]
 
 #: What a label can be printed on. "sheet" layouts tile an A4 page; the others
 #: are thermal rolls, one label per page of that size.
 LAYOUTS = {
-	"a4-8": {"label": "A4 sheet, 8 labels (99.1 × 67.7 mm)", "w": SHEET["label_w"], "h": SHEET["label_h"], "sheet": True},
+	"a4-8": {"label": "A4 sheet, 8 labels (99.1 × 67.7 mm)", "w": 99.1, "h": 67.7, "sheet": True},
+	"a4-40": {"label": "A4 sheet, 40 labels (39 × 35 mm)", "w": 39, "h": 35, "sheet": True},
 	"thermal-100x50": {"label": "Thermal roll, 100 × 50 mm", "w": 100, "h": 50},
 	"thermal-75x50": {"label": "Thermal roll, 75 × 50 mm", "w": 75, "h": 50},
 	"thermal-50x25": {"label": "Thermal roll, 50 × 25 mm (barcode and name only)", "w": 50, "h": 25},
@@ -112,7 +112,16 @@ def code128_svg(value: str, module_width: float = 0.33, height: float = 11.0) ->
 
 	# Strip the XML declaration and DOCTYPE so the fragment can sit inside HTML.
 	start = svg.find("<svg")
-	return svg[start:] if start != -1 else ""
+	if start == -1:
+		return ""
+	svg = svg[start:]
+	# A viewBox (in px, the unit its mm coordinates resolve to) lets the label's
+	# CSS shrink the barcode to fit a small label instead of cutting it off.
+	m = re.match(r'<svg[^>]*width="([\d.]+)mm" height="([\d.]+)mm"', svg)
+	if m:
+		w, h = (float(x) * 96 / 25.4 for x in m.groups())
+		svg = svg.replace("<svg ", f'<svg viewBox="0 0 {w:.2f} {h:.2f}" preserveAspectRatio="none" ', 1)
+	return svg
 
 
 # ---------------------------------------------------------------------------
@@ -306,7 +315,10 @@ def _label_html(ctx: dict, kind: str) -> str:
 	return f"""<div class="hcc-label">
   <div class="hcc-top">
     <img class="hcc-logo" src="{LOGO}">
-    <div class="hcc-item" title="{esc(ctx.get('item_name'))}">{esc(ctx.get('item_name'))}</div>
+    <div class="hcc-id">
+      <div class="hcc-code">{esc(ctx.get('item_code'))}</div>
+      <div class="hcc-item" title="{esc(ctx.get('item_name'))}">{esc(ctx.get('item_name') if ctx.get('item_name') != ctx.get('item_code') else '')}</div>
+    </div>
   </div>
   {code_block}
   <table class="hcc-facts">{rows}</table>
@@ -318,13 +330,15 @@ def _wrap(labels: list[str], layout: str = DEFAULT_LAYOUT, guides: int = 0, titl
 	lay = LAYOUTS.get(layout) or LAYOUTS[DEFAULT_LAYOUT]
 	w, h = lay["w"], lay["h"]
 	if lay.get("sheet"):
-		s = SHEET
+		s = SHEETS[layout if layout in SHEETS else DEFAULT_LAYOUT]
+		per_sheet = s["cols"] * s["rows"]
+		small = h < 40
 		pages = []
-		for page_start in range(0, len(labels), PER_SHEET):
-			page = labels[page_start : page_start + PER_SHEET]
+		for page_start in range(0, len(labels), per_sheet):
+			page = labels[page_start : page_start + per_sheet]
 			cells = "".join(page)
 			# Pad the last sheet so the grid keeps its shape and nothing reflows.
-			cells += '<div class="hcc-label hcc-blank"></div>' * (PER_SHEET - len(page))
+			cells += '<div class="hcc-label hcc-blank"></div>' * (per_sheet - len(page))
 			pages.append(f'<div class="hcc-sheet">{cells}</div>')
 		body = "".join(pages)
 		page_css = f"""
@@ -339,6 +353,21 @@ def _wrap(labels: list[str], layout: str = DEFAULT_LAYOUT, guides: int = 0, titl
   }}
   .hcc-sheet:last-child {{ page-break-after: auto; break-after: auto; }}
   .hcc-label {{ padding: 4mm 5mm; }}"""
+		if small:
+			# 39 x 35 mm: no logo, everything a size down, barcode across the label
+			page_css += """
+  .hcc-label { padding: 1.5mm 1.5mm 1mm; }
+  .hcc-logo { display: none; }
+  .hcc-code { font-size: 7.5pt; }
+  .hcc-item { font-size: 6pt; line-height: 1.1; }
+  .hcc-bc, .hcc-bc svg { height: 7mm; width: 100%; }
+  .hcc-bc { margin-top: 1mm; }
+  .hcc-batch { font-size: 7pt; letter-spacing: 0; }
+  .hcc-nobatch { font-size: 6pt; margin: 1mm 0; }
+  .hcc-facts { font-size: 5.5pt; line-height: 1.15; }
+  .hcc-facts th { width: 9mm; padding-right: 1mm; }
+  .hcc-facts td { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 0; }
+  .hcc-ref { display: none; }"""
 	else:
 		# a roll: every label is its own page of exactly the label's size
 		body = "".join(labels)
@@ -348,7 +377,8 @@ def _wrap(labels: list[str], layout: str = DEFAULT_LAYOUT, guides: int = 0, titl
   .hcc-label {{ padding: {1.5 if small else 2.5}mm {2 if small else 3.5}mm; page-break-after: always; break-after: page; }}
   .hcc-label:last-child {{ page-break-after: auto; break-after: auto; }}
   .hcc-logo {{ height: 6mm; {"display:none;" if small else ""} }}
-  .hcc-item {{ font-size: {8 if small else 10}pt; -webkit-line-clamp: {1 if small else 2}; }}
+  .hcc-code {{ font-size: {8 if small else 10}pt; }}
+  .hcc-item {{ font-size: {6.5 if small else 8.5}pt; -webkit-line-clamp: {1 if small else 2}; }}
   .hcc-bc, .hcc-bc svg {{ height: {8 if small else 10}mm; }}
   .hcc-batch {{ font-size: {8 if small else 11}pt; }}
   .hcc-facts {{ font-size: 7.5pt; {"display:none;" if small else ""} }}
@@ -371,8 +401,10 @@ def _wrap(labels: list[str], layout: str = DEFAULT_LAYOUT, guides: int = 0, titl
   .hcc-blank {{ visibility: hidden; }}
   .hcc-top {{ display:flex; align-items:center; gap:3mm; }}
   .hcc-logo {{ height: 8mm; width:auto; flex: none; }}
+  .hcc-id {{ min-width: 0; }}
+  .hcc-code {{ font-size: 11pt; font-weight: 700; line-height: 1.15; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }}
   .hcc-item {{
-    font-size: 11pt; font-weight: 700; line-height: 1.15;
+    font-size: 9pt; line-height: 1.15;
     display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
   }}
   .hcc-bc {{ margin: 1.5mm 0 0; height: 11mm; }}
@@ -397,7 +429,9 @@ def _wrap(labels: list[str], layout: str = DEFAULT_LAYOUT, guides: int = 0, titl
 
 @frappe.whitelist()
 def layouts() -> list[dict]:
-	return [{"value": k, "label": _(v["label"])} for k, v in LAYOUTS.items()]
+	return [{"value": k, "label": _(v["label"]),
+	         "per_sheet": SHEETS[k]["cols"] * SHEETS[k]["rows"] if v.get("sheet") else 0}
+	        for k, v in LAYOUTS.items()]
 
 
 def _batch_balances(warehouse=None, item_code=None, batch_no=None) -> list[dict]:
@@ -481,9 +515,10 @@ def render_stock(rows, layout: str = DEFAULT_LAYOUT, guides: int | str = 0) -> s
 		for b in frappe.get_all(
 			"Batch",
 			filters={"name": ("in", [r.get("batch_no") for r in rows if r.get("batch_no")] or [""])},
-			fields=["name", "supplier", "manufacturing_date", "creation"],
+			fields=["name", "supplier", "manufacturing_date", "creation", "reference_doctype", "reference_name"],
 		)
 	}
+	receipts = _receipts({b.reference_name for b in batches.values() if b.reference_doctype == "Purchase Receipt"})
 	suppliers = {}
 	labels = []
 	for row in rows or []:
@@ -491,7 +526,8 @@ def render_stock(rows, layout: str = DEFAULT_LAYOUT, guides: int | str = 0) -> s
 		if count < 1 or not row.get("item_code"):
 			continue
 		batch = batches.get(row.get("batch_no"))
-		supplier = batch and batch.supplier
+		receipt = receipts.get(batch.reference_name) if batch and batch.reference_doctype == "Purchase Receipt" else None
+		supplier = (receipt and receipt.supplier) or (batch and batch.supplier)
 		if supplier and supplier not in suppliers:
 			suppliers[supplier] = frappe.db.get_value("Supplier", supplier, "supplier_name") or supplier
 		context = {
@@ -499,7 +535,8 @@ def render_stock(rows, layout: str = DEFAULT_LAYOUT, guides: int | str = 0) -> s
 			"item_code": row["item_code"],
 			"batch_no": row.get("batch_no"),
 			"supplier": suppliers.get(supplier, ""),
-			"date": format_date(batch.manufacturing_date or batch.creation) if batch else "",
+			# the date of receipt for a bought-in batch, else when the batch was made
+			"date": format_date(receipt.posting_date if receipt else (batch.manufacturing_date or batch.creation)) if batch else "",
 			"warehouse": row.get("warehouse") or "",
 			"reference": row["item_code"] if row.get("batch_no") else "",
 			"barcode": code128_svg(row.get("batch_no") or row["item_code"]),
@@ -508,6 +545,17 @@ def render_stock(rows, layout: str = DEFAULT_LAYOUT, guides: int | str = 0) -> s
 	if not labels:
 		frappe.throw(_("Nothing to print: every line was set to zero labels."))
 	return _wrap(labels, layout=layout, guides=guides, title=_("Stock labels"))
+
+
+def _receipts(names: set[str]) -> dict:
+	"""Posting date and supplier of the receipts batches came in on."""
+	if not names:
+		return {}
+	return {
+		r.name: r
+		for r in frappe.get_all("Purchase Receipt", filters={"name": ("in", list(names))},
+		                        fields=["name", "supplier", "posting_date"])
+	}
 
 
 # ---------------------------------------------------------------------------
