@@ -4,7 +4,7 @@
 // Stock Labels (SOP-006 step 3, identification): two jobs for Stores.
 //   Scan   — what a label is, where that stock is now and where it belongs,
 //            including lots waiting in Inspection Required.
-//   Print  — labels for stock already on the shelves, on an A4 sheet of eight
+//   Print  — labels for stock already on the shelves, on an A4 sheet of eight or forty
 //            or a thermal roll. Server side: iso_compliance.api.labels.
 
 const HCC_LBL = "iso_compliance.api.labels";
@@ -172,6 +172,7 @@ class HccStockLabels {
 		$(`<div><div class="hcc-sl-h">${__("Labels each")}</div><input type="number" min="0" class="form-control input-sm hcc-sl-all" style="width:90px" placeholder="1"></div>`).appendTo($b);
 		$b.append(`<span class="hcc-sl-total"></span><button class="btn btn-primary btn-sm hcc-sl-print">${__("Print")}</button>`);
 		frappe.call({ method: `${HCC_LBL}.layouts` }).then(({ message }) => {
+			this.layouts = message;
 			this.layout.df.options = message;
 			this.layout.refresh();
 			this.layout.set_value(message[0].value);
@@ -223,8 +224,9 @@ class HccStockLabels {
 
 	total() {
 		const n = this.count();
-		const sheet = (this.layout.get_value() || "a4-8") === "a4-8";
-		this.$w.find(".hcc-sl-total").text(n ? (sheet ? __("{0} labels · {1} A4 sheet(s)", [n, Math.ceil(n / 8)]) : __("{0} labels", [n])) : "");
+		const lay = (this.layouts || []).find((l) => l.value === (this.layout.get_value() || "a4-8"));
+		const per_sheet = lay ? lay.per_sheet : 8;
+		this.$w.find(".hcc-sl-total").text(n ? (per_sheet ? __("{0} labels · {1} A4 sheet(s)", [n, Math.ceil(n / per_sheet)]) : __("{0} labels", [n])) : "");
 	}
 
 	print() {

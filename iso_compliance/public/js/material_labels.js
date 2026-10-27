@@ -1,4 +1,4 @@
-// Material identification labels (SOP-006): eight to an A4 sheet, or a thermal
+// Material identification labels (SOP-006): eight or forty to an A4 sheet, or a thermal
 // roll (the layouts live in iso_compliance.api.labels.LAYOUTS). Labels for stock
 // already on the shelves, and the scan lookup, are on the Stock Labels page.
 //
@@ -124,11 +124,12 @@ hcc.labels.show = function (frm, rows) {
 	const refresh_total = () => {
 		const data = dialog.get_value("rows") || [];
 		const total = data.reduce((sum, d) => sum + cint(d.labels), 0);
-		const sheet = (dialog.get_value("layout") || "a4-8") === "a4-8";
+		const lay = (hcc.labels.layouts || []).find((l) => l.value === (dialog.get_value("layout") || "a4-8"));
+		const per_sheet = lay ? lay.per_sheet : 8;
 		dialog.fields_dict.total.$wrapper.html(
 			`<div style="padding:6px 0;font-weight:600">${__("Total")}: ${total} ${__(
 				"label(s)"
-			)}${sheet ? ` — ${Math.ceil(total / 8)} ${__("A4 sheet(s)")}` : ""}${
+			)}${per_sheet ? ` — ${Math.ceil(total / per_sheet)} ${__("A4 sheet(s)")}` : ""}${
 				total > hcc.labels.WARN_THRESHOLD
 					? ` <span style="color:var(--orange-600);font-weight:400">(${__(
 							"will ask to confirm"
