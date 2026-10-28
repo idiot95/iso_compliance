@@ -1147,7 +1147,21 @@
   "label": "One-off plan",
   "insert_after": "custom_superseded_by",
   "module": "ISO Compliance",
-  "description": "Begun in an inspection of an item that had no plan, with its characteristics added there. Save it against the item or its item group from the inspection to use it again.",
+  "description": "Begun in an inspection, with its characteristics added there. Save it against the item or its item group from the inspection to use it again.",
+  "no_copy": 1,
+  "read_only": 1
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Quality Inspection Template-custom_based_on",
+  "dt": "Quality Inspection Template",
+  "fieldname": "custom_based_on",
+  "fieldtype": "Link",
+  "options": "Quality Inspection Template",
+  "label": "Based on",
+  "insert_after": "custom_one_off",
+  "module": "ISO Compliance",
+  "description": "The saved plan this one-off plan was copied from, when characteristics were added in an inspection that followed it. Saving it as the plan replaces that one.",
   "no_copy": 1,
   "read_only": 1
  },
@@ -1180,7 +1194,7 @@
   "fieldname": "custom_used_by",
   "fieldtype": "HTML",
   "label": "Used by",
-  "insert_after": "custom_one_off",
+  "insert_after": "custom_based_on",
   "module": "ISO Compliance"
  },
  {

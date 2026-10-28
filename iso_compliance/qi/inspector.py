@@ -59,7 +59,8 @@ def get_inspection(qi: str) -> dict:
 
 	one_off = bool(cint(tpl.custom_one_off))
 	can_write = doc.docstatus == 0 and frappe.has_permission(QI, "write", doc)
-	can_add = one_off and can_write and not cint(tpl.custom_locked)
+	# on a saved plan, the first characteristic added copies it (_editable_plan)
+	can_add = can_write
 	cache, rows = {"all": measuring_instruments(), "cal": {}}, []
 	for r in drawing_rows(doc):
 		src = tpl_rows.get(r.custom_balloon_no)
@@ -86,7 +87,7 @@ def get_inspection(qi: str) -> dict:
 			"instruments": instruments,
 			"values": data.get(r.custom_balloon_no, []),
 			"status": r.status,
-			"removable": can_add and not data.get(r.custom_balloon_no),
+			"removable": can_add and one_off and not cint(tpl.custom_locked) and not data.get(r.custom_balloon_no),
 		})
 	return {
 		"name": doc.name,
@@ -117,11 +118,14 @@ def get_inspection(qi: str) -> dict:
 		"rows": rows,
 		"can_write": can_write,
 		"can_submit": doc.docstatus == 0 and frappe.has_permission(QI, "submit", doc),
-		# no plan existed: characteristics are added here, then saved as a plan
+		# characteristics added here (no plan, or added to the plan's), then saved as a plan
 		"one_off": one_off,
+		"based_on": tpl.get("custom_based_on"),
 		"can_add": can_add,
 		"can_save_plan": one_off and bool({"Quality Manager", "System Manager"} & set(frappe.get_roles())),
 		"plan_groups": _item_groups(doc.item_code) if one_off else [],
+		"current_plans": _current_plans(doc.item_code) if one_off else {},
+		"suggestions": _suggestions(doc) if can_add else [],
 	}
 
 
@@ -279,10 +283,13 @@ def summary(qi: str) -> dict:
 	}
 
 
-# ------------------------------------------------- one-off plan (no plan) --
+# ------------------------------------------------------------ one-off plan --
 # An item with no plan is inspected on a one-off plan (inspection.one_off_plan):
 # the inspector adds each characteristic here, no drawing needed, and Quality
-# saves the result as the plan of the item or its item group.
+# saves the result as the plan of the item or its item group. An inspection on
+# a saved plan can add characteristics too: the first one copies the plan into
+# a one-off plan for this inspection (the saved plan is not touched), and
+# saving that replaces the plan it came from.
 
 #: what the add-characteristic dialog may set on a plan row
 CHARACTERISTIC_FIELDS = {
@@ -294,13 +301,71 @@ CHARACTERISTIC_FIELDS = {
 
 
 def _one_off(doc):
-	"""The inspection's one-off plan, still open to new characteristics."""
+	"""The inspection's one-off plan, still open to change."""
 	tpl = frappe.get_doc("Quality Inspection Template", doc.quality_inspection_template)
 	if not cint(tpl.custom_one_off):
 		frappe.throw(_("This inspection follows the plan {0}. Change its characteristics there.").format(tpl.name))
 	if cint(tpl.custom_locked):
 		frappe.throw(_("The plan {0} is locked by a submitted inspection.").format(tpl.name))
 	return tpl
+
+
+def _editable_plan(doc):
+	"""The plan a new characteristic goes on: the inspection's own one-off plan,
+	else a one-off copy of the plan it follows, which the inspection moves to.
+	Readings and values are keyed by number, and the copy keeps the numbers."""
+	tpl = frappe.get_doc("Quality Inspection Template", doc.quality_inspection_template)
+	if cint(tpl.custom_one_off) and not cint(tpl.custom_locked):
+		return tpl
+	base = _("{0} (from {1})").format(doc.item_code, tpl.name)[:130]
+	name, n = base, 1
+	while frappe.db.exists("Quality Inspection Template", name):
+		n += 1
+		name = f"{base} {n}"
+	copy = frappe.copy_doc(tpl)
+	copy.quality_inspection_template_name = name
+	copy.custom_item = copy.custom_item or doc.item_code
+	copy.custom_drawing_hash = tpl.get("custom_drawing_hash")  # no_copy; the drawing itself is kept
+	copy.custom_one_off = 1
+	copy.custom_based_on = tpl.get("custom_based_on") or tpl.name
+	copy.custom_locked = 0
+	copy.custom_superseded_by = None
+	copy.flags.ignore_permissions = True
+	copy.insert()
+	doc.quality_inspection_template = copy.name
+	return copy
+
+
+def _current_plans(item_code: str) -> dict:
+	"""The new-format plans already on the item and on each of its groups: what
+	Save as plan would replace."""
+	out = {}
+	item_plan = frappe.db.get_value("Item", item_code, "quality_inspection_template")
+	if is_drawing_template(item_plan):
+		out["Item"] = item_plan
+	for g in _item_groups(item_code):
+		plan = frappe.db.get_value("Item Group", g, "custom_default_qi_template")
+		if is_drawing_template(plan):
+			out[g] = plan
+	return out
+
+
+def _suggestions(doc) -> list[str]:
+	"""Characteristic names to offer: the retired old-format template's
+	parameters for this item, then those already used on new-format plans."""
+	from iso_compliance.qi.inspection import legacy_template
+
+	names = []
+	old = legacy_template(doc.item_code, doc.get("bom_no"))
+	if old:
+		names += frappe.get_all("Item Quality Inspection Parameter",
+		                        filters={"parenttype": "Quality Inspection Template", "parent": old},
+		                        pluck="specification", order_by="idx")
+	names += frappe.get_all("Item Quality Inspection Parameter",
+	                        filters={"parenttype": "Quality Inspection Template", "custom_row_type": ("is", "set")},
+	                        pluck="specification", distinct=True, order_by="specification", limit=500)
+	on_it = {r.specification for r in doc.readings}
+	return list(dict.fromkeys(n for n in names if n and n not in on_it))
 
 
 def _item_groups(item_code: str) -> list[str]:
@@ -321,7 +386,6 @@ def add_characteristic(qi: str, characteristic) -> str:
 
 	_draft_for_writing(qi)
 	doc = _load(qi, "write")
-	tpl = _one_off(doc)
 	c = frappe.parse_json(characteristic) or {}
 	name = (c.get("specification") or "").strip()
 	if not name:
@@ -332,6 +396,7 @@ def add_characteristic(qi: str, characteristic) -> str:
 		frappe.throw(_("A reference dimension is not inspected."))
 	if not frappe.db.exists("Quality Inspection Parameter", name):
 		frappe.get_doc({"doctype": "Quality Inspection Parameter", "parameter": name}).insert(ignore_permissions=True)
+	tpl = _editable_plan(doc)
 	row = tpl.append(ROWS, {
 		"specification": name,
 		**{field: c.get(key) for key, field in CHARACTERISTIC_FIELDS.items() if c.get(key) not in (None, "")},
@@ -373,9 +438,12 @@ def remove_characteristic(qi: str, row_key: str):
 
 
 @frappe.whitelist(methods=["POST"])
-def save_as_plan(qi: str, target: str, item_group: str | None = None) -> str:
+def save_as_plan(qi: str, target: str, item_group: str | None = None, replace=0) -> str:
 	"""Keep the one-off plan as the inspection plan of the item, or of an item
-	group the item sits in, so later inspections load it. Draft or submitted."""
+	group the item sits in, so later inspections load it. Draft or submitted.
+	A new-format plan already there is replaced only when asked (`replace`).
+	Saved on the Item, it also takes over the item's BOMs that carried the plan
+	it was copied from, since a BOM's plan comes first."""
 	require_quality_manager()
 	doc = _load(qi)
 	tpl = frappe.get_doc("Quality Inspection Template", doc.quality_inspection_template)
@@ -392,10 +460,22 @@ def save_as_plan(qi: str, target: str, item_group: str | None = None) -> str:
 	else:
 		frappe.throw(_("Save the plan against the Item or an Item Group."))
 	current = frappe.db.get_value(holder, name, field)
-	if current and current != tpl.name and is_drawing_template(current):
+	if current and current != tpl.name and is_drawing_template(current) and not cint(replace):
 		frappe.throw(_("{0} {1} already has the plan {2}.").format(_(holder), name, current), title=_("Plan exists"))
+	note = _("Inspection plan: {0} → {1} (built in {2})")
 	frappe.db.set_value(holder, name, field, tpl.name)
 	frappe.db.set_value("Quality Inspection Template", tpl.name, "custom_one_off", 0)
-	frappe.get_doc(holder, name).add_comment(
-		"Info", _("Inspection plan: {0} → {1} (built in {2})").format(current or _("none"), tpl.name, doc.name))
+	frappe.get_doc(holder, name).add_comment("Info", note.format(current or _("none"), tpl.name, doc.name))
+	base = tpl.get("custom_based_on")
+	if base and target == "Item":
+		for bom in frappe.get_all("BOM", filters={"item": doc.item_code, "quality_inspection_template": base,
+		                                          "docstatus": ("<", 2)}, pluck="name"):
+			frappe.db.set_value("BOM", bom, "quality_inspection_template", tpl.name)
+			frappe.get_doc("BOM", bom).add_comment("Info", note.format(base, tpl.name, doc.name))
+	# the plan it replaced, once nothing uses it any more, points at this one
+	from iso_compliance.qi.template import used_by
+
+	for old in {base, current} - {None, tpl.name}:
+		if is_drawing_template(old) and not any(used_by(old).values()):
+			frappe.db.set_value("Quality Inspection Template", old, "custom_superseded_by", tpl.name)
 	return name
