@@ -97,7 +97,7 @@ frappe.ui.form.on("Quality Inspection Template", {
 // Only the new format shows. The builder under the drawing holds the rows, the
 // lock, the supersession and "Used by", so the raw fields behind it stay out of
 // sight. A template from before drawings (no item, no drawing rows) is
-// archived: read only, still used by its items until a new-format one replaces it.
+// retired (2026-10-28): read only, and no new inspection loads it.
 const QIT_BEHIND_BUILDER = [QI_ROWS, "custom_rows_section", "custom_drawing", "custom_locked", "custom_superseded_by", "custom_used_by"];
 
 function qi_is_legacy(frm) {
@@ -567,10 +567,10 @@ class QIBuilder {
 		this.$panel.html(`
 			<div class="qi-b-head">
 				<div class="qi-b-title">${__("Old-format template")}</div>
-				<div class="qi-b-status">${__("Archived · read only")}</div>
+				<div class="qi-b-status">${__("Retired · read only")}</div>
 			</div>
 			<div class="alert alert-warning small">${__(
-				"Made before drawing-based inspection. Inspections of the items below still use it as it is. To change what is inspected, make the new-format template from the item's drawing; tagging it on the item replaces this one."
+				"Made before drawing-based inspection, and retired: new inspections no longer load it. An item below with no new-format plan is inspected by adding its characteristics in the inspection, which Quality can then save as its plan. Or make the new-format plan from the item's drawing now."
 			)} ${qi_can_edit() ? `<button class="btn btn-xs btn-primary qi-start-new" style="margin-left:6px">${__("New-format template")}</button>` : ""}</div>
 			<div class="qi-b-subtitle">${__("Checks in this template")}</div>
 			<table class="table table-sm qi-legacy"><thead><tr><th>${__("Parameter")}</th><th>${__("Group")}</th><th>${__("Accept")}</th></tr></thead>

@@ -141,7 +141,7 @@ iso_qi.render_plan = async function (frm, item, bom) {
 			: `<span>${__("No plan has been made for this item yet.")}</span>`
 	);
 	$w.find("[data-use]").on("click", (e) => use(String($(e.currentTarget).data("use"))));
-	// any other plan, an older one without a drawing included
+	// any other new-format plan (old-format ones are retired)
 	const ctl = frappe.ui.form.make_control({
 		parent: $w.find(".qi-plan-search"),
 		df: { fieldtype: "Link", options: "Quality Inspection Template", fieldname: "other_plan", placeholder: __("Search all plans"),

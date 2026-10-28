@@ -52,13 +52,11 @@ frappe.ui.form.on("Quality Inspection", {
 	},
 });
 
-// The item had no plan: characteristics are added on this inspection, then
-// Quality saves them as the plan of the item or its group (qi_one_off.js).
+// Characteristics are added on this inspection (to the item's plan, or with no
+// plan at all), then Quality saves them as the plan of the item or its group
+// (qi_one_off.js).
 async function qi_one_off_buttons(frm) {
-	const tpl = frm.doc.quality_inspection_template;
-	if (!tpl || frm.is_new() || frm.doc.docstatus === 2) return;
-	const { message: t } = await frappe.db.get_value("Quality Inspection Template", tpl, "custom_one_off");
-	if (!t || !cint(t.custom_one_off)) return;
+	if (!frm.doc.quality_inspection_template || frm.is_new() || frm.doc.docstatus === 2 || !frm.doc.custom_stage) return;
 	const { message: d } = await frappe.call({ method: "iso_compliance.qi.inspector.get_inspection", args: { qi: frm.doc.name } });
 	await frappe.require("/assets/iso_compliance/js/qi_one_off.js");
 	if (d.can_add) frm.add_custom_button(__("Add characteristic"), () => window.iso_qi_one_off.add(d, () => frm.reload_doc()));
@@ -124,14 +122,14 @@ async function qi_form_drawing($box, d) {
 	}
 }
 
-// An inspection on a template from before drawings still works the old way
-// (readings typed into the grid); say so, and point at the way out.
+// A draft begun on an old-format template before those were retired still
+// works the old way (readings typed into the grid); say so, and the way out.
 function qi_old_format_note(frm) {
+	if (frm.is_new() || frm.doc.custom_stage || frm.doc.docstatus !== 0) return; // saving sets the stage on a new-format plan
 	const tpl = frm.doc.quality_inspection_template;
-	if (frm.is_new() || frm.doc.custom_stage || frm.doc.docstatus !== 0 || !tpl) return; // saving sets the stage on a drawing template
 	frm.set_intro(
-		__("Inspection plan {0} is old format (no new-format plan exists for this item yet), so readings are typed into the grid below. Once a new-format plan is tagged on the item, new inspections load it automatically.", [
-			`<a href="/app/quality-inspection-template/${encodeURIComponent(tpl)}">${frappe.utils.escape_html(tpl)}</a>`,
+		__("This draft was begun on an old-format plan{0}, which is retired. Finish it here, or cancel it and start the inspection again from the receipt or work order: new inspections load the new-format plan, or let you add the characteristics yourself.", [
+			tpl ? ` (<a href="/app/quality-inspection-template/${encodeURIComponent(tpl)}">${frappe.utils.escape_html(tpl)}</a>)` : "",
 		]),
 		"orange"
 	);
@@ -155,7 +153,7 @@ function qi_start_dialog(frm) {
 	if (frm.__qi_start || frm.doc.item_code || frm.doc.reference_name) return;
 	frm.__qi_start = true;
 	const esc = frappe.utils.escape_html;
-	const st = { stage: "Final", mode: "new", item: null, bom: null, explicit: null, lot: null };
+	const st = { stage: "Final", item: null, bom: null, explicit: null, lot: null };
 	const d = new frappe.ui.Dialog({
 		title: __("New quality inspection"),
 		size: "large",
@@ -174,43 +172,13 @@ function qi_start_dialog(frm) {
 				get_query: () => ({ query: "iso_compliance.overrides.inspection_flow.work_orders_waiting" }) },
 			{ fieldtype: "Column Break" },
 			{ fieldname: "final_html", fieldtype: "HTML", depends_on: "work_order" },
-			// what is inspected (above) is common; how it is recorded is a tab
-			{ fieldtype: "Section Break" },
-			{ fieldname: "mode_html", fieldtype: "HTML" },
+			// old-format plans are retired (2026-10-28): every inspection starts on the new format
 			{ fieldtype: "Section Break", fieldname: "new_section", label: __("Inspection plan that will load") },
 			{ fieldname: "plan_html", fieldtype: "HTML" },
-			{ fieldtype: "Section Break", fieldname: "old_section", hidden: 1 },
-			{ fieldname: "old_html", fieldtype: "HTML" },
-			{ fieldname: "old_template", fieldtype: "Link", options: "Quality Inspection Template", label: __("Old-format template") },
 		],
 		primary_action_label: __("Start inspection"),
-		primary_action: (v) => (st.mode === "old" ? open_old(v) : start(v)),
+		primary_action: (v) => start(v),
 	});
-	// New format: the drawing plan and the inspector screen. Old format:
-	// ERPNext's own form, readings typed into its grid, filled in from above.
-	const show_mode = () => {
-		const tabs = [["new", __("New format")], ["old", __("Old format")]];
-		d.fields_dict.mode_html.$wrapper.html(`<div class="qi-start-tabs">${tabs
-			.map(([v, label]) => `<button type="button" class="qi-start-tab ${st.mode === v ? "on" : ""}" data-m="${v}">${esc(label)}</button>`)
-			.join("")}</div>`);
-		d.fields_dict.mode_html.$wrapper.find("[data-m]").on("click", (e) => {
-			st.mode = String($(e.currentTarget).data("m"));
-			show_mode();
-		});
-		// an item with a drawing plan always inspects on it: saving swaps any old
-		// template for it (inspection.use_new_plan), so the old format is not offered
-		const blocked = !!(st.plan && st.plan.new_format);
-		d.set_df_property("new_section", "hidden", st.mode !== "new");
-		d.set_df_property("old_section", "hidden", st.mode !== "old");
-		d.set_df_property("old_template", "hidden", blocked);
-		// the checkpoint is recorded on drawing inspections only
-		d.set_df_property("check_point", "hidden", st.stage !== "In Process" || st.mode === "old");
-		d.fields_dict.old_html.$wrapper.html(blocked
-			? `<div class="qi-start-plan warn">${__("{0} has a new-format plan ({1}); inspections load it. Use New format.", [esc(st.item), esc(st.plan.template)])}</div>`
-			: `<div class="text-muted small" style="margin-bottom:8px">${__("Opens ERPNext's standard inspection form with what is inspected filled in. Readings are typed into its grid; there is no drawing or inspector screen.")}</div>`);
-		d.set_primary_action(st.mode === "old" ? __("Open old-format form") : __("Start inspection"), (v) => (st.mode === "old" ? open_old(v) : start(v)));
-		d.get_primary_btn().prop("disabled", st.mode === "old" && blocked);
-	};
 	const show_stage = () => {
 		d.fields_dict.stage_html.$wrapper.html(`<div class="qi-start-stages">${QI_START_STAGES.map(
 			([v, label, hint]) => `<button type="button" class="qi-start-stage ${st.stage === v ? "on" : ""}" data-v="${v}"><b>${esc(label)}</b><span>${esc(hint)}</span></button>`
@@ -224,15 +192,13 @@ function qi_start_dialog(frm) {
 		d.set_df_property("purchase_receipt", "hidden", st.stage !== "Incoming");
 		d.set_df_property("pr_row", "hidden", st.stage !== "Incoming");
 		d.set_df_property("job_card", "hidden", st.stage !== "In Process");
-		d.set_df_property("check_point", "hidden", st.stage !== "In Process" || st.mode === "old");
+		d.set_df_property("check_point", "hidden", st.stage !== "In Process");
 		d.set_df_property("work_order", "hidden", st.stage !== "Final");
 		d.set_df_property("final_html", "hidden", st.stage !== "Final");
 	};
 	const plan = async () => {
 		const $p = d.fields_dict.plan_html.$wrapper;
 		st.plan = null;
-		d.set_value("old_template", ""); // the last item's
-		show_mode();
 		if (!st.item) {
 			$p.html(`<div class="text-muted small">${__("Choose what is inspected above.")}</div>`);
 			return;
@@ -243,14 +209,8 @@ function qi_start_dialog(frm) {
 			args: { item_code: st.item, bom_no: st.bom, stage: st.stage, explicit: st.explicit },
 		});
 		st.plan = m;
-		show_mode();
 		if (!m.template) {
-			$p.html(`<div class="qi-start-plan warn">${__("{0} has no inspection plan. Start the inspection and add each characteristic you check as you go; no drawing is needed. Quality can then save them as the plan of the item or its item group.", [esc(st.item)])}</div>`);
-			return;
-		}
-		if (!m.new_format) {
-			$p.html(`<div class="qi-start-plan warn">${__("{0} has only the old-format plan {1}. Use the Old format tab, or build a new plan from the item's BOM.", [esc(st.item), esc(m.template)])}</div>`);
-			d.set_value("old_template", m.template);
+			$p.html(`<div class="qi-start-plan warn">${__("{0} has no inspection plan. Start the inspection and add each dimensional, operational or visual characteristic you check as you go; no drawing is needed. Quality can then save them as the plan of the item or its item group.", [esc(st.item)])}</div>`);
 			return;
 		}
 		$p.html(`<div class="qi-start-plan">
@@ -258,6 +218,7 @@ function qi_start_dialog(frm) {
 			<div><a href="/app/quality-inspection-template/${encodeURIComponent(m.template)}" target="_blank"><b>${esc(m.template)}</b></a>
 				<div class="text-muted small">${m.drawing_no ? __("Drawing {0}", [esc(m.drawing_no + (m.revision ? " Rev " + m.revision : ""))]) : ""}</div>
 				<div class="qi-start-due">${__("{0} of {1} characteristics are checked at this stage", [m.due, m.rows])}</div>
+				<div class="text-muted small">${__("You can add more characteristics during the inspection and save them as the plan.")}</div>
 				${m.superseded_by ? `<div class="text-danger small">${__("Superseded by {0}: check with Quality.", [esc(m.superseded_by)])}</div>` : ""}
 			</div></div>`);
 		if (m.drawing) {
@@ -306,8 +267,8 @@ function qi_start_dialog(frm) {
 		plan();
 	};
 	const start = async (v) => {
-		// no plan at all starts on a one-off plan; an old-format one uses the Old format tab
-		if (!st.plan || (st.plan.template && !st.plan.new_format)) return frappe.msgprint(__("There is no new-format plan to start from."));
+		// no plan starts on a one-off plan, built in the inspection
+		if (!st.plan) return frappe.msgprint(__("Choose what is inspected first."));
 		const call =
 			st.stage === "Incoming"
 				? { method: "start_receipt_inspection", args: { purchase_receipt: v.purchase_receipt, row: v.pr_row, sample_size: st.sample_for === v.pr_row ? st.sample : null }, ask: true }
@@ -354,28 +315,11 @@ function qi_start_dialog(frm) {
 		d.hide();
 		frappe.set_route("Form", "Quality Inspection", name);
 	};
-	// Old format: fill ERPNext's own form from what was chosen above
-	const open_old = async (v) => {
-		if (st.plan && st.plan.new_format) return;
-		const lot = (st.lots || [])[0];
-		const ref =
-			st.stage === "Incoming" ? v.purchase_receipt && { inspection_type: "Incoming", reference_type: "Purchase Receipt", reference_name: v.purchase_receipt, child_row_reference: v.pr_row }
-			: st.stage === "In Process" ? v.job_card && { inspection_type: "In Process", reference_type: "Job Card", reference_name: v.job_card }
-			: lot && { inspection_type: "Outgoing", reference_type: "Stock Entry", reference_name: lot.stock_entry, child_row_reference: lot.row };
-		d.__started = true;
-		d.hide();
-		if (!ref) return; // nothing chosen: the blank form
-		// one at a time, in order: a type's change may reset the name after it
-		for (const [f, val] of Object.entries(ref)) if (val) await frm.set_value(f, val);
-		if (st.item) await frm.set_value("item_code", st.item);
-		if (v.old_template) await frm.set_value("quality_inspection_template", v.old_template);
-	};
 	d.onhide = () => {
 		if (!d.__started) frm.__qi_start_declined = true;
 	};
 	d.show();
 	show_stage();
-	show_mode();
 	plan();
 }
 
@@ -770,9 +714,6 @@ frappe.dom.set_style(`
 .qi-start-stage{text-align:left;border:1px solid var(--border-color);background:var(--fg-color);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
 .qi-start-stage span{font-size:var(--text-sm);color:var(--text-muted)}
 .qi-start-stage.on{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary);background:var(--blue-50)}
-.qi-start-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border-color);margin-bottom:4px}
-.qi-start-tab{border:0;background:none;padding:8px 14px;margin-bottom:-1px;border-bottom:2px solid transparent;color:var(--text-muted);font-weight:500}
-.qi-start-tab.on{color:var(--text-color);border-bottom-color:var(--primary)}
 .qi-start-plan{display:flex;gap:14px;align-items:flex-start;padding:10px;border:1px solid var(--border-color);border-radius:10px}
 .qi-start-plan.warn{background:var(--yellow-50);border-color:var(--yellow-300);display:block}
 .qi-start-thumb{width:222px;min-height:80px;border:1px solid var(--border-color);border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;flex:none}

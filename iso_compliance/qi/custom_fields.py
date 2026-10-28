@@ -73,9 +73,13 @@ TEMPLATE_FIELDS = [
 	     label="Superseded by", read_only=1, no_copy=1, insert_after="custom_locked"),
 	dict(fieldname="custom_one_off", fieldtype="Check", label="One-off plan", read_only=1, no_copy=1,
 	     insert_after="custom_superseded_by",
-	     description="Begun in an inspection of an item that had no plan, with its characteristics added there. "
+	     description="Begun in an inspection, with its characteristics added there. "
 	                 "Save it against the item or its item group from the inspection to use it again."),
-	dict(fieldname="custom_used_by", fieldtype="HTML", label="Used by", insert_after="custom_one_off"),
+	dict(fieldname="custom_based_on", fieldtype="Link", options="Quality Inspection Template", label="Based on",
+	     read_only=1, no_copy=1, insert_after="custom_one_off",
+	     description="The saved plan this one-off plan was copied from, when characteristics were added in an "
+	                 "inspection that followed it. Saving it as the plan replaces that one."),
+	dict(fieldname="custom_used_by", fieldtype="HTML", label="Used by", insert_after="custom_based_on"),
 ]
 
 ROW_FIELDS = [
