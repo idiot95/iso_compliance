@@ -30,6 +30,10 @@ RECORD_FORMAT = "Sampling and Inspection Record"
 TEST_REPORT_FORMAT = "Test Report 2.2"
 COC_FORMAT = "Certificate of Conformity"
 MTC_FORMAT = "Material Test Certificate 3.1"
+#: What the dispatch email prints, from the inspections behind a delivery (ERPT-2026-01061):
+#: the Quality Inspection twins of the formats above, and the marked drawing.
+QI_FORMATS = {"d21": f"{COC_FORMAT} (QI)", "d22": f"{TEST_REPORT_FORMAT} (QI)", "mtc": f"{MTC_FORMAT} (QI)"}
+DRAWING_FORMAT = f"{RECORD_FORMAT} (QI)"
 #: Next free form number after FRM-037 (developer, 2026-10-13); REG-001 entry by iso's document set.
 RECORD_FORM_NO = "HCCPL/QMS/FRM-038"
 
@@ -720,7 +724,10 @@ def certificate_readiness(delivery_note: str) -> dict:
 
 	{"coc": {...}, "record": {...}, "mtc": {...}}, each with `applicable`,
 	`ready`, `reason` and `print_format`. Format names are stable: renaming
-	one is an OVERLAPS.md change first.
+	one is an OVERLAPS.md change first. The EN 10204 keys (d21, d22, mtc)
+	name the "(QI)" formats and add `doctype` ("Quality Inspection"),
+	`inspections` (what to print them from, one per item) and `drawing`
+	({print_format, inspections}: the marked drawings, for "Add Drawing").
 	"""
 	from iso_compliance.utils import coc_row_inspections
 
@@ -732,12 +739,26 @@ def certificate_readiness(delivery_note: str) -> dict:
 	missing, drafts, rejected, concessions, records, no_record = [], [], [], [], 0, []
 	mtc_items, mtc_gaps = [], []
 	no_results, no_specific = [], []
+	# The email prints each certificate from one inspection per item, whose (QI) format
+	# brings in this note's lines for that item; and the marked drawing of each drawing inspection.
+	inspections, uncovered, drawings = {}, [], []
 	for row in dn.items:
 		chain = coc_row_inspections(row)
 		evidence = (list(chain.get("incoming") or []) + list(chain["pdi"])
 		            + ([chain["outgoing"]] if chain["outgoing"] else []))
 		if not evidence:
 			missing.append(row.item_code)
+		if row.item_code not in inspections:
+			# the despatch inspection first, then the latest final, then the latest receipt one;
+			# only one that prints this Delivery Note
+			pick = next((q for q in [chain["outgoing"], *reversed(chain["pdi"]), *reversed(chain.get("incoming") or [])]
+			             if q and q.docstatus == 1 and q.status != "Rejected" and _qi_delivery(q)[0] == dn.name), None)
+			if pick:
+				inspections[row.item_code] = pick.name
+			elif row.item_code not in uncovered:
+				uncovered.append(row.item_code)
+		drawings += [q.name for q in evidence if q.docstatus == 1 and is_drawing_template(q.quality_inspection_template)
+		             and q.name not in drawings]
 		for q in evidence:
 			if q.docstatus == 0:
 				drafts.append(q.name)
@@ -764,6 +785,9 @@ def certificate_readiness(delivery_note: str) -> dict:
 		return "; ".join(p for p in parts if p)
 
 	coc_ready = dn.docstatus == 1 and not drafts and not rejected
+	no_qi = uncovered and _("no submitted inspection connected to this delivery for {0}").format(", ".join(uncovered))
+	printed = {"doctype": "Quality Inspection", "inspections": list(inspections.values()),
+	           "drawing": {"print_format": DRAWING_FORMAT, "inspections": drawings}}
 	record_applicable = records > 0 or bool(drafts)
 	return {
 		"coc": {
@@ -791,39 +815,45 @@ def certificate_readiness(delivery_note: str) -> dict:
 		# EN 10204 documents; "default" says whether the email ticks it unasked.
 		"d21": {
 			"applicable": True,
-			"ready": coc_ready,
+			"ready": coc_ready and not uncovered,
 			"reason": why(
 				dn.docstatus != 1 and _("Delivery Note not submitted"),
+				no_qi,
 				drafts and _("inspections still in draft"),
 				rejected and _("rejected inspections: {0}").format(", ".join(rejected)),
 				concessions and _("includes concession {0}").format(", ".join(concessions)),
 			),
-			"print_format": COC_FORMAT,  # 2.1 is the Certificate of Conformity
+			"print_format": QI_FORMATS["d21"],  # 2.1 is the Certificate of Conformity
 			"default": False,
+			**printed,
 		},
 		"d22": {
 			"applicable": True,
-			"ready": coc_ready and not no_results,
+			"ready": coc_ready and not no_results and not uncovered,
 			"reason": why(
 				dn.docstatus != 1 and _("Delivery Note not submitted"),
+				no_qi,
 				drafts and _("inspections still in draft"),
 				no_results and _("no test results for {0}").format(", ".join(no_results)),
 				concessions and _("includes concession {0}").format(", ".join(concessions)),
 			),
-			"print_format": TEST_REPORT_FORMAT,
+			"print_format": QI_FORMATS["d22"],
 			"default": False,
+			**printed,
 		},
 		# Gaps warn but never block: the sender decides (developer, 2026-10-13).
 		# Any delivery may carry a 3.1; it is ticked unasked only for item groups that issue one.
 		"mtc": {
 			"applicable": True,
-			"ready": coc_ready and not no_specific and not mtc_gaps,
+			"ready": coc_ready and not no_specific and not mtc_gaps and not uncovered,
 			"reason": why(
 				dn.docstatus != 1 and _("Delivery Note not submitted"),
+				no_qi,
 				no_specific and _("no inspection of the delivered batches for {0}").format(", ".join(no_specific)),
 				"; ".join(mtc_gaps),
 			),
-			"print_format": MTC_FORMAT,
+			"print_format": QI_FORMATS["mtc"],
 			"default": bool(mtc_items),
+			**printed,
 		},
 	}
