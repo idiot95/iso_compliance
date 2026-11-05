@@ -1,11 +1,11 @@
 // Copyright (c) 2026, Hatim Carbon Co. Pvt. Ltd. and contributors
 // For license information, please see license.txt
 
-// An item with no inspection plan is inspected on a one-off plan: each
-// characteristic is added during the inspection (no drawing needed), and
-// Quality then saves them as the plan of the item or an item group. Used by
-// the inspector screen and the Quality Inspection form. `d` is what
-// iso_compliance.qi.inspector.get_inspection returns.
+// Characteristics added during the inspection (no drawing needed): an item
+// with no plan starts on an empty one-off plan; on a saved plan the first one
+// added copies it for this inspection. Quality then saves the result as the
+// plan of the item or an item group. Used by the inspector screen and the
+// Quality Inspection form. `d` is what iso_compliance.qi.inspector.get_inspection returns.
 
 window.iso_qi_one_off = (() => {
 	const API = "iso_compliance.qi.inspector";
@@ -16,6 +16,13 @@ window.iso_qi_one_off = (() => {
 		const dlg = new frappe.ui.Dialog({
 			title: __("Add characteristic"),
 			fields: [
+				...(d.one_off ? [] : [{
+					fieldname: "copy_note", fieldtype: "HTML",
+					options: `<p class="text-muted small">${__(
+						"This inspection follows the plan {0}. Adding a characteristic makes a copy of it for this inspection; the plan itself does not change until Quality saves the copy as the plan.",
+						[frappe.utils.escape_html(d.template)]
+					)}</p>`,
+				}]),
 				{
 					fieldname: "row_type", fieldtype: "Select", label: __("Kind"), reqd: 1, default: "Dimension",
 					options: [
@@ -27,7 +34,10 @@ window.iso_qi_one_off = (() => {
 					],
 					onchange: () => dlg.set_value("tolerance_type", dlg.get_value("row_type") === "Dimension" ? "Symmetric" : "Limits"),
 				},
-				{ fieldname: "specification", fieldtype: "Data", label: __("Characteristic"), reqd: 1, description: __("e.g. Length, Hardness, Surface finish") },
+				{
+					fieldname: "specification", fieldtype: "Autocomplete", label: __("Characteristic"), reqd: 1, options: d.suggestions || [], ignore_validation: 1,
+					description: __("e.g. Length, Hardness, Surface finish. Pick one or type a new name."),
+				},
 				{ fieldname: "spec_text", fieldtype: "Data", label: __("As specified"), description: __("Optional: as the customer or catalogue states it, e.g. 25 ±0.1") },
 				{ fieldname: "test_method", fieldtype: "Link", options: "Test Method", label: __("Test method"), depends_on: 'eval:doc.row_type==="Test"', mandatory_depends_on: 'eval:doc.row_type==="Test"' },
 				{ fieldtype: "Column Break" },
@@ -63,6 +73,7 @@ window.iso_qi_one_off = (() => {
 		const dlg = new frappe.ui.Dialog({
 			title: __("Save as inspection plan"),
 			fields: [
+				// set below: the plan this would replace, if any
 				{
 					fieldname: "intro", fieldtype: "HTML",
 					options: `<p class="text-muted small">${__(
@@ -80,13 +91,15 @@ window.iso_qi_one_off = (() => {
 				{
 					fieldname: "item_group", fieldtype: "Select", label: __("Item group"), options: d.plan_groups, default: d.plan_groups[0],
 					depends_on: 'eval:doc.target==="Item Group"', description: __("The item's own group, or one above it"),
+					onchange: () => show_replaces(),
 				},
+				{ fieldname: "replaces", fieldtype: "HTML" },
 			],
 			primary_action_label: __("Save plan"),
 			primary_action: async (v) => {
 				const { message: holder } = await frappe.call({
 					method: `${API}.save_as_plan`,
-					args: { qi: d.name, target: v.target, item_group: v.target === "Item Group" ? v.item_group : null },
+					args: { qi: d.name, target: v.target, item_group: v.target === "Item Group" ? v.item_group : null, replace: replaced() ? 1 : 0 },
 					freeze: true,
 				});
 				dlg.hide();
@@ -94,7 +107,20 @@ window.iso_qi_one_off = (() => {
 				then && then(holder);
 			},
 		});
+		const plans = d.current_plans || {};
+		const replaced = () => (dlg.get_value("target") === "Item" ? plans.Item : plans[dlg.get_value("item_group")]);
+		const show_replaces = () => {
+			const old = replaced();
+			const esc = frappe.utils.escape_html;
+			const own = dlg.get_value("target") === "Item Group" && plans.Item;
+			dlg.fields_dict.replaces.$wrapper.html([
+				old && `<div class="alert alert-warning small">${__("Replaces the plan {0}. Inspections already made on it keep it.", [esc(old)])}</div>`,
+				own && `<div class="alert alert-info small">${__("{0} has its own plan {1}, which still comes first for it.", [esc(d.item_code), esc(own)])}</div>`,
+			].filter(Boolean).join(""));
+		};
+		dlg.fields_dict.target.df.onchange = show_replaces;
 		dlg.show();
+		show_replaces();
 	}
 
 	return { add, save };

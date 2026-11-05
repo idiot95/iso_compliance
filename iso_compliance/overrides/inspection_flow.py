@@ -277,9 +277,9 @@ def _row_batch(row) -> str | None:
 
 def _open_inspection(*, inspection_type, stage, reference_type, reference_name, row, item_code, lot, batch_no,
                      bom_no=None, extra=None, sample=None) -> str:
-	"""A draft inspection for one waiting row, on the item's plan; an item with
-	no plan at all gets a one-off plan, built in the inspection. (An item with
-	only an old-format plan keeps it until those are phased out.)"""
+	"""A draft inspection for one waiting row, on the item's new-format plan; an
+	item with none gets a one-off plan, built in the inspection (old-format
+	plans are retired)."""
 	from iso_compliance.qi.inspection import default_sample, one_off_plan, resolve_template
 
 	existing = frappe.db.get_value(QI, {"reference_type": reference_type, "reference_name": reference_name,

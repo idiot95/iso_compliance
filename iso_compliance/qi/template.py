@@ -637,6 +637,8 @@ def use_plan(doctype: str, name: str, template: str | None = None):
 		frappe.throw(_("Only BOMs and Items use an inspection plan"))
 	if template and not frappe.db.exists("Quality Inspection Template", template):
 		frappe.throw(_("Inspection plan {0} does not exist").format(template))
+	if template and not is_drawing_template(template):
+		frappe.throw(_("{0} is an old-format plan. Those are retired: no inspection loads them.").format(template))
 	current = frappe.db.get_value(doctype, name, "quality_inspection_template")
 	if current == (template or None):
 		return

@@ -120,8 +120,12 @@ class Inspector {
 			</div>
 			${d.superseded_by ? `<div class="qi-banner warn">${__("This drawing has a newer revision: {0}. Check with Quality before measuring.", [esc(d.superseded_by)])}</div>` : ""}
 			${this.readonly && d.docstatus === 0 ? `<div class="qi-banner">${__("You can view this inspection but not change it.")}</div>` : ""}
-			${d.one_off && (d.can_add || d.can_save_plan) ? `<div class="qi-banner warn qi-one-off"><span>${
-				d.can_add
+			${d.can_add || (d.one_off && d.can_save_plan) ? `<div class="qi-banner ${d.one_off ? "warn " : ""}qi-one-off"><span>${
+				!d.one_off
+					? __("Something to check that is not on the plan? Add it here; Quality can save it into the plan.")
+					: d.based_on
+					? __("Characteristics added to the plan {0} for this inspection. They are not saved as the plan yet.", [esc(d.based_on)])
+					: d.can_add
 					? __("{0} has no inspection plan. Add each characteristic you check; no drawing is needed.", [esc(d.item_code)])
 					: __("These characteristics are not saved as {0}'s plan yet.", [esc(d.item_code)])
 			}</span><span class="qi-one-off-tools">${d.can_add ? `<button class="qi-add-char primary">+ ${__("Add characteristic")}</button>` : ""}${

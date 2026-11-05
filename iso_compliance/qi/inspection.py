@@ -4,11 +4,11 @@
 """Drawing-based Quality Inspections (SPEC §4.3–4.5).
 
 Every hook starts with `applies()`: a draft inspection on a drawing template.
-An item with no plan at all is inspected on a one-off plan whose
+An item with no new-format plan is inspected on a one-off plan whose
 characteristics the inspection adds (`one_off_plan`).
-Anything else -- the ~1,300 inspections already on the site, and every new one
-on a legacy template -- passes through untouched, so ERPNext behaves exactly
-as before.
+Old-format (legacy) templates are retired (2026-10-28): no new inspection loads
+one (`use_new_plan`). The ~1,300 inspections already made on them, and drafts
+begun before then, pass through untouched.
 
 Measured values live in QI Measurement (one row per inspection × balloon ×
 sample). The inspection's readings are a summary of them, rebuilt on every
@@ -64,14 +64,9 @@ def applies(doc) -> bool:
 	return doc.docstatus == 0 and is_drawing_template(doc.quality_inspection_template)
 
 
-def resolve_template(item_code: str, bom_no: str | None = None, explicit: str | None = None) -> str | None:
-	"""The inspection plan for an item: the BOM's, then the Item's, then its
-	Item Group's default (up the tree), then a new-format plan made for the item
-	but not tagged. A new-format (drawing) plan anywhere in that order wins over
-	an old one, so an inspection never loads the old plan while a new one
-	exists. An explicit plan wins only if it is new-format."""
-	if explicit and is_drawing_template(explicit):
-		return explicit
+def _tagged_templates(item_code: str, bom_no: str | None = None) -> list[str]:
+	"""Every plan tagged for an item, in the order an inspection looks: the
+	BOM's, then the Item's, then its Item Group's default (up the tree)."""
 	found = []
 	if bom_no:
 		found.append(frappe.db.get_value("BOM", bom_no, "quality_inspection_template"))
@@ -86,8 +81,18 @@ def resolve_template(item_code: str, bom_no: str | None = None, explicit: str | 
 				pluck="custom_default_qi_template",
 				order_by="lft desc",
 			)
-	found = [t for t in found if t]
-	new = next((t for t in found if is_drawing_template(t)), None)
+	return [t for t in found if t]
+
+
+def resolve_template(item_code: str, bom_no: str | None = None, explicit: str | None = None) -> str | None:
+	"""The new-format plan for an item: the first tagged one (BOM, Item, Item
+	Group up the tree), else a new-format plan made for the item but not tagged.
+	Old-format templates are retired and never returned: an item with only one
+	of those has no plan (None), and is inspected on a one-off plan. An explicit
+	plan wins if it is new-format."""
+	if explicit and is_drawing_template(explicit):
+		return explicit
+	new = next((t for t in _tagged_templates(item_code, bom_no) if is_drawing_template(t)), None)
 	if not new and item_code:
 		# a new-format plan made for this item but not tagged on it yet: the
 		# latest revision that is not superseded
@@ -101,11 +106,17 @@ def resolve_template(item_code: str, bom_no: str | None = None, explicit: str | 
 			if is_drawing_template(t):
 				new = t
 				break
-	return new or (found[0] if found else explicit)
+	return new
+
+
+def legacy_template(item_code: str, bom_no: str | None = None) -> str | None:
+	"""The retired old-format template the item used to load, if any: its
+	parameter names are offered when characteristics are added."""
+	return next((t for t in _tagged_templates(item_code, bom_no) if not is_drawing_template(t)), None)
 
 
 def one_off_plan(item_code: str) -> str:
-	"""A blank plan for an item with no plan at all. The inspection adds its
+	"""A blank plan for an item with no new-format plan. The inspection adds its
 	characteristics, no drawing needed (inspector.add_characteristic), and
 	Quality can then save it against the item or its group
 	(inspector.save_as_plan). Unsaved, it serves that one inspection only."""
@@ -124,30 +135,20 @@ def one_off_plan(item_code: str) -> str:
 
 
 def plan_or_one_off(item_code: str, bom_no: str | None = None, explicit: str | None = None) -> str:
-	"""The item's new-format plan, else (no plan at all) a one-off plan to build
-	in the inspection. An old-format plan stays on ERPNext's form until those
-	are phased out."""
-	template = resolve_template(item_code, bom_no, explicit)
-	if is_drawing_template(template):
-		return template
-	if template:
-		frappe.throw(_("{0} has only the old-format plan {1}: inspect it on the standard form, or build a new plan.").format(
-			item_code, template), title=_("Old-format plan"))
-	return one_off_plan(item_code)
+	"""The item's new-format plan, else a one-off plan to build in the inspection."""
+	return resolve_template(item_code, bom_no, explicit) or one_off_plan(item_code)
 
 
 def use_new_plan(doc):
-	"""A new inspection that arrived with an old-format plan (ERPNext fills the
-	Item's) takes the item's new-format plan instead, and its readings are
-	rebuilt from it."""
+	"""Old-format templates are retired: a new inspection that arrived with one,
+	or with none (ERPNext's own buttons fill the Item's), takes the item's
+	new-format plan, else a one-off plan, and its readings are rebuilt from it."""
 	if not doc.is_new() or doc.docstatus != 0 or not doc.item_code:
 		return
 	if doc.quality_inspection_template and is_drawing_template(doc.quality_inspection_template):
 		return
-	plan = resolve_template(doc.item_code, doc.get("bom_no"))
-	if plan and is_drawing_template(plan):
-		doc.quality_inspection_template = plan
-		doc.set("readings", [])
+	doc.quality_inspection_template = plan_or_one_off(doc.item_code, doc.get("bom_no"))
+	doc.set("readings", [])
 
 
 # ------------------------------------------------------------------ hooks --
@@ -307,13 +308,10 @@ def build_readings(doc):
 		and is_due(r, doc)
 	]
 	if not due:
-		if cint(tpl.custom_one_off):
-			_snapshot(doc, tpl, [])  # characteristics are added as the inspection goes
-			return
-		frappe.throw(
-			_("Nothing on {0} is due at stage {1} for this lot.").format(tpl.name, doc.custom_stage),
-			title=_("Nothing to inspect"),
-		)
+		# a one-off plan starts empty; a plan with nothing due at this stage is
+		# added to in the inspection (inspector.add_characteristic copies it)
+		_snapshot(doc, tpl, [])
+		return
 	for r in due:
 		reading = doc.append("readings", {})
 		for src, dst in ROW_COPY.items():
