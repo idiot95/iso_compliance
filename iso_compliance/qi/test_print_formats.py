@@ -69,6 +69,16 @@ class TestEmailedCertificates(unittest.TestCase):
 		body = re.search(r"\ndef qi_en10204\(.*?(?=\n\ndef |\Z)", src, re.S).group(0)
 		self.assertIn("return en10204(dn, doc_type,", body)
 
+	def test_email_prints_the_qi_formats(self):
+		"""Since ERPT-2026-01061 the email prints the "(QI)" formats and the marked drawing."""
+		src = (APP / "qi" / "certificates.py").read_text()
+		for key, const in (("d21", "COC_FORMAT"), ("d22", "TEST_REPORT_FORMAT"), ("mtc", "MTC_FORMAT")):
+			with self.subTest(key=key):
+				self.assertIn(f'"{key}": f"{{{const}}} (QI)"', src)
+				self.assertEqual(self.formats[f"{self.names[const]} (QI)"]["doc_type"], "Quality Inspection")
+		self.assertIn('DRAWING_FORMAT = f"{RECORD_FORMAT} (QI)"', src)
+		self.assertEqual(self.formats[f"{self.names['RECORD_FORMAT']} (QI)"]["doc_type"], "Quality Inspection")
+
 	def test_no_retired_format_is_emailed(self):
 		for const, name in self.names.items():
 			with self.subTest(const=const):
