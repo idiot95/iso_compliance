@@ -415,7 +415,7 @@ def _wrap(labels: list[str], layout: str = DEFAULT_LAYOUT, guides: int = 0, titl
   .hcc-bc svg {{ height: 11mm; width: auto; max-width: 100%; display:block; }}
   .hcc-batch {{ font-size: 12pt; font-weight: 700; letter-spacing: 0.4pt; margin-top: 0.5mm; }}
   .hcc-nobatch {{ font-size: 9pt; color:#888; margin: 2mm 0; font-style: italic; }}
-  .hcc-facts {{ margin-top: auto; border-collapse: collapse; width:100%; font-size: 8.5pt; }}
+  .hcc-facts {{ margin-top: 1.5mm; border-collapse: collapse; width:100%; font-size: 8.5pt; }}
   .hcc-facts th {{ text-align:left; font-weight:600; color:#555; padding:0 2mm 0 0; white-space:nowrap;
                    vertical-align:top; width: 22mm; }}
   .hcc-facts td {{ text-align:left; padding:0; }}
