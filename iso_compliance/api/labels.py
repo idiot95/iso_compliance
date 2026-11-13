@@ -57,8 +57,7 @@ SHEETS = {
 	"a4-8": {"label_w": 99.1, "label_h": 67.7, "cols": 2, "rows": 4, "margin_top": 13.1, "margin_side": 4.65, "col_gap": 2.5},
 	# 40 to a sheet as stocked: 3 mm top/bottom, 4 mm sides, 2 mm gaps both ways, so
 	# (210 - 2 x 4 - 4 x 2) / 5 = 38.8 wide and (297 - 2 x 3 - 7 x 2) / 8 = 34.6 high.
-	# 38.75 keeps five to a row through printer rounding (0.05 mm a label).
-	"a4-40": {"label_w": 38.75, "label_h": 34.6, "cols": 5, "rows": 8, "margin_top": 3, "margin_side": 4,
+	"a4-40": {"label_w": 38.8, "label_h": 34.6, "cols": 5, "rows": 8, "margin_top": 3, "margin_side": 4,
 	          "col_gap": 2, "row_gap": 2},
 }
 
@@ -66,7 +65,7 @@ SHEETS = {
 #: are thermal rolls, one label per page of that size.
 LAYOUTS = {
 	"a4-8": {"label": "A4 sheet, 8 labels (99.1 × 67.7 mm)", "w": 99.1, "h": 67.7, "sheet": True},
-	"a4-40": {"label": "A4 sheet, 40 labels (38.8 × 34.6 mm, 2 mm gaps)", "w": 38.75, "h": 34.6, "sheet": True},
+	"a4-40": {"label": "A4 sheet, 40 labels (38.8 × 34.6 mm, 2 mm gaps)", "w": 38.8, "h": 34.6, "sheet": True},
 	"thermal-100x50": {"label": "Thermal roll, 100 × 50 mm", "w": 100, "h": 50},
 	"thermal-75x50": {"label": "Thermal roll, 75 × 50 mm", "w": 75, "h": 50},
 	"thermal-50x25": {"label": "Thermal roll, 50 × 25 mm (barcode and name only)", "w": 50, "h": 25},
@@ -330,6 +329,10 @@ def _label_html(ctx: dict, kind: str) -> str:
 </div>"""
 
 
+def _mm(v: float) -> str:
+	return f"{v:.2f}".rstrip("0").rstrip(".")
+
+
 def _wrap(labels: list[str], layout: str = DEFAULT_LAYOUT, guides: int = 0, title: str = "Labels") -> str:
 	lay = LAYOUTS.get(layout) or LAYOUTS[DEFAULT_LAYOUT]
 	w, h = lay["w"], lay["h"]
@@ -340,21 +343,22 @@ def _wrap(labels: list[str], layout: str = DEFAULT_LAYOUT, guides: int = 0, titl
 		pages = []
 		for page_start in range(0, len(labels), per_sheet):
 			page = labels[page_start : page_start + per_sheet]
-			cells = "".join(page)
-			# Pad the last sheet so the grid keeps its shape and nothing reflows.
-			cells += '<div class="hcc-label hcc-blank"></div>' * (per_sheet - len(page))
+			# Every label at a fixed place in mm: printers and wkhtmltopdf ignore
+			# flex gaps, so the sheet carries its gaps and margins in the numbers.
+			cells = "".join(
+				f'<div class="hcc-cell" style="left:{_mm(s["margin_side"] + (i % s["cols"]) * (w + s["col_gap"]))}mm;'
+				f'top:{_mm(s["margin_top"] + (i // s["cols"]) * (h + s.get("row_gap", 0)))}mm">{label}</div>'
+				for i, label in enumerate(page)
+			)
 			pages.append(f'<div class="hcc-sheet">{cells}</div>')
 		body = "".join(pages)
 		page_css = f"""
   @page {{ size: A4; margin: 0; }}
   .hcc-sheet {{
-    width: 210mm; height: 297mm; box-sizing: border-box;
-    padding: {s["margin_top"]}mm {s["margin_side"]}mm;
-    display: flex; flex-wrap: wrap;
-    align-content: flex-start;
-    column-gap: {s["col_gap"]}mm; row-gap: {s.get("row_gap", 0)}mm;
+    position: relative; width: 210mm; height: 297mm; overflow: hidden;
     page-break-after: always; break-after: page;
   }}
+  .hcc-cell {{ position: absolute; width: {w}mm; height: {h}mm; }}
   .hcc-sheet:last-child {{ page-break-after: auto; break-after: auto; }}
   .hcc-label {{ padding: 4mm 5mm; }}"""
 		if small:
