@@ -25,8 +25,9 @@ No CDN and no JavaScript, so the sheet prints identically from the browser and
 through wkhtmltopdf.
 
 Sheet geometry is in SHEETS: Avery L7165 and its many equivalents (99.1 x 67.7
-mm, two across and four down), and the 40-up sheet of 39 x 35 mm labels, five
-across and eight down with no gaps, centred on the page. Print the guides
+mm, two across and four down), and the 40-up sheet as stocked: five across and
+eight down, 2 mm between labels both ways, 3 mm top and bottom and 4 mm at the sides
+(ERPT label paper, 2026-11-13). Print the guides
 version on plain paper first and hold it against a label sheet to check the
 printer is not scaling the page.
 
@@ -54,15 +55,18 @@ LOGO = "/assets/iso_compliance/images/hcc-mark.png"
 SHEETS = {
 	# Avery L7165 and equivalents
 	"a4-8": {"label_w": 99.1, "label_h": 67.7, "cols": 2, "rows": 4, "margin_top": 13.1, "margin_side": 4.65, "col_gap": 2.5},
-	# 40 to a sheet, 39 x 35 mm, no gaps: (210 - 5 x 39) / 2 and (297 - 8 x 35) / 2
-	"a4-40": {"label_w": 39, "label_h": 35, "cols": 5, "rows": 8, "margin_top": 8.5, "margin_side": 7.5, "col_gap": 0},
+	# 40 to a sheet as stocked: 3 mm top/bottom, 4 mm sides, 2 mm gaps both ways, so
+	# (210 - 2 x 4 - 4 x 2) / 5 = 38.8 wide and (297 - 2 x 3 - 7 x 2) / 8 = 34.6 high.
+	# 38.75 keeps five to a row through printer rounding (0.05 mm a label).
+	"a4-40": {"label_w": 38.75, "label_h": 34.6, "cols": 5, "rows": 8, "margin_top": 3, "margin_side": 4,
+	          "col_gap": 2, "row_gap": 2},
 }
 
 #: What a label can be printed on. "sheet" layouts tile an A4 page; the others
 #: are thermal rolls, one label per page of that size.
 LAYOUTS = {
 	"a4-8": {"label": "A4 sheet, 8 labels (99.1 × 67.7 mm)", "w": 99.1, "h": 67.7, "sheet": True},
-	"a4-40": {"label": "A4 sheet, 40 labels (39 × 35 mm)", "w": 39, "h": 35, "sheet": True},
+	"a4-40": {"label": "A4 sheet, 40 labels (38.8 × 34.6 mm, 2 mm gaps)", "w": 38.75, "h": 34.6, "sheet": True},
 	"thermal-100x50": {"label": "Thermal roll, 100 × 50 mm", "w": 100, "h": 50},
 	"thermal-75x50": {"label": "Thermal roll, 75 × 50 mm", "w": 75, "h": 50},
 	"thermal-50x25": {"label": "Thermal roll, 50 × 25 mm (barcode and name only)", "w": 50, "h": 25},
@@ -348,7 +352,7 @@ def _wrap(labels: list[str], layout: str = DEFAULT_LAYOUT, guides: int = 0, titl
     padding: {s["margin_top"]}mm {s["margin_side"]}mm;
     display: flex; flex-wrap: wrap;
     align-content: flex-start;
-    column-gap: {s["col_gap"]}mm; row-gap: 0;
+    column-gap: {s["col_gap"]}mm; row-gap: {s.get("row_gap", 0)}mm;
     page-break-after: always; break-after: page;
   }}
   .hcc-sheet:last-child {{ page-break-after: auto; break-after: auto; }}
@@ -411,7 +415,7 @@ def _wrap(labels: list[str], layout: str = DEFAULT_LAYOUT, guides: int = 0, titl
   .hcc-bc svg {{ height: 11mm; width: auto; max-width: 100%; display:block; }}
   .hcc-batch {{ font-size: 12pt; font-weight: 700; letter-spacing: 0.4pt; margin-top: 0.5mm; }}
   .hcc-nobatch {{ font-size: 9pt; color:#888; margin: 2mm 0; font-style: italic; }}
-  .hcc-facts {{ margin-top: auto; border-collapse: collapse; width:100%; font-size: 8.5pt; }}
+  .hcc-facts {{ margin-top: 1.5mm; border-collapse: collapse; width:100%; font-size: 8.5pt; }}
   .hcc-facts th {{ text-align:left; font-weight:600; color:#555; padding:0 2mm 0 0; white-space:nowrap;
                    vertical-align:top; width: 22mm; }}
   .hcc-facts td {{ text-align:left; padding:0; }}
