@@ -59,6 +59,20 @@ function tcr_fetch_order(frm) {
 		});
 }
 
+// An enquiry-stage review raised on a Quotation: same header, from the quotation.
+function tcr_fetch_quotation(frm) {
+	if (!frm.doc.quotation || frm.doc.sales_order) return;
+	frappe.db
+		.get_value("Quotation", frm.doc.quotation, ["quotation_to", "party_name", "base_grand_total"])
+		.then((r) => {
+			const q = r && r.message;
+			if (!q) return;
+			if (!frm.doc.customer && q.quotation_to === "Customer") frm.set_value("customer", q.party_name);
+			frm.set_value("order_value", q.base_grand_total);
+			tcr_compute_tier(frm);
+		});
+}
+
 function tcr_compute_costing(frm) {
 	const total = TCR_COSTS.reduce((sum, f) => sum + (frm.doc[f] || 0), 0);
 	frm.set_value("total_estimated_cost", total);
@@ -181,11 +195,18 @@ const tcr_handlers = {
 		if (frm.is_new() && frm.doc.sales_order && !frm.doc.order_value) {
 			tcr_fetch_order(frm);
 		}
+		if (frm.is_new() && frm.doc.quotation && !frm.doc.order_value) {
+			tcr_fetch_quotation(frm);
+		}
 		tcr_render_progress(frm);
 	},
 
 	sales_order(frm) {
 		tcr_fetch_order(frm);
+	},
+
+	quotation(frm) {
+		tcr_fetch_quotation(frm);
 	},
 
 	order_value(frm) {

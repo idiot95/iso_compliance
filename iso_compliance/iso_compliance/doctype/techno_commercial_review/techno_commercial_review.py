@@ -153,7 +153,7 @@ class TechnoCommercialReview(Document):
 					_("A contract-stage review must be linked to the Sales Order it reviews."),
 					title=_("Sales Order Missing"),
 				)
-			return
+			return self.fetch_from_quotation()
 		so = frappe.db.get_value(
 			"Sales Order",
 			self.sales_order,
@@ -171,6 +171,24 @@ class TechnoCommercialReview(Document):
 		self.order_value = so.base_grand_total
 		if not self.enquiry_reference and so.po_no:
 			self.enquiry_reference = so.po_no
+
+	def fetch_from_quotation(self):
+		"""An enquiry-stage review raised on a Quotation takes its header from it."""
+		if not self.quotation:
+			return
+		quotation = frappe.db.get_value(
+			"Quotation",
+			self.quotation,
+			("quotation_to", "party_name", "customer_name", "base_grand_total"),
+			as_dict=True,
+		)
+		if not quotation:
+			return
+		# A quotation may be to a Lead or Prospect; only a Customer fits the link.
+		if not self.customer and quotation.quotation_to == "Customer":
+			self.customer = quotation.party_name
+		self.customer_name = quotation.customer_name
+		self.order_value = quotation.base_grand_total
 
 	def compute_tier(self):
 		"""Detailed on value or any criticality factor; Standard otherwise.
@@ -358,7 +376,7 @@ class TechnoCommercialReview(Document):
 					"doctype": self.doctype,
 					"name": self.name,
 					"description": _("Complete the {0} section of review {1} for order {2} ({3}).").format(
-						", ".join(sections), self.name, self.sales_order or "-", self.customer_name or ""
+						", ".join(sections), self.name, self.sales_order or self.quotation or "-", self.customer_name or ""
 					),
 				},
 				ignore_permissions=True,
