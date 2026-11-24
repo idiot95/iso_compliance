@@ -84,7 +84,7 @@
    "label": "Review Stage",
    "options": "Contract Review\nEnquiry Review",
    "reqd": 1,
-   "read_only_depends_on": "eval:doc.sales_order"
+   "read_only_depends_on": "eval:doc.sales_order || doc.quotation"
   },
   {
    "fieldname": "column_break_order",

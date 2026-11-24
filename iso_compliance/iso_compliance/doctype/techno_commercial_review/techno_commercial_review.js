@@ -54,6 +54,8 @@ function tcr_fetch_order(frm) {
 // An enquiry-stage review raised on a Quotation: same header, from the quotation.
 function tcr_fetch_quotation(frm) {
 	if (!frm.doc.quotation || frm.doc.sales_order) return;
+	// Before any order it is an enquiry review; the stage is then read-only.
+	if (frm.doc.review_stage !== "Enquiry Review") frm.set_value("review_stage", "Enquiry Review");
 	frappe.db
 		.get_value("Quotation", frm.doc.quotation, ["quotation_to", "party_name", "base_grand_total"])
 		.then((r) => {
