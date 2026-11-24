@@ -136,6 +136,9 @@ class TechnoCommercialReview(Document):
 
 	def fetch_from_sales_order(self):
 		if not self.sales_order:
+			# Raised on a quotation, before any order: an enquiry-stage review.
+			if self.quotation:
+				self.review_stage = "Enquiry Review"
 			if self.review_stage == "Contract Review":
 				frappe.throw(
 					_("A contract-stage review must be linked to the Sales Order it reviews."),
