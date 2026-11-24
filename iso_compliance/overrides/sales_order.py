@@ -41,33 +41,59 @@ def enforce_techno_commercial_review(doc, method=None):
 	FRM-036 of at least the required tier, concluding Accept, must exist.
 	A review concluding Reject always blocks, whatever the enforcement mode.
 
+	A review done on the Quotation the order was made from counts as the
+	order's own: nobody is asked for the same review twice. It still has to be
+	of the tier the order's value demands.
+
 	The slabs are rupee values, so the comparison uses base_grand_total (the
 	company-currency total) -- an export order priced in EUR or USD is judged
 	by what it is worth in INR, not by the foreign-currency figure.
 	"""
-	required = required_tier(doc.base_grand_total)
-	names = [doc.name]
-	if doc.get("amended_from"):
-		# An amendment inherits its predecessor's review; if the amended value
-		# crosses a slab, the old review's tier no longer satisfies the gate
-		# and a fresh review is demanded by the tier check below.
-		names.append(doc.amended_from)
-	reviews = frappe.get_all(
+	quotations = sorted({row.prevdoc_docname for row in doc.get("items") or [] if row.get("prevdoc_docname")})
+	_gate(doc, _reviews(sales_orders=_with_predecessor(doc), quotations=quotations), _("order"))
+
+
+def enforce_quotation_review(doc, method=None):
+	"""The same gate, run when a Quotation is submitted: by the same slabs, on
+	the quotation's company-currency total, against the reviews raised on it."""
+	_gate(doc, _reviews(quotations=_with_predecessor(doc)), _("quotation"))
+
+
+def _with_predecessor(doc):
+	# An amendment inherits its predecessor's review; if the amended value
+	# crosses a slab, the old review's tier no longer satisfies the gate
+	# and a fresh review is demanded by the tier check in _gate.
+	return [doc.name] + ([doc.amended_from] if doc.get("amended_from") else [])
+
+
+def _reviews(sales_orders=None, quotations=None):
+	or_filters = {}
+	if sales_orders:
+		or_filters["sales_order"] = ("in", sales_orders)
+	if quotations:
+		or_filters["quotation"] = ("in", quotations)
+	return frappe.get_all(
 		"Techno Commercial Review",
-		filters={"sales_order": ("in", names), "docstatus": ("<", 2)},
+		filters={"docstatus": ("<", 2)},
+		or_filters=or_filters,
 		fields=["name", "docstatus", "review_tier", "outcome"],
 		order_by="modified desc",
 	)
+
+
+def _gate(doc, reviews, noun):
+	"""`noun` is what the document is called in the messages: order or quotation."""
+	required = required_tier(doc.base_grand_total)
 	approved = [r for r in reviews if r.docstatus == 1]
 	pending = [r for r in reviews if r.docstatus == 0]
 
 	if approved and approved[0].outcome == "Reject":
 		frappe.throw(
 			_(
-				"Techno-Commercial Review {0} concluded <b>Reject</b> for this order. "
+				"Techno-Commercial Review {0} concluded <b>Reject</b> for this {1}. "
 				"It cannot be accepted; amend the review decision first."
-			).format(frappe.utils.get_link_to_form("Techno Commercial Review", approved[0].name)),
-			title=_("Order Rejected by Review"),
+			).format(frappe.utils.get_link_to_form("Techno Commercial Review", approved[0].name), noun),
+			title=_("Rejected by Review"),
 		)
 
 	if required:
@@ -78,28 +104,30 @@ def enforce_techno_commercial_review(doc, method=None):
 		if not satisfied:
 			if pending:
 				message = _(
-					"Techno-Commercial Review {0} for this order is still open "
-					"(<b>{1}</b>). It must be completed before the order can be submitted."
+					"Techno-Commercial Review {0} for this {2} is still open "
+					"(<b>{1}</b>). It must be completed before the {2} can be submitted."
 				).format(
 					frappe.utils.get_link_to_form("Techno Commercial Review", pending[0].name),
 					_progress_text(pending[0].name),
+					noun,
 				)
 			else:
 				company_currency = frappe.get_cached_value("Company", doc.company, "default_currency")
 				message = _(
-					"This order is {0}, so SOP-004 requires a <b>{1}</b> "
+					"This {2} is {0}, so SOP-004 requires a <b>{1}</b> "
 					"Techno-Commercial Review (FRM-036) before acceptance. "
-					"Use <b>Create → Techno-Commercial Review</b> on this order."
-				).format(fmt_money(flt(doc.base_grand_total), currency=company_currency), _(required))
+					"Use <b>Create → Techno-Commercial Review</b> on this {2}."
+				).format(fmt_money(flt(doc.base_grand_total), currency=company_currency), _(required), noun)
 			_fail(message)
 	elif pending:
 		_fail(
 			_(
-				"Techno-Commercial Review {0} was opened for this order and is still open "
-				"(<b>{1}</b>). Complete or cancel it before submitting the order."
+				"Techno-Commercial Review {0} was opened for this {2} and is still open "
+				"(<b>{1}</b>). Complete or cancel it before submitting the {2}."
 			).format(
 				frappe.utils.get_link_to_form("Techno Commercial Review", pending[0].name),
 				_progress_text(pending[0].name),
+				noun,
 			)
 		)
 

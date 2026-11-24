@@ -1,0 +1,78 @@
+# Every push to `staging` deploys to https://erpstaging.hatimcarbon.com.
+#
+# The staging stack lives on the Hostinger VPS in /opt/hcc-staging (Docker, see
+# stg.sh there). This copies the pushed tree into /opt/hcc-staging/apps/iso_compliance
+# and runs `stg.sh deploy`, which rebuilds the in-house apps image, migrates,
+# clears the cache and re-applies the staging lockdown. The VPS never needs
+# GitHub credentials.
+#
+# Repository secrets (Settings -> Secrets and variables -> Actions):
+#   STAGING_SSH_KEY   private key whose public half is in root's authorized_keys on the VPS
+#   STAGING_HOST      62.72.58.18
+name: Deploy to staging
+
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+
+# one deploy at a time; a newer push waits for the running one instead of cancelling it
+concurrency:
+  group: hcc-staging-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: SSH key
+        env:
+          KEY: ${{ secrets.STAGING_SSH_KEY }}
+          HOST: ${{ secrets.STAGING_HOST }}
+        run: |
+          install -m 700 -d ~/.ssh
+          # Rebuild the key's line breaks, which a copy from a browser terminal can lose.
+          printf '%s' "$KEY" | tr -d '\r' \
+            | sed -e 's/-----BEGIN OPENSSH PRIVATE KEY-----//' -e 's/-----END OPENSSH PRIVATE KEY-----//' \
+            | tr -d ' \n\t' > /tmp/key.b64
+          { echo '-----BEGIN OPENSSH PRIVATE KEY-----'; fold -w 70 /tmp/key.b64; echo; echo '-----END OPENSSH PRIVATE KEY-----'; } > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keygen -y -f ~/.ssh/id_ed25519 > /dev/null || { echo '::error::STAGING_SSH_KEY is not a valid private key. Paste the whole private key file, BEGIN and END lines included.'; exit 1; }
+          echo "Deploy key: $(ssh-keygen -y -f ~/.ssh/id_ed25519 | ssh-keygen -lf -)"
+          ssh-keyscan -t ed25519 "$HOST" >> ~/.ssh/known_hosts
+
+      - name: Back up the server's copy
+        env:
+          HOST: ${{ secrets.STAGING_HOST }}
+        run: |
+          # The copy on the server may hold work never committed (it first came
+          # from a laptop). Keep it before rsync --delete replaces it; the last 10 stay.
+          ssh "root@$HOST" 'set -e; d=/opt/hcc-staging/backups; mkdir -p $d
+            if [ -d /opt/hcc-staging/apps/iso_compliance ]; then
+              tar -czf $d/iso_compliance-$(date +%Y%m%d-%H%M%S).tgz -C /opt/hcc-staging/apps iso_compliance
+            fi
+            ls -1t $d/iso_compliance-*.tgz 2>/dev/null | tail -n +11 | xargs -r rm -f'
+
+      - name: Copy the app to the VPS
+        env:
+          HOST: ${{ secrets.STAGING_HOST }}
+        run: |
+          rsync -az --delete --exclude .git --exclude .github --exclude '__pycache__' \
+            ./ "root@$HOST:/opt/hcc-staging/apps/iso_compliance/"
+
+      - name: Rebuild, migrate, restart
+        env:
+          HOST: ${{ secrets.STAGING_HOST }}
+        run: |
+          ssh "root@$HOST" 'flock /opt/hcc-staging/.deploy.lock /opt/hcc-staging/stg.sh deploy'
+
+      - name: Check the site answers
+        run: |
+          for i in 1 2 3 4 5 6; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' https://erpstaging.hatimcarbon.com/api/method/ping) && [ "$code" = 200 ] && echo "staging is up" && exit 0
+            sleep 10
+          done
+          echo "staging did not answer 200 (last: $code)"; exit 1

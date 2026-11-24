@@ -32,18 +32,6 @@ CRITICALITY_FIELDS = (
 	"special_statutory_requirements",
 )
 
-COST_FIELDS = (
-	"estimated_material_cost",
-	"estimated_labour_cost",
-	"estimated_overhead_cost",
-	"logistics_cost",
-	"other_direct_cost",
-)
-
-#: Figures a Detailed review must carry before it can be submitted; the
-#: rest of the cost block is optional and the margin is computed.
-REQUIRED_COST_FIELDS = ("estimated_material_cost", "proposed_selling_price")
-
 #: section key -> (assignee field, checklist table, label)
 SECTIONS = (
 	("technical", "technical_assignee", "technical_parameters", "Technical"),
@@ -58,6 +46,7 @@ TECHNICAL_PARAMETERS = (
 	"Specification and drawings are clear and complete",
 	"Applicable standards and statutory requirements identified",
 	"We can make it: machines, people and material available",
+	"Is existing tooling available?",
 	"Inspection, testing and acceptance criteria agreed",
 	"Delivery schedule is achievable",
 )
@@ -78,6 +67,7 @@ COMMERCIAL_PARAMETERS = (
 # The standard-depth review: the order verified against the quotation.
 STANDARD_TECHNICAL = (
 	"Specification and grade match the quotation / previously supplied item",
+	"Is existing tooling available?",
 	"Delivery schedule technically achievable",
 )
 
@@ -119,12 +109,10 @@ class TechnoCommercialReview(Document):
 		self.fetch_from_sales_order()
 		self.compute_tier()
 		self.seed_checklist()
-		self.compute_costing()
 		self.compute_recommendation()
 
 	def before_submit(self):
 		self.require_complete_checklist()
-		self.require_cost_figures()
 		if not self.outcome:
 			frappe.throw(
 				_("Record the decision before completing the review."),
@@ -153,7 +141,7 @@ class TechnoCommercialReview(Document):
 					_("A contract-stage review must be linked to the Sales Order it reviews."),
 					title=_("Sales Order Missing"),
 				)
-			return
+			return self.fetch_from_quotation()
 		so = frappe.db.get_value(
 			"Sales Order",
 			self.sales_order,
@@ -171,6 +159,24 @@ class TechnoCommercialReview(Document):
 		self.order_value = so.base_grand_total
 		if not self.enquiry_reference and so.po_no:
 			self.enquiry_reference = so.po_no
+
+	def fetch_from_quotation(self):
+		"""An enquiry-stage review raised on a Quotation takes its header from it."""
+		if not self.quotation:
+			return
+		quotation = frappe.db.get_value(
+			"Quotation",
+			self.quotation,
+			("quotation_to", "party_name", "customer_name", "base_grand_total"),
+			as_dict=True,
+		)
+		if not quotation:
+			return
+		# A quotation may be to a Lead or Prospect; only a Customer fits the link.
+		if not self.customer and quotation.quotation_to == "Customer":
+			self.customer = quotation.party_name
+		self.customer_name = quotation.customer_name
+		self.order_value = quotation.base_grand_total
 
 	def compute_tier(self):
 		"""Detailed on value or any criticality factor; Standard otherwise.
@@ -221,13 +227,6 @@ class TechnoCommercialReview(Document):
 			for parameter in params:
 				self.append(field, {"parameter": parameter})
 
-	def compute_costing(self):
-		total = sum(flt(self.get(field)) for field in COST_FIELDS)
-		self.total_estimated_cost = total
-		selling = flt(self.proposed_selling_price)
-		self.expected_gross_margin = selling - total if selling else 0
-		self.expected_margin_pct = (self.expected_gross_margin / selling * 100) if selling else 0
-
 	def _all_rows(self):
 		return [row for field, _p in self._parameter_sets() for row in (self.get(field) or [])]
 
@@ -263,20 +262,6 @@ class TechnoCommercialReview(Document):
 				title=_("Checklist Incomplete"),
 			)
 
-	def require_cost_figures(self):
-		if self.review_tier != "Detailed":
-			return
-		missing = [
-			_(self.meta.get_label(field)) for field in REQUIRED_COST_FIELDS if not flt(self.get(field))
-		]
-		if missing:
-			frappe.throw(
-				_("A Detailed review needs these figures under Costing: {0}").format(
-					frappe.bold(", ".join(missing))
-				),
-				title=_("Cost Figures Missing"),
-			)
-
 	def progress(self):
 		"""What is filled and what is left, per section, for the progress bar
 		on the form and for the Sales Order gate's message."""
@@ -285,9 +270,6 @@ class TechnoCommercialReview(Document):
 			rows = self.get(table) or []
 			done = len([row for row in rows if row.response])
 			total = len(rows)
-			if key == "costing" and self.review_tier == "Detailed":
-				total += len(REQUIRED_COST_FIELDS)
-				done += len([f for f in REQUIRED_COST_FIELDS if flt(self.get(f))])
 			sections.append(
 				{
 					"key": key,
@@ -358,7 +340,7 @@ class TechnoCommercialReview(Document):
 					"doctype": self.doctype,
 					"name": self.name,
 					"description": _("Complete the {0} section of review {1} for order {2} ({3}).").format(
-						", ".join(sections), self.name, self.sales_order or "-", self.customer_name or ""
+						", ".join(sections), self.name, self.sales_order or self.quotation or "-", self.customer_name or ""
 					),
 				},
 				ignore_permissions=True,

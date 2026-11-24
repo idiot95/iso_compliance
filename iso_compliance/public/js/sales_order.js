@@ -58,9 +58,14 @@ frappe.ui.form.on("Sales Order", {
 		if (value < STANDARD_FROM) return;
 		const tier = value >= DETAILED_FROM ? __("Detailed") : __("Standard");
 
+		// A review done on the quotation this order came from counts as the order's own.
+		const quotations = [...new Set((frm.doc.items || []).map((row) => row.prevdoc_docname).filter(Boolean))];
+		const or_filters = [["sales_order", "=", frm.doc.name]];
+		if (quotations.length) or_filters.push(["quotation", "in", quotations]);
 		frappe.db
 			.get_list("Techno Commercial Review", {
-				filters: { sales_order: frm.doc.name, docstatus: 1 },
+				filters: { docstatus: 1 },
+				or_filters,
 				fields: ["name", "outcome"],
 				limit: 1,
 			})
