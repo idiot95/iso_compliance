@@ -162,3 +162,13 @@ def get_work_order_items(sales_order, for_raw_material_request=0):
 		if selected:
 			item["bom"] = selected
 	return items
+
+
+def get_dashboard_data(data):
+	"""Connections tab: the order's Techno-Commercial Review (FRM-036), with
+	a count and a + that opens one pre-linked to this order (ERPT-2026-01073)."""
+	data.setdefault("non_standard_fieldnames", {})["Techno Commercial Review"] = "sales_order"
+	data.setdefault("transactions", []).append(
+		{"label": _("Review"), "items": ["Techno Commercial Review"]}
+	)
+	return data
