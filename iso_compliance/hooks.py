@@ -94,6 +94,7 @@ add_to_apps_screen = [
 # status banners on the transactional forms. All logged in EXTERNAL_CHANGES.md.
 doctype_js = {
 	"Sales Order": "public/js/sales_order.js",
+	"Quotation": "public/js/quotation.js",
 	"Supplier": "public/js/supplier.js",
 	"Purchase Order": "public/js/purchase_order.js",
 	# quality_inspection.js: SOP-005/006 one-click NCR. qi_inspection.js: drawing inspection.
@@ -254,6 +255,10 @@ doc_events = {
 	"Sales Order": {
 		"before_submit": "iso_compliance.overrides.sales_order.enforce_techno_commercial_review",
 	},
+	# The same review gate on a Quotation; a review done there carries to its Sales Order.
+	"Quotation": {
+		"before_submit": "iso_compliance.overrides.sales_order.enforce_quotation_review",
+	},
 	# SOP-005: warn when ordering from a supplier who is not Approved;
 	# a Suspended supplier blocks.
 	"Purchase Order": {
@@ -345,9 +350,9 @@ override_whitelisted_methods = {
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
 # along with any modifications made in other Frappe apps
-# override_doctype_dashboards = {
-# 	"Task": "iso_compliance.task.get_dashboard_data"
-# }
+override_doctype_dashboards = {
+	"Sales Order": "iso_compliance.overrides.sales_order.get_dashboard_data",
+}
 
 # exempt linked doctypes from being automatically cancelled
 #

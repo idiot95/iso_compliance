@@ -1,9 +1,9 @@
-// One form, three reviewers. Sales picks who fills Technical, Costing and
-// Commercial and saves; the server assigns them and lets them edit. A
-// progress bar on top says what is left in each section, and a click on a
-// section jumps there. Section headings are enlarged so an assignee can find
-// theirs at a glance. The tier and costing arithmetic mirror the server so
-// the figures are right before the first save (the server recomputes them).
+// One form, three reviewers, laid out as steps (the Report Issue screens'
+// pattern): each step is a tab, numbered, with a tick once done; the current
+// step's number is dark and its name bold; a line above the tabs says whose turn it is. Sales
+// fills the Order tab and picks who fills Technical, Costing and Commercial;
+// the server assigns them and lets them edit. Sales records the Decision.
+// The tier mirrors the server so it is right before the first save.
 
 const TCR_DETAILED_FROM = 1000000;
 
@@ -14,21 +14,11 @@ const TCR_CRITICALITY = [
 	"special_statutory_requirements",
 ];
 
-const TCR_COSTS = [
-	"estimated_material_cost",
-	"estimated_labour_cost",
-	"estimated_overhead_cost",
-	"logistics_cost",
-	"other_direct_cost",
-];
-
-// Must match REQUIRED_COST_FIELDS and SECTIONS in techno_commercial_review.py.
-const TCR_REQUIRED_COSTS = ["estimated_material_cost", "proposed_selling_price"];
-
+// Must match SECTIONS in techno_commercial_review.py.
 const TCR_SECTIONS = [
-	{ key: "technical", assignee: "technical_assignee", table: "technical_parameters", label: __("Technical"), section: "section_technical" },
-	{ key: "costing", assignee: "costing_assignee", table: "costing_parameters", label: __("Costing"), section: "section_costing" },
-	{ key: "commercial", assignee: "commercial_assignee", table: "commercial_parameters", label: __("Commercial"), section: "section_commercial" },
+	{ key: "technical", assignee: "technical_assignee", table: "technical_parameters", label: __("Technical"), section: "section_technical", tab: "tab_technical" },
+	{ key: "costing", assignee: "costing_assignee", table: "costing_parameters", label: __("Costing"), section: "section_costing", tab: "tab_costing" },
+	{ key: "commercial", assignee: "commercial_assignee", table: "commercial_parameters", label: __("Commercial"), section: "section_commercial", tab: "tab_commercial" },
 ];
 
 function tcr_compute_tier(frm) {
@@ -40,6 +30,8 @@ function tcr_compute_tier(frm) {
 
 function tcr_fetch_order(frm) {
 	if (!frm.doc.sales_order) return;
+	// From a Sales Order it is a contract review; the stage is then read-only.
+	if (!frm.doc.quotation && frm.doc.review_stage !== "Contract Review") frm.set_value("review_stage", "Contract Review");
 	frappe.db
 		.get_value("Sales Order", frm.doc.sales_order, [
 			"customer",
@@ -59,111 +51,131 @@ function tcr_fetch_order(frm) {
 		});
 }
 
-function tcr_compute_costing(frm) {
-	const total = TCR_COSTS.reduce((sum, f) => sum + (frm.doc[f] || 0), 0);
-	frm.set_value("total_estimated_cost", total);
-	const selling = frm.doc.proposed_selling_price || 0;
-	frm.set_value("expected_gross_margin", selling ? selling - total : 0);
-	frm.set_value("expected_margin_pct", selling ? ((selling - total) / selling) * 100 : 0);
-	tcr_render_progress(frm);
+// An enquiry-stage review raised on a Quotation: same header, from the quotation.
+function tcr_fetch_quotation(frm) {
+	if (!frm.doc.quotation || frm.doc.sales_order) return;
+	// Before any order it is an enquiry review; the stage is then read-only.
+	if (frm.doc.review_stage !== "Enquiry Review") frm.set_value("review_stage", "Enquiry Review");
+	frappe.db
+		.get_value("Quotation", frm.doc.quotation, ["quotation_to", "party_name", "base_grand_total"])
+		.then((r) => {
+			const q = r && r.message;
+			if (!q) return;
+			if (!frm.doc.customer && q.quotation_to === "Customer") frm.set_value("customer", q.party_name);
+			frm.set_value("order_value", q.base_grand_total);
+			tcr_compute_tier(frm);
+		});
 }
 
-function tcr_progress(frm) {
-	const sections = TCR_SECTIONS.map((s) => {
-		const rows = frm.doc[s.table] || [];
-		let done = rows.filter((r) => r.response).length;
-		let total = rows.length;
-		if (s.key === "costing" && frm.doc.review_tier === "Detailed") {
-			total += TCR_REQUIRED_COSTS.length;
-			done += TCR_REQUIRED_COSTS.filter((f) => frm.doc[f]).length;
+// The five steps in order: whose each is, and how far along.
+function tcr_steps(frm) {
+	const d = frm.doc;
+	const named = TCR_SECTIONS.every((s) => d[s.assignee]);
+	const steps = [
+		{ label: __("Order"), tab: "tab_order", user: d.owner, left: 0, done: !frm.is_new() && named },
+		...TCR_SECTIONS.map((s) => {
+			const rows = d[s.table] || [];
+			const answered = rows.filter((r) => r.response).length;
+			return {
+				...s,
+				user: d[s.assignee],
+				answered,
+				total: rows.length,
+				left: rows.length - answered,
+				done: !frm.is_new() && rows.length > 0 && answered === rows.length,
+			};
+		}),
+		{ label: __("Decision"), tab: "tab_decision", user: d.owner, left: 0, done: d.docstatus === 1 },
+	];
+	return { steps, k: steps.findIndex((s) => !s.done) };
+}
+
+function tcr_name(user) {
+	return user ? frappe.utils.escape_html(frappe.user.full_name(user)) : "";
+}
+
+// The line above the tabs: whose turn it is.
+function tcr_headline(frm, steps, k) {
+	const n = steps.length;
+	if (frm.is_new()) return [__("Save to load the checklist. Then pick the reviewers."), "blue"];
+	if (frm.doc.docstatus === 1) return [__("Review complete: {0}. All {1} steps are done.", [__(frm.doc.outcome || ""), n]), "green"];
+	if (frm.doc.docstatus === 2) return [__("This review was cancelled."), "red"];
+	const cur = steps[k];
+	const left = (s) => (s.left ? " · " + __("{0} left", [s.left]) : "");
+	// The reviewers work side by side, so a later review step can be yours while an earlier one is open.
+	const mine = steps.filter((s, i) => !s.done && s.user === frappe.session.user && (s.table || i === k));
+	if (mine.length) return [__("Step {0} of {1} · Your turn: {2}", [k + 1, n, mine.map((s) => s.label + left(s)).join(", ")]), "orange"];
+	if (!cur.user) return [__("Step {0} of {1} · {2}: no reviewer picked yet. Pick one on the Order tab.", [k + 1, n, cur.label]), "orange"];
+	return [__("Step {0} of {1} · With {2}: {3}{4}. Nothing for you to do.", [k + 1, n, tcr_name(cur.user), cur.label, left(cur)]), "blue"];
+}
+
+function tcr_render_steps(frm) {
+	if (!frm.layout || !frm.layout.tabs) return;
+	const { steps, k } = tcr_steps(frm);
+	const [text, color] = tcr_headline(frm, steps, k);
+	frm.layout.show_message(); // clears the previous line
+	frm.layout.show_message(`<div>${text}</div>`, color, true);
+
+	const closed = frm.doc.docstatus === 1;
+	steps.forEach((s, i) => {
+		const tab = frm.layout.tabs.find((t) => t.df.fieldname === s.tab);
+		if (!tab) return;
+		const state = s.done || closed ? "done" : i === k ? "now" : "todo";
+		tab.tab_link
+			.find(".nav-link")
+			.removeClass("tcr-step--done tcr-step--now tcr-step--todo")
+			.addClass(`tcr-step--${state}`)
+			.html(`<span class="tcr-step"><span class="tcr-step__dot">${state === "done" ? "✓" : i + 1}</span>${s.label}</span>`);
+
+		// A reviewer's section says who fills it and how far they are.
+		if (s.table && !frm.is_new()) {
+			const who = s.user ? tcr_name(s.user) : __("the {0} reviewer (not picked yet)", [s.label]);
+			const head =
+				state === "done" ? __("Filled by {0}", [who]) : state === "now" ? __("To be filled by {0}", [who]) : __("Will be filled by {0}", [who]);
+			const section = frm.get_field(s.section);
+			section.set_label(head);
+			section.description_wrapper && section.description_wrapper.text(__("{0} of {1} answered", [s.answered, s.total]));
 		}
-		return { ...s, user: frm.doc[s.assignee], done, total };
 	});
-	sections.push({
-		key: "outcome",
-		label: __("Decision"),
-		section: "section_outcome",
-		user: frm.doc.owner,
-		done: frm.doc.outcome ? 1 : 0,
-		total: 1,
-	});
-	const done = sections.reduce((n, s) => n + s.done, 0);
-	const total = sections.reduce((n, s) => n + s.total, 0);
-	return { sections, done, total };
+
+	// Opens on the current step the first time this review is shown.
+	if (!frm.is_new() && frm.__tcr_opened !== frm.doc.name) {
+		frm.__tcr_opened = frm.doc.name;
+		frm.layout.select_tab(k >= 0 ? steps[k].tab : "tab_decision");
+	}
 }
 
-function tcr_render_progress(frm) {
-	const field = frm.get_field("progress_html");
-	if (!field) return;
-	if (frm.is_new()) {
-		field.$wrapper.html(
-			`<div class="tcr-progress tcr-progress--hint">${__(
-				"Save to load the checklist. Then pick the reviewers."
-			)}</div>`
-		);
-		return;
-	}
-	const p = tcr_progress(frm);
-	const pct = p.total ? Math.round((p.done / p.total) * 100) : 0;
-	const left = p.total - p.done;
-	const headline =
-		frm.doc.docstatus === 1
-			? __("Review complete: {0}", [__(frm.doc.outcome || "")])
-			: left
-			? __("{0} of {1} done · {2} left", [p.done, p.total, left])
-			: __("All done. Submit to complete the review.");
-
-	const chips = p.sections
-		.map((s) => {
-			const complete = s.total && s.done >= s.total;
-			const who = s.user
-				? frappe.utils.escape_html(frappe.user.full_name(s.user))
-				: `<span class="tcr-chip__unassigned">${__("not assigned")}</span>`;
-			return `<button type="button" class="tcr-chip ${complete ? "tcr-chip--done" : ""}" data-section="${s.section}">
-				<span class="tcr-chip__label">${complete ? "✓ " : ""}${s.label}</span>
-				<span class="tcr-chip__count">${s.done}/${s.total}</span>
-				<span class="tcr-chip__who">${who}</span>
-			</button>`;
-		})
-		.join("");
-
-	field.$wrapper.html(`
-		<div class="tcr-progress">
-			<div class="tcr-progress__head">
-				<span>${headline}</span><span>${pct}%</span>
-			</div>
-			<div class="tcr-progress__bar"><div style="width:${pct}%"></div></div>
-			<div class="tcr-progress__chips">${chips}</div>
-		</div>`);
-	field.$wrapper.find(".tcr-chip").on("click", function () {
-		frm.scroll_to_field($(this).attr("data-section"));
+// The reviewers by name, not email: Frappe's own link titles, on these three fields only.
+// User links have no title on the server, so the names come from the desk's user list.
+// Frappe's own lookup answers with the email, so these fields ask for the full name instead.
+function tcr_show_names(frm) {
+	TCR_SECTIONS.forEach((s) => {
+		const field = frm.fields_dict[s.assignee];
+		if (!field || field.__tcr_names) return;
+		field.__tcr_names = true;
+		field.set_link_title = async (user) => {
+			let name = frappe.utils.get_link_title("User", user);
+			if (!name || name === user) {
+				const r = await frappe.db.get_value("User", user, "full_name").catch(() => null);
+				name = (r && r.message && r.message.full_name) || user;
+				frappe.utils.add_link_title("User", user, name);
+			}
+			if (field.value === user) field.translate_and_set_input_value(name, user); // not if changed meanwhile
+		};
+		field.set_formatted_input(frm.doc[s.assignee]);
 	});
 }
 
 function tcr_inject_styles() {
 	if (document.getElementById("tcr-form-styles")) return;
 	const css = `
-	.tcr-form .form-section .section-head {
-		font-size: 1.35rem; font-weight: 700; color: var(--heading-color);
-		padding-top: var(--padding-md); padding-bottom: var(--padding-sm);
-	}
-	.tcr-form .form-section .section-head + .section-body .section-description,
-	.tcr-form .form-section .section-description { font-size: var(--text-sm); }
-	.tcr-progress { padding: var(--padding-sm) 0; }
-	.tcr-progress--hint { color: var(--text-muted); }
-	.tcr-progress__head { display: flex; justify-content: space-between; font-weight: 600; font-size: var(--text-lg); margin-bottom: 6px; }
-	.tcr-progress__bar { height: 10px; border-radius: 5px; background: var(--gray-200); overflow: hidden; }
-	.tcr-progress__bar > div { height: 100%; background: var(--primary); transition: width .2s; }
-	.tcr-progress__chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-	.tcr-chip { display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
-		min-width: 150px; padding: 8px 12px; border: 1px solid var(--border-color);
-		border-radius: var(--border-radius-md); background: var(--card-bg); text-align: left; cursor: pointer; }
-	.tcr-chip:hover { border-color: var(--primary); }
-	.tcr-chip--done { border-color: var(--green-500); background: var(--green-50); }
-	.tcr-chip__label { font-weight: 600; }
-	.tcr-chip__count { font-size: var(--text-lg); font-weight: 700; }
-	.tcr-chip__who { font-size: var(--text-sm); color: var(--text-muted); }
-	.tcr-chip__unassigned { color: var(--orange-600); }
+	.tcr-form .form-tabs .tcr-step { display: inline-flex; align-items: center; gap: 6px; padding: 2px 0; border-radius: 999px; }
+	.tcr-form .form-tabs .tcr-step__dot { width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center;
+		justify-content: center; font-size: 11px; font-weight: 600; background: var(--gray-200); color: var(--text-muted); }
+	.tcr-form .form-tabs .tcr-step--done .tcr-step__dot { background: var(--green-500); color: var(--white); }
+	.tcr-form .form-tabs .tcr-step--now .tcr-step { font-weight: 600; color: var(--text-color); }
+	.tcr-form .form-tabs .tcr-step--now .tcr-step__dot { background: var(--text-color); color: var(--bg-color); }
+	.tcr-form .form-tabs .tcr-step--todo { color: var(--text-muted); }
 	`;
 	$("<style>").attr("id", "tcr-form-styles").text(css).appendTo("head");
 }
@@ -176,43 +188,39 @@ const tcr_handlers = {
 	refresh(frm) {
 		$(frm.wrapper).addClass("tcr-form");
 
+		tcr_show_names(frm);
+
 		// On a brand-new form the server has not run yet: pull the order's
 		// company-currency value now so the header is right before saving.
 		if (frm.is_new() && frm.doc.sales_order && !frm.doc.order_value) {
 			tcr_fetch_order(frm);
 		}
-		tcr_render_progress(frm);
+		if (frm.is_new() && frm.doc.quotation && !frm.doc.order_value) {
+			tcr_fetch_quotation(frm);
+		}
+		tcr_render_steps(frm);
 	},
 
 	sales_order(frm) {
 		tcr_fetch_order(frm);
 	},
 
+	quotation(frm) {
+		tcr_fetch_quotation(frm);
+	},
+
 	order_value(frm) {
 		tcr_compute_tier(frm);
-	},
-
-	review_tier(frm) {
-		tcr_render_progress(frm);
-	},
-
-	proposed_selling_price(frm) {
-		tcr_compute_costing(frm);
-	},
-
-	outcome(frm) {
-		tcr_render_progress(frm);
 	},
 };
 
 TCR_CRITICALITY.forEach((f) => (tcr_handlers[f] = tcr_compute_tier));
-TCR_COSTS.forEach((f) => (tcr_handlers[f] = tcr_compute_costing));
-TCR_SECTIONS.forEach((s) => (tcr_handlers[s.assignee] = tcr_render_progress));
+TCR_SECTIONS.forEach((s) => (tcr_handlers[s.assignee] = tcr_render_steps));
 
 frappe.ui.form.on("Techno Commercial Review", tcr_handlers);
 
 frappe.ui.form.on("Techno Commercial Review Parameter", {
 	response(frm) {
-		tcr_render_progress(frm);
+		tcr_render_steps(frm);
 	},
 });

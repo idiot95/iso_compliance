@@ -14,3 +14,4 @@ iso_compliance.patches.sop_006_post_first
 iso_compliance.patches.qi_check_point_names
 iso_compliance.patches.retire_declaration_2_1
 iso_compliance.patches.qi_default_print_format
+iso_compliance.patches.tcr_tooling_question

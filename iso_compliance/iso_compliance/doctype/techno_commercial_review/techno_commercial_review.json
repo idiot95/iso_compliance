@@ -5,8 +5,7 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_progress",
-  "progress_html",
+  "tab_order",
   "section_order",
   "sales_order",
   "quotation",
@@ -29,23 +28,16 @@
   "costing_assignee",
   "cb_rev2",
   "commercial_assignee",
+  "tab_technical",
   "section_technical",
   "technical_parameters",
+  "tab_costing",
   "section_costing",
   "costing_parameters",
-  "section_costing_figures",
-  "estimated_material_cost",
-  "estimated_labour_cost",
-  "estimated_overhead_cost",
-  "logistics_cost",
-  "other_direct_cost",
-  "column_break_costing",
-  "total_estimated_cost",
-  "proposed_selling_price",
-  "expected_gross_margin",
-  "expected_margin_pct",
+  "tab_commercial",
   "section_commercial",
   "commercial_parameters",
+  "tab_decision",
   "section_outcome",
   "computed_recommendation",
   "outcome",
@@ -55,22 +47,16 @@
  ],
  "fields": [
   {
-   "fieldname": "section_progress",
-   "fieldtype": "Section Break",
-   "hide_border": 1
-  },
-  {
-   "fieldname": "progress_html",
-   "fieldtype": "HTML",
-   "label": "Progress"
+   "fieldname": "tab_order",
+   "fieldtype": "Tab Break",
+   "label": "Order"
   },
   {
    "fieldname": "section_order",
    "fieldtype": "Section Break",
-   "label": "Order"
+   "label": ""
   },
   {
-   "description": "The order this review clears. Mandatory for a contract-stage review.",
    "fieldname": "sales_order",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -82,23 +68,23 @@
    "fieldname": "quotation",
    "fieldtype": "Link",
    "label": "Quotation",
-   "options": "Quotation"
+   "options": "Quotation",
+   "depends_on": "eval:!doc.sales_order"
   },
   {
-   "description": "Customer enquiry, RFQ or purchase order reference.",
    "fieldname": "enquiry_reference",
    "fieldtype": "Data",
-   "label": "Enquiry / RFQ / Customer PO Reference"
+   "label": "Customer PO / Enquiry Ref"
   },
   {
    "default": "Contract Review",
-   "description": "Contract Review confirms an order before acceptance; Enquiry Review assesses feasibility before quoting.",
    "fieldname": "review_stage",
    "fieldtype": "Select",
    "in_standard_filter": 1,
    "label": "Review Stage",
    "options": "Contract Review\nEnquiry Review",
-   "reqd": 1
+   "reqd": 1,
+   "read_only_depends_on": "eval:doc.sales_order || doc.quotation"
   },
   {
    "fieldname": "column_break_order",
@@ -110,25 +96,26 @@
    "fieldname": "customer",
    "fieldtype": "Link",
    "label": "Customer",
-   "options": "Customer"
+   "options": "Customer",
+   "read_only_depends_on": "eval:doc.sales_order || doc.quotation"
   },
   {
    "fetch_from": "customer.customer_name",
    "fieldname": "customer_name",
    "fieldtype": "Data",
    "label": "Customer Name",
-   "read_only": 1
+   "read_only": 1,
+   "hidden": 1
   },
   {
-   "description": "The order's value in company currency (₹), taken from the Sales Order while the review is in progress; for an enquiry-stage review, enter the expected value in ₹.",
    "fieldname": "order_value",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Order Value"
+   "label": "Order Value",
+   "read_only_depends_on": "eval:doc.sales_order || doc.quotation"
   },
   {
    "bold": 1,
-   "description": "Computed: Detailed for orders of ₹ 10,00,000 and above or when any criticality factor applies; Standard otherwise.",
    "fieldname": "review_tier",
    "fieldtype": "Select",
    "in_list_view": 1,
@@ -138,7 +125,7 @@
    "read_only": 1
   },
   {
-   "description": "Tick any that apply. One tick makes this a Detailed review, whatever the value.",
+   "description": "One tick makes it a Detailed review.",
    "fieldname": "section_criticality",
    "fieldtype": "Section Break",
    "label": "Is this order critical?",
@@ -175,8 +162,7 @@
   {
    "fieldname": "section_reviewers",
    "fieldtype": "Section Break",
-   "label": "Reviewers",
-   "description": "Pick who completes each section, then save. Each person is notified and can edit this form. Discuss in the comments at the bottom."
+   "label": "Reviewers"
   },
   {
    "fieldname": "technical_assignee",
@@ -208,11 +194,16 @@
    "in_standard_filter": 1
   },
   {
+   "fieldname": "tab_technical",
+   "fieldtype": "Tab Break",
+   "label": "Technical"
+  },
+  {
    "description": "Completed by the technical reviewer.",
    "fieldname": "section_technical",
    "fieldtype": "Section Break",
    "label": "Technical",
-   "collapsible": 1
+   "collapsible": 0
   },
   {
    "fieldname": "technical_parameters",
@@ -221,11 +212,16 @@
    "options": "Techno Commercial Review Parameter"
   },
   {
+   "fieldname": "tab_costing",
+   "fieldtype": "Tab Break",
+   "label": "Costing"
+  },
+  {
    "description": "Completed by the costing reviewer.",
    "fieldname": "section_costing",
    "fieldtype": "Section Break",
    "label": "Costing",
-   "collapsible": 1
+   "collapsible": 0
   },
   {
    "fieldname": "costing_parameters",
@@ -234,71 +230,16 @@
    "options": "Techno Commercial Review Parameter"
   },
   {
-   "fieldname": "section_costing_figures",
-   "fieldtype": "Section Break",
-   "label": "Cost and margin",
-   "depends_on": "eval:doc.review_tier=='Detailed'"
-  },
-  {
-   "fieldname": "estimated_material_cost",
-   "fieldtype": "Currency",
-   "label": "Estimated Material Cost"
-  },
-  {
-   "fieldname": "estimated_labour_cost",
-   "fieldtype": "Currency",
-   "label": "Estimated Labour Cost"
-  },
-  {
-   "fieldname": "estimated_overhead_cost",
-   "fieldtype": "Currency",
-   "label": "Estimated Overhead Cost"
-  },
-  {
-   "fieldname": "logistics_cost",
-   "fieldtype": "Currency",
-   "label": "Freight / logistics cost"
-  },
-  {
-   "fieldname": "other_direct_cost",
-   "fieldtype": "Currency",
-   "label": "Other Direct Cost"
-  },
-  {
-   "fieldname": "column_break_costing",
-   "fieldtype": "Column Break"
-  },
-  {
-   "description": "Computed: sum of the estimated costs.",
-   "fieldname": "total_estimated_cost",
-   "fieldtype": "Currency",
-   "label": "Total Estimated Cost",
-   "read_only": 1
-  },
-  {
-   "fieldname": "proposed_selling_price",
-   "fieldtype": "Currency",
-   "label": "Proposed Selling Price"
-  },
-  {
-   "description": "Computed: selling price minus total estimated cost.",
-   "fieldname": "expected_gross_margin",
-   "fieldtype": "Currency",
-   "label": "Expected Gross Margin",
-   "read_only": 1
-  },
-  {
-   "fieldname": "expected_margin_pct",
-   "fieldtype": "Percent",
-   "label": "Expected Margin %",
-   "read_only": 1
+   "fieldname": "tab_commercial",
+   "fieldtype": "Tab Break",
+   "label": "Commercial"
   },
   {
    "description": "Completed by the commercial reviewer.",
    "fieldname": "section_commercial",
    "fieldtype": "Section Break",
    "label": "Commercial",
-   "collapsible": 1
+   "collapsible": 0
   },
   {
    "fieldname": "commercial_parameters",
@@ -307,10 +248,15 @@
    "options": "Techno Commercial Review Parameter"
   },
   {
+   "fieldname": "tab_decision",
+   "fieldtype": "Tab Break",
+   "label": "Decision"
+  },
+  {
    "fieldname": "section_outcome",
    "fieldtype": "Section Break",
    "label": "Decision",
-   "collapsible": 1,
+   "collapsible": 0,
    "description": "Recorded by Sales once every section is done."
   },
   {
