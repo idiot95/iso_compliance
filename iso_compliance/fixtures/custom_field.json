@@ -541,7 +541,7 @@
   "dt": "Item Group",
   "fieldname": "custom_qms_section",
   "fieldtype": "Section Break",
-  "label": "Incoming Inspection (SOP-006)",
+  "label": "Inspection (SOP-006)",
   "insert_after": "item_group_defaults",
   "module": "ISO Compliance"
  },
@@ -1767,10 +1767,21 @@
   "dt": "Item Group",
   "fieldname": "custom_qc_required",
   "fieldtype": "Check",
-  "label": "Quality inspection required",
+  "label": "Incoming inspection required",
   "insert_after": "custom_issue_mtc",
   "module": "ISO Compliance",
-  "description": "Receipts and finished production of items in this group (and its sub-groups) wait in Inspection Required until Engineering inspects them (SOP-006)."
+  "description": "Purchase receipts of items in this group (and its sub-groups) wait in Inspection Required until Engineering inspects them (SOP-006)."
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Item Group-custom_qc_final",
+  "dt": "Item Group",
+  "fieldname": "custom_qc_final",
+  "fieldtype": "Check",
+  "label": "Outgoing (final) inspection required",
+  "insert_after": "custom_qc_required",
+  "module": "ISO Compliance",
+  "description": "Finished production of items in this group (and its sub-groups) waits in Inspection Required until the final inspection, before it can be delivered (SOP-006)."
  },
  {
   "doctype": "Custom Field",

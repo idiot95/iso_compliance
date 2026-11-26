@@ -290,6 +290,10 @@ doc_events = {
 	"Item": {
 		"validate": "iso_compliance.overrides.inspection_flow.item_validate",
 	},
+	# Ticking or unticking incoming inspection on a group reaches its items at once.
+	"Item Group": {
+		"on_update": "iso_compliance.overrides.inspection_flow.item_group_on_update",
+	},
 	# SOP-006 step 3: a batch born from a goods receipt records its supplier,
 	# so identity can be traced back from the shop floor.
 	"Batch": {
