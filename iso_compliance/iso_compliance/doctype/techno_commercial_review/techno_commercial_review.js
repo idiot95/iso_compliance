@@ -183,6 +183,15 @@ function tcr_inject_styles() {
 const tcr_handlers = {
 	setup(frm) {
 		tcr_inject_styles();
+		// A review raised on a quotation can only move to an order made from it.
+		frm.set_query("sales_order", () =>
+			frm.doc.quotation
+				? {
+						query: "iso_compliance.iso_compliance.doctype.techno_commercial_review.techno_commercial_review.orders_from_quotation",
+						filters: { quotation: frm.doc.quotation },
+				  }
+				: {}
+		);
 	},
 
 	refresh(frm) {

@@ -14,7 +14,7 @@ uses the same endpoint and is corrected by the same swap.
 
 import frappe
 from frappe import _
-from frappe.utils import flt, fmt_money
+from frappe.utils import cint, flt, fmt_money
 from erpnext.selling.doctype.sales_order.sales_order import (
 	get_work_order_items as _core_get_work_order_items,
 )
@@ -162,3 +162,114 @@ def get_work_order_items(sales_order, for_raw_material_request=0):
 		if selected:
 			item["bom"] = selected
 	return items
+
+
+# Used by the Sales Order's step 5 (hcc_erp_edits sales_order_steps.js, Abdeali 25-11-2026):
+# the review's state on the order, and opening it with its reviewers right after a save.
+# The review itself is unchanged; the same review serves the Quotation and the order.
+REVIEWER_FIELDS = ("technical_assignee", "costing_assignee", "commercial_assignee")
+
+
+@frappe.whitelist()
+def review_status(sales_order: str):
+	"""Is a review needed for this order, why, and where the latest one stands."""
+	doc = frappe.get_doc("Sales Order", sales_order)
+	doc.check_permission("read")
+	tier = required_tier(doc.base_grand_total)
+	reasons = []
+	if tier:
+		currency = frappe.get_cached_value("Company", doc.company, "default_currency")
+		reasons.append(_("Order value {0}: a {1} review is needed").format(fmt_money(flt(doc.base_grand_total), currency=currency), _(tier)))
+	quotations = sorted({row.prevdoc_docname for row in doc.get("items") or [] if row.get("prevdoc_docname")})
+	reviews = _reviews(sales_orders=_with_predecessor(doc), quotations=quotations)
+	out = {"needed": bool(tier), "reasons": reasons, "review": None, "state": "none", "progress": None}
+	if not reviews:
+		return out
+	latest = reviews[0]
+	review = frappe.get_doc("Techno Commercial Review", latest.name)
+	progress = review.progress()
+	out.update(review=review.name, outcome=latest.outcome, progress={"done": progress["done"], "total": progress["total"]})
+	if latest.docstatus == 0:
+		out["state"] = "open"
+	elif latest.outcome == "Reject":
+		out["state"] = "rejected"
+	elif latest.outcome in PASSING_OUTCOMES:
+		out["state"] = "approved"
+	else:
+		out["state"] = "clarification"
+	return out
+
+
+@frappe.whitelist()
+def reviewer_defaults():
+	"""The three reviewers last picked by this user, else by anyone."""
+	for filters in ({"owner": frappe.session.user}, {}):
+		rows = frappe.get_all(
+			"Techno Commercial Review",
+			filters={**filters, "docstatus": ("<", 2), **{f: ("is", "set") for f in REVIEWER_FIELDS}},
+			fields=list(REVIEWER_FIELDS),
+			order_by="creation desc",
+			limit=1,
+		)
+		if rows:
+			return rows[0]
+	return {}
+
+
+@frappe.whitelist()
+def create_review(
+	sales_order: str,
+	technical_assignee: str,
+	costing_assignee: str,
+	commercial_assignee: str,
+	new_or_first_time_product: int = 0,
+	customer_drawings_design_inputs: int = 0,
+	special_contract_conditions: int = 0,
+	special_statutory_requirements: int = 0,
+):
+	"""Open the order's review with its three reviewers (assigned on insert) and Sales's
+	answers to "Is this order critical?". Returns an existing review for the order instead."""
+	doc = frappe.get_doc("Sales Order", sales_order)
+	doc.check_permission("read")
+	existing = frappe.get_all(
+		"Techno Commercial Review",
+		filters={"sales_order": sales_order, "docstatus": ("<", 2)},
+		pluck="name",
+		order_by="creation desc",
+		limit=1,
+	)
+	if existing:
+		return existing[0]
+	return frappe.get_doc(
+		{
+			"doctype": "Techno Commercial Review",
+			"sales_order": sales_order,
+			"review_stage": "Contract Review",
+			"technical_assignee": technical_assignee,
+			"costing_assignee": costing_assignee,
+			"commercial_assignee": commercial_assignee,
+			"new_or_first_time_product": cint(new_or_first_time_product),
+			"customer_drawings_design_inputs": cint(customer_drawings_design_inputs),
+			"special_contract_conditions": cint(special_contract_conditions),
+			"special_statutory_requirements": cint(special_statutory_requirements),
+		}
+	).insert().name
+
+
+def refresh_open_reviews(doc, method=None):
+	"""The quotation's review is linked to the order made from it, and a saved draft order
+	brings its open draft review's value up to date."""
+	quotations = list({row.prevdoc_docname for row in doc.items if row.get("prevdoc_docname")})
+	if quotations:
+		for name in frappe.get_all(
+			"Techno Commercial Review",
+			filters={"quotation": ("in", quotations), "sales_order": ("is", "not set"), "docstatus": ("<", 2)},
+			pluck="name",
+		):
+			frappe.db.set_value("Techno Commercial Review", name, "sales_order", doc.name, update_modified=False)
+	if doc.docstatus != 0:
+		return
+	for name in frappe.get_all(
+		"Techno Commercial Review", filters={"sales_order": doc.name, "docstatus": 0}, pluck="name"
+	):
+		frappe.get_doc("Techno Commercial Review", name).save(ignore_permissions=True)

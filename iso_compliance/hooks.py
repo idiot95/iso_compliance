@@ -254,6 +254,8 @@ doc_events = {
 	},
 	"Sales Order": {
 		"before_submit": "iso_compliance.overrides.sales_order.enforce_techno_commercial_review",
+		# The quotation's review is linked to the order; an open review follows the order's value.
+		"on_update": "iso_compliance.overrides.sales_order.refresh_open_reviews",
 	},
 	# The same review gate on a Quotation; a review done there carries to its Sales Order.
 	"Quotation": {

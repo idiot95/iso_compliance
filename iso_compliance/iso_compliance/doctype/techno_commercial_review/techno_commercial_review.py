@@ -145,6 +145,13 @@ class TechnoCommercialReview(Document):
 					title=_("Sales Order Missing"),
 				)
 			return self.fetch_from_quotation()
+		if self.quotation and not frappe.db.exists(
+			"Sales Order Item", {"parent": self.sales_order, "prevdoc_docname": self.quotation}
+		):
+			frappe.throw(
+				_("Sales Order {0} was not made from Quotation {1}.").format(self.sales_order, self.quotation),
+				title=_("Wrong Sales Order"),
+			)
 		so = frappe.db.get_value(
 			"Sales Order",
 			self.sales_order,
@@ -408,3 +415,20 @@ def get_progress(review: str):
 	doc = frappe.get_doc("Techno Commercial Review", review)
 	doc.check_permission("read")
 	return doc.progress()
+
+
+@frappe.whitelist()
+@frappe.validate_and_sanitize_search_inputs
+def orders_from_quotation(doctype, txt, searchfield, start, page_len, filters):
+	"""Sales Orders made from the review's quotation, each once."""
+	return frappe.get_list(
+		"Sales Order",
+		filters=[["Sales Order Item", "prevdoc_docname", "=", filters.get("quotation")]],
+		or_filters=[["name", "like", f"%{txt}%"], ["customer_name", "like", f"%{txt}%"]],
+		fields=["name", "customer_name"],
+		group_by="`tabSales Order`.name",
+		order_by="`tabSales Order`.creation desc",
+		limit_start=start,
+		limit_page_length=page_len,
+		as_list=True,
+	)
