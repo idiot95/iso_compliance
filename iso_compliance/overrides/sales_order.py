@@ -273,3 +273,13 @@ def refresh_open_reviews(doc, method=None):
 		"Techno Commercial Review", filters={"sales_order": doc.name, "docstatus": 0}, pluck="name"
 	):
 		frappe.get_doc("Techno Commercial Review", name).save(ignore_permissions=True)
+
+
+def get_dashboard_data(data):
+	"""Connections tab: the order's Techno-Commercial Review (FRM-036), with
+	a count and a + that opens one pre-linked to this order (ERPT-2026-01073)."""
+	data.setdefault("non_standard_fieldnames", {})["Techno Commercial Review"] = "sales_order"
+	data.setdefault("transactions", []).append(
+		{"label": _("Review"), "items": ["Techno Commercial Review"]}
+	)
+	return data

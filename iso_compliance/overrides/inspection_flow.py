@@ -39,10 +39,14 @@ MODULE = "ISO Compliance"
 
 FIELDS = {
 	"Item Group": [
-		dict(fieldname="custom_qc_required", fieldtype="Check", label="Quality inspection required",
+		dict(fieldname="custom_qc_required", fieldtype="Check", label="Incoming inspection required",
 		     insert_after="custom_issue_mtc",
-		     description="Receipts and finished production of items in this group (and its sub-groups) wait in "
+		     description="Purchase receipts of items in this group (and its sub-groups) wait in "
 		                 "Inspection Required until Engineering inspects them (SOP-006)."),
+		dict(fieldname="custom_qc_final", fieldtype="Check", label="Outgoing (final) inspection required",
+		     insert_after="custom_qc_required",
+		     description="Finished production of items in this group (and its sub-groups) waits in "
+		                 "Inspection Required until the final inspection, before it can be delivered (SOP-006)."),
 	],
 	"Purchase Receipt": [
 		dict(fieldname="custom_receiving_section", fieldtype="Section Break", label="Receiving checks",
@@ -111,14 +115,19 @@ def inspection_warehouse(company):
 	return _warehouse(company, INSPECTION_WAREHOUSE)
 
 
-def group_requires_qc(item_group: str | None) -> bool:
+INCOMING, OUTGOING = "custom_qc_required", "custom_qc_final"
+
+
+def group_requires_qc(item_group: str | None, field: str = INCOMING) -> bool:
+	"""The group's own tick or an ancestor's. INCOMING: purchase receipts.
+	OUTGOING: finished production (final inspection)."""
 	from iso_compliance.overrides.purchase_receipt import _group_and_ancestors
 
-	return any(frappe.get_cached_value("Item Group", g, "custom_qc_required") for g in _group_and_ancestors(item_group))
+	return any(frappe.get_cached_value("Item Group", g, field) for g in _group_and_ancestors(item_group))
 
 
-def qc_required(item_code: str | None) -> bool:
-	return bool(item_code) and group_requires_qc(frappe.get_cached_value("Item", item_code, "item_group"))
+def qc_required(item_code: str | None, field: str = INCOMING) -> bool:
+	return bool(item_code) and group_requires_qc(frappe.get_cached_value("Item", item_code, "item_group"), field)
 
 
 def _is_inspection_warehouse(warehouse: str | None) -> bool:
@@ -133,6 +142,16 @@ def item_validate(doc, method=None):
 	if doc.item_group and doc.is_stock_item:
 		doc.inspection_required_before_purchase = 1 if group_requires_qc(doc.item_group) else 0
 	ensure_item_barcode(doc)
+
+
+def item_group_on_update(doc, method=None):
+	"""A changed incoming tick reaches the group's items at once, not on their next save."""
+	before = doc.get_doc_before_save()
+	if before and cint(before.get(INCOMING)) == cint(doc.get(INCOMING)):
+		return
+	for name in frappe.get_all("Item Group", filters={"lft": (">=", doc.lft), "rgt": ("<=", doc.rgt)}, pluck="name"):
+		frappe.db.set_value("Item", {"item_group": name, "is_stock_item": 1}, "inspection_required_before_purchase",
+		                    cint(group_requires_qc(name)), update_modified=False)
 
 
 def ensure_item_barcode(doc):
@@ -202,7 +221,7 @@ def se_before_validate(doc, method=None):
 	if doc.purpose == "Manufacture" and doc.docstatus == 0:
 		wh = inspection_warehouse(doc.company)
 		for row in doc.get("items") or []:
-			if wh and row.is_finished_item and row.t_warehouse and qc_required(row.item_code):
+			if wh and row.is_finished_item and row.t_warehouse and qc_required(row.item_code, OUTGOING):
 				if row.t_warehouse != wh:
 					row.custom_release_warehouse = row.t_warehouse
 				row.t_warehouse = wh

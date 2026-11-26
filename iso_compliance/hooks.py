@@ -292,6 +292,10 @@ doc_events = {
 	"Item": {
 		"validate": "iso_compliance.overrides.inspection_flow.item_validate",
 	},
+	# Ticking or unticking incoming inspection on a group reaches its items at once.
+	"Item Group": {
+		"on_update": "iso_compliance.overrides.inspection_flow.item_group_on_update",
+	},
 	# SOP-006 step 3: a batch born from a goods receipt records its supplier,
 	# so identity can be traced back from the shop floor.
 	"Batch": {
@@ -352,9 +356,9 @@ override_whitelisted_methods = {
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
 # along with any modifications made in other Frappe apps
-# override_doctype_dashboards = {
-# 	"Task": "iso_compliance.task.get_dashboard_data"
-# }
+override_doctype_dashboards = {
+	"Sales Order": "iso_compliance.overrides.sales_order.get_dashboard_data",
+}
 
 # exempt linked doctypes from being automatically cancelled
 #
