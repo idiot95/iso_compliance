@@ -72,6 +72,9 @@ add_to_apps_screen = [
 # include js, css files in header of desk.html
 # app_include_css = "/assets/iso_compliance/css/iso_compliance.css"
 # app_include_js = "/assets/iso_compliance/js/iso_compliance.js"
+# Report Issue: the button on every saved record (EXTERNAL_CHANGES 2026-11-28).
+# The ?v= is bumped with every change to the file so browsers drop their cached copy.
+app_include_js = ["/assets/iso_compliance/js/report_issue.js?v=2026112803"]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/iso_compliance/css/iso_compliance.css"
@@ -113,6 +116,8 @@ doctype_js = {
 	"Purchase Receipt": ["public/js/material_labels.js", "public/js/purchase_receipt.js", "public/js/qi_purchase_receipt.js",
 	                     "public/js/inspection_waiting.js"],
 	"Delivery Note": ["public/js/material_labels.js", "public/js/delivery_note.js"],
+	# Report Issue: the steps of an Issue raised through it, drawn on the form.
+	"Issue": "public/js/issue_steps.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -300,6 +305,14 @@ doc_events = {
 	# so identity can be traced back from the shop floor.
 	"Batch": {
 		"before_insert": "iso_compliance.overrides.batch.before_insert",
+	},
+	# Report Issue: the current step's owner holds the Issue's one open
+	# assignment. Returns at once for an Issue not raised through Report Issue.
+	"Issue": {
+		# a step's answers are changed only by its owner, on their turn
+		"validate": "iso_compliance.issues.engine.guard",
+		"after_insert": "iso_compliance.issues.engine.settle",
+		"on_change": "iso_compliance.issues.engine.settle",
 	},
 }
 
